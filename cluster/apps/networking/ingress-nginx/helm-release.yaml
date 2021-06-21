@@ -21,7 +21,8 @@ spec:
       replicaCount: 1
       service:
         type: LoadBalancer
-        loadBalancerIP: "${INGRESS_NGINX_LB}"
+        # loadBalancerIP: "${INGRESS_NGINX_LB}"
+        externalIp: "${INGRESS_NGINX_LB}"
         externalTrafficPolicy: Local
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
