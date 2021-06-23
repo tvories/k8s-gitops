@@ -22,7 +22,8 @@ spec:
       service:
         type: LoadBalancer
         # loadBalancerIP: "${INGRESS_NGINX_LB}"
-        externalIp: "${INGRESS_NGINX_LB}"
+        externalIps: 
+        - "${INGRESS_NGINX_LB}"
         externalTrafficPolicy: Local
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
@@ -36,7 +37,7 @@ spec:
         default-ssl-certificate: "networking/${SECRET_DOMAIN/./-}-tls"
       resources:
         requests:
-          memory: 100Mi
+          memory: 250Mi
           cpu: 100m
         limits:
-          memory: 500Mi
+          memory: 350Mi
