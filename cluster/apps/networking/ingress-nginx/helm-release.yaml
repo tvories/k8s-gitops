@@ -22,7 +22,7 @@ spec:
       service:
         type: LoadBalancer
         # loadBalancerIP: "${INGRESS_NGINX_LB}"
-        externalIps: 
+        externalIPs: 
         - "${INGRESS_NGINX_LB}"
         externalTrafficPolicy: Local
       config:
