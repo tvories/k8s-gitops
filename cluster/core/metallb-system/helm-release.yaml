@@ -19,6 +19,6 @@ spec:
     configInline:
       address-pools:
       - name: default
-        protocol: bgp
+        protocol: layer2
         addresses:
         - "${METALLB_LB_RANGE}"
