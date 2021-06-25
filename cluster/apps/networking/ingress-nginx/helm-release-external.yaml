@@ -30,8 +30,8 @@ spec:
         use-forwarded-headers: "true"
       tcp:
         annotations:
-          1688: "pykms/pykms:1688"
-          25565: "minecraft/minecraft-minecraft:25565"
+          - 1688: "pykms/pykms:1688"
+          - 25565: "minecraft/minecraft-minecraft:25565"
       metrics:
         enabled: false
         serviceMonitor:
