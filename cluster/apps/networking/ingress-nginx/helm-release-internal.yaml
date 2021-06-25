@@ -22,7 +22,7 @@ spec:
       service:
         type: LoadBalancer
         externalIPs: 
-        - "${INTERNAL_INGRESS_NGINX_LB}"
+        - "${INTERNAL_NGINX_LB}"
         externalTrafficPolicy: Local
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
