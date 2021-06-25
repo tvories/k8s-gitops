@@ -16,6 +16,9 @@ spec:
         name: ingress-nginx-charts
         namespace: flux-system
   values:
+    tcp:
+      "1688": "pykms/pykms:1688"
+      "25565": "minecraft/minecraft-minecraft:25565"
     controller:
       ingressClass: nginx-external
       replicaCount: 1
@@ -28,9 +31,6 @@ spec:
         ssl-protocols: "TLSv1.3 TLSv1.2"
         proxy-body-size: "100m"
         use-forwarded-headers: "true"
-    tcp:
-      "1688": "pykms/pykms:1688"
-      "25565": "minecraft/minecraft-minecraft:25565"
       metrics:
         enabled: false
         serviceMonitor:
