@@ -5,5 +5,7 @@ metadata:
   name: cluster-settings
   namespace: flux-system
 data:
+  INTERNAL_NGINX_LB: 192.168.81.180
+  EXTERNAL_NGINX_LB: 192.168.81.181
   INGRESS_NGINX_LB: 192.168.81.34
   METALLB_LB_RANGE: 192.168.81.170-192.168.81.180
