@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: ingress-nginx
+  name: ingress-nginx-external
   namespace: networking
 spec:
   interval: 5m
@@ -17,13 +17,12 @@ spec:
         namespace: flux-system
   values:
     controller:
-      ingressClass: nginx
+      ingressClass: nginx-external
       replicaCount: 1
       service:
         type: LoadBalancer
-        # loadBalancerIP: "${INGRESS_NGINX_LB}"
         externalIPs: 
-        - "${INGRESS_NGINX_LB}"
+        - "${EXTERNAL_INGRESS_NGINX_LB}"
         externalTrafficPolicy: Local
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
