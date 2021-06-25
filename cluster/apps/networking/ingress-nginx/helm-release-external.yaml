@@ -28,10 +28,10 @@ spec:
         ssl-protocols: "TLSv1.3 TLSv1.2"
         proxy-body-size: "100m"
         use-forwarded-headers: "true"
-      tcp:
-        annotations:
-          - 1688: "pykms/pykms:1688"
-          - 25565: "minecraft/minecraft-minecraft:25565"
+      # tcp:
+      #   annotations:
+      #     - 1688: "pykms/pykms:1688"
+      #     - 25565: "minecraft/minecraft-minecraft:25565"
       metrics:
         enabled: false
         serviceMonitor:
