@@ -1,0 +1,99 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home
+spec:
+  releaseName: home-assistant
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: home-assistant
+      version: 9.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: homeassistant/home-assistant
+      tag: 2021.6.6
+    persistence:
+      config:
+        enabled: true
+        existingClaim: homeassistant-pvc
+    extraEnv:
+      TZ: "America/Denver"
+    # envFrom:
+    # - secretRef:
+    #     name: home-assistant-secrets
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: "nginx-external"
+        kubernetes.io/tls-acme: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+      - host: "hatemp.${SECRET_DOMAIN}"
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - secretName: home-assistant-cert
+        hosts:
+        - "hatemp.${SECRET_DOMAIN}"
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+    mariadb:
+      enabled: false
+    postgresql:
+      enabled: true
+      existingSecret: home-assistant-postgresql-secret
+      persistence:
+        enabled: true
+        existingClaim: homeassistant-postgres-pvc
+    addons:
+      codeserver:
+        enabled: true
+        image:
+          repository: codercom/code-server
+          tag: 3.10.2
+        workingDir: "/config"
+        #TODO: Eventually add a git secret here
+        # git:
+        #   deployKeySecret: home-assistant-code-server-secret
+        env:
+          password: ${SECRET_CODESERVER_PASSWORD}
+        args:
+        - --auth
+        - "none"
+        - --user-data-dir
+        - "/config/.vscode"
+        - --extensions-dir
+        - "/config/.vscode"
+        ingress:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: "nginx-internal"
+            # nginx.ingress.kubernetes.io/auth-url: "https://auth.${SECRET_DOMAIN}/oauth2/auth"
+            # nginx.ingress.kubernetes.io/auth-signin: "https://auth.${SECRET_DOMAIN}/oauth2/start"
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+            kubernetes.io/tls-acme: "true"
+            cert-manager.io/cluster-issuer: letsencrypt-production
+          hosts:
+          - host: "ha-vscode.${SECRET_DOMAIN}"
+            paths:
+            - path: /
+              pathType: Prefix
+          tls:
+          - secretName: ha-vscode-cert
+            hosts:
+            - "ha-vscode.${SECRET_DOMAIN}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+    # podAnnotations:
+    #   secret.reloader.stakater.com/reload: home-assistant-secrets

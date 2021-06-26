@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homeassistant-pvc
+  namespace: home
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-homeassistant
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homeassistant-postgres-pvc
+  namespace: home
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-homeassistant-postgres
+  resources:
+    requests:
+      storage: 1Mi

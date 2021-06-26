@@ -17,7 +17,7 @@ spec:
         namespace: flux-system
   values:
     tcp:
-      "1688": "pykms/pykms:1688"
+      "1688": "default/pykms:1688"
       "25565": "minecraft/minecraft-minecraft:25565"
     controller:
       ingressClass: nginx-external
