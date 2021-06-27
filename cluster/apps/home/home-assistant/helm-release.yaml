@@ -31,20 +31,21 @@ spec:
     # - secretRef:
     #     name: home-assistant-secrets
     ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: "nginx-external"
-        kubernetes.io/tls-acme: "true"
-        cert-manager.io/cluster-issuer: letsencrypt-production
-      hosts:
-      - host: "hatemp.${SECRET_DOMAIN}"
-        paths:
-        - path: /
-          pathType: Prefix
-      tls:
-      - secretName: home-assistant-cert
+      main:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: "nginx-external"
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-        - "hatemp.${SECRET_DOMAIN}"
+        - host: "hatemp.${SECRET_DOMAIN}"
+          paths:
+          - path: /
+            pathType: Prefix
+        tls:
+        - secretName: home-assistant-cert
+          hosts:
+          - "hatemp.${SECRET_DOMAIN}"
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
     mariadb:
