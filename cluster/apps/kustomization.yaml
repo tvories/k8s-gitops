@@ -4,3 +4,4 @@ resources:
 - default
 - networking
 - system-upgrade
+- home
