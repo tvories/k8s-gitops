@@ -5,7 +5,7 @@ metadata:
   name: nfs-homeassistant
 spec:
   storageClassName: nfs-homeassistant
-  capcity:
+  capacity:
     storage: 1Mi
   accessModes:
     - ReadWriteMany
@@ -20,7 +20,7 @@ metadata:
   name: nfs-homeassistant-postgres
 spec:
   storageClassName: nfs-homeassistant-postgres
-  capcity:
+  capacity:
     storage: 1Mi
   accessModes:
     - ReadWriteMany
