@@ -61,7 +61,7 @@ spec:
       enabled: true
       existingSecret: home-assistant-postgresql-secret
       persistence:
-        enabled: true
+        enabled: false
         existingClaim: homeassistant-postgres-pvc
     addons:
       codeserver:
