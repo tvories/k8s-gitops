@@ -18,6 +18,11 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
     image:
       repository: homeassistant/home-assistant
       tag: 2021.6.6
