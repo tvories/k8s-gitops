@@ -8,3 +8,4 @@ resources:
 - metallb-charts.yaml
 - kubernetes-dashboard-charts.yaml
 - kubernetes-sigs.yaml
+- vernemq.yaml
