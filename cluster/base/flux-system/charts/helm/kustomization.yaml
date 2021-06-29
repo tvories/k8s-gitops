@@ -7,3 +7,4 @@ resources:
 - k8s-at-home-charts.yaml
 - metallb-charts.yaml
 - kubernetes-dashboard-charts.yaml
+- kubernetes-sigs.yaml
