@@ -30,10 +30,10 @@ spec:
       - ${VERNEMQ_EXTERNAL_IP}
       ws:
         enabled: true
-        nodePort: 32080
+        nodePort: 8080
       mqtt:
         enabled: true
-        nodePort: 31883
+        nodePort: 8443
     # statefulset:
     #   podAnnotations:
     #     prometheus.io/scrape: "true"
