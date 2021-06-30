@@ -18,6 +18,9 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    statefulset:
+      annotations:
+        secret.reloader.stakater.com/reload: "vernemq-secrets"
     image:
       repository: vernemq/vernemq
       tag: 1.11.0-alpine
@@ -38,9 +41,17 @@ spec:
     #   podAnnotations:
     #     prometheus.io/scrape: "true"
     #     prometheus.io/port: "8888"
+    secretMounts:
+    - name: vernemq-auth
+      secretName: vernemq-secrets
+      path: /vernemq/auth
+
     additionalEnv:
     - name: DOCKER_VERNEMQ_ACCEPT_EULA
       value: "yes"
-    - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
-      value: "on"
+    - name: DOCKER_VERNEMQ_VMQ_PASSWD__PASSWORD_FILE
+      value: /vernemq/auth/vmq.passwd
+    - name: DOCKER_VERNEMQ_VMQ_ACL__ACL_FILE
+      value: /vernemq/auth/vmq.acl
+
     podAntiAffinity: hard
