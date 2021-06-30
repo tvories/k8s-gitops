@@ -53,5 +53,9 @@ spec:
       value: /vernemq/auth/vmq.passwd
     - name: DOCKER_VERNEMQ_VMQ_ACL__ACL_FILE
       value: /vernemq/auth/vmq.acl
+    - name: DOCKER_VERNEMQ_PLUGINS__VMQ_PASSWD
+      value: "on"
+    - name: DOCKER_VERNEMQ_PLUGINS__VMQ_ACL
+      value: "on"
 
     podAntiAffinity: hard
