@@ -7,5 +7,5 @@ resources:
 # - mealie
 # - node-red
 - vernemq
-# - zigbee2mqtt
+- zigbee2mqtt
 # - zwavejs2mqtt
