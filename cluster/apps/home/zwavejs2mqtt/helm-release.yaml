@@ -22,7 +22,7 @@ spec:
       tag: 5.2.1
     env:
       TZ: "America/Denver"
-      NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
+      # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
     securityContext:
       privileged: true
     ingress:
