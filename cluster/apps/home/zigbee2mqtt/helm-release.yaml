@@ -1,0 +1,91 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: zigbee2mqtt
+  namespace: home
+spec:
+  dependsOn:
+  - name: vernemq
+    namespace: home
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: zigbee2mqtt
+      version: 8.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/koenkk/zigbee2mqtt
+      tag: 1.19.1
+
+    env:
+      TZ: "America/Denver"
+      ZIGBEE2MQTT_DATA: /data
+      # DEBUG: "zigbee-herdsman*"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: zigbee2mqtt-pvc
+        mountPath: /data
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+        hostPathType: CharDevice
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+
+        hosts:
+        - host: zig.${SECRET_DOMAIN}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: tls.zigbee2mqtt
+          hosts:
+          - zig.${SECRET_DOMAIN}
+
+    config:
+      mqtt:
+        base_topic: zigbee2mqtt
+        server: "mqtt://vernemq"
+        user: ${ZIGBEE2MQTT_MQTT_USER}
+        password: ${ZIGBEE2MQTT_MQTT_PASSWORD}
+
+      homeassistant: true
+
+      device_options:
+        retain: true
+
+      permit_join: false
+
+      serial:
+        port: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+
+      advanced:
+        log_output:
+        - console
+        network_key: GENERATE
+        # pan_id: 6752
+
+      # Both of these need to be enabled for the webui
+      frontend:
+        port: 8080
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - {key: "feature.node.kubernetes.io/custom-zigbee", operator: In, values: ["true"]}
