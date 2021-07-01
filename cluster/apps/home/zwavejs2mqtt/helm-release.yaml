@@ -33,13 +33,13 @@ spec:
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-        - host: "zwave.${SECRET_DOMAIN}"
+        - host: "zw.${SECRET_DOMAIN}"
           paths:
           - path: /
             pathType: Prefix
         tls:
         - hosts:
-          - "zwave.${SECRET_DOMAIN}"
+          - "zw.${SECRET_DOMAIN}"
           secretName: zwave-cert
     persistence:
       config:
