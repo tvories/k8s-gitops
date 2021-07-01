@@ -28,6 +28,9 @@ spec:
       TZ: "America/Denver"
       ZIGBEE2MQTT_DATA: /data
       # DEBUG: "zigbee-herdsman*"
+    
+    securityContext:
+      privileged: true
 
     persistence:
       config:
