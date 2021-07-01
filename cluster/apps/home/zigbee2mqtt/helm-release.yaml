@@ -81,7 +81,7 @@ spec:
       advanced:
         log_output:
         - console
-        network_key: GENERATE
+        network_key: [9, 3, 2, 7, 9, 3, 13, 15, 0, 2, 13, 6, 8, 11, 12, 13]
         # pan_id: 6752
 
       # Both of these need to be enabled for the webui
