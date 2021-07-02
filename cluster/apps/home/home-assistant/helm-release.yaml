@@ -45,14 +45,14 @@ spec:
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         hosts:
-        - host: "hatemp.${SECRET_DOMAIN}"
+        - host: "ha.${SECRET_DOMAIN}"
           paths:
           - path: /
             pathType: Prefix
         tls:
         - secretName: home-assistant-cert
           hosts:
-          - "hatemp.${SECRET_DOMAIN}"
+          - "ha.${SECRET_DOMAIN}"
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
     mariadb:
