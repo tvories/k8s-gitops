@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/hatemp
+    path: /mnt/fatguys/k8s/homeassistant
     server: ${SECRET_NAS1}
 
 ---
@@ -25,7 +25,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/hatemp-postgres
+    path: /mnt/fatguys/k8s/homeassistant-db
     server: ${SECRET_NAS1}
 
 ---
