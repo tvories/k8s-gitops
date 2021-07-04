@@ -1,0 +1,39 @@
+---
+api_version: v1
+kind: Service
+metadata:
+  name: gitlab
+  namespace: web
+spec:
+  externalName: "gitlab.${SECRET_INTERNAL_DOMAIN}"
+  type: ExternalName
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gitlab-ingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx-external
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+spec:
+  rules:
+  - host: gitlab.${SECRET_DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          serviceName: gitlab
+          servicePort: 8083
+  tls:
+  - hosts:
+    - gitlab.${SECRET_DOMAIN}
+    secretName: gitlab-cert
+status:
+  loadBalancer: {}
