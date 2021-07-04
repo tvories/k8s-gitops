@@ -17,17 +17,19 @@ definition:
         error_page 404 "https://taylorvories.com/404.html";
         proxy_intercept_errors on;
   spec:
+    rules:
+    - host: taylorvories.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: taylorvories-com
+            servicePort: 80
     tls:
     - hosts:
       - taylorvories.com
       - www.taylorvories.com
       secretName: taylorvories-com
-    rules:
-    - host: taylorvories.com
-      http:
-        paths:
-        - backend:
-            serviceName: taylorvories-com
-            servicePort: 80
   status:
     loadBalancer: {}
