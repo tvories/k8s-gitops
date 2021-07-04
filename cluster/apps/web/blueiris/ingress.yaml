@@ -33,6 +33,7 @@ spec:
         backend:
           service: 
             name: blueiris
-            port: 81
+            port:
+              number: 81
 status:
   loadBalancer: {}

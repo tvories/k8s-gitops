@@ -24,7 +24,8 @@ spec:
         backend:
           service:
             name: taylorvories-com
-            port: 80
+            port:
+              number: 80
   tls:
   - hosts:
     - taylorvories.com

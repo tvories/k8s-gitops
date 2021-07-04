@@ -32,7 +32,8 @@ spec:
         backend:
           service:
             name: gitlab
-            port: 8083
+            port: 
+              number: 8083
   tls:
   - hosts:
     - gitlab.${SECRET_DOMAIN}
