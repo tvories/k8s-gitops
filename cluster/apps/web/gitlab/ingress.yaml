@@ -30,8 +30,9 @@ spec:
       - path: /
         pathType: Prefix
         backend:
-          serviceName: gitlab
-          servicePort: 8083
+          service:
+            name: gitlab
+            port: 8083
   tls:
   - hosts:
     - gitlab.${SECRET_DOMAIN}

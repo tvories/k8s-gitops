@@ -31,7 +31,8 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: blueiris
-          servicePort: 81
+          service: 
+            name: blueiris
+            port: 81
 status:
   loadBalancer: {}

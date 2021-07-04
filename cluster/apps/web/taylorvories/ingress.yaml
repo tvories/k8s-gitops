@@ -22,8 +22,9 @@ spec:
       - path: /
         pathType: Prefix
         backend:
-          serviceName: taylorvories-com
-          servicePort: 80
+          service:
+            name: taylorvories-com
+            port: 80
   tls:
   - hosts:
     - taylorvories.com
