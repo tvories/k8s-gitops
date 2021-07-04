@@ -1,35 +1,33 @@
 ---
-state: present
-definition:
-  apiVersion: extensions/v1beta1
-  kind: Ingress
-  metadata:
-    name: taylorvories-com-ingress
-    namespace: web
-    annotations:
-      ingress.kubernetes.io/ssl-redirect: "true"
-      kubernetes.io/tls-acme: "true"
-      kubernetes.io/ingress.class: nginx-external
-      cert-manager.io/cluster-issuer: "letsencrypt-prod"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-      nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
-      nginx.ingress.kubernetes.io/server-snippet: |
-        error_page 404 "https://taylorvories.com/404.html";
-        proxy_intercept_errors on;
-  spec:
-    rules:
-    - host: taylorvories.com
-      http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            serviceName: taylorvories-com
-            servicePort: 80
-    tls:
-    - hosts:
-      - taylorvories.com
-      - www.taylorvories.com
-      secretName: taylorvories-com
-  status:
-    loadBalancer: {}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: taylorvories-com-ingress
+  namespace: web
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx-external
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      error_page 404 "https://taylorvories.com/404.html";
+      proxy_intercept_errors on;
+spec:
+  rules:
+  - host: taylorvories.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          serviceName: taylorvories-com
+          servicePort: 80
+  tls:
+  - hosts:
+    - taylorvories.com
+    - www.taylorvories.com
+    secretName: taylorvories-com
+status:
+  loadBalancer: {}
