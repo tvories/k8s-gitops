@@ -11,3 +11,17 @@ spec:
   resources:
     requests:
       storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: adguard-config-pvc
+  namespace: networking
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-adguard-config
+  resources:
+    requests:
+      storage: 1Mi
