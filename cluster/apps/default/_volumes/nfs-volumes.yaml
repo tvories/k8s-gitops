@@ -72,3 +72,18 @@ spec:
   nfs:
     path: /mnt/fatguys/k8s/esphome
     server: ${SECRET_NAS1}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-adguard
+spec:
+  storageClassName: nfs-adguard
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/k8s/adguard
+    server: ${SECRET_NAS1}
