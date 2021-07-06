@@ -67,3 +67,8 @@ spec:
         cpu: 35m
       limits:
         memory: 750Mi
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    
