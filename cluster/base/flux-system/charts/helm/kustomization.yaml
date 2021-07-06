@@ -9,3 +9,4 @@ resources:
 - kubernetes-dashboard-charts.yaml
 - kubernetes-sigs.yaml
 - vernemq.yaml
+- gitlab-charts.yaml
