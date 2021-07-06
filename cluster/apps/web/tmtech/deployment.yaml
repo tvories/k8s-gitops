@@ -1,0 +1,74 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmtech-landing
+  namespace: web
+  labels:
+    k8s-app: tmtech-landing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: tmtech-landing
+  template:
+    metadata:
+      labels:
+        k8s-app: tmtech-landing
+    spec:
+      containers:
+      - name: tmtech-landing
+        image: tvories/tmtechme:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: tmtech-landing
+  name: tmtech-landing
+  namespace: web
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: tmtech-landing
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tmtech-ingress
+  namespace: web
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx-external
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+spec:
+  rules:
+  - host: tmtech.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tmtech-landing
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - tmtech.me
+    - www.tmtech.me
+    secretName: tmtech-cert
+status:
+  loadBalancer: {}
