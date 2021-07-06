@@ -28,7 +28,7 @@ spec:
       privileged: true
       cache_dir: cache
       imagePullPolicy: "if-not-present"
-      serviceAccountName: gitlab-admin
+      # serviceAccountName: gitlab-admin
       namespace: default
       env:
           DOCKER_HOST: tcp://docker:2375
