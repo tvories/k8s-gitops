@@ -102,3 +102,18 @@ spec:
   nfs:
     path: /mnt/fatguys/k8s/adguard-config
     server: ${SECRET_NAS1}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-unifi
+spec:
+  storageClassName: nfs-unifi
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/k8s/unifi
+    server: ${SECRET_NAS1}
