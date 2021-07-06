@@ -1,0 +1,69 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: unifi
+  namespace: networking
+spec:
+  interval: 5m
+  releaseName: unifi
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: unifi
+      version: 2.0.4
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: jacobalberty/unifi
+      tag: v6.2.26
+    persistence:
+      enabled: true
+      existingClaim: unifi-pvc
+    timezone: "America/Denver"
+    runAsRoot: true
+    ingress:
+      enabled: true
+      annotations:
+        ingress.kubernetes.io/ssl-redirect: "true"
+        kubernetes.io/ingress.class: "nginx-internal"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        kubernetes.io/tls-acme: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - "unifi.${SECRET_DOMAIN}"
+      tls:
+        - hosts:
+            - "unifi.${SECRET_DOMAIN}"
+          secretName: unifi-cert
+    guiService:
+      type: LoadBalancer
+      externalIPs:
+        - ${UNIFI_LB}
+    controllerService:
+      type: LoadBalancer
+      externalTrafficPolicy: Local
+      externalIPs:
+        - ${UNIFI_LB}
+    stunService:
+      type: LoadBalancer
+      externalTrafficPolicy: Local
+      externalIPs:
+        - ${UNIFI_LB}
+    discoveryService:
+      type: LoadBalancer
+      externalTrafficPolicy: Local
+      externalIPs:
+        - ${UNIFI_LB}
+    # podAnnotations:
+    #   backup.velero.io/backup-volumes: unifi-data
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 35m
+      limits:
+        memory: 750Mi
