@@ -34,7 +34,7 @@ spec:
           DOCKER_HOST: tcp://docker:2375
           DOCKER_TLS_CERTDIR: ""
 
-    rbac:
-      create: false
-      serviceAccountName: gitlab-admin
-      clusterWideAccess: true
+    # rbac:
+    #   create: false
+    #   serviceAccountName: gitlab-admin
+    #   clusterWideAccess: true
