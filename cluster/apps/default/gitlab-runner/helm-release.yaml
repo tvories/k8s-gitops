@@ -9,12 +9,13 @@ spec:
   chart:
     spec:
       # renovate: registryUrl=https://charts.gitlab.io
-      chart: gitlab-charts
+      chart: gitlab-runner
       version: 0.30.0
       sourceRef:
         kind: HelmRepository
-        name: gitlab/gitlab-runner
+        name: gitlab-charts
         namespace: flux-system
+      interval: 5m
   values:
     image: gitlab/gitlab-runner:alpine-v14.0.1
     imagePullPolicy: IfNotPresent
