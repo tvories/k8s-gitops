@@ -21,16 +21,16 @@ spec:
     image:
       tag: 20.0.11-apache
 
-    ingress:
-      enabled: true
-      annotations:
-        ingress.kubernetes.io/ssl-redirect: "true"
-        kubernetes.io/tls-acme: "true"
-        kubernetes.io/ingress.class: nginx-external
-        cert-manager.io/cluster-issuer: "letsencrypt-prod"
-        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
-        nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+    # ingress:
+    #   enabled: true
+    #   annotations:
+    #     ingress.kubernetes.io/ssl-redirect: "true"
+    #     kubernetes.io/tls-acme: "true"
+    #     kubernetes.io/ingress.class: nginx-external
+    #     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    #     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    #     nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+    #     nginx.ingress.kubernetes.io/proxy-body-size: "10G"
         # nginx.ingress.kubernetes.io/proxy-buffering: "off"
         # nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         # nginx.ingress.kubernetes.io/server-snippet: |-
@@ -57,10 +57,10 @@ spec:
         #   location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
         #     deny all;
         #   }
-      tls:
-        - hosts:
-          - nc.${SECRET_DOMAIN}
-          secretName: nc-cert
+      # tls:
+      #   - hosts:
+      #     - nc.${SECRET_DOMAIN}
+          # secretName: nc-cert
         
     # nextcloud:
     #   configs:
@@ -81,19 +81,19 @@ spec:
     #               'port' => 6379,
     #             ),
     #         );
-      host: nc.${SECRET_DOMAIN}
+      # host: nc.${SECRET_DOMAIN}
       # username: admin
       # password: changeme
-      mail:
-        enabled: true
-        fromAddress: ${SECRET_NEXTCLOUD_MAIL_USER}
-        domain: ${SECRET_DOMAIN}
-        smtp:
-          host: ${SECRET_SMTP_HOST}
-          secure: ssl
-          port: 465
-          name: ${SECRET_NEXTCLOUD_MAIL_USER}
-          password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
+      # mail:
+      #   enabled: true
+      #   fromAddress: ${SECRET_NEXTCLOUD_MAIL_USER}
+      #   domain: ${SECRET_DOMAIN}
+      #   smtp:
+      #     host: ${SECRET_SMTP_HOST}
+      #     secure: ssl
+      #     port: 465
+      #     name: ${SECRET_NEXTCLOUD_MAIL_USER}
+      #     password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
 
     internalDatabase:
       enabled: false
@@ -111,7 +111,7 @@ spec:
       cluster:
         enabled: false
       usePassword: true
-      password: ${$SECRET_NEXTCLOUD_REDIS_PASSWORD}
+      password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
       master:
         persistence:
           enabled: false
