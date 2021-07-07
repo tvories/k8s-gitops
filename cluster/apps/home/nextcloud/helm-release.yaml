@@ -19,7 +19,8 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 21.0.2-apache
+      tag: 21.0.3-apache
+      pullPolicy: Always
 
     ingress:
       enabled: true
