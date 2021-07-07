@@ -10,3 +10,4 @@ resources:
 - kubernetes-sigs.yaml
 - vernemq.yaml
 - gitlab-charts.yaml
+- nextcloud-charts.yaml

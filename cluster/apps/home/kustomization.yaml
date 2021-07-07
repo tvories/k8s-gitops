@@ -9,3 +9,4 @@ resources:
 - vernemq
 - zigbee2mqtt
 - zwavejs2mqtt
+- nextcloud
