@@ -20,7 +20,6 @@ spec:
   values:
     image:
       tag: 21.0.3-apache
-      pullPolicy: Always
 
     ingress:
       enabled: true
