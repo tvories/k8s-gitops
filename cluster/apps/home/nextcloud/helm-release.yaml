@@ -64,23 +64,23 @@ spec:
         
     nextcloud:
       configs:
-        custom.config.php: |-
-          <?php
-            $CONFIG = array (
-              'overwriteprotocol' => 'https',
-              'filelocking.enabled' => 'true',
-              'memcache.distributed' => '\\OC\\Memcache\\Redis',
-              'memcache.locking' => '\\OC\\Memcache\\Redis',
-              'memcache.local' => '\\OC\\Memcache\\Redis',
-              'trusted_proxies' => ['10.43.0.0/16'],
-              'trusted_domains' => ['nc.${SECRET_DOMAIN}'],
-              'redis' =>
-                array (
-                  'host' => 'nextcloud-k8-prod-redis-master',
-                  'password' => '${SECRET_NEXTCLOUD_REDIS_PASSWORD}',
-                  'port' => 6379,
-                ),
-            );
+        # custom.config.php: |-
+        #   <?php
+        #     $CONFIG = array (
+        #       'overwriteprotocol' => 'https',
+        #       'filelocking.enabled' => 'true',
+        #       'memcache.distributed' => '\\OC\\Memcache\\Redis',
+        #       'memcache.locking' => '\\OC\\Memcache\\Redis',
+        #       'memcache.local' => '\\OC\\Memcache\\Redis',
+        #       'trusted_proxies' => ['10.43.0.0/16'],
+        #       'trusted_domains' => ['nc.${SECRET_DOMAIN}'],
+        #       'redis' =>
+        #         array (
+        #           'host' => 'nextcloud-k8-prod-redis-master',
+        #           'password' => '${SECRET_NEXTCLOUD_REDIS_PASSWORD}',
+        #           'port' => 6379,
+        #         ),
+        #     );
       host: nc.${SECRET_DOMAIN}
       username: admin
       password: changeme
@@ -107,7 +107,7 @@ spec:
       user: ncuser
 
     redis:
-      enabled: false
+      enabled: true
       cluster:
         enabled: false
       usePassword: true
