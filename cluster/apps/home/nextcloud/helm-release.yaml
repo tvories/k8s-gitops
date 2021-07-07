@@ -19,7 +19,7 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 20.0.11-apache
+      tag: 21.0.3-apache
 
     ingress:
       enabled: true
