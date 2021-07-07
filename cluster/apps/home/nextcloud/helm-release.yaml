@@ -39,9 +39,10 @@ spec:
           - nc.${SECRET_DOMAIN}
           secretName: nc-cert
         
-      host: nc
+    nextcloud:
+      host: nc.${SECRET_DOMAIN}
       username: admin
-      password: changeme
+      password: ${SECRET_NEXTCLOUD_}
       mail:
         enabled: true
         fromAddress: ${SECRET_NEXTCLOUD_MAIL_USER}
