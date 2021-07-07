@@ -44,7 +44,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tmtech-ingress
+  name: taylorvories-com-ingress
   namespace: web
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -54,21 +54,21 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
 spec:
-  rules:
-  - host: tmtech.me
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: tmtech-landing
-            port:
-              number: 80
   tls:
   - hosts:
     - tmtech.me
     - www.tmtech.me
     secretName: tmtech-cert
+  rules:
+  - host: tmtech.me
+    http:
+      paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: tmtech-landing
+            port:
+              number: 80
 status:
   loadBalancer: {}
