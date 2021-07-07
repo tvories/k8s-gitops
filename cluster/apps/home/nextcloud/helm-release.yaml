@@ -64,7 +64,7 @@ spec:
           secretName: nc-cert
         
     nextcloud:
-      configs:
+      # configs:
         # custom.config.php: |-
         #   <?php
         #     $CONFIG = array (
