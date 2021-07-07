@@ -78,7 +78,7 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: nextcloud-k8-prod-postgresql
+      host: nextcloud-postgresql
       database: nextcloud
       password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
       user: ncuser
