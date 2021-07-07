@@ -18,8 +18,11 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    nginx:
+      ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
+      enabled: true
     image:
-      tag: 21.0.3-apache
+      tag: 21.0.3-fpm
 
     ingress:
       enabled: true
