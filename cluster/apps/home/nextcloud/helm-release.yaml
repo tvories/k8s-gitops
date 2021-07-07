@@ -33,54 +33,54 @@ spec:
         nginx.ingress.kubernetes.io/proxy-body-size: "10G"
         # nginx.ingress.kubernetes.io/proxy-buffering: "off"
         # nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-        nginx.ingress.kubernetes.io/server-snippet: |-
-          server_tokens off;
-          proxy_hide_header X-Powered-By;
+        # nginx.ingress.kubernetes.io/server-snippet: |-
+        #   server_tokens off;
+        #   proxy_hide_header X-Powered-By;
 
-          rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
-          rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
-          rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
-          location = /.well-known/carddav {
-            return 301 $scheme://$host/remote.php/dav;
-          }
-          location = /.well-known/caldav {
-            return 301 $scheme://$host/remote.php/dav;
-          }
-          location = /robots.txt {
-            allow all;
-            log_not_found off;
-            access_log off;
-          }
-          location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
-            deny all;
-          }
-          location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
-            deny all;
-          }
+        #   rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+        #   rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+        #   rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+        #   location = /.well-known/carddav {
+        #     return 301 $scheme://$host/remote.php/dav;
+        #   }
+        #   location = /.well-known/caldav {
+        #     return 301 $scheme://$host/remote.php/dav;
+        #   }
+        #   location = /robots.txt {
+        #     allow all;
+        #     log_not_found off;
+        #     access_log off;
+        #   }
+        #   location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+        #     deny all;
+        #   }
+        #   location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+        #     deny all;
+        #   }
       tls:
         - hosts:
           - nc.${SECRET_DOMAIN}
           secretName: nc-cert
         
-    nextcloud:
-      configs:
-        custom.config.php: |-
-          <?php
-            $CONFIG = array (
-              'overwriteprotocol' => 'https',
-              'filelocking.enabled' => 'true',
-              'memcache.distributed' => '\\OC\\Memcache\\Redis',
-              'memcache.locking' => '\\OC\\Memcache\\Redis',
-              'memcache.local' => '\\OC\\Memcache\\Redis',
-              'trusted_proxies' => ['10.43.0.0/16'],
-              'trusted_domains' => ['nc.${SECRET_DOMAIN}'],
-              'redis' =>
-                array (
-                  'host' => 'nextcloud-k8-prod-redis-master',
-                  'password' => '${SECRET_NEXTCLOUD_REDIS_PASSWORD}',
-                  'port' => 6379,
-                ),
-            );
+    # nextcloud:
+    #   configs:
+    #     custom.config.php: |-
+    #       <?php
+    #         $CONFIG = array (
+    #           'overwriteprotocol' => 'https',
+    #           'filelocking.enabled' => 'true',
+    #           'memcache.distributed' => '\\OC\\Memcache\\Redis',
+    #           'memcache.locking' => '\\OC\\Memcache\\Redis',
+    #           'memcache.local' => '\\OC\\Memcache\\Redis',
+    #           'trusted_proxies' => ['10.43.0.0/16'],
+    #           'trusted_domains' => ['nc.${SECRET_DOMAIN}'],
+    #           'redis' =>
+    #             array (
+    #               'host' => 'nextcloud-k8-prod-redis-master',
+    #               'password' => '${SECRET_NEXTCLOUD_REDIS_PASSWORD}',
+    #               'port' => 6379,
+    #             ),
+    #         );
       host: nc.${SECRET_DOMAIN}
       # username: admin
       # password: changeme
