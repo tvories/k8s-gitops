@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-minecraft
-  namespace: home
+  namespace: games
 spec:
   accessModes:
   - ReadWriteMany
