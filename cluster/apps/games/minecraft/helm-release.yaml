@@ -27,10 +27,7 @@ spec:
         cpu: 500m
 
     minecraftServer:
-      loadBalancerIP:
-        externalTrafficPolicy: Local
-        externalIPs:
-        - ${MINECRAFT_LB}
+      loadBalancerIP: ${MINECRAFT_LB}
       eula: "TRUE"
       version: "LATEST"
       type: "PAPER"
