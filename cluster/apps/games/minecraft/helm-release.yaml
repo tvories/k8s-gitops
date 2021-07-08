@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minecraft
+  namespace: games
+spec:
+  releaseName: minecraft
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://itzg.github.io/minecraft-server-charts/
+      chart: minecraft
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: minecraft-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image: itzg/minecraft-server
+    imageTag: latest
+
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 500m
+
+    minecraftServer:
+      eula: "TRUE"
+      version: "LATEST"
+      type: "PAPER"
+      # bukkitDownloadUrl: https://cdn.getbukkit.org/craftbukkit/craftbukkit-1.16.5.jar
+      paperDownloadUrl: https://papermc.io/api/v2/projects/paper/versions/1.17.1/builds/90/downloads/paper-1.17.1-90.jar
+      # downloadModpackUrl: https://media.forgecdn.net/files/3047/439/SevTech-Ages_3.1.7.zip
+      difficulty: normal
+      # whitelist:
+      ops: McBadarse
+
+
+      dynmap:
+        service:
+          enabled: true
+        ingress:
+          enabled: true
+          annotations:
+            ingress.kubernetes.io/ssl-redirect: "true"
+            service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+            kubernetes.io/ingress.class: nginx-external
+            kubernetes.io/tls-acme: "true"
+            cert-manager.io/cluster-issuer: "letsencrypt-production"
+            nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          hosts:
+            - host: dynmap.${SECRET_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Exact
+          tls:
+            - hosts:
+              - dynmap.${SECRET_DOMAIN}
+              secretName: dynmap-cert
+
+    persistence:
+      dataDir:
+        enabled: true
+        existingClaim: pvc-minecraft
