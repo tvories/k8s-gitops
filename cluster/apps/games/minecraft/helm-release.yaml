@@ -27,6 +27,7 @@ spec:
         cpu: 500m
 
     minecraftServer:
+      serviceType: LoadBalancer
       loadBalancerIP: ${MINECRAFT_LB}
       eula: "TRUE"
       version: "LATEST"
