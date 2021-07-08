@@ -58,7 +58,7 @@ spec:
   - hosts:
     - tmtech.me
     - www.tmtech.me
-    secretName: tmtech-cert-mmcvj
+    secretName: tmtech-cert
   rules:
   - host: tmtech.me
     http:

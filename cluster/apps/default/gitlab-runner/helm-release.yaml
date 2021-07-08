@@ -19,7 +19,7 @@ spec:
   values:
     image: gitlab/gitlab-runner:alpine-v14.0.1
     imagePullPolicy: IfNotPresent
-    gitlabUrl: https://gitlab.t-vo.us
+    gitlabUrl: https://gitlab.${SECRET_DOMAIN}
     runnerRegistrationToken: ${SECRET_GITLAB_RUNNER_TOKEN}
     concurrent: 20
     unregisterRunners: true
