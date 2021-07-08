@@ -6,3 +6,4 @@ resources:
 - networking.yaml
 - home.yaml
 - web.yaml
+- games
