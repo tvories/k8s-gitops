@@ -29,7 +29,6 @@ spec:
     minecraftServer:
       serviceType: LoadBalancer
       loadBalancerIP: ${MINECRAFT_LB}
-      externalTrafficPolicy: Local
       eula: "TRUE"
       version: "LATEST"
       type: "PAPER"
