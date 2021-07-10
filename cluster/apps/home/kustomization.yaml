@@ -10,3 +10,4 @@ resources:
 - zigbee2mqtt
 - zwavejs2mqtt
 - nextcloud
+- emqx
