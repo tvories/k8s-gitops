@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kms
+  labels:
+    k8s-app: kms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kms
+  template:
+    metadata:
+      labels:
+        k8s-app: kms
+    spec:
+      containers:
+      - name: kms
+        image: teddysun/kms
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 1688
+          protocol: TCP
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kms
+  name: kms
+spec:
+  ports:
+    - port: 1688
+      targetPort: 1688
+  selector:
+    k8s-app: kms
+  type: LoadBalancer
+  externalIPs:
+    - "192.168.81.38"
