@@ -2,11 +2,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: vernemq
+  name: emqx
   namespace: home
 spec:
   interval: 5m
-  releaseName: vernemq
+  releaseName: emqx
   chart:
     spec:
       # renovate: registryUrl=https://repos.emqx.io/charts
