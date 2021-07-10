@@ -12,3 +12,4 @@ resources:
 - gitlab-charts.yaml
 - nextcloud-charts.yaml
 - minecraft-charts.yaml
+- emqx-charts.yaml
