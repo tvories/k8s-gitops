@@ -25,6 +25,14 @@ spec:
       NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
     securityContext:
       privileged: true
+    service:
+      ws:
+        enabled: true
+        primary: false
+        ports:
+          ws:
+            enabled: true
+            port: 3000
     ingress:
       main:
         enabled: true
