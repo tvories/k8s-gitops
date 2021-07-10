@@ -38,6 +38,7 @@ spec:
         tls:
         - hosts:
           - emqx.${SECRET_DOMAIN}
+          secretName: emqx-cert
     emqxConfig:
       EMQX_ALLOW_ANONYMOUS: "false"
       EMQX_ADMIN_PASSWORD: "${SECRET_EMQX_ADMIN_PASSWORD}"
