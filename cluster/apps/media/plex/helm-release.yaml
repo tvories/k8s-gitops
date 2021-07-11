@@ -23,11 +23,11 @@ spec:
       tag: v1.23.3.4707-ebb5fe9f3
     env:
       TZ: "America/Denver"
-    podSecurityContext:
-      supplementalGroups:
-      - 44
-      - 109
-      - 100
+    # podSecurityContext:
+    #   supplementalGroups:
+    #   - 44
+    #   - 109
+    #   - 100
     service:
       main:
         enabled: true
@@ -64,6 +64,7 @@ spec:
         enabled: true
         existingClaim: pvc-media
         mountPath: /data
+        readOnly: true
     # podAnnotations:
     #   configmap.reloader.stakater.com/reload: "plex-promtail"
     # addons:
