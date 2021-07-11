@@ -162,3 +162,33 @@ spec:
   nfs:
     path: /mnt/fatguys/k8s/minecraft
     server: ${SECRET_NAS1}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-plex-config
+spec:
+  storageClassName: nfs-plex-config
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/k8s/plex-config
+    server: ${SECRET_NAS1}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-media
+spec:
+  storageClassName: nfs-media
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/Media
+    server: ${SECRET_NAS1}
