@@ -7,3 +7,4 @@ resources:
 - home.yaml
 - web.yaml
 - games.yaml
+- media
