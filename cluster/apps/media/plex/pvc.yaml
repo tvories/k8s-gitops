@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-plex-config
+  namespace: games
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-plex-config
+  resources:
+    requests:
+      storage: 1Mi

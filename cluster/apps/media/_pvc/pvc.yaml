@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-media
+  namespace: networking
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-media
+  resources:
+    requests:
+      storage: 1Mi
