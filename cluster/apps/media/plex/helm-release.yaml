@@ -18,7 +18,7 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    mage:
+    image:
       repository: ghcr.io/k8s-at-home/plex
       tag: v1.23.3.4707-ebb5fe9f3
     env:
