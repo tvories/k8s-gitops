@@ -25,7 +25,7 @@ spec:
       tag: v4.3.5
       pullPolicy: Always
 
-    hostname: qb
+    # hostname: qb
 
     podAnnotations:
       setGateway: "true"
@@ -34,8 +34,8 @@ spec:
       supplementalGroups:
       - 65539
 
-    settings:
-      automaticPortSetup: true
+    # settings:
+    #   automaticPortSetup: true
 
     env:
       TZ: "America/Denver"
