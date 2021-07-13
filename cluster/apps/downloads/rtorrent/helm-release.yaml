@@ -31,6 +31,7 @@ spec:
       config:
         enabled: true
         existingClaim: pvc-rtorrent-config
+        mountPath: /config
       media:
         enabled: true
         type: custom
