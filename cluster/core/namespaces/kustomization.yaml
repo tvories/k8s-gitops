@@ -8,3 +8,4 @@ resources:
 - web.yaml
 - games.yaml
 - media.yaml
+- downloads.yaml
