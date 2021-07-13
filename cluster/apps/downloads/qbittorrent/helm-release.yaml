@@ -28,7 +28,7 @@ spec:
     hostname: qbittorrent
 
     podAnnotations:
-      setGateway: "false"
+      setGateway: "true"
 
     podSecurityContext:
       supplementalGroups:
