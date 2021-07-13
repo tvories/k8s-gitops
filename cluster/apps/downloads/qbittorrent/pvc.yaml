@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-qb-config
+  namespace: downloads
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs-qb-config
+  resources:
+    requests:
+      storage: 1Mi
