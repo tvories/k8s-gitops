@@ -1,0 +1,80 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+  namespace: downloads
+spec:
+  dependsOn:
+  - name: vpn-gateway
+    namespace: vpn
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: qbittorrent
+      version: 11.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/qbittorrent
+      tag: v4.3.5
+      pullPolicy: Always
+
+    hostname: qbittorrent
+
+    podAnnotations:
+      setGateway: "true"
+
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
+
+    settings:
+      automaticPortSetup: true
+
+    env:
+      TZ: "America/Denver"
+      UMASK: "022"
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: pvc-qb-config
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Media
+        mountPath: /data/nas-media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          kubernetes.io/ingress.class: "nginx-internal"
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+        hosts:
+        - host: qb.${SECRET_DOMAIN}
+          paths:
+          - path: /
+        tls:
+        - secretName: qb-cert
+          hosts:
+          - qb.${SECRET_DOMAIN}
+
+    resources:
+      requests:
+        cpu: "0.3"
+        memory: "1000Mi"
+      limits:
+        memory: "4000Mi"
