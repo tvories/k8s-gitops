@@ -34,7 +34,7 @@ spec:
   tls:
   - hosts:
     - mpsmpi.${SECRET_DOMAIN}
-    secretName: nvr-cert
+    secretName: mpsmpi-cert
   rules:
   - host: mpsmpi.${SECRET_DOMAIN}
     http:
@@ -42,7 +42,7 @@ spec:
       - path: /
         pathType: Prefix
         backend:
-          service: 
+          service:
             name: mpsmpi
             port:
               number: 80
@@ -65,7 +65,7 @@ spec:
   tls:
   - hosts:
     - enderpi.${SECRET_DOMAIN}
-    secretName: nvr-cert
+    secretName: endepri-cert
   rules:
   - host: enderpi.${SECRET_DOMAIN}
     http:
@@ -73,7 +73,7 @@ spec:
       - path: /
         pathType: Prefix
         backend:
-          service: 
+          service:
             name: enderpi
             port:
               number: 80
