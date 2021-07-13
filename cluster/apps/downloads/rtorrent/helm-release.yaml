@@ -22,7 +22,7 @@ spec:
   values:
     image:
       repository: jesec/rtorrent-flood
-      tag: latest
+      # tag: latest
     podAnnotations:
       setGateway: "true"
     env:
