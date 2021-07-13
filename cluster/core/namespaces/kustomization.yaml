@@ -9,3 +9,4 @@ resources:
 - games.yaml
 - media.yaml
 - downloads.yaml
+- vpn.yaml
