@@ -41,7 +41,7 @@ spec:
 
     env:
       TZ: "America/Denver"
-      UMASK: "022"
+      # UMASK: "022"
 
     persistence:
       config:
