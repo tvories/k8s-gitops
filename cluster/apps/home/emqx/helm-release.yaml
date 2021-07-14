@@ -20,11 +20,12 @@ spec:
   values:
     replicaCount: 3
     recreatePods: true
+
     service:
       type: LoadBalancer
-      # loadBalancerIP: "${EMQX_EXTERNAL_IP}"
-      externalIPs:
-        - "${EMQX_EXTERNAL_IP}"
+      loadBalancerIP: "${EMQX_EXTERNAL_IP}"
+      # externalIPs:
+      #   - "${EMQX_EXTERNAL_IP}"
     ingress:
       dashboard:
         enabled: true
