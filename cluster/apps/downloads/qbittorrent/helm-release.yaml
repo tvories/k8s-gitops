@@ -80,3 +80,11 @@ spec:
         memory: "1000Mi"
       limits:
         memory: "4000Mi"
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+      startup:
+        enabled: false
