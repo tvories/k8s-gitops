@@ -31,8 +31,10 @@ spec:
       setGateway: "true"
 
     podSecurityContext:
-      supplementalGroups:
-      - 65539
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
 
     # settings:
     #   automaticPortSetup: true
