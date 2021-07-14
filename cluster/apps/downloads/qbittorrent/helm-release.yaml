@@ -30,9 +30,9 @@ spec:
     podAnnotations:
       setGateway: "true"
 
-    # podSecurityContext:
-    #   runAsUser: 568
-    #   runAsGroup: 568
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
     #   fsGroup: 568
       # fsGroupChangePolicy: "OnRootMismatch"
 
