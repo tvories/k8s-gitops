@@ -24,7 +24,7 @@ spec:
     persistence:
       enabled: true
       existingClaim: unifi-pvc
-    timezone: "America/Denver"
+    timezone: "${TIMEZONE}"
     runAsRoot: true
     ingress:
       enabled: true
@@ -71,4 +71,4 @@ spec:
       enabled: false
     readinessProbe:
       enabled: false
-    
+

@@ -80,7 +80,7 @@ spec:
           runAsGroup: 568
 
         env:
-          TZ: "America/Denver"
+          TZ: "${TIMEZONE}"
           IPTABLES_BACKEND: nft
           KILLSWITCH: "false"
 

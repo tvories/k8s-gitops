@@ -51,7 +51,7 @@ spec:
         enabled: true
         existingClaim: adguard-pvc
     env:
-      TZ: "America/Denver"
+      TZ: "${TIMEZONE}"
       PUID: "1000"
       PGID: "1000"
     service:

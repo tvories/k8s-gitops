@@ -22,7 +22,7 @@ spec:
       repository: esphome/esphome
       tag: 1.19.4
     env:
-      TZ: "America/Denver"
+      TZ: "${TIMEZONE}"
       ESPHOME_DASHBOARD_USE_PING: true
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet

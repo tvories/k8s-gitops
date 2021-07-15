@@ -11,3 +11,4 @@ resources:
 - zwavejs2mqtt
 - nextcloud
 - emqx
+- octoprint-mpsm
