@@ -69,6 +69,13 @@ spec:
             path: /mnt/fatguys/Media
         mountPath: /media
         readOnly: true
+
+      podSecurityContext:
+        supplementalGroups:
+        - 44
+        - 109
+        - 65539
+
     # podAnnotations:
     #   configmap.reloader.stakater.com/reload: "plex-promtail"
     # addons:
