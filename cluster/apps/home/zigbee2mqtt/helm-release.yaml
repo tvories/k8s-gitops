@@ -25,10 +25,10 @@ spec:
       tag: 1.20.0
 
     env:
-      TZ: "America/Denver"
+      TZ: "${TIMEZONE}"
       ZIGBEE2MQTT_DATA: /data
       # DEBUG: "zigbee-herdsman*"
-    
+
     securityContext:
       privileged: true
 

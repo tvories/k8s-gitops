@@ -31,7 +31,7 @@ spec:
         enabled: true
         existingClaim: homeassistant-pvc
     extraEnv:
-      TZ: "America/Denver"
+      TZ: "${TIMEZONE}"
     # envFrom:
     # - secretRef:
     #     name: home-assistant-secrets
