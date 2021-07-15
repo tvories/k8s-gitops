@@ -56,6 +56,10 @@ spec:
             path: /mnt/fatguys/Media
         mountPath: /data/nas-media
 
+    podSecurityContext:
+      supplementalGroups:
+      - 65539
+
     ingress:
       main:
         enabled: true
@@ -80,11 +84,3 @@ spec:
         memory: "1000Mi"
       limits:
         memory: "4000Mi"
-
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
