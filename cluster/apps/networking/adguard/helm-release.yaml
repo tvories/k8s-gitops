@@ -101,6 +101,7 @@ spec:
         tls:
         - hosts:
           - "adguard.${SECRET_DOMAIN}"
+          secretName: adguard-cert
     resources:
       requests:
         memory: 1000Mi
