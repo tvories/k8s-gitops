@@ -11,5 +11,5 @@ resources:
 - zwavejs2mqtt
 - nextcloud
 - emqx
-- octoprint-mpsm
+# - octoprint-mpsm
 - octoprint-ender
