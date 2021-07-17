@@ -1,0 +1,79 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: octoprint-ender
+  namespace: home
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: octoprint
+      version: 5.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: octoprint/octoprint
+      tag: 1.6.1
+
+    env:
+      TZ: "${TIMEZONE}"
+      OCTOPRINT_PORT: "5000"
+      ENABLE_MJPG_STREAMER: "false"
+      CAMERA_DEV: "/dev/usbwebcam"
+      MJPG_STREAMER_INPUT: "-y -n -r 1920x1080"
+
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: pvc-octoprint-ender
+      host-dev:
+        enabled: true
+        type: hostPath
+        hostPath: /dev
+
+    securityContext:
+      privileged: true
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: feature.node.kubernetes.io/custom-3dprinter-ender
+              operator: In
+              values:
+              - "true"
+            - key: feature.node.kubernetes.io/custom-webcam-c270
+              operator: In
+              values:
+              - "true"
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: "nginx-internal"
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+        hosts:
+        - host: octo-ender.${SECRET_DOMAIN}
+          paths:
+          - path: /
+
+        tls:
+        - secretName: octo-ender-cert
+          hosts:
+          - octo-ender.${SECRET_DOMAIN}
