@@ -17,6 +17,8 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    imagePullSecrets:
+      - name: regcred
     image: gitlab/gitlab-runner:alpine-v14.0.1
     imagePullPolicy: IfNotPresent
     gitlabUrl: https://gitlab.${SECRET_DOMAIN}

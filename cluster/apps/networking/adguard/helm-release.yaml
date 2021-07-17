@@ -17,6 +17,8 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    imagePullSecrets:
+      - name: regcred
     # initContainers:
     # - name: git-config
     #   image: alpine/git:v2.30.2
