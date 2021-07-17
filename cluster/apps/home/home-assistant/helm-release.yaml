@@ -24,6 +24,8 @@ spec:
       readiness:
         enabled: false
     image:
+      imagePullSecrets:
+      - name: regcred
       repository: homeassistant/home-assistant
       tag: 2021.7.3
     persistence:
@@ -67,7 +69,7 @@ spec:
       codeserver:
         enabled: true
         image:
-          repository: codercom/code-server
+          repository: ghcr.io/codercom/code-server
           tag: 3.10.2
         workingDir: "/config"
         #TODO: Eventually add a git secret here
