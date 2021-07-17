@@ -5,3 +5,4 @@ resources:
 - _volumes
 - gitlab-runner
 - kms
+- image-pull-secret
