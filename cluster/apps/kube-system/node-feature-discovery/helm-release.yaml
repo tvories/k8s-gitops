@@ -82,6 +82,18 @@ spec:
               class: ["02"]
               vendor: ["2974"]
               device: ["0503"]
+          - name: "3dprinter-ender"
+            matchOn:
+            - usbId:
+              class: ["02"]
+              vendor: ["1eaf"]
+              device: ["0004"]
+          - name: "webcam-c270"
+            matchOn:
+            - usbId:
+              class: ["ef"]
+              vendor: ["046d"]
+              device: ["0825"]
       tolerations:
       - effect: "NoExecute"
         operator: "Exists"
