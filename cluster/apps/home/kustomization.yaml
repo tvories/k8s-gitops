@@ -12,3 +12,4 @@ resources:
 - nextcloud
 - emqx
 - octoprint-mpsm
+- octoprint-ender
