@@ -19,14 +19,14 @@ spec:
   values:
     image:
       repository: octoprint/octoprint
-      tag: 5512.0.0
+      tag: 1.6.1
 
     env:
       TZ: "${TIMEZONE}"
-      OCTOPRINT_PORT: "5000"
-      ENABLE_MJPG_STREAMER: "false"
+      # OCTOPRINT_PORT: "5000"
+      ENABLE_MJPG_STREAMER: "true"
       CAMERA_DEV: "/dev/usbwebcam"
-      MJPG_STREAMER_INPUT: "-y -n -r 1920x1080"
+      MJPG_STREAMER_INPUT: "-y -n -r 1280x720"
 
     probes:
       liveness:
@@ -69,11 +69,11 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         hosts:
-        - host: octo-ender.${SECRET_DOMAIN}
+        - host: ender.${SECRET_DOMAIN}
           paths:
           - path: /
 
         tls:
         - secretName: octo-ender-cert
           hosts:
-          - octo-ender.${SECRET_DOMAIN}
+          - ender.${SECRET_DOMAIN}
