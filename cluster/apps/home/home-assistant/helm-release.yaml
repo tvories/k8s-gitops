@@ -23,9 +23,9 @@ spec:
         enabled: false
       readiness:
         enabled: false
+    imagePullSecrets:
+    - name: regcred
     image:
-      imagePullSecrets:
-      - name: regcred
       repository: homeassistant/home-assistant
       tag: 2021.7.3
     persistence:
@@ -67,6 +67,8 @@ spec:
         existingClaim: homeassistant-postgres-pvc
     addons:
       codeserver:
+        imagePullSecrets:
+        - name: regcred
         enabled: true
         image:
           repository: codercom/code-server
