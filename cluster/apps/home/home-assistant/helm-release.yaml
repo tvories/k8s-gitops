@@ -60,6 +60,7 @@ spec:
     service:
       main:
         type: LoadBalancer
+        loadBalancerIP: "${HOME_ASSISTANT_ADDRESS}"
         externalIPs:
         - "${HOME_ASSISTANT_ADDRESS}"
         externalTrafficPolicy: Local
