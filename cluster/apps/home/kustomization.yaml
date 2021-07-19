@@ -10,6 +10,6 @@ resources:
 - zigbee2mqtt
 - zwavejs2mqtt
 - nextcloud
-# - emqx
+- emqx
 # - octoprint-mpsm
 - octoprint-ender
