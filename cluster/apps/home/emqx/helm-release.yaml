@@ -18,8 +18,12 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    image: emqx/emqx:latest
-    replicaCount: 2
+    image:
+      repository: emqx/emqx
+      pullPolicy: IfNotPresent
+      pullSecrets:
+        - regcred
+    replicaCount: 3
     recreatePods: true
 
     service:
