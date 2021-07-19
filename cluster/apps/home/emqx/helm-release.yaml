@@ -31,7 +31,8 @@ spec:
       type: LoadBalancer
       # loadBalancerIP: "${EMQX_EXTERNAL_IP}"
       externalIPs:
-        - "${EMQX_EXTERNAL_IP}"
+        # - "${EMQX_EXTERNAL_IP}"
+        - "192.168.81.40"
     ingress:
       dashboard:
         enabled: true
