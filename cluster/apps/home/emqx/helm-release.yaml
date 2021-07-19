@@ -19,7 +19,8 @@ spec:
       interval: 5m
   values:
     image:
-      repository: emqx/emqx:4.3.5
+      repository: emqx/emqx
+      ref: 4.3.5
       pullPolicy: IfNotPresent
       pullSecrets:
         - regcred
