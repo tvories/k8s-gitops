@@ -57,6 +57,12 @@ spec:
           - "ha.${SECRET_DOMAIN}"
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
+    service:
+      main:
+        type: LoadBalancer
+        externalIPs:
+        - "${HOME_ASSISTANT_ADDRESS}"
+        externalTrafficPolicy: Local
     mariadb:
       enabled: false
     postgresql:
