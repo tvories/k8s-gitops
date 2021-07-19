@@ -28,7 +28,7 @@ spec:
     recreatePods: true
 
     service:
-      # type: LoadBalancer
+      type: LoadBalancer
       # loadBalancerIP: "${EMQX_EXTERNAL_IP}"
       externalIPs:
         - "${EMQX_EXTERNAL_IP}"
