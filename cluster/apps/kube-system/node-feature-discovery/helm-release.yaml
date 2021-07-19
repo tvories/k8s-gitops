@@ -94,6 +94,12 @@ spec:
               class: ["ef"]
               vendor: ["046d"]
               device: ["0825"]
+          - name: "canon-dslr"
+            matchOn:
+            - usbId:
+              class: ["00"]
+              vendor: ["04a9"]
+              device: ["317b"]
       tolerations:
       - effect: "NoExecute"
         operator: "Exists"
