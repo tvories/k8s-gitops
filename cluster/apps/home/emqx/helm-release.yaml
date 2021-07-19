@@ -19,7 +19,7 @@ spec:
       interval: 5m
   values:
     image:
-      repository: emqx/emqx
+      repository: emqx/emqx:4.3.5
       pullPolicy: IfNotPresent
       pullSecrets:
         - regcred
@@ -27,8 +27,8 @@ spec:
     recreatePods: true
 
     service:
-      type: LoadBalancer
-      loadBalancerIP: "${EMQX_EXTERNAL_IP}"
+      # type: LoadBalancer
+      # loadBalancerIP: "${EMQX_EXTERNAL_IP}"
       externalIPs:
         - "${EMQX_EXTERNAL_IP}"
     ingress:
