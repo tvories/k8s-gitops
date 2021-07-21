@@ -10,3 +10,4 @@ resources:
 - media.yaml
 - downloads.yaml
 - vpn.yaml
+- monitoring.yaml
