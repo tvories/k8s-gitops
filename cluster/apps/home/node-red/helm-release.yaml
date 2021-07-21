@@ -18,7 +18,7 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    pullSecret: regcred
+    imagePullSecret: regcred
     image:
       repository: nodered/node-red
       tag: 1.3.5-12-minimal
