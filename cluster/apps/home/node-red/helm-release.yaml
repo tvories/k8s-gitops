@@ -2,54 +2,57 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: jackett
-  namespace: downloads
+  name: node-red
+  namespace: home
 spec:
-  releaseName: jackett
+  releaseName: node-red
   interval: 5m
   chart:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: jackett
-      version: 10.3.0
+      chart: node-red
+      version: 8.1.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
         namespace: flux-system
       interval: 5m
   values:
+    imagePullSecret: regcred
     image:
-      repository: ghcr.io/k8s-at-home/jackett
-      tag: v0.18.459
+      repository: nodered/node-red
+      tag: 2.0.5-12-minimal
     env:
       TZ: "${TIMEZONE}"
-      PUID: 1000
-      PGID: 1000
+      NODE_RED_ENABLE_PROJECTS: "true"
+      NODE_RED_ENABLE_SAFE_MODE: "false"
+    persistence:
+      data:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/k8s/node-red
+        mountPath: /data
     ingress:
       main:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: "nginx-internal"
           kubernetes.io/tls-acme: "true"
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         hosts:
-        - host: "jackett.${SECRET_DOMAIN}"
+        - host: "node-red.${SECRET_DOMAIN}"
           paths:
           - path: /
             pathType: Prefix
         tls:
         - hosts:
-          - "jackett.${SECRET_DOMAIN}"
-          secretName: jackett-cert
-    persistence:
-      config:
-        enabled: true
-        existingClaim: pvc-jackett
-    podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+          - "node-red.${SECRET_DOMAIN}"
+          secretName: node-red-cert
     resources:
       requests:
         memory: 350Mi
