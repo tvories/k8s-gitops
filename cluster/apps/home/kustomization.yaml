@@ -5,7 +5,7 @@ resources:
 - esphome
 - home-assistant
 # - mealie
-# - node-red
+- node-red
 # - vernemq
 - zigbee2mqtt
 - zwavejs2mqtt

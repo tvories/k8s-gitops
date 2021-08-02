@@ -68,7 +68,7 @@ spec:
           kubernetes.io/tls-acme: "true"
           nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
           cert-manager.io/cluster-issuer: letsencrypt-production
-          # nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         hosts:
         - host: qb.${SECRET_DOMAIN}
           paths:
