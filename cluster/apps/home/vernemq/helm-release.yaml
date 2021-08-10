@@ -23,7 +23,7 @@ spec:
         secret.reloader.stakater.com/reload: "vernemq-secrets"
     image:
       repository: vernemq/vernemq
-      tag: 1.11.0-alpine
+      tag: 1.12.1-alpine
     replicaCount: 1
     serviceMonitor:
       create: true
