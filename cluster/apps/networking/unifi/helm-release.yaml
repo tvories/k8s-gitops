@@ -22,8 +22,9 @@ spec:
       repository: jacobalberty/unifi
       tag: v6.2.26
     persistence:
-      enabled: true
-      existingClaim: unifi-pvc
+      config:
+        enabled: true
+        existingClaim: unifi-pvc
     timezone: "${TIMEZONE}"
     runAsRoot: true
     ingress:
