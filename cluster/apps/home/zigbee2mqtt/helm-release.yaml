@@ -5,9 +5,9 @@ metadata:
   name: zigbee2mqtt
   namespace: home
 spec:
-  dependsOn:
-  - name: zigbee2mqtt
-    namespace: home
+  # dependsOn:
+  # - name: zigbee2mqtt
+  #   namespace: home
   interval: 5m
   chart:
     spec:
