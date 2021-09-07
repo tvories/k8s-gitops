@@ -64,7 +64,7 @@ spec:
     config:
       mqtt:
         base_topic: zigbee2mqtt
-        server: "mqtt://vernemq"
+        server: "mqtt://emqx"
         user: ${ZIGBEE2MQTT_MQTT_USER}
         password: ${ZIGBEE2MQTT_MQTT_PASSWORD}
 
