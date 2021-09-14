@@ -51,8 +51,8 @@ spec:
             pathType: Prefix
         tls:
         - hosts:
-          - "radarr.${SECRET_DOMAIN}"
-          secretName: radarr-cert
+          - "radarr-api.${SECRET_DOMAIN}"
+          secretName: radarr-api-cert
     persistence:
       config:
         enabled: true
