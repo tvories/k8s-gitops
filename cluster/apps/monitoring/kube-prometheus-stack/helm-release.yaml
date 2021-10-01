@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://prometheus-community.github.io/helm-charts
       chart: kube-prometheus-stack
-      version: 18.1.0
+      version: 19.0.1
       sourceRef:
         kind: HelmRepository
         name: prometheus-community-charts
@@ -152,14 +152,16 @@ spec:
         enableAdminAPI: true
         walCompression: true
         storageSpec:
-          volumeClaimTemplate:
-            spec:
-              selector:
-                matchLabels:
-                  app.kubernetes.io/name: prometheus
-              resources:
-                requests:
-                  storage: 50Gi
+          # volumeClaimTemplate:
+          #   spec:
+          #     selector:
+          #       matchLabels:
+          #         app.kubernetes.io/name: prometheus
+          #     resources:
+          #       requests:
+          #         storage: 50Gi
+          emptyDir:
+            medium: Memory
         thanos:
           image: quay.io/thanos/thanos:v0.23.0
           version: v0.21.1
