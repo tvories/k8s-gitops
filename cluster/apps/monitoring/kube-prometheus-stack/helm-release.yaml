@@ -89,12 +89,12 @@ spec:
     nodeExporter:
       serviceMonitor:
         relabelings:
-        - action: replace
-          regex: (.*)
-          replacement: $1
-          sourceLabels:
-          - __meta_kubernetes_pod_node_name
-          targetLabel: kubernetes_node
+          - action: replace
+            regex: (.*)
+            replacement: $1
+            sourceLabels:
+              - __meta_kubernetes_pod_node_name
+            targetLabel: kubernetes_node
     grafana:
       enabled: false
     kubelet:
@@ -103,7 +103,7 @@ spec:
         metricRelabelings:
         - action: replace
           sourceLabels:
-          - node
+            - node
           targetLabel: instance
     kubeApiServer:
       enabled: true
@@ -127,11 +127,11 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         hosts:
-        - "prom.${SECRET_DOMAIN}"
-        tls:
-        - hosts:
           - "prom.${SECRET_DOMAIN}"
-          secretName: prom-cert
+        tls:
+          - hosts:
+              - "prom.${SECRET_DOMAIN}"
+            secretName: prom-cert
       prometheusSpec:
         # externalUrl: "prom-server.${SECRET_DOMAIN}"
         # image:
@@ -154,10 +154,12 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: rook-ceph-block
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
               resources:
                 requests:
-                  storage: 10Gi
+                  storage: 50Gi
         thanos:
           image: quay.io/thanos/thanos:v0.23.0
           version: v0.21.1
@@ -178,14 +180,14 @@ spec:
         #   static_configs:
         #   - targets:
         #     - fw.${SECRET_DOMAIN}:9100
-        - job_name: 'home-assistant'
-          scrape_interval: 60s
-          metrics_path: '/api/prometheus'
-          bearer_token: '${SECRET_HASS_PROMETHEUS_TOKEN}'
-          scheme: http
-          static_configs:
-          - targets:
-            - home-assistant.home.svc:8123
+          - job_name: 'home-assistant'
+            scrape_interval: 60s
+            metrics_path: '/api/prometheus'
+            bearer_token: '${SECRET_HASS_PROMETHEUS_TOKEN}'
+            scheme: http
+            static_configs:
+              - targets:
+                - home-assistant.home.svc:8123
 
       thanosService:
         enabled: true
