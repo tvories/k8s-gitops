@@ -40,7 +40,7 @@ spec:
             pathType: Prefix
         tls:
         - hosts:
-          - "jackett.${SECRET_DOMAIN}"
+            - "jackett.${SECRET_DOMAIN}"
           secretName: jackett-cert
     persistence:
       config:
