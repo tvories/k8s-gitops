@@ -15,4 +15,4 @@ resources:
   - minecraft-charts.yaml
   - emqx-charts.yaml
   - hashicorp-charts.yaml
-  - prometheus-community.yaml
+  - prometheus-community-charts.yaml
