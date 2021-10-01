@@ -152,16 +152,16 @@ spec:
         enableAdminAPI: true
         walCompression: true
         storageSpec:
-          # volumeClaimTemplate:
-          #   spec:
-          #     selector:
-          #       matchLabels:
-          #         app.kubernetes.io/name: prometheus
-          #     resources:
-          #       requests:
-          #         storage: 50Gi
-          emptyDir:
-            medium: Memory
+          volumeClaimTemplate:
+            spec:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
+              resources:
+                requests:
+                  storage: 50Gi
+          # emptyDir:
+          #   medium: Memory
         thanos:
           image: quay.io/thanos/thanos:v0.23.0
           version: v0.21.1
