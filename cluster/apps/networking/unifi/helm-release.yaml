@@ -52,14 +52,6 @@ spec:
         type: LoadBalancer
         loadBalancerIP: ${UNIFI_LB}
         externalTrafficPolicy: Local
-      stun:
-        enabled: true
-        protocol: UDP
-        port: 3478
-      discovery:
-        enabled: true
-        protocol: UDP
-        port: 10001
     # controllerService:
     #   type: LoadBalancer
     #   externalTrafficPolicy: Local
