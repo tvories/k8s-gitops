@@ -80,7 +80,7 @@ spec:
     readinessProbe:
       enabled: false
     mongodb:
-      enabled: true
+      enabled: false
       persistence:
         enabled: true
         existingClaim: unifi-pvc-db
