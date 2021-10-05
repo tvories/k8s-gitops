@@ -87,4 +87,5 @@ spec:
       enabled: false
     readinessProbe:
       enabled: false
-
+    mongodb:
+      enabled: true
