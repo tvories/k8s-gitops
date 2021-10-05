@@ -83,4 +83,4 @@ spec:
       enabled: true
       persistence:
         enabled: true
-        existingClaim: unifi-pvc
+        existingClaim: unifi-pvc-db
