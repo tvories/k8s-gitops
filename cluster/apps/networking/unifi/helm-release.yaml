@@ -25,8 +25,10 @@ spec:
       data:
         enabled: true
         existingClaim: unifi-pvc
-    timezone: "${TIMEZONE}"
-    runAsRoot: true
+    # timezone: "${TIMEZONE}"
+    # runAsRoot: true
+    env:
+      TZ: "${TIMEZONE}"
     ingress:
       main:
         enabled: true
@@ -45,25 +47,34 @@ spec:
           - hosts:
               - "unifi.${SECRET_DOMAIN}"
             secretName: unifi-cert
-    guiService:
-      type: LoadBalancer
-      externalIPs:
-        - ${UNIFI_LB}
-    controllerService:
-      type: LoadBalancer
-      externalTrafficPolicy: Local
-      externalIPs:
-        - ${UNIFI_LB}
-    stunService:
-      type: LoadBalancer
-      externalTrafficPolicy: Local
-      externalIPs:
-        - ${UNIFI_LB}
-    discoveryService:
-      type: LoadBalancer
-      externalTrafficPolicy: Local
-      externalIPs:
-        - ${UNIFI_LB}
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: ${UNIFI_LB}
+        externalTrafficPolicy: Local
+      stun:
+        enabled: true
+        protocol: UDP
+        port: 3478
+      discovery:
+        enabled: true
+        protocol: UDP
+        port: 10001
+    # controllerService:
+    #   type: LoadBalancer
+    #   externalTrafficPolicy: Local
+    #   externalIPs:
+    #     - ${UNIFI_LB}
+    # stunService:
+    #   type: LoadBalancer
+    #   externalTrafficPolicy: Local
+    #   externalIPs:
+    #     - ${UNIFI_LB}
+    # discoveryService:
+    #   type: LoadBalancer
+    #   externalTrafficPolicy: Local
+    #   externalIPs:
+    #     - ${UNIFI_LB}
     # podAnnotations:
     #   backup.velero.io/backup-volumes: unifi-data
     resources:
