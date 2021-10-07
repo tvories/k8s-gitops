@@ -119,9 +119,9 @@ spec:
       ingress:
         enabled: true
         pathType: Prefix
-        # ingressClassName: "nginx"
+        ingressClassName: "nginx-internal"
         annotations:
-          kubernetes.io/ingress.class: "nginx-internal"
+          # kubernetes.io/ingress.class: "nginx-internal"
           kubernetes.io/tls-acme: "true"
           nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
           cert-manager.io/cluster-issuer: letsencrypt-production
@@ -162,9 +162,9 @@ spec:
             #       storage: 50Gi
           emptyDir:
             medium: Memory
-        thanos:
-          image: quay.io/thanos/thanos:v0.23.0
-          version: v0.21.1
+        # thanos:
+        #   image: quay.io/thanos/thanos:v0.23.0
+        #   version: v0.21.1
           # objectStorageConfig:
           #   name: thanos-objstore-secret
           #   key: objstore.yml
@@ -191,7 +191,7 @@ spec:
           #     - targets:
           #       - home-assistant.home.svc:8123
 
-      thanosService:
-        enabled: true
+      # thanosService:
+      #   enabled: true
     kube-state-metrics:
       fullnameOverride: kube-state-metrics

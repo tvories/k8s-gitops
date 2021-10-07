@@ -36,8 +36,9 @@ spec:
     ingress:
       dashboard:
         enabled: true
+        ingressClassName: "nginx-internal"
         annotations:
-          kubernetes.io/ingress.class: "nginx-internal"
+          # kubernetes.io/ingress.class: "nginx-internal"
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
         path: /

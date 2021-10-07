@@ -26,9 +26,9 @@ spec:
     ingress:
       main:
         enabled: true
-        # ingressClassName: "nginx-internal"
+        ingressClassName: "nginx-internal"
         annotations:
-          kubernetes.io/ingress.class: "nginx-internal"
+          # kubernetes.io/ingress.class: "nginx-internal"
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
@@ -43,9 +43,9 @@ spec:
           secretName: sonarr-cert
       api:
         enabled: true
-        # ingressClassName: "nginx-internal"
+        ingressClassName: "nginx-internal"
         annotations:
-          kubernetes.io/ingress.class: "nginx-internal"
+          # kubernetes.io/ingress.class: "nginx-internal"
         hosts:
         - host: "sonarr.${SECRET_DOMAIN}"
           paths:

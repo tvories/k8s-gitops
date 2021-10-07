@@ -40,8 +40,9 @@ spec:
     ingress:
       main:
         enabled: true
+        ingressClassName: "nginx-internal"
         annotations:
-          kubernetes.io/ingress.class: "nginx-internal"
+          # kubernetes.io/ingress.class: "nginx-internal"
           # external-dns/is-public: "true"
           # external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
           kubernetes.io/tls-acme: "true"
