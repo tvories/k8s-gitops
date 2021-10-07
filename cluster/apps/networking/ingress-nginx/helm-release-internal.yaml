@@ -17,7 +17,9 @@ spec:
         namespace: flux-system
   values:
     controller:
-      ingressClass: nginx-internal
+      ingressClassResource:
+        name: nginx-internal
+        default: true
       replicaCount: 1
       service:
         type: LoadBalancer
@@ -29,7 +31,7 @@ spec:
         proxy-body-size: "100m"
         use-forwarded-headers: "true"
       metrics:
-        enabled: false
+        enabled: true
         serviceMonitor:
           enabled: false
       extraArgs:
