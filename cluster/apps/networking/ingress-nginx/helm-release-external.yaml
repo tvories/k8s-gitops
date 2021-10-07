@@ -20,7 +20,9 @@ spec:
       "1688": "default/pykms:1688"
       "25565": "minecraft/minecraft-minecraft:25565"
     controller:
-      ingressClass: nginx-external
+      ingressClassResource:
+        name: nginx-external
+        default: false
       replicaCount: 1
       service:
         type: LoadBalancer
@@ -32,7 +34,7 @@ spec:
         proxy-body-size: "100m"
         use-forwarded-headers: "true"
       metrics:
-        enabled: false
+        enabled: true
         serviceMonitor:
           enabled: false
       extraArgs:
