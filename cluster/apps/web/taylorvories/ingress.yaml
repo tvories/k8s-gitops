@@ -4,7 +4,6 @@ kind: Ingress
 metadata:
   name: taylorvories-com-ingress
   namespace: web
-  ingressClassName: "nginx-external"
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/tls-acme: "true"
@@ -16,6 +15,7 @@ metadata:
       error_page 404 "https://taylorvories.com/404.html";
       proxy_intercept_errors on;
 spec:
+  ingressClassName: "nginx-external"
   rules:
   - host: taylorvories.com
     http:
