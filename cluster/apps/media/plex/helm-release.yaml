@@ -37,6 +37,7 @@ spec:
         externalTrafficPolicy: Local
         port:
           port: 32400
+    hostNetwork: true
     ingress:
       main:
         enabled: true
