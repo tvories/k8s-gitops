@@ -41,7 +41,7 @@ spec:
               - "radarr.${SECRET_DOMAIN}"
             secretName: radarr-cert
       api:
-        enabled: false
+        enabled: true
         ingressClassName: "nginx-internal"
         annotations:
           # kubernetes.io/ingress.class: "nginx-internal"
@@ -49,7 +49,11 @@ spec:
           - host: "radarr.${SECRET_DOMAIN}"
             paths:
               - path: /api
-            pathType: Prefix
+                pathType: Prefix
+        tls:
+          - hosts:
+            - "radarr.${SECRET_DOMAIN}"
+            secretName: radarr-cert
     persistence:
       config:
         enabled: true

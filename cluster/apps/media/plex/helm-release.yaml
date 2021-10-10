@@ -81,6 +81,7 @@ spec:
         - 44
         - 109
         - 65539
+        - 100
 
     # podAnnotations:
     #   configmap.reloader.stakater.com/reload: "plex-promtail"
