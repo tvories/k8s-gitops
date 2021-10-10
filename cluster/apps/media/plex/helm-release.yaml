@@ -20,7 +20,7 @@ spec:
   values:
     image:
       repository: ghcr.io/k8s-at-home/plex
-      tag: v1.23.3.4707-ebb5fe9f3
+      tag: v1.24.3.5033-757abe6b4
     env:
       TZ: "${TIMEZONE}"
     # podSecurityContext:
@@ -30,14 +30,18 @@ spec:
     #   - 100
     service:
       main:
-        enabled: true
+        # primary: true
+        # ports:
+        #   http:
+        #     port: 32400
+        # enabled: true
         type: LoadBalancer
         externalIPs:
         - 192.168.81.39
         externalTrafficPolicy: Local
-        port:
-          port: 32400
-    hostNetwork: true
+        # port:
+        #   port: 32400
+    # hostNetwork: true
     ingress:
       main:
         enabled: true
