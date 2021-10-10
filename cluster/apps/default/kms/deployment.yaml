@@ -27,6 +27,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
+  namespace: default
   labels:
     k8s-app: kms
   name: kms
