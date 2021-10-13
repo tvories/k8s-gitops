@@ -42,6 +42,10 @@ spec:
         enabled: true
         type: hostPath
         hostPath: /dev
+      # printer:
+      #   enabled: true
+      #   type: hostPath
+      #   hostPath: /dev/ttyACM0
 
     securityContext:
       privileged: true
