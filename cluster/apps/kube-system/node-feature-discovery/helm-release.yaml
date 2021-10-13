@@ -86,8 +86,8 @@ spec:
             matchOn:
             - usbId:
               class: ["02"]
-              vendor: ["1eaf"]
-              device: ["0004"]
+              vendor: ["0483"]
+              device: ["5740"]
           - name: "webcam-c270"
             matchOn:
             - usbId:

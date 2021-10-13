@@ -38,14 +38,14 @@ spec:
       data:
         enabled: true
         existingClaim: pvc-octoprint-ender
-      host-dev:
-        enabled: true
-        type: hostPath
-        hostPath: /dev
-      # printer:
+      # host-dev:
       #   enabled: true
       #   type: hostPath
-      #   hostPath: /dev/ttyACM0
+      #   hostPath: /dev
+      printer:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/ttyACM1
 
     securityContext:
       privileged: true
