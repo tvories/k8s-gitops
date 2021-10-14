@@ -55,7 +55,6 @@ kind: Ingress
 metadata:
   name: enderpi-ingress
   namespace: web
-  ingressClassName: "nginx-internal"
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/tls-acme: "true"
@@ -63,6 +62,7 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-production"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
+  ingressClassName: "nginx-internal"
   tls:
   - hosts:
     - enderpi.${SECRET_DOMAIN}
