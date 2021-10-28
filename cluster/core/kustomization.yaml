@@ -5,4 +5,4 @@ resources:
   - cert-manager
   - system-upgrade
   - image-pull-secret
-  # - rook-ceph
+  - rook-ceph
