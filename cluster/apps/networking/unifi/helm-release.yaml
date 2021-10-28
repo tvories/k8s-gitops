@@ -24,7 +24,7 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: unifi-pvc
+        existingClaim: unifi-config
     # timezone: "${TIMEZONE}"
     # runAsRoot: true
     env:
