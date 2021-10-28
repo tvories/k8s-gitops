@@ -4,4 +4,4 @@ resources:
 - ingress-nginx
 - wildcard-certificate
 - adguard
-# - unifi
+- unifi
