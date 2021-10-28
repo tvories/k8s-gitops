@@ -7,7 +7,7 @@ resources:
   - ceph-cluster.yaml
   - ceph-file-system.yaml
   - ceph-block-storage-class.yaml
-  - ceph-volume-snapshot-class.yaml
+  # - ceph-volume-snapshot-class.yaml
   - ceph-object-store.yaml
   - ceph-bucket-storage-class.yaml
   # - ceph-object-bucket.yaml
