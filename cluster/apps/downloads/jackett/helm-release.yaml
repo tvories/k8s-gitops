@@ -46,7 +46,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: pvc-jackett
+        existingClaim: pvc-rook-jackett
     podSecurityContext:
       runAsUser: 1000
       runAsGroup: 1000
