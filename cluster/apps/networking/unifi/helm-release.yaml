@@ -18,6 +18,10 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    probes:
+      startup:
+        spec:
+          initialDelaySeconds: 30
     image:
       repository: jacobalberty/unifi
       tag: v6.4.54
