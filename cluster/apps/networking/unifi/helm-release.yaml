@@ -20,8 +20,13 @@ spec:
   values:
     probes:
       startup:
+        enabled: false
         spec:
           initialDelaySeconds: 30
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
     image:
       repository: jacobalberty/unifi
       tag: v6.4.54
