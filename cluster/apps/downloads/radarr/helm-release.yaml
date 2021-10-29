@@ -57,7 +57,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: pvc-radarr-config
+        existingClaim: pvc-rook-radarr-config
       media:
         enabled: true
         type: custom
