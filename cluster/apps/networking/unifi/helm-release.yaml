@@ -60,7 +60,9 @@ spec:
     service:
       main:
         type: LoadBalancer
-        loadBalancerIP: ${UNIFI_LB}
+        # loadBalancerIP: ${UNIFI_LB}
+        externalIPs:
+          - ${UNIFI_LB}
         externalTrafficPolicy: Local
     # controllerService:
     #   type: LoadBalancer
