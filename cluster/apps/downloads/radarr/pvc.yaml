@@ -11,3 +11,19 @@ spec:
   resources:
     requests:
       storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-rook-radarr-config
+  namespace: downloads
+  # labels:
+  #   kasten.io/backup-volume: "enabled"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: ceph-block
