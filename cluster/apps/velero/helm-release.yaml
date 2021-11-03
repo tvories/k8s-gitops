@@ -26,6 +26,7 @@ spec:
       backupStorageLocation:
         name: default
         bucket: velero
+        caCert: ${ROOT_CA}
         default: true
         config:
           region: us-east-1
