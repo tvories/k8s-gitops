@@ -13,3 +13,4 @@ resources:
   - downloads
   - vpn
   - monitoring
+  - velero

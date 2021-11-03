@@ -17,3 +17,4 @@ resources:
   - hashicorp-charts.yaml
   - prometheus-community-charts.yaml
   - rook-ceph-charts.yaml
+  - vmware-tanzu-charts.yaml
