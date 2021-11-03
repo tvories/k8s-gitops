@@ -30,7 +30,7 @@ spec:
         config:
           region: us-east-1
           s3ForcePathStyle: true
-          s3Url: http://nas1.${SECRET_INTERNAL_DOMAIN}:9000
+          s3Url: https://nas1.${SECRET_INTERNAL_DOMAIN}:9000
           # publicUrl: https://nas1.${SECRET_INTERNAL_DOMAIN}
       resticTimeout: 4h
     initContainers:
