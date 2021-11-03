@@ -30,6 +30,12 @@ spec:
     image:
       repository: jacobalberty/unifi
       tag: v6.4.54
+    podAnnotations:
+      backup.velero.io/backup-volumes: config
+      pre.hook.backup.velero.io/container: fsfreeze
+      pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/config"]'
+      post.hook.backup.velero.io/container: fsfreeze
+      post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/config"]'
     persistence:
       data:
         enabled: true
@@ -93,6 +99,12 @@ spec:
       enabled: false
     mongodb:
       enabled: true
+      podAnnotations:
+        backup.velero.io/backup-volumes: datadir
+        pre.hook.backup.velero.io/container: fsfreeze
+        pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/datadir"]'
+        post.hook.backup.velero.io/container: fsfreeze
+        post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/datadir"]'
       persistence:
         enabled: true
         existingClaim: unifi-pvc-db
