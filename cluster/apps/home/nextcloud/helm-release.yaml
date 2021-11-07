@@ -43,7 +43,7 @@ spec:
     nextcloud:
       host: nc.${SECRET_DOMAIN}
       username: admin
-      password: ${SECRET_NEXTCLOUD_}
+      password: ${SECRET_NEXTCLOUD_ADMIN_PASSWORD}
       mail:
         enabled: true
         fromAddress: ${SECRET_NEXTCLOUD_MAIL_USER}
