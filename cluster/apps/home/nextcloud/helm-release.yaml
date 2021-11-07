@@ -103,7 +103,7 @@ spec:
           postgresqlDatabase: nextcloud
 
     cronjob:
-      enabled: false
+      enabled: true
 
     persistence:
       enabled: true
