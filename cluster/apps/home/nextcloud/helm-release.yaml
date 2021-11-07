@@ -53,7 +53,7 @@ spec:
           secure: ssl
           port: 465
           authtype: LOGIN
-          name: ${SECRET_NEXTCLOUD_MAIL_USER}
+          name: owncloud
           password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
       # extraVolumes:
       #   - name: media
