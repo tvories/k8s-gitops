@@ -48,6 +48,22 @@ spec:
         enabled: true
         fromAddress: ${SECRET_NEXTCLOUD_MAIL_USER}
         domain: ${SECRET_DOMAIN}
+        smtp:
+          host: ${SECRET_SMTP_HOST}
+          secure: ssl
+          port: 465
+          authtype: LOGIN
+          name: ${SECRET_NEXTCLOUD_MAIL_USER}
+          password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
+      extraVolumes:
+        - name: media
+          type: custom
+          volumeSpec:
+            nfs:
+              server: ${SECRET_NAS1}
+              path: /mnt/fatguys/Media
+          mountPath: /media
+          readOnly: true
 
     nginx:
       ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
