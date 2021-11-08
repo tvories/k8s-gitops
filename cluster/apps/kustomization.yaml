@@ -5,7 +5,7 @@ resources:
   - kube-system
   - default
   - networking
-  - system-upgrade
+  # - system-upgrade
   - home
   - web
   - games
