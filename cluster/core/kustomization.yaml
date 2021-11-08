@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - namespaces
   - cert-manager
-  - system-upgrade
+  # - system-upgrade
   - image-pull-secret
   - rook-ceph
