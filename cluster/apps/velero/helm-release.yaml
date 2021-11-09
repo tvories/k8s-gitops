@@ -43,7 +43,7 @@ spec:
             name: plugins
     credentials:
       existingSecret: minio-credentials
-      extraSecretRef: velero-restic-credentials
+      # extraSecretRef: velero-restic-credentials
     schedules:
       daily-backup:
         schedule: "0 6 * * *"
