@@ -83,12 +83,22 @@ spec:
         mountPath: /media
         readOnly: true
 
-      podSecurityContext:
-        supplementalGroups:
-        - 44
-        - 109
-        - 65539
-        - 100
+    podSecurityContext:
+      supplementalGroups:
+      - 44
+      - 109
+      - 65539
+      - 100
+
+    additionalContainers:
+      fsfreeze:
+        name: fsfreeze
+        image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        securityContext:
+          privileged: true
 
     # podAnnotations:
     #   configmap.reloader.stakater.com/reload: "plex-promtail"
