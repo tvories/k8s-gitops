@@ -26,8 +26,8 @@ spec:
       tag: v0.19.116
     env:
       TZ: "${TIMEZONE}"
-      PUID: 1000
-      PGID: 1000
+      # PUID: 1000
+      # PGID: 1000
     ingress:
       main:
         enabled: true
@@ -58,9 +58,9 @@ spec:
         enabled: true
         existingClaim: pvc-rook-jackett
     podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+      # runAsUser: 1000
+      # runAsGroup: 1000
+      # fsGroup: 1000
     resources:
       requests:
         memory: 350Mi
