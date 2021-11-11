@@ -24,14 +24,14 @@ spec:
     routed_namespaces:
     - downloads
 
-    # publicPorts:
-    # - hostname: qb #hostname assigned to the pod
-    #   IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
-    #   ports:
-    #   - type: udp
-    #     port: ${VPN_FORWARDED_PORT_1}
-    #   - type: tcp
-    #     port: ${VPN_FORWARDED_PORT_1}
+    publicPorts:
+    - hostname: qb #hostname assigned to the pod
+      IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
+      ports:
+      - type: udp
+        port: ${VPN_FORWARDED_PORT_1}
+      - type: tcp
+        port: ${VPN_FORWARDED_PORT_1}
 
     settings:
       NOT_ROUTED_TO_GATEWAY_CIDRS: "${NETWORK_K8S_CLUSTER_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR} ${NETWORK_LOCAL_CIDR}"
