@@ -47,7 +47,7 @@ spec:
             - "jackett.${SECRET_DOMAIN}"
           secretName: jackett-cert
     podAnnotations:
-      # setGateway: "true"
+      setGateway: "true"
       backup.velero.io/backup-volumes: config
       pre.hook.backup.velero.io/container: fsfreeze
       pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/config"]'
