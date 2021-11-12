@@ -110,3 +110,12 @@ spec:
         existingClaim: unifi-pvc-db
       containerSecurityContext:
         runAsNonRoot: false
+      additionalContainers:
+        fsfreeze:
+          name: fsfreeze
+          image: ghcr.io/k8s-at-home/fsfreeze:v2.37-r0
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          securityContext:
+            privileged: true
