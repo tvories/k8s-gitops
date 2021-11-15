@@ -12,4 +12,5 @@ resources:
   - vpn.yaml
   - monitoring.yaml
   - rook-ceph.yaml
-  - velero.yaml
+  # - velero.yaml
+  - benji.yaml
