@@ -92,7 +92,7 @@ spec:
       volumes:
         - name: backup
           persistentVolumeClaim:
-            claimName: nfs-backup
+            claimName: pvc-nfs-backup
         # - name: mon-endpoint-volume
         #   configMap:
         #     name: rook-ceph-mon-endpoints
