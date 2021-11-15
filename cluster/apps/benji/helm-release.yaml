@@ -160,8 +160,8 @@ spec:
                         "bash /script/generate-ceph.sh",
                       ]
                     volumeMounts:
-                      - name: mon-endpoint-volume
-                        mountPath: /etc/rook
+                      # - name: mon-endpoint-volume
+                      #   mountPath: /etc/rook
                       - name: ceph-data
                         mountPath: /etc/ceph
                       - name: ceph-config
