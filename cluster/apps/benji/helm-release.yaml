@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: benji
-  namespace: benji
+  namespace: backup-system
 spec:
   releaseName: benji
   interval: 5m
@@ -93,12 +93,12 @@ spec:
         - name: backup
           persistentVolumeClaim:
             claimName: pvc-nfs-backup
-        # - name: mon-endpoint-volume
-        #   configMap:
-        #     name: rook-ceph-mon-endpoints
-        #     items:
-        #       - key: data
-        #         path: mon-endpoints
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
         - name: ceph-data
           emptyDir: {}
         - name: ceph-config
@@ -160,8 +160,8 @@ spec:
                         "bash /script/generate-ceph.sh",
                       ]
                     volumeMounts:
-                      # - name: mon-endpoint-volume
-                      #   mountPath: /etc/rook
+                      - name: mon-endpoint-volume
+                        mountPath: /etc/rook
                       - name: ceph-data
                         mountPath: /etc/ceph
                       - name: ceph-config
