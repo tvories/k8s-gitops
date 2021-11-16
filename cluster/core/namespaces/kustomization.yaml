@@ -13,4 +13,4 @@ resources:
   - monitoring.yaml
   - rook-ceph.yaml
   # - velero.yaml
-  - benji.yaml
+  - backup-system.yaml
