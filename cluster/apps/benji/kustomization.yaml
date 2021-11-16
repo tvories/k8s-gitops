@@ -8,7 +8,7 @@ resources:
 # - service-monitor.yaml
 configMapGenerator:
 - name: ceph-config
-  namespace: benji
+  namespace: backup-system
   files:
   - ceph/generate-ceph.sh
 generatorOptions:
