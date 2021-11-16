@@ -21,8 +21,8 @@ metadata:
   namespace: backup-system
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 10Gi
+      storage: 1Mi
   storageClassName: nfs-backup
