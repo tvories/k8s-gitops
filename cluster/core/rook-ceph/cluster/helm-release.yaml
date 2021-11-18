@@ -22,10 +22,6 @@ spec:
       enabled: false
     monitoring:
       enabled: true
-    cephClusterSpec:
-      dashboard:
-        enabled: true
-        urlPrefix: /
     ingress:
       dashboard:
         annotations:
@@ -37,6 +33,10 @@ spec:
         tls:
           - hosts:
               - "rook.${SECRET_DOMAIN}"
+    cephClusterSpec:
+      dashboard:
+        enabled: true
+        urlPrefix: /
       storage:
         useAllNodes: false
         useAllDevices: false
