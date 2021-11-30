@@ -20,7 +20,7 @@ spec:
   values:
     image:
       repository: esphome/esphome
-      tag: 2021.11.1
+      tag: 2021.11.4
     env:
       TZ: "${TIMEZONE}"
       ESPHOME_DASHBOARD_USE_PING: true
