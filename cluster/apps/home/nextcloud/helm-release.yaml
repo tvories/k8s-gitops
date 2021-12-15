@@ -11,7 +11,7 @@ spec:
     spec:
       # renovate: registryUrl=https://nextcloud.github.io/helm/
       chart: nextcloud
-      version: 2.11.0
+      version: 2.11.2
       sourceRef:
         kind: HelmRepository
         name: nextcloud-charts
@@ -98,8 +98,9 @@ spec:
       enabled: true
       cluster:
         enabled: false
-      usePassword: true
-      password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
+      auth:
+        enabled: true
+        password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
       master:
         persistence:
           enabled: false
