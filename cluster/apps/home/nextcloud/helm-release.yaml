@@ -99,7 +99,7 @@ spec:
       cluster:
         enabled: false
       auth:
-        enabled: true
+        enabled: false
         password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
       master:
         persistence:
