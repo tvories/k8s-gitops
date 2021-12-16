@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf
+  namespace: web
+  labels:
+    k8s-app: audiobookshelf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: audiobookshelf
+  template:
+    metadata:
+      labels:
+        k8s-app: audiobookshelf
+    spec:
+      containers:
+      - name: audiobookshelf
+        env:
+          - name: AUDIOBOOKSHELF_GID
+            value: "568"
+          - name: AUDIOBOOKSHELF_UID
+            value: "568"
+        image: advplyr/audiobookshelf
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /metadata
+            name: metadata
+          - mountPath: /audiobooks
+            name: audiobooks
+        volumes:
+          - name: config
+            persistentVolumeClaim:
+              claimName: pvc-ceph-audiobookshelf-config
+          - name: metadata
+            persistentVolumeClaim:
+              claimName: pvc-ceph-audiobookshelf-metadata
+          - name: audiobooks
+            persistentVolumeClaim:
+              claimName: audiobookshelf-media-pvc
