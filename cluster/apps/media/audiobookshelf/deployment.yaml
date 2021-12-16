@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: audiobookshelf
-  namespace: web
+  namespace: media
   labels:
     k8s-app: audiobookshelf
 spec:
@@ -28,20 +28,20 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
-        volumeMounts:
-          - mountPath: /config
-            name: config
-          - mountPath: /metadata
-            name: metadata
-          - mountPath: /audiobooks
-            name: audiobooks
-        volumes:
-          - name: config
-            persistentVolumeClaim:
-              claimName: pvc-ceph-audiobookshelf-config
-          - name: metadata
-            persistentVolumeClaim:
-              claimName: pvc-ceph-audiobookshelf-metadata
-          - name: audiobooks
-            persistentVolumeClaim:
-              claimName: audiobookshelf-media-pvc
+        # volumeMounts:
+        #   - mountPath: /config
+        #     name: config
+        #   - mountPath: /metadata
+        #     name: metadata
+        #   - mountPath: /audiobooks
+        #     name: audiobooks
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: pvc-ceph-audiobookshelf-config
+        - name: metadata
+          persistentVolumeClaim:
+            claimName: pvc-ceph-audiobookshelf-metadata
+        - name: audiobooks
+          persistentVolumeClaim:
+            claimName: audiobookshelf-media-pvc
