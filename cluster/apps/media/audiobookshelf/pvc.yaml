@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/Media/books
+    path: /mnt/fatguys/Media/books
     server: ${SECRET_NAS1}
 
 
