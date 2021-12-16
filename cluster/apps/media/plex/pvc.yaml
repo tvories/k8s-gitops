@@ -2,20 +2,6 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-plex-config
-  namespace: media
-spec:
-  accessModes:
-  - ReadWriteMany
-  storageClassName: nfs-plex-config
-  resources:
-    requests:
-      storage: 1Mi
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: pvc-ceph-plex-config
   namespace: media
   # labels:
