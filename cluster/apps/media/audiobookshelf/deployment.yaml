@@ -28,13 +28,13 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
-        # volumeMounts:
-        #   - mountPath: /config
-        #     name: config
-        #   - mountPath: /metadata
-        #     name: metadata
-        #   - mountPath: /audiobooks
-        #     name: audiobooks
+        volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /metadata
+            name: metadata
+          - mountPath: /audiobooks
+            name: audiobooks
       volumes:
         - name: config
           persistentVolumeClaim:
