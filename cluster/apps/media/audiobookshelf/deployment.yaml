@@ -23,7 +23,7 @@ spec:
             value: "568"
           - name: AUDIOBOOKSHELF_UID
             value: "568"
-        image: advplyr/audiobookshelf:1.6.43
+        image: advplyr/audiobookshelf:1.6.46
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
