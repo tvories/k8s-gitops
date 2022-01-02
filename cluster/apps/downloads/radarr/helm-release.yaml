@@ -84,6 +84,12 @@ spec:
       limits:
         memory: 1500Mi
 
+    prometheus:
+      podMonitor:
+        enabled: true
+        interval: 10m
+        scrapeTimeout: 2s
+
     additionalContainers:
       fsfreeze:
         name: fsfreeze
