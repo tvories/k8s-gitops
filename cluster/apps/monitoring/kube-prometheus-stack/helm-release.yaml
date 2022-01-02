@@ -175,14 +175,14 @@ spec:
           #   name: thanos-objstore-secret
           #   key: objstore.yml
         additionalScrapeConfigs:
-        - job_name: 'netdata-scrape'
-          metrics_path: "/api/v1/allmetrics"
-          params:
-            format: [prometheus_all_hosts]
-          honor_labels: true
-          static_configs:
-          - targets:
-            - nas1.${SECRET_INTERNAL_DOMAIN}:19999
+          - job_name: 'netdata-scrape'
+            metrics_path: "/api/v1/allmetrics"
+            params:
+              format: [prometheus_all_hosts]
+            honor_labels: true
+            static_configs:
+            - targets:
+              - 192.168.1.21:19999
         # - job_name: 'node-exporter'
         #   static_configs:
         #   - targets:
