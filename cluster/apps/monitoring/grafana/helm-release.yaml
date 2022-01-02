@@ -83,7 +83,7 @@ spec:
         - name: Prometheus
           type: prometheus
           access: proxy
-          url: http://thanos-query-http:10902/
+          url: http://kube-prometheus-stack-prometheus:9090/
           isDefault: true
         # - name: Loki
         #   type: loki
