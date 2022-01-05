@@ -59,6 +59,12 @@ spec:
             - benji-backup-pvc
             - --namespace
             - downloads
+        - name: backup-monitoring
+          schedule: "00 02 * * *"
+          command:
+            - benji-backup-pvc
+            - --namespace
+            - monitoring
         - name: backup-media
           schedule: "00 03 * * *"
           command:
@@ -193,6 +199,38 @@ spec:
           - target:
               kind: CronJob
               name: benji-backup-downloads
+            patch:
+              - op: add
+                path: /spec/jobTemplate/spec/template/spec/initContainers
+                value:
+                  - name: generate-ceph-files
+                    image: rook/ceph:v1.8.1
+                    imagePullPolicy: Always
+                    command: ["/usr/bin/bash"]
+                    args:
+                      [
+                        "-c",
+                        "curl -s https://raw.githubusercontent.com/tvories/k8s-gitops/main/cluster/apps/benji/ceph/generate-ceph.sh | bash",
+                      ]
+                    volumeMounts:
+                      - name: mon-endpoint-volume
+                        mountPath: /etc/rook
+                      - name: ceph-data
+                        mountPath: /etc/ceph
+                    env:
+                      - name: ROOK_CEPH_USERNAME
+                        valueFrom:
+                          secretKeyRef:
+                            name: rook-ceph-mon
+                            key: ceph-username
+                      - name: ROOK_CEPH_SECRET
+                        valueFrom:
+                          secretKeyRef:
+                            name: rook-ceph-mon
+                            key: ceph-secret
+          - target:
+              kind: CronJob
+              name: benji-backup-monitoring
             patch:
               - op: add
                 path: /spec/jobTemplate/spec/template/spec/initContainers
