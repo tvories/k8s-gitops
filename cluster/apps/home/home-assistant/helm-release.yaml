@@ -70,7 +70,7 @@ spec:
     postgresql:
       enabled: true
       image:
-        tag: 11.14.0
+        tag: 12.9.0
       existingSecret: home-assistant-postgresql-secret
       persistence:
         enabled: true
