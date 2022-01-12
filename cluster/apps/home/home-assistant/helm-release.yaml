@@ -69,6 +69,8 @@ spec:
       enabled: false
     postgresql:
       enabled: true
+      image:
+        tag: 11.14.0
       existingSecret: home-assistant-postgresql-secret
       persistence:
         enabled: true
