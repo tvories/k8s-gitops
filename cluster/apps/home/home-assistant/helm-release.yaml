@@ -69,10 +69,10 @@ spec:
       enabled: false
     postgresql:
       enabled: true
-      diagnosticMode:
-        enabled: true
-      image:
-        tag: 12.9.0
+      # diagnosticMode:
+      #   enabled: true
+      # image:
+      #   tag: 12.9.0
       existingSecret: home-assistant-postgresql-secret
       persistence:
         enabled: true
