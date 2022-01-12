@@ -48,6 +48,7 @@ spec:
           protocol: TCP
           service:
             enabled: true
+            type: LoadBalancer
           ingress:
             enabled: true
             ingressClassName: "nginx-external"
