@@ -47,8 +47,10 @@ spec:
           containerPort: 8123
           protocol: TCP
           service:
-            enabled: true
+            enabled: false
             type: LoadBalancer
+            port: 8123
+            externalTrafficPolicy: Local
           ingress:
             enabled: true
             ingressClassName: "nginx-external"
