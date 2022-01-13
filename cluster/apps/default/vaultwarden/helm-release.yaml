@@ -76,7 +76,7 @@ spec:
             secretName: tls.vaultwarden
       admin:
         enabled: true
-        ingressClassName: "nginx-internal"
+        ingressClassName: "nginx-external"
         annotations:
           # traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
           # traefik.ingress.kubernetes.io/router.middlewares: "networking-rfc1918@kubernetescrd"
