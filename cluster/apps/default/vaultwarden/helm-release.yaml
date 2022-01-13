@@ -34,7 +34,7 @@ spec:
       SIGNUPS_ALLOWED: "false"
       SMTP_FROM_NAME: Vaultwarden
       SMTP_FROM: ${SECRET_VAULTWARDEN_MAIL_USER}
-      SMTP_HOST: ${SECRET_SMTP_HOST}
+      SMTP_HOST: smtppro.zoho.com
       SMTP_PORT: 465
       SMTP_SSL: "true"
       SMTP_USERNAME: ${SECRET_VAULTWARDEN_MAIL_USER}
