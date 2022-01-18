@@ -75,7 +75,7 @@ spec:
         password: ${SECRET_FRIGATE_MQTT_PASSWORD}
       database:
         path: /data/frigate.db
-      detectors:
+      # detectors:
         # coral:
         #   type: edgetpu
         #   device: usb
