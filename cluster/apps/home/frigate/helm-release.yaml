@@ -111,10 +111,11 @@ spec:
             - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
               roles:
               - detect
+              - record
             # Main Stream
             - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
-              - record
+              # - record
               - rtmp
               - clips
           detect:
@@ -125,7 +126,7 @@ spec:
             enabled: True
           record:
             enabled: True
-            retain_days: 14
+            retain_days: 40
             events:
               objects:
                 - person
