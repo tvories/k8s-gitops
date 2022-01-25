@@ -117,6 +117,7 @@ spec:
               - rtmp
               - clips
               - detect
+              - record
           # detect:
           #   width: 352
           #   height: 240
