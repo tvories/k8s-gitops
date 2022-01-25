@@ -114,18 +114,11 @@ spec:
               roles:
               - record
               - rtmp
-              - clips
+              # - clips
           detect:
             height: 384
             width: 512
             fps: 10
-          # objects:
-          #   filters:
-          #     person:
-          #       min_area: 1500
-          #       max_area: 100000
-          #       threshold: 0.75
-          #       min_score: 0.60
           record:
             enabled: True
             retain_days: 14
@@ -144,9 +137,6 @@ spec:
               default: 2
           rtmp:
             enabled: True
-          # zones:
-          #   front:
-          #     coordinates: 640,0,640,360,0,360,0,0
 
         # frontdoor:
         #   ffmpeg:
