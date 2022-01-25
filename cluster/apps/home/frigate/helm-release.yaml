@@ -115,7 +115,7 @@ spec:
             - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
               - rtmp
-              - clips
+              # - clips
               - detect
               - record
           # detect:
