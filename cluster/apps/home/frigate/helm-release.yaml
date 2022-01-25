@@ -107,18 +107,22 @@ spec:
         doorbell:
           ffmpeg:
             inputs:
+            # Sub Stream
             - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
               roles:
               - detect
+            # Main Stream
             - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
               - record
               - rtmp
-              # - clips
+              - clips
           detect:
-            height: 384
-            width: 512
-            fps: 10
+            width: 352
+            height: 240
+            fps: 15
+          clips:
+            enabled: True
           record:
             enabled: True
             retain_days: 14
