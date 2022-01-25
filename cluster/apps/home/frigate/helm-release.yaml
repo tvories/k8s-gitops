@@ -131,10 +131,10 @@ spec:
             timestamp: False
             retain:
               default: 14
-          clips:
-            enabled: True
-            retain:
-              default: 2
+          # clips:
+          #   enabled: True
+          #   retain:
+          #     default: 2
           rtmp:
             enabled: True
 
