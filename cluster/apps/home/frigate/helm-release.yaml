@@ -75,7 +75,9 @@ spec:
         password: ${SECRET_FRIGATE_MQTT_PASSWORD}
       database:
         path: /data/frigate.db
-      # detectors:
+      detectors:
+        cpu1:
+          type: cpu
         # coral:
         #   type: edgetpu
         #   device: usb
@@ -112,6 +114,7 @@ spec:
               roles:
               - record
               - rtmp
+              - clips
           detect:
             height: 384
             width: 512
