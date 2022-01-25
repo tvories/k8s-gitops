@@ -142,6 +142,8 @@ spec:
             enabled: True
             retain:
               default: 2
+          rtmp:
+            enabled: True
           # zones:
           #   front:
           #     coordinates: 640,0,640,360,0,360,0,0
