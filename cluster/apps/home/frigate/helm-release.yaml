@@ -67,6 +67,21 @@ spec:
         medium: Memory
         sizeLimit: 2Gi
         mountPath: /dev/shm
+    service:
+      main:
+        ports:
+          rtmp-tcp:
+            enabled: true
+            primary: false
+            port: 1935
+            protocol: TCP
+            targetPort: 1935
+          rtmp-udp:
+            enabled: true
+            primary: false
+            port: 1935
+            protocol: UDP
+            targetPort: 1935
     config: |
       mqtt:
         host: emqx
