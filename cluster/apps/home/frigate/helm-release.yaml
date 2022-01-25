@@ -118,12 +118,12 @@ spec:
               # - clips
               - detect
               - record
-          # detect:
-          #   width: 352
-          #   height: 240
-          #   fps: 15
-          clips:
-            enabled: True
+          detect:
+            width: 720
+            height: 576
+            fps: 15
+          # clips:
+          #   enabled: True
           record:
             enabled: True
             retain_days: 2
