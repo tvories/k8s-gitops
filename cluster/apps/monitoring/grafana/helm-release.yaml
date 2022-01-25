@@ -100,7 +100,7 @@ spec:
           gnetId: 2842
           revision: 14
           datasource: Prometheus
-        # # Ref: https://grafana.com/grafana/dashboards/5336
+        # Ref: https://grafana.com/grafana/dashboards/5336
         # ceph-osd:
         #   gnetId: 5336
         #   revision: 5
@@ -160,6 +160,11 @@ spec:
         # Ref: https://grafana.com/grafana/dashboards/13665
         speedtest:
           gnetId: 13665
+          revision: 1
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/14371
+        nut:
+          gnetId: 14371
           revision: 1
           datasource: Prometheus
     sidecar:
