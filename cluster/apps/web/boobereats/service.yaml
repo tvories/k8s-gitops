@@ -1,0 +1,14 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: boobereats
+  name: boobereats
+  namespace: web
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: boobereats
