@@ -167,6 +167,10 @@ spec:
           gnetId: 14371
           revision: 1
           datasource: Prometheus
+        deskmonster:
+          gnetId: 14574
+          revision: 8
+          datasource: Prometheus
     sidecar:
       dashboards:
         enabled: true

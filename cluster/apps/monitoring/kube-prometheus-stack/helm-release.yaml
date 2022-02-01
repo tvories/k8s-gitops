@@ -195,6 +195,12 @@ spec:
             static_configs:
               - targets:
                 - home-assistant.home.svc:8123
+          - job_name: 'deskmonster'
+            scape_interval: 30s
+            metrics_path: '/metrics'
+            static_configs:
+              - targets:
+                - 192.168.1.50:9835
 
       # thanosService:
       #   enabled: true
