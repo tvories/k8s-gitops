@@ -23,13 +23,13 @@ spec:
       TZ: "${TIMEZONE}"
     service:
       main:
-        enabled: true
+        enabled: false
         type: LoadBalancer
         loadBalancerIP: "${LB_NUT}"
         externalTrafficPolicy: Local
         ports:
           server:
-            enabled: false
+            enabled: true
             protocol: TCP
             port: 3493
     ingress:
