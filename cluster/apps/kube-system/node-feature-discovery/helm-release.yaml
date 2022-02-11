@@ -100,6 +100,11 @@ spec:
               class: ["00"]
               vendor: ["04a9"]
               device: ["317b"]
+          - name: 'coral-tpu'
+            matchOn:
+              - pciId:
+                  vendor: ['1ac1']
+                  device: ['089a']
       tolerations:
       - effect: "NoExecute"
         operator: "Exists"
