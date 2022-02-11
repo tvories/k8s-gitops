@@ -29,7 +29,7 @@ spec:
         externalTrafficPolicy: Local
         ports:
           server:
-            enabled: true
+            enabled: false
             protocol: TCP
             port: 3493
     ingress:
