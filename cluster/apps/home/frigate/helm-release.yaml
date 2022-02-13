@@ -117,7 +117,7 @@ spec:
       #   - yuv420p
       cameras:
         # --
-        doorbell_detection:
+        doorbell:
           ffmpeg:
             inputs:
             # Sub Stream
@@ -136,7 +136,7 @@ spec:
             fps: 15
           record:
             enabled: True
-            retain_days: 2
+            retain_days: 14
             events:
               retain:
                 default: 20
@@ -155,45 +155,6 @@ spec:
           rtmp:
             enabled: True
 
-        doorbell_lowdef:
-          ffmpeg:
-            inputs:
-            # Sub Stream
-            - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
-              roles:
-              - record
-            # Main Stream
-            # - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
-            #   roles:
-            #   - rtmp
-            #   - clips
-            #   - detect
-          # detect:
-          #   width: 352
-          #   height: 240
-          #   fps: 15
-          # clips:
-          #   enabled: True
-          record:
-            enabled: True
-            retain_days: 20
-            # events:
-            #   retain:
-            #     default: 20
-            #   objects:
-            #     - person
-            #     - dog
-          # snapshots:
-          #   enabled: True
-          #   timestamp: False
-          #   retain:
-          #     default: 14
-          # clips:
-          #   enabled: True
-          #   retain:
-          #     default: 2
-          # rtmp:
-          #   enabled: True
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
