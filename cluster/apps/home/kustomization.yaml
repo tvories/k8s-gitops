@@ -13,3 +13,4 @@ resources:
   # - octoprint-mpsm
   # - octoprint-ender
   - frigate
+  - mealie
