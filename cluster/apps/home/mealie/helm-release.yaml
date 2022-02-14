@@ -22,7 +22,7 @@ spec:
       repository: hkotel/mealie
       tag: v0.5.4
     env:
-      TZ: "${TIMEZONE}"
+      TZ: "America/Denver"
       DEFAULT_EMAIL: meals@${SECRET_DOMAIN}
       BASE_URL: https://meals.${SECRET_DOMAIN}
     ingress:
