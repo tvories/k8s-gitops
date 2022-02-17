@@ -51,5 +51,5 @@ spec:
           nfs:
             server: ${SECRET_NAS1}
             path: /mnt/fatguys/k8s/mealie
-        mountPath: /media
+        mountPath: /app/data
         readOnly: true
