@@ -2,21 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-mealie
-  namespace: home
-spec:
-  accessModes:
-  - ReadWriteMany
-  storageClassName: nfs-mealie
-  resources:
-    requests:
-      storage: 1Mi
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-rook-mealie
+  name: mealie-pvc
   namespace: home
   # labels:
   #   kasten.io/backup-volume: "enabled"
