@@ -46,10 +46,4 @@ spec:
     persistence:
       config:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/k8s/mealie
-        mountPath: /app/data
-        readOnly: true
+        existingClaim: pvc-rook-mealie
