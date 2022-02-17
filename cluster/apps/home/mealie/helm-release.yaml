@@ -46,4 +46,4 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: pvc-rook-mealie
+        existingClaim: mealie-pvc
