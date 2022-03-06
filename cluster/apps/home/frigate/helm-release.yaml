@@ -162,7 +162,7 @@ spec:
             # Main Stream
             - path: rtsp://admin:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
-              # - rtmp
+              - rtmp
               - detect
               - record
           detect:
@@ -171,10 +171,10 @@ spec:
             fps: 15
           record:
             enabled: True
-            retain_days: 14
             events:
               retain:
                 default: 20
+                days: 14
               objects:
                 - person
                 - dog
