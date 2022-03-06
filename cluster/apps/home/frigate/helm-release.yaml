@@ -155,6 +155,40 @@ spec:
           #     default: 2
           rtmp:
             enabled: True
+          
+        front_door:
+          ffmpeg:
+            inputs:
+            # Main Stream
+            - path: rtsp://admin:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
+              roles:
+              - rtmp
+              - detect
+              - record
+          detect:
+            width: 3840
+            height: 2160
+            fps: 15
+          record:
+            enabled: True
+            retain_days: 14
+            events:
+              retain:
+                default: 20
+              objects:
+                - person
+                - dog
+          snapshots:
+            enabled: True
+            timestamp: False
+            retain:
+              default: 14
+          # clips:
+          #   enabled: True
+          #   retain:
+          #     default: 2
+          rtmp:
+            enabled: True
 
 
     podAnnotations:
