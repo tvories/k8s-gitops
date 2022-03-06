@@ -174,7 +174,6 @@ spec:
             events:
               retain:
                 default: 20
-                days: 14
               objects:
                 - person
                 - dog
