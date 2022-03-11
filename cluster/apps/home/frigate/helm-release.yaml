@@ -195,9 +195,54 @@ spec:
           # clips:
           #   enabled: True
           #   retain:
-          #     default: 2
+          # #     default: 2
+          # rtmp:
+          #   enabled: True
+
+          garage:
           rtmp:
+            enabled: false
+          ffmpeg:
+            inputs:
+            # Main Stream
+            - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101
+              roles:
+              # - rtmp
+              # - detect
+              - record
+            - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102
+              roles:
+              - rtmp
+              - detect
+              # - record
+              # - clips
+          detect:
+            width: 640
+            height: 480
+            fps: 30
+          record:
             enabled: True
+            events:
+              retain:
+                default: 20
+              objects:
+                - person
+                - dog
+                - cat
+                - car
+          snapshots:
+            enabled: True
+            timestamp: False
+            retain:
+              default: 14
+          # clips:
+          #   enabled: True
+          #   retain:
+          # #     default: 2
+          # rtmp:
+          #   enabled: True
+
+          
 
 
     podAnnotations:
