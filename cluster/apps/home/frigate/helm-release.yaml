@@ -176,7 +176,7 @@ spec:
           detect:
             width: 640
             height: 480
-            fps: 15
+            fps: 30
           record:
             enabled: True
             events:
@@ -185,6 +185,8 @@ spec:
               objects:
                 - person
                 - dog
+                - cat
+                - car
           snapshots:
             enabled: True
             timestamp: False
