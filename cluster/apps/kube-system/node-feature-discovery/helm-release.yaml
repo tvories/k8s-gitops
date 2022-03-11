@@ -100,6 +100,12 @@ spec:
               class: ["00"]
               vendor: ["04a9"]
               device: ["317b"]
+          - name: "tplink-bluetooth"
+            matchOn:
+            - usbId:
+              class: ["224"]
+              vendor: ["2357"]
+              device: ["0604"]
           - name: 'coral-tpu'
             matchOn:
               - pciId:
