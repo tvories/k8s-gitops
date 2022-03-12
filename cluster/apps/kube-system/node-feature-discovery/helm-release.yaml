@@ -57,6 +57,12 @@ spec:
             - "class"
             - "vendor"
             - "device"
+          pci:
+            deviceClassWhitelist: ["0300"]
+            deviceLabelFields:
+              - 'class'
+              - 'vendor'
+              - 'device'
           custom:
           - name: "zigbee"
             matchOn:
