@@ -162,12 +162,12 @@ spec:
           ffmpeg:
             inputs:
             # Main Stream
-            - path: rtsp://admin:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
+            - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
               # - rtmp
               # - detect
               - record
-            - path: rtsp://admin:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
+            - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
               roles:
               - rtmp
               - detect
