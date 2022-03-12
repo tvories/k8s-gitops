@@ -108,14 +108,18 @@ spec:
             min_area: 1000
             max_area: 10000
             threshold: 0.7
-      # ffmpeg:
-      #   hwaccel_args:
-      #   - -hwaccel
-      #   - vaapi
-      #   - -hwaccel_device
-      #   - /dev/dri/renderD128
-      #   - -hwaccel_output_format
-      #   - yuv420p
+      ffmpeg:
+        hwaccel_args:
+        - -hwaccel
+        - vaapi
+        - -hwaccel_device
+        - /dev/dri/renderD128
+        - -hwaccel_output_format
+        - yuv420p
+        # Enable audio on recordings...
+        # might cause issues on recording playback
+        output_args:
+          record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
       cameras:
         # --
         doorbell:
@@ -157,26 +161,26 @@ spec:
             enabled: True
           
         front_door:
-          rtmp:
-            enabled: false
+          # rtmp:
+          #   enabled: false
           ffmpeg:
             inputs:
             # Main Stream
             - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
-              # - rtmp
+              - rtmp
               # - detect
               - record
             - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
               roles:
-              - rtmp
+              # - rtmp
               - detect
               # - record
               # - clips
           detect:
             width: 640
             height: 480
-            fps: 30
+            fps: 15
           record:
             enabled: True
             events:
