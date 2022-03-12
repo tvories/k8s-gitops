@@ -168,12 +168,12 @@ spec:
             # Main Stream
             - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
               roles:
-              - rtmp
+              # - rtmp
               # - detect
               - record
             - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
               roles:
-              # - rtmp
+              - rtmp
               - detect
               # - record
               # - clips
