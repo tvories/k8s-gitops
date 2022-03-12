@@ -40,7 +40,8 @@ spec:
     worker:
       config: #|-
         core:
-          sources:
+          labelSources:
+          # sources:
           - custom
           - pci
           - usb
