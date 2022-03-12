@@ -55,5 +55,8 @@ spec:
           - name: "physical1"
             devices:
               - name: "sdb"
+          - name: "sff1"
+            devices:
+              - name: "sdb"
     cephFileSystems: []
     cephObjectStores: []
