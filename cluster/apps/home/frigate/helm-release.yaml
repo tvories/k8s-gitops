@@ -66,7 +66,7 @@ spec:
         enabled: true
         type: emptyDir
         medium: Memory
-        sizeLimit: 2Gi
+        sizeLimit: 4Gi
         mountPath: /dev/shm
     service:
       main:
@@ -266,4 +266,4 @@ spec:
         memory: 100Mi
         cpu: 500m
       limits:
-        memory: 2000Mi
+        memory: 4000Mi
