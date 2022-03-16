@@ -83,168 +83,172 @@ spec:
             port: 1935
             protocol: UDP
             targetPort: 1935
-    config: |
-      mqtt:
-        host: emqx
-        topic_prefix: frigate
-        user: ${SECRET_FRIGATE_MQTT_USER}
-        password: ${SECRET_FRIGATE_MQTT_PASSWORD}
-      database:
-        path: /data/frigate.db
-      detectors:
-        coral:
-          type: edgetpu
-          device: pci
-      objects:
-        track:
-        - person
-        - dog
-        filters:
-          person:
-            min_area: 2500
-            max_area: 100000
-            threshold: 0.7
-          dog:
-            min_area: 1000
-            max_area: 10000
-            threshold: 0.7
-      ffmpeg:
-        hwaccel_args:
-        - -hwaccel
-        - vaapi
-        - -hwaccel_device
-        - /dev/dri/renderD128
-        - -hwaccel_output_format
-        - yuv420p
-        # Enable audio on recordings...
-        # might cause issues on recording playback
-        output_args:
-          record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
-      cameras:
-        # --
-        doorbell:
-          ffmpeg:
-            inputs:
-            # Sub Stream
-            # - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
-            #   roles:
-            #   - detect
-            # Main Stream
-            - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
-              roles:
-              - rtmp
-              - detect
-              - record
-          detect:
-            width: 720
-            height: 576
-            fps: 15
-          record:
-            enabled: True
-            retain_days: 14
-            events:
-              retain:
-                default: 20
-              objects:
-                - person
-                - dog
-          snapshots:
-            enabled: True
-            timestamp: False
-            retain:
-              default: 14
-          # clips:
-          #   enabled: True
-          #   retain:
-          #     default: 2
-          rtmp:
-            enabled: True
-          
-        front_door:
-          # rtmp:
-          #   enabled: false
-          ffmpeg:
-            inputs:
-            # Main Stream
-            - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
-              roles:
-              # - rtmp
-              # - detect
-              - record
-            - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
-              roles:
-              - rtmp
-              - detect
-              # - record
-              # - clips
-          detect:
-            width: 640
-            height: 480
-            fps: 15
-          record:
-            enabled: True
-            events:
-              retain:
-                default: 20
-              objects:
-                - person
-                - dog
-                - cat
-                - car
-          snapshots:
-            enabled: True
-            timestamp: False
-            retain:
-              default: 14
-          # clips:
-          #   enabled: True
-          #   retain:
-          # #     default: 2
-          # rtmp:
-          #   enabled: True
+    configmap:
+      config: 
+        enabled: true
+        data: 
+          config.yml: |
+            mqtt:
+              host: emqx
+              topic_prefix: frigate
+              user: ${SECRET_FRIGATE_MQTT_USER}
+              password: ${SECRET_FRIGATE_MQTT_PASSWORD}
+            database:
+              path: /data/frigate.db
+            detectors:
+              coral:
+                type: edgetpu
+                device: pci
+            objects:
+              track:
+              - person
+              - dog
+              filters:
+                person:
+                  min_area: 2500
+                  max_area: 100000
+                  threshold: 0.7
+                dog:
+                  min_area: 1000
+                  max_area: 10000
+                  threshold: 0.7
+            ffmpeg:
+              hwaccel_args:
+              - -hwaccel
+              - vaapi
+              - -hwaccel_device
+              - /dev/dri/renderD128
+              - -hwaccel_output_format
+              - yuv420p
+              # Enable audio on recordings...
+              # might cause issues on recording playback
+              output_args:
+                record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
+            cameras:
+              # --
+              doorbell:
+                ffmpeg:
+                  inputs:
+                  # Sub Stream
+                  # - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
+                  #   roles:
+                  #   - detect
+                  # Main Stream
+                  - path: rtsp://admin:${SECRET_DOORBELL_VIEWER_PASSWORD}@${SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101
+                    roles:
+                    - rtmp
+                    - detect
+                    - record
+                detect:
+                  width: 720
+                  height: 576
+                  fps: 15
+                record:
+                  enabled: True
+                  retain_days: 14
+                  events:
+                    retain:
+                      default: 20
+                    objects:
+                      - person
+                      - dog
+                snapshots:
+                  enabled: True
+                  timestamp: False
+                  retain:
+                    default: 14
+                # clips:
+                #   enabled: True
+                #   retain:
+                #     default: 2
+                rtmp:
+                  enabled: True
+                
+              front_door:
+                # rtmp:
+                #   enabled: false
+                ffmpeg:
+                  inputs:
+                  # Main Stream
+                  - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
+                    roles:
+                    # - rtmp
+                    # - detect
+                    - record
+                  - path: rtsp://frig:${SECRET_FRONT_DOOR_VIEWER_PASSWORD}@${SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
+                    roles:
+                    - rtmp
+                    - detect
+                    # - record
+                    # - clips
+                detect:
+                  width: 640
+                  height: 480
+                  fps: 15
+                record:
+                  enabled: True
+                  events:
+                    retain:
+                      default: 20
+                    objects:
+                      - person
+                      - dog
+                      - cat
+                      - car
+                snapshots:
+                  enabled: True
+                  timestamp: False
+                  retain:
+                    default: 14
+                # clips:
+                #   enabled: True
+                #   retain:
+                # #     default: 2
+                # rtmp:
+                #   enabled: True
 
-        garage:
-          rtmp:
-            enabled: false
-          ffmpeg:
-            inputs:
-            # Main Stream
-            - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101
-              roles:
-              # - rtmp
-              # - detect
-              - record
-            - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102
-              roles:
-              - rtmp
-              - detect
-              # - record
-              # - clips
-          detect:
-            width: 640
-            height: 480
-            fps: 30
-          record:
-            enabled: True
-            events:
-              retain:
-                default: 20
-              objects:
-                - person
-                - dog
-                - cat
-                - car
-          snapshots:
-            enabled: True
-            timestamp: False
-            retain:
-              default: 14
-          # clips:
-          #   enabled: True
-          #   retain:
-          # #     default: 2
-          # rtmp:
-          #   enabled: True
+              garage:
+                rtmp:
+                  enabled: false
+                ffmpeg:
+                  inputs:
+                  # Main Stream
+                  - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101
+                    roles:
+                    # - rtmp
+                    # - detect
+                    - record
+                  - path: rtsp://frig:${SECRET_GARAGE_VIEWER_PASSWORD}@${SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102
+                    roles:
+                    - rtmp
+                    - detect
+                    # - record
+                    # - clips
+                detect:
+                  width: 640
+                  height: 480
+                  fps: 30
+                record:
+                  enabled: True
+                  events:
+                    retain:
+                      default: 20
+                    objects:
+                      - person
+                      - dog
+                      - cat
+                      - car
+                snapshots:
+                  enabled: True
+                  timestamp: False
+                  retain:
+                    default: 14
+                # clips:
+                #   enabled: True
+                #   retain:
+                # #     default: 2
+                # rtmp:
+                #   enabled: True
 
           
 
