@@ -145,22 +145,21 @@ spec:
                   fps: 15
                 record:
                   enabled: True
-                  retain_days: 14
+                  retain:
+                    days: 0
+                    mode: active_objects
                   events:
                     retain:
-                      default: 20
+                      default: 14
                     objects:
                       - person
                       - dog
+                      - cat
                 snapshots:
                   enabled: True
                   timestamp: False
                   retain:
                     default: 14
-                # clips:
-                #   enabled: True
-                #   retain:
-                #     default: 2
                 rtmp:
                   enabled: True
                 
@@ -187,9 +186,12 @@ spec:
                   fps: 15
                 record:
                   enabled: True
+                  retain:
+                    days: 0
+                    mode: active_objects
                   events:
                     retain:
-                      default: 20
+                      default: 14
                     objects:
                       - person
                       - dog
@@ -200,10 +202,6 @@ spec:
                   timestamp: False
                   retain:
                     default: 14
-                # clips:
-                #   enabled: True
-                #   retain:
-                # #     default: 2
                 # rtmp:
                 #   enabled: True
 
@@ -230,9 +228,12 @@ spec:
                   fps: 30
                 record:
                   enabled: True
+                  retain:
+                    days: 0
+                    mode: active_objects
                   events:
                     retain:
-                      default: 20
+                      default: 14
                     objects:
                       - person
                       - dog
@@ -243,15 +244,8 @@ spec:
                   timestamp: False
                   retain:
                     default: 14
-                # clips:
-                #   enabled: True
-                #   retain:
-                # #     default: 2
                 # rtmp:
                 #   enabled: True
-
-          
-
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
