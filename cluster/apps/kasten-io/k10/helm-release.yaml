@@ -40,10 +40,10 @@ spec:
     ingress:
       create: true
       class: nginx-internal
-      host: &host "k10.${SECRET_DOMAIN}"
+      host: "k10.${SECRET_DOMAIN}"
       urlPath: k10
       hosts:
-        - *host
+        - k10.${SECRET_DOMAIN}
       tls:
         enabled: true
         secretName: "k10-tls"
