@@ -34,7 +34,7 @@ spec:
             port: 3493
     ingress:
       main:
-        enabled: true
+        enabled: false
         ingressClassName: "nginx-internal"
         annotations:
           kubernetes.io/tls-acme: "true"
