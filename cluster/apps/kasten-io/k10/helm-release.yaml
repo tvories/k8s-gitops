@@ -20,7 +20,7 @@ spec:
     eula:
       accept: true
       company: tvo
-      email: "${SECRET_PERSONAL_EMAIL}"
+      email: taylor@${SECRET_DOMAIN}
     global:
       persistence:
         storageClass: ceph-block
