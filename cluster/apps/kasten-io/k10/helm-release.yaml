@@ -35,6 +35,8 @@ spec:
       urlPath: k10
       hosts:
         - k10.${SECRET_DOMAIN}
+      annotations:
+        kubernetes.io/ingress.class: "nginx-internal"
       tls:
         enabled: true
         secretName: k10-tls
