@@ -28,7 +28,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: pvc-calibre-config
+        existingClaim: pvc-ceph-calibre-config
       nfs-nas-media:
         enabled: true
         type: custom
