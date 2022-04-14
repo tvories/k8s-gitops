@@ -22,7 +22,7 @@ spec:
       tag: version-v5.40.0
 
     env:
-      TZ: "${ TIMEZONE }"
+      TZ: "${TIMEZONE}"
       PGID: 65539
 
     persistence:
