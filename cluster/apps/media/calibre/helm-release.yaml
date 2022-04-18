@@ -37,6 +37,14 @@ spec:
             server: ${SECRET_NAS1}
             path: /mnt/fatguys/Books
         mountPath: /data
+      books-download:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Media/books
+        mountPath: /downloads
 
 
     service:
