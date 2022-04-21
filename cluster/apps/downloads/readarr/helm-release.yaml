@@ -18,7 +18,7 @@ spec:
       interval: 5m
   values:
     image:
-      repository: ghcr.io/k8s-at-home/readarr-nightly
+      repository: ghcr.io/k8s-at-home/readarr
       tag: v0.1.1.1312
     env:
       TZ: "${TIMEZONE}"
@@ -53,6 +53,14 @@ spec:
             server: ${SECRET_NAS1}
             path: /mnt/fatguys/Media
         mountPath: /media
+      ebooks:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Books
+        mountPath: /ebooks
     podAnnotations:
       backup.velero.io/backup-volumes: config
       pre.hook.backup.velero.io/container: fsfreeze
