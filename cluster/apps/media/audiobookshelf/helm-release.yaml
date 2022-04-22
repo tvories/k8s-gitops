@@ -20,6 +20,7 @@ spec:
   values:
     image:
       tag: 2.0.0
+      pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
     
