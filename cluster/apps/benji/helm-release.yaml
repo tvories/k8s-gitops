@@ -146,7 +146,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -178,7 +178,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -210,7 +210,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -242,7 +242,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -274,7 +274,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -306,7 +306,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -338,7 +338,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -370,7 +370,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
@@ -402,7 +402,7 @@ spec:
                 path: /spec/jobTemplate/spec/template/spec/initContainers
                 value:
                   - name: generate-ceph-files
-                    image: rook/ceph:v1.8.5
+                    image: rook/ceph:v1.9.2
                     imagePullPolicy: Always
                     command: ["/usr/bin/bash"]
                     args:
