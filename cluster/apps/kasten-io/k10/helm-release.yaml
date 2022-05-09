@@ -18,7 +18,6 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    ambas
     eula:
       accept: true
       company: tvo
