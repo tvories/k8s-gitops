@@ -23,11 +23,12 @@ spec:
       TZ: "${TIMEZONE}"
     service:
       main:
-        enabled: false
         type: LoadBalancer
         loadBalancerIP: "${LB_NUT}"
         externalTrafficPolicy: Local
         ports:
+          http:
+            enabled: false
           server:
             enabled: true
             protocol: TCP
