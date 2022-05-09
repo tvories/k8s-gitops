@@ -8,3 +8,9 @@ kubeconfig
 # vscode-sops
 .decrypted~*.yaml
 .envrc
+.terraform/
+*.tfstate
+*.lock.hcl
+backend.conf
+*.tfvars
+*.pkrvars.hcl
