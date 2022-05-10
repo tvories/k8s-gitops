@@ -24,8 +24,9 @@ spec:
       enabled: true
     ingress:
       dashboard:
+        ingressClassName: nginx-internal
         annotations:
-          kubernetes.io/ingress.class: nginx-internal
+          # kubernetes.io/ingress.class: nginx-internal
           # traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
         host:
           name: "rook.${SECRET_DOMAIN}"
