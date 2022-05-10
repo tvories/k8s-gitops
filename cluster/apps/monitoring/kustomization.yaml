@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
   - kube-prometheus-stack
   - grafana
-  - network-ups-tools
+  # - network-ups-tools
   - speedtest-exporter
   - thanos
