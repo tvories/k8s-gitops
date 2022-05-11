@@ -44,11 +44,14 @@ spec:
 
       ingress:
         enabled: true
-        hostname: "thanos-query.${SECRET_DOMAIN}}"
+        hostname: &host "thanos-query.${SECRET_DOMAIN}}"
         ingressClassName: "nginx-internal"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         tls: true
+        extraTls:
+          - hosts:
+              - *host
 
     queryFrontend:
       enabled: false
@@ -63,9 +66,12 @@ spec:
           memory: 64M
       ingress:
         enabled: true
-        hostname: "thanos-bucketweb.${SECRET_DOMAIN}"
+        hostname: &host "thanos-bucketweb.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
+        extraTls:
+          - hosts:
+              - *host
 
     compactor:
       enabled: true
@@ -80,9 +86,12 @@ spec:
           memory: 270M
       ingress:
         enabled: true
-        hostname: "thanos-bucketweb.${SECRET_DOMAIN}"
+        hostname: &host "thanos-bucketweb.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
+        extraTls:
+          - hosts:
+              - *host
       persistence:
         enabled: true
         storageClass: "ceph-block"
@@ -101,6 +110,9 @@ spec:
         hostname: &host "thanos-storegateway.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
+        extraTls:
+          - hosts:
+              - *host
       persistence:
         enabled: true
         size: 512Mi
@@ -120,9 +132,12 @@ spec:
                 expr: absent(up{job="kube-prometheus-stack-prometheus"})
       ingress:
         enabled: true
-        hostname: "thanos-ruler.${SECRET_DOMAIN}"
+        hostname: &host "thanos-ruler.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
+        extraTls:
+          - hosts:
+              - *host
       persistence:
         enabled: true
         storageClass: "ceph-block"
