@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - objectbucketclaim.yaml
   - helm-release.yaml
-  - ./dashboard
+  - dashboard
