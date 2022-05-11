@@ -86,7 +86,7 @@ spec:
           memory: 270M
       ingress:
         enabled: true
-        hostname: &host "thanos-bucketweb.${SECRET_DOMAIN}"
+        hostname: &host "thanos-compactor.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
         extraTls:
