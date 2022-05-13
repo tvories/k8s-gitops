@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rook-direct-mount
-  namespace: rook-ceph # namespace:cluster
+  namespace: rook-ceph
   labels:
     app: rook-direct-mount
 spec:
@@ -20,9 +20,10 @@ spec:
       containers:
         - name: rook-direct-mount
           image: rook/ceph:v1.9.2
-          command: ["/tini"]
-          args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
           imagePullPolicy: IfNotPresent
+          command: ["/bin/bash"]
+          args: ["-m", "-c", "/usr/local/bin/toolbox.sh"]
+          tty: true
           env:
             - name: ROOK_CEPH_USERNAME
               valueFrom:
@@ -36,6 +37,7 @@ spec:
                   key: ceph-secret
           securityContext:
             privileged: true
+            runAsUser: 0
           volumeMounts:
             - mountPath: /dev
               name: dev
@@ -45,7 +47,10 @@ spec:
               name: libmodules
             - name: mon-endpoint-volume
               mountPath: /etc/rook
-      # if hostNetwork: false, the "rbd map" command hangs, see https://github.com/rook/rook/issues/2021
+            - name: backups
+              mountPath: /mnt/backups
+            - name: direct-mount-backup-script
+              mountPath: /scripts
       hostNetwork: true
       volumes:
         - name: dev
@@ -63,3 +68,13 @@ spec:
             items:
               - key: data
                 path: mon-endpoints
+        - name: backups
+          nfs:
+            server: "expanse.${SECRET_PRIVATE_DOMAIN}"
+            path: /tycho/Apps/External/Backups
+        - name: direct-mount-backup-script
+          projected:
+            defaultMode: 0775
+            sources:
+              - configMap:
+                  name: direct-mount-backup-script
