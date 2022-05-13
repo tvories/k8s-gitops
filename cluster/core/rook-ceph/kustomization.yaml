@@ -4,4 +4,5 @@ resources:
   - cluster
   - operator
   - reflector
-  - rook-direct-mount
+  - add-ons
+  - snapshot-controller
