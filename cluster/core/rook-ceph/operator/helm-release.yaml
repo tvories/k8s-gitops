@@ -10,14 +10,14 @@ spec:
     spec:
       # renovate: registryUrl=https://charts.rook.io/release
       chart: rook-ceph
-      version: v1.9.2
+      version: v1.8.5
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
         namespace: flux-system
   values:
     crds:
-      enabled: true
+      enabled: false
     resources:
       requests:
         cpu: 100m
