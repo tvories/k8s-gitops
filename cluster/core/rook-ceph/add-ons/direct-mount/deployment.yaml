@@ -20,9 +20,9 @@ spec:
       containers:
         - name: rook-direct-mount
           image: rook/ceph:v1.9.2
-          imagePullPolicy: IfNotPresent
           command: ["/bin/bash"]
           args: ["-m", "-c", "/usr/local/bin/toolbox.sh"]
+          imagePullPolicy: IfNotPresent
           tty: true
           env:
             - name: ROOK_CEPH_USERNAME
@@ -47,10 +47,17 @@ spec:
               name: libmodules
             - name: mon-endpoint-volume
               mountPath: /etc/rook
-            - name: backups
-              mountPath: /mnt/backups
-            - name: direct-mount-backup-script
+            - name: direct-mount-scripts
               mountPath: /scripts
+            - name: nas-backup
+              mountPath: /mnt/nas-backup
+          resources:
+            requests:
+              cpu: 15m
+              memory: 64M
+            limits:
+              memory: 64M
+      # if hostNetwork: false, the "rbd map" command hangs, see https://github.com/rook/rook/issues/2021
       hostNetwork: true
       volumes:
         - name: dev
@@ -68,13 +75,13 @@ spec:
             items:
               - key: data
                 path: mon-endpoints
-        - name: backups
+        - name: nas-backup
           nfs:
-            server: "expanse.${SECRET_PRIVATE_DOMAIN}"
-            path: /tycho/Apps/External/Backups
-        - name: direct-mount-backup-script
+            server: "${SECRET_NAS1}"
+            path: /mnt/fatguys/Backup/k8s/rook-ceph
+        - name: direct-mount-scripts
           projected:
             defaultMode: 0775
             sources:
               - configMap:
-                  name: direct-mount-backup-script
+                  name: direct-mount-scripts
