@@ -20,6 +20,7 @@ spec:
   values:
     image:
       tag: 1.7.2
+      repository: advplyr/audiobookshelf
       # pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
