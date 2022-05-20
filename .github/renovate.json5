@@ -51,51 +51,92 @@
       "datasourceTemplate": "helm"
     },
   ],
-  "packageRules": [
-    // setup datasources
+  packageRules: [
+    // Setup datasources
     {
-      "matchDatasources": ["helm"],
-      "separateMinorPatch": true,
-      "ignoreDeprecated": true
-    },
-    // global docker datasource settings
-    {
-      "matchDatasources": ["docker"],
-      "enabled": true,
-      "commitMessageTopic": "container image {{depName}}",
-      "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
-      "matchUpdateTypes": ["major", "minor", "patch"],
-    },
-    // add labels according to package and update types
-    {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["major"],
-      "labels": ["renovate/image", "dep/major"]
+      matchDatasources: ["helm"],
+      ignoreDeprecated: true,
     },
     {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["minor"],
-      "labels": ["renovate/image", "dep/minor"]
+      matchDatasources: ["docker"],
+      commitMessageExtra: "to {{newVersion}}",
+    },
+    // Custom version schemes
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["blakeblackshear/frigate"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
     },
     {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["patch"],
-      "labels": ["renovate/image", "dep/patch"]
+      matchDatasources: ["docker"],
+      matchPackageNames: ["xirixiz/dsmr-reader-docker"],
+      versioning: "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-\\d+\\.\\d+\\.\\d+$",
     },
     {
-      "matchDatasources": ["helm"],
-      "matchUpdateTypes": ["major"],
-      "labels": ["renovate/helm", "dep/major"]
+      matchDatasources: ["docker"],
+      matchPackageNames: ["quay.io/minio/minio"],
+      versioning: "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})",
     },
     {
-      "matchDatasources": ["helm"],
-      "matchUpdateTypes": ["minor"],
-      "labels": ["renovate/helm", "dep/minor"]
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "ghcr.io/linuxserver/calibre",
+        "ghcr.io/linuxserver/calibre-web",
+      ],
+      versioning: "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
     {
-      "matchDatasources": ["helm"],
-      "matchUpdateTypes": ["patch"],
-      "labels": ["renovate/helm", "dep/patch"]
-    }
-  ]
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/airsonic-advanced/airsonic-advanced"],
+      versioning: "regex:^edge-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-SNAPSHOT\\.(?<build>\\d+)$",
+    },
+    // Version strategies
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/k8s-at-home/plex"],
+      versioning: "loose",
+    },
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["tomsquest/docker-radicale"],
+      versioning: "pep440",
+    },
+    // Group packages
+    {
+      matchDatasources: ["helm", "docker"],
+      matchPackagePatterns: ["^rook.ceph"],
+      groupName: "rook-ceph-suite",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      matchDatasources: ["helm", "docker"],
+      matchPackageNames: [
+        "quay.io/cilium/cilium",
+        "quay.io/cilium/operator-generic",
+        "cilium",
+      ],
+      groupName: "cilium",
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "thanos-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+    {
+      groupName: "vector-suite",
+      matchDatasources: ["docker", "github-releases", "helm"],
+      matchPackagePatterns: ["vector"],
+      additionalBranchPrefix: "",
+      separateMinorPatch: true,
+      stabilityDays: 2,
+    },
+  ],
 }
