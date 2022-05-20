@@ -49,9 +49,6 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         tls: true
-        extraTls:
-          - hosts:
-              - *host
 
     queryFrontend:
       enabled: false
@@ -69,9 +66,6 @@ spec:
         hostname: "thanos-bucketweb.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
-        extraTls:
-          - hosts:
-              - *host
 
     compactor:
       enabled: true
@@ -89,9 +83,6 @@ spec:
         hostname: "thanos-compactor.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
-        extraTls:
-          - hosts:
-              - *host
       persistence:
         enabled: true
         storageClass: "ceph-block"
@@ -110,9 +101,6 @@ spec:
         hostname: "thanos-storegateway.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
-        extraTls:
-          - hosts:
-              - *host
       persistence:
         enabled: true
         size: 512Mi
@@ -135,9 +123,6 @@ spec:
         hostname: "thanos-ruler.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
         tls: true
-        extraTls:
-          - hosts:
-              - *host
       persistence:
         enabled: true
         storageClass: "ceph-block"
