@@ -14,3 +14,5 @@ kubeconfig
 backend.conf
 *.tfvars
 *.pkrvars.hcl
+
+talosconfig
