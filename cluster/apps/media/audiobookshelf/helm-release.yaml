@@ -19,11 +19,11 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 2.0.13
+      tag: 2.0.15
       # pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
-    
+
     ingress:
       main:
         enabled: true
@@ -44,11 +44,11 @@ spec:
       config:
         enabled: true
         mountPath: /config
-        existingClaim: pvc-ceph-audiobookshelf-config
+        existingClaim: audiobookshelf-config-pvc
       metadata:
         enabled: true
         mountPath: /metadata
-        existingClaim: pvc-ceph-audiobookshelf-metadata
+        existingClaim: audiobookshelf-metadata-pvc
       media:
         enabled: true
         mountPath: /audiobooks
