@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - ../../../../../global/flux/repositories/git
   - external-snapshotter.yaml
-  - home-ops.yaml
+  - k8s-gitops.yaml
   - kube-prometheus-stack.yaml
