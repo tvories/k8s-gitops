@@ -110,7 +110,7 @@ spec:
               - name: "sdb"
           - name: "physical2"
             devices:
-              - name: "/dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S2R5NXAH203856K"
+              - name: "sdb"
 
     ingress:
       dashboard:
