@@ -115,12 +115,12 @@ spec:
         annotations:
           # traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
         host:
-          name: "rook.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+          name: &host "rook.${CLUSTER_NAME}.${SECRET_DOMAIN}"
           path: "/"
         tls:
           - secretName: tls.rook-ceph
             hosts:
-              - "rook.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+              - *host
 
     cephBlockPoolsVolumeSnapshotClass:
       enabled: true
