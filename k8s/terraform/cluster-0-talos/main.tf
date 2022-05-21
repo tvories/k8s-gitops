@@ -103,7 +103,7 @@ resource "vsphere_virtual_machine" "talos-worker" {
   datacenter_id = data.vsphere_datacenter.dc.id
   wait_for_guest_net_timeout = -1
   host_system_id = data.vsphere_host.host.id
-  num_cpus = "4"
+  num_cpus = "8"
   memory = 8192
   folder = "k8"
   # firmware = "efi"
