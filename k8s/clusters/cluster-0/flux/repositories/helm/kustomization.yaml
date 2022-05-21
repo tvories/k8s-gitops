@@ -16,7 +16,7 @@ resources:
   - minecraft-charts.yaml
   - emqx-charts.yaml
   - hashicorp-charts.yaml
-  - prometheus-community-charts.yaml
+  # - prometheus-community-charts.yaml
   - rook-ceph-charts.yaml
   - vmware-tanzu-charts.yaml
   - grafana-charts.yaml
