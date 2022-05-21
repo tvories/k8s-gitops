@@ -52,7 +52,7 @@ spec:
         osd:
           requests:
             cpu: "442m"
-            memory: "2678M"
+            memory: "5944"
           limits:
             memory: "5944M"
         prepareosd:
