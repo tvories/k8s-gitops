@@ -5,7 +5,7 @@ resources:
   - ../../../../../global/flux/repositories/helm
   # - bitnami-charts.yaml
   - ingress-nginx-charts.yaml
-  - jetstack-charts.yaml
+  # - jetstack-charts.yaml
   - k8s-at-home-charts.yaml
   - metallb-charts.yaml
   - kubernetes-dashboard-charts.yaml
