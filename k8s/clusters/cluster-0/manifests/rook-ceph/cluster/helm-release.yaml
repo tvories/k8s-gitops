@@ -30,9 +30,9 @@ spec:
     cephClusterSpec:
       network:
         provider: host
-      connections:
-        compression:
-          enabled: true
+        connections:
+          compression:
+            enabled: true
 
       resources:
         mgr:
