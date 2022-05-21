@@ -15,17 +15,23 @@ tasks:
   talos-apply:
     desc: Apply manifests to talos nodes
     cmds:
-      - talosctl -n physical2 apply-config -f k8s/talos/cluster-0/machineConfigs/physical2.yaml --insecure
       - talosctl -n talos-cp-1 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-cp-1.yaml --insecure
       - talosctl -n talos-cp-2 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-cp-2.yaml --insecure
       - talosctl -n talos-cp-3 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-cp-3.yaml --insecure
       - talosctl -n talos-worker-1 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-worker-1.yaml --insecure
       - talosctl -n talos-worker-2 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-worker-2.yaml --insecure
+      - talosctl -n talos-worker-3 apply-config -f k8s/talos/cluster-0/machineConfigs/talos-worker-3.yaml --insecure
+      - talosctl -n physical2 apply-config -f k8s/talos/cluster-0/machineConfigs/physical2.yaml --insecure
     
   talos-wipe-physical:
     desc: Wipe physical nodes for re-apply
     cmds:
       - talosctl reset --nodes physical2 --endpoints physical2 --reboot
+
+  talos-bootstrap-cluster:
+    desc: Bootstrap first etcd node
+    cmds:
+      - talosctl bootstrap --nodes talos-cp-1 --endpoints talos-cp-1
 
   # bootstrap-wipe-rook:
   #   desc: Wipe rook disks in talos

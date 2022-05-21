@@ -38,7 +38,7 @@ machine:
       rotate-server-certificates: 'true'
     image: ghcr.io/siderolabs/kubelet:v1.23.6
   network:
-    hostname: physical2.mcbadass.local
+    hostname: talos-worker-3.mcbadass.local
   sysctls:
     fs.inotify.max_user_instances: '8192'
     fs.inotify.max_user_watches: '1048576'

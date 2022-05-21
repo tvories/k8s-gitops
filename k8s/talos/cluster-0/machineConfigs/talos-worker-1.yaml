@@ -39,9 +39,6 @@ machine:
     image: ghcr.io/siderolabs/kubelet:v1.23.6
   network:
     hostname: talos-worker-1.mcbadass.local
-    interfaces:
-    - dhcp: true
-      interface: eth0
   sysctls:
     fs.inotify.max_user_instances: '8192'
     fs.inotify.max_user_watches: '1048576'
