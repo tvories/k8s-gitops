@@ -14,14 +14,10 @@ spec:
       - dns01:
           cloudflare:
             apiKeySecretRef:
-              key: api_key
-              name: cloudflare-api-key-secret
+              key: cloudflare-token
+              name: cloudflare-token-secret
             email: "${SECRET_CLOUDFLARE_EMAIL}"
-        selector:
-          dnsZones:
-            - ${PERSONAL_DOMAIN}
-            - ${FAMILY_DOMAIN}
-            - ${INGRESS_DOMAIN}
+
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -38,7 +34,6 @@ spec:
       - dns01:
           cloudflare:
             apiKeySecretRef:
-              key: api_key
-              name: cloudflare-api-key-secret
+              key: cloudflare-token
+              name: cloudflare-token-secret
             email: "${SECRET_CLOUDFLARE_EMAIL}"
-
