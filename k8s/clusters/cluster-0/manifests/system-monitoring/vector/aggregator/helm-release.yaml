@@ -223,6 +223,6 @@ spec:
               - op: add
                 path: /spec/loadBalancerIP
                 value: ${LB_VECTOR_AGGREGATOR}
-              - op: replace
-                path: /spec/externalTrafficPolicy
-                value: Local
+              # - op: replace
+              #   path: /spec/externalTrafficPolicy
+              #   value: Local
