@@ -24,3 +24,4 @@ resources:
   - kasten-charts.yaml
   - fairwinds-charts.yaml
   - vector-charts.yaml
+  - kubernetes-sigs-descheduler-charts.yaml
