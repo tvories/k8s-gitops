@@ -2,7 +2,7 @@
 # kubeProxyReplacement enables kube-proxy replacement in Cilium BPF datapath
 kubeProxyReplacement: "strict"
 
-k8sServiceHost: talos-prod.mcbadass.local
+k8sServiceHost: cluster-0.mcbadass.local
 k8sServicePort: 6443
 
 ipam:

@@ -5,8 +5,13 @@ cluster:
     key: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUJSVy9PTGVFajlZdk5SYytwWmkwTzZDK2FiMEtHYTNZMVE2UE4yN1ZHWmVvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFN1h2RTg4YjhYeThFVnU0S1RpVTFYWjU3bnJEMGRzNGd2azNJK3NTMEJMd0VscmVlOElMZApnbVdpd2FWc3Z5OXhUMklXQi9KOE9jMEFYaHdDNDVHMTFRPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
   apiServer:
     certSANs:
+    - 192.168.80.91
+    - talos-cp-2
+    - talos-cp-2.mcbadass.local
     - cluster-0.mcbadass.local
     disablePodSecurityPolicy: true
+    extraArgs:
+      feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     image: k8s.gcr.io/kube-apiserver:v1.23.6
   ca:
     crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJpekNDQVRDZ0F3SUJBZ0lSQU8vWHpyV1FSVU5YaXFkbi94clZXMmd3Q2dZSUtvWkl6ajBFQXdJd0ZURVQKTUJFR0ExVUVDaE1LYTNWaVpYSnVaWFJsY3pBZUZ3MHlNakExTVRjd016TXdORGxhRncwek1qQTFNVFF3TXpNdwpORGxhTUJVeEV6QVJCZ05WQkFvVENtdDFZbVZ5Ym1WMFpYTXdXVEFUQmdjcWhrak9QUUlCQmdncWhrak9QUU1CCkJ3TkNBQVQ3YnVGTk5ZakNabVcxeVY3OFpubW1ZZzIzQXNvek5nTkRYaW1Nbko2dm9obDhHOFBmRE1OTTRyYjcKTi92WkFzNkNqMndhdTlVaVpuNTR1bkdpNmdjaW8yRXdYekFPQmdOVkhROEJBZjhFQkFNQ0FvUXdIUVlEVlIwbApCQll3RkFZSUt3WUJCUVVIQXdFR0NDc0dBUVVGQndNQ01BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPCkJCWUVGTDkxdHZMSUJybFc2RGlPam56WklvSjJNKzhKTUFvR0NDcUdTTTQ5QkFNQ0Ewa0FNRVlDSVFDWEdVaFYKWUtWSjhwNUV5S0I3T21xRCtiWm9jdXVvUENJTnlEcGk3M0dRdGdJaEFJRitCOHBFNlUveEVCeUR2UmVGKzlGWAp0MmN6cThocW1ZOXdsQkY3NGdyNwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
@@ -15,6 +20,8 @@ cluster:
   controlPlane:
     endpoint: https://talos-prod.mcbadass.local:6443
   controllerManager:
+    extraArgs:
+      feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     image: k8s.gcr.io/kube-controller-manager:v1.23.6
   discovery:
     enabled: true
@@ -42,8 +49,12 @@ cluster:
     - 10.96.0.0/12
   proxy:
     disabled: true
+    extraArgs:
+      feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     image: k8s.gcr.io/kube-proxy:v1.23.6
   scheduler:
+    extraArgs:
+      feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     image: k8s.gcr.io/kube-scheduler:v1.23.6
   secret: z3XyWmAze9VRXWv7i7jr8UMWA8bMP2NNeKrDSlA/rzA=
   serviceAccount:
@@ -55,12 +66,16 @@ machine:
     crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJQekNCOHFBREFnRUNBaEVBNC9uNnNsQ25PWHdSS1VBNUtJckF4akFGQmdNclpYQXdFREVPTUF3R0ExVUUKQ2hNRmRHRnNiM013SGhjTk1qSXdOVEUzTURNek1EUTVXaGNOTXpJd05URTBNRE16TURRNVdqQVFNUTR3REFZRApWUVFLRXdWMFlXeHZjekFxTUFVR0F5dGxjQU1oQUhMV1d4bWVaODZPV0hObUhhemJieGl1K1ZJMUNNOXo0RTFJCjB4ODBtSTJHbzJFd1h6QU9CZ05WSFE4QkFmOEVCQU1DQW9Rd0hRWURWUjBsQkJZd0ZBWUlLd1lCQlFVSEF3RUcKQ0NzR0FRVUZCd01DTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlBDZXRPdTN1aDkzVzU0YwpqMlZlejd4VWJvUDBNQVVHQXl0bGNBTkJBR2FDOU5wNWk1dWVEVW5JdGxTVXZOdndDanZGUTJ0K1dPYWxZSHpOCmtKV1FOUEVnTHNybXVIUTZTRDA4a2oyMGpVeDk3YzdTNmZDbUtoeG9iTUQrblFrPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
     key: LS0tLS1CRUdJTiBFRDI1NTE5IFBSSVZBVEUgS0VZLS0tLS0KTUM0Q0FRQXdCUVlESzJWd0JDSUVJS3NHZVR6R05DUVBHajJQdUN5eVZHUFNTV3VwdU5pZUwvUGdpRzB4Qk9mOAotLS0tLUVORCBFRDI1NTE5IFBSSVZBVEUgS0VZLS0tLS0K
   certSANs:
+  - 192.168.80.91
+  - talos-cp-2.mcbadass.local
   - cluster-0.mcbadass.local
   features:
     rbac: true
   install:
     bootloader: true
     disk: /dev/sda
+    extraKernelArgs:
+    - talos.logging.kernel=udp://192.168.81.42:6050/
     image: ghcr.io/siderolabs/installer:v1.0.5
     wipe: false
   kubelet:
@@ -68,7 +83,15 @@ machine:
       feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
       rotate-server-certificates: 'true'
     image: ghcr.io/siderolabs/kubelet:v1.23.6
+  logging:
+    destinations:
+    - endpoint: udp://192.168.81.42:6051/
+      format: json_lines
   network:
+    extraHostEntries:
+    - aliases:
+      - cluster-0.mcbadass.local
+      ip: 192.168.80.91
     hostname: talos-cp-2.mcbadass.local
     interfaces:
     - dhcp: true
