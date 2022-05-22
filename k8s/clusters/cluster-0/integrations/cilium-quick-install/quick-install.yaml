@@ -372,11 +372,7 @@ subjects:
   - kind: ServiceAccount
     name: "cilium"
     namespace: kube-system
-    annotations:
-      meta.helm.sh/release-name: cilium
-      meta.helm.sh/release-namespace: kube-system
-    labels:
-      app.kubernetes.io/managed-by: Helm
+
 ---
 # Source: cilium/templates/cilium-operator/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -391,11 +387,6 @@ subjects:
   - kind: ServiceAccount
     name: "cilium-operator"
     namespace: kube-system
-    annotations:
-      meta.helm.sh/release-name: cilium
-      meta.helm.sh/release-namespace: kube-system
-    labels:
-      app.kubernetes.io/managed-by: Helm
 ---
 # Source: cilium/templates/cilium-agent/daemonset.yaml
 apiVersion: apps/v1
