@@ -1,6 +1,8 @@
 domains:
     hardware: mcbadass.local
 cluster:
+    endpointIP: 192.168.80.91
+    vectorAggregatorIP: 192.168.81.42
     aescbcEncryptionSecret: ENC[AES256_GCM,data:PRzqvdfvjieWvYO4nT9nH6kwYVXJ8oUswBihGQmL6GgiTpg9gDSef3/yEKE=,iv:pVyZooOGY9CDsJW2NyXWfZqpEFt8yrAwmjg4bWZNPE8=,tag:8n8KAWiDcvnQS8H8+oarYQ==,type:str]
     ca:
         key: ENC[AES256_GCM,data:zFwVnIZyn7VqmG9o7InQm89PBPMV6tNjN8bbZ7FhCMbXnXey4R+ffSzUJ/520GLqQmRacXylHcsQlnLakZ8zDmFxqWXwnTashIkam8ISPT8s82LNVdx16zGF6eJ7Gh2k8FbUeMkPYzTss8nYML5GFNhNrvm1Uct4kr36s5VdB1Ex1k1ixbKAbwyR0g5aptj3knxCRa4EN4Ex6ksa9TEjzmQlY+8D1srNeDnvWyHeg018gD97f+hDF1AFbpvkdpB3M3vM/yYEmPPxxU0zp0RNBmAlzY5RchY6NfuooRflLo+DJVPLfbsJ0YVXqUX36UBN823nflxnjE6fe3w7lKN+OcZaMwx75WnHFhlo9Px2+A37GDei+clqR1joW0Ge6cLnoP0u2ENEvnBwju5tZK6AuA==,iv:sp5bWqq6yB+Hi9Rx0GamqGnmJkY5ba1pNEa5UfIAueI=,tag:jeyPb8QoKKZZnyIwPSQADQ==,type:str]
@@ -33,8 +35,8 @@ sops:
             VDd6bGYxSk53L3FZcEZrQW1mdkFaZ3MKiM8ki9T50j/LTkW7DA0uOHFl1Slz5Utx
             hgP+27/BqvSlVd854Pahm74I1u1/TJhCN8g9rpIjoyllw8p94phhVg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2022-05-20T22:06:36Z"
-    mac: ENC[AES256_GCM,data:aL171LN0RY3u4NkxzmmTyUBxcAratGrxf/wQ33KpFgvIt9YWIzzzO7mtFxtuu+cNsPonxKvCPbgarBeuuBz7vL7avliw77ku0Lclq0Hqd115uBZzvU7Fc8j8/rXYixHAQ+14UVTFtpe+8w+9oJLi0rhIRsOlx8BsOisbuMoR4cU=,iv:zi2OAUcpkkFZ55XWccJNbZ7dHVOHI5ifmBA4qqqL3zo=,tag:j0y+jFa8FHNsrpMdxsqClQ==,type:str]
+    lastmodified: "2022-05-22T15:57:45Z"
+    mac: ENC[AES256_GCM,data:MNTN0FQod06QHksipMSMuHgsBEcTNXn0MW1Ii1kIVp35hkkhkJN1KfBrxsejmw0571+cVAFXokCJT9xuhXsgka+HZJ62uQvPFceX5PNgdwq9gKcw1kSd957TkA5owDtn0HVVvAEnpWuR0dbn8PpNzUcHwel8iVKhCyk4+ZUIcFs=,iv:Aiee3LkWICsXchYPylrtSug0EfyFemgF3wtrlgcmFsk=,tag:+rT2QEz3v9b0fA9LS7cbgw==,type:str]
     pgp:
         - created_at: "2022-05-20T22:06:35Z"
           enc: |

@@ -28,7 +28,7 @@ nodes:
     ip_address: 192.168.80.90
 
 controlplane:
-  endpoint: "https://talos-prod.${domains.hardware}:6443"
+  endpoint: "https://cluster-0.${domains.hardware}:6443"
 
   configPatches:
     - op: add
@@ -36,6 +36,18 @@ controlplane:
       value:
         rotate-server-certificates: "true"
         feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+
+    - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+        - "talos.logging.kernel=udp://192.168.81.42:6050/"
+
+    - op: add
+      path: /machine/logging
+      value:
+        destinations:
+          - endpoint: "udp://192.168.81.42:6051/"
+            format: json_lines
 
     - op: add
       path: /machine/time
@@ -51,17 +63,49 @@ controlplane:
           dhcp: true
 
     - op: add
+      path: /machine/network/extraHostEntries
+      value:
+        - ip: ${cluster.endpointIP}
+          aliases:
+            - cluster-0.${domains.hardware}
+
+    - op: add
       path: /cluster/proxy/disabled
       value: true
 
     - op: add
       path: /cluster/apiServer/certSANs
       value:
+        - ${cluster.endpointIP}
+        - ${builtin.hostname}
+        - ${builtin.hostname}.${domains.hardware}
         - cluster-0.${domains.hardware}
+
+    - op: add
+      path: /cluster/apiServer/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/controllerManager/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/proxy/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /cluster/scheduler/extraArgs
+      value:
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
 
     - op: add
       path: /machine/certSANs
       value:
+        - ${cluster.endpointIP}
+        - ${builtin.hostname}.${domains.hardware}
         - cluster-0.${domains.hardware}
 
     - op: add
@@ -82,6 +126,13 @@ workers:
       path: /machine/kubelet/extraArgs
       value:
         rotate-server-certificates: "true"
+        feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+
+    - op: add
+      path: /machine/certSANs
+      value:
+        - ${builtin.hostname}
+        - ${builtin.hostname}.${domains.hardware}
 
     - op: add
       path: /machine/time
@@ -96,8 +147,27 @@ workers:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
 
-    # - op: add
-    #   path: /machine/network/interfaces
-    #   value:
-    #     - interface: eth0
-    #       dhcp: true
+    - op: add
+      path: /machine/network/interfaces
+      value:
+        - interface: eth0
+          dhcp: true
+
+    - op: add
+      path: /machine/network/extraHostEntries
+      value:
+        - ip: ${cluster.endpointIP}
+          aliases:
+            - cluster-0.${domains.hardware}
+
+    - op: add
+      path: /machine/install/extraKernelArgs
+      value:
+        - "talos.logging.kernel=udp://192.168.81.42:6050/"
+
+    - op: add
+      path: /machine/logging
+      value:
+        destinations:
+          - endpoint: "udp://192.168.81.42:6051/"
+            format: json_lines
