@@ -172,6 +172,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cilium
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - networking.k8s.io
@@ -247,6 +252,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cilium-operator
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - ""
@@ -364,6 +374,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cilium
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -379,6 +394,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cilium-operator
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -411,12 +431,15 @@ spec:
   template:
     metadata:
       annotations:
+        meta.helm.sh/release-name: cilium
+        meta.helm.sh/release-namespace: kube-system
         # This annotation plus the CriticalAddonsOnly toleration makes
         # cilium to be a critical pod in the cluster, which ensures cilium
         # gets priority scheduling.
         # https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
         scheduler.alpha.kubernetes.io/critical-pod: ""
       labels:
+        app.kubernetes.io/managed-by: Helm
         k8s-app: cilium
     spec:
       affinity:
@@ -708,7 +731,10 @@ spec:
   template:
     metadata:
       annotations:
+        meta.helm.sh/release-name: cilium
+        meta.helm.sh/release-namespace: kube-system
       labels:
+        app.kubernetes.io/managed-by: Helm
         io.cilium/app: operator
         name: cilium-operator
     spec:
