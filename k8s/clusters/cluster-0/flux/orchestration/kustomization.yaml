@@ -4,15 +4,15 @@ kind: Kustomization
 resources:
   - ./cert-manager.yaml
   # - ./dev.yaml
-  # - ./downloads.yaml
+  - ./downloads.yaml
   - ./flux-system.yaml
-  # - ./home-automation.yaml
+  - ./home.yaml
   - ./kube-system.yaml
-  # - ./media.yaml
+  - ./media.yaml
   - ./network.yaml
   - ./rook-ceph.yaml
   # - ./scripts.yaml
-  # - ./selfhosted.yaml
+  - ./selfhosted.yaml
   - ./system-monitoring.yaml
   - ./system.yaml
   - ./trilio.yaml
