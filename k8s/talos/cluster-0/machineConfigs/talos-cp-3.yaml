@@ -75,7 +75,7 @@ machine:
     bootloader: true
     disk: /dev/sda
     extraKernelArgs:
-    - talos.logging.kernel=udp://192.168.81.42:6050/
+    - talos.logging.kernel=udp://192.168.83.42:6050/
     image: ghcr.io/siderolabs/installer:v1.0.5
     wipe: false
   kubelet:
@@ -85,7 +85,7 @@ machine:
     image: ghcr.io/siderolabs/kubelet:v1.23.6
   logging:
     destinations:
-    - endpoint: udp://192.168.81.42:6051/
+    - endpoint: udp://192.168.83.42:6051/
       format: json_lines
   network:
     extraHostEntries:
