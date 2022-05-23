@@ -2,7 +2,7 @@ domains:
     hardware: mcbadass.local
 cluster:
     endpointIP: 192.168.80.91
-    vectorAggregatorIP: 192.168.81.42
+    vectorAggregatorIP: 192.168.83.42
     aescbcEncryptionSecret: ENC[AES256_GCM,data:PRzqvdfvjieWvYO4nT9nH6kwYVXJ8oUswBihGQmL6GgiTpg9gDSef3/yEKE=,iv:pVyZooOGY9CDsJW2NyXWfZqpEFt8yrAwmjg4bWZNPE8=,tag:8n8KAWiDcvnQS8H8+oarYQ==,type:str]
     ca:
         key: ENC[AES256_GCM,data:zFwVnIZyn7VqmG9o7InQm89PBPMV6tNjN8bbZ7FhCMbXnXey4R+ffSzUJ/520GLqQmRacXylHcsQlnLakZ8zDmFxqWXwnTashIkam8ISPT8s82LNVdx16zGF6eJ7Gh2k8FbUeMkPYzTss8nYML5GFNhNrvm1Uct4kr36s5VdB1Ex1k1ixbKAbwyR0g5aptj3knxCRa4EN4Ex6ksa9TEjzmQlY+8D1srNeDnvWyHeg018gD97f+hDF1AFbpvkdpB3M3vM/yYEmPPxxU0zp0RNBmAlzY5RchY6NfuooRflLo+DJVPLfbsJ0YVXqUX36UBN823nflxnjE6fe3w7lKN+OcZaMwx75WnHFhlo9Px2+A37GDei+clqR1joW0Ge6cLnoP0u2ENEvnBwju5tZK6AuA==,iv:sp5bWqq6yB+Hi9Rx0GamqGnmJkY5ba1pNEa5UfIAueI=,tag:jeyPb8QoKKZZnyIwPSQADQ==,type:str]
