@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - tls-cert.yaml
   - helmrelease.yaml
-  # - secret-dex.sops.yaml
+  - secret-dex.sops.yaml
   - rbac.yaml
