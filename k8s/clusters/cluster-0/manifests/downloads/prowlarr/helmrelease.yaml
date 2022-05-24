@@ -23,8 +23,8 @@ spec:
 
     hostname: prowlarr
 
-    podAnnotations:
-      setGateway: "true"
+    # podAnnotations:
+    #   setGateway: "true"
 
     env:
       TZ: "${TIMEZONE}"
