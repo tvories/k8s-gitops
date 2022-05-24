@@ -81,14 +81,14 @@ spec:
         path: /mnt/fatguys/Backup/k8s/applications/plex
         mountPath: /config/Backups
 
-    # resources:
-    #   requests:
-    #     cpu: 49m
-    #     memory: 4282M
+    resources:
+      requests:
+        cpu: 49m
+        memory: 4282M
     #     gpu.intel.com/i915: 1
-    #   limits:
+      limits:
     #     gpu.intel.com/i915: 1
-    #     memory: 7982M
+        memory: 7982M
 
     # affinity:
     #   nodeAffinity:
