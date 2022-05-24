@@ -8,7 +8,6 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: pod-gateway
       version: 5.4.2
       sourceRef:
@@ -22,7 +21,7 @@ spec:
       tag: v1.5.0
 
     routed_namespaces:
-    - downloads
+      - downloads
 
     publicPorts:
     - hostname: qb #hostname assigned to the pod
@@ -65,6 +64,8 @@ spec:
       failureThreshold: 1
 
     addons:
+      netshoot:
+        enabled: true
       vpn:
         enabled: true
         type: wireguard
@@ -74,6 +75,7 @@ spec:
             repository: ghcr.io/k8s-at-home/wireguard
             tag: v1.0.20210914
             pullPolicy: IfNotPresent
+
         
         up: |-
           #!/bin/bash
@@ -82,6 +84,9 @@ spec:
         securityContext:
           runAsUser: 568
           runAsGroup: 568
+          capabilities:
+            drop:
+              - "SYS_MODULE"
 
         env:
           TZ: "${TIMEZONE}"
