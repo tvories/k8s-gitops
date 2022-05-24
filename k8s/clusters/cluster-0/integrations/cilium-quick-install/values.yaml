@@ -1,4 +1,11 @@
 ---
+cluster:
+  name: "cluster-0"
+  id: "1"
+
+rollOutCiliumPods: true
+localRedirectPolicy: true
+
 # kubeProxyReplacement enables kube-proxy replacement in Cilium BPF datapath
 kubeProxyReplacement: "strict"
 
@@ -21,6 +28,8 @@ ipam:
 # Cilium leverages MetalLB's simplified BGP announcement system for service type: LoadBalancer
 bgp:
   enabled: false
+  announce:
+    loadbalancerIP: true
 
 hubble:
   # -- Enable Hubble (true by default).
