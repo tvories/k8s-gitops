@@ -35,6 +35,7 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      ADVERTISE_IP: "https://plex.${SECRET_DOMAIN}:443/,http://${LB_PLEX}:32400/"
 
     service:
       main:
