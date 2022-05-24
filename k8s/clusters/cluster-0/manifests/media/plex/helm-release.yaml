@@ -35,7 +35,7 @@ spec:
 
     service:
       main:
-        type: Loadbalancer
+        type: LoadBalancer
         loadBalancerIP: ${LB_PLEX}
         externalTrafficPolicy: Local
 
