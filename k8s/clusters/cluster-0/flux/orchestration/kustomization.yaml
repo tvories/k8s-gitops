@@ -16,4 +16,4 @@ resources:
   - ./system-monitoring.yaml
   - ./system.yaml
   - ./trilio.yaml
-  # - ./vpn.yaml
+  - ./vpn.yaml
