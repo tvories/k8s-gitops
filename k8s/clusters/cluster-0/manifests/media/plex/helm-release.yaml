@@ -23,6 +23,9 @@ spec:
       tag: v1.26.1.5798-99a4a6ac9
 
     podSecurityContext:
+      runAsUser: 568                                                                                                                                                                                                                                                                         
+      runAsGroup: 568                                                                                                                                                                                                                                                                        
+      fsGroup: 568
       supplementalGroups:
       - 44
       - 109
