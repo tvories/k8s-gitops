@@ -8,7 +8,6 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: radarr
       version: 16.2.3
       sourceRef:
@@ -31,6 +30,19 @@ spec:
     env:
       TZ: "${TIMEZONE}"
 
+    persistence:
+      config:
+        enabled: true
+        existingClaim: radarr-config
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Media
+        mountPath: /media
+
     ingress:
       main:
         enabled: true
@@ -45,19 +57,6 @@ spec:
           - secretName: tls.radarr
             hosts:
               - *host
-
-      persistence:
-      config:
-        enabled: true
-        existingClaim: radarr-config
-      media:
-        enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Media
-        mountPath: /media
 
     resources:
       requests:
