@@ -22,6 +22,8 @@ spec:
       tag: v3.0.8.1507
 
     podSecurityContext:
+      fsGroup: 568
+      runAsUser: 568
       supplementalGroups:
         - 65539
 
