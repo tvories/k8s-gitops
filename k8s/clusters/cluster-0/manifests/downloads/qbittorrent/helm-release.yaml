@@ -1,0 +1,114 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: qbittorrent
+      version: 13.4.3
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: ghcr.io/k8s-at-home/qbittorrent
+      tag: v4.4.2
+      pullPolicy: Always
+
+    hostname: qb
+
+    podAnnotations:
+      setGateway: "true"
+
+    initContainers:
+      copy-config:
+        image: busybox:latest
+        command:
+          - "/bin/sh"
+          - -c
+        args:
+          - cp /data/configfiles/* /data/config/; chown -R 568:568 /data/config
+        volumeMounts:
+          - name: config
+            mountPath: /data/config
+          - name: configfiles
+            mountPath: /data/configfiles
+
+    podSecurityContext:
+      supplementalGroups:
+        - 65539
+    #   runAsUser: 1000
+    #   runAsGroup: 1000
+    #   fsGroup: 1000
+    #   fsGroupChangePolicy: OnRootMismatch
+
+    # settings:
+    #   automaticPortSetup: true
+
+    env:
+      TZ: "${TIMEZONE}"
+      UMASK: "022"
+      USE_PROFILE: "true"
+
+    persistence:
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /config/qBittorrent/cache
+
+      config:
+        enabled: true
+        type: emptyDir
+        mountPath: /config/qBittorrent/config
+      
+      configfiles:
+        enabled: true
+        type: configMap
+        name: qbittorrent-config
+        mountPath: "-"
+
+      data:
+        enabled: true
+        existingClaim: qbittorrent-config
+        mountPath: /config/qBittorrent/data
+
+      media:
+        enabled: true
+        type: nfs
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Media
+        mountPath: /media
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_hide_header "x-webkit-csp";
+            proxy_hide_header "content-security-policy";
+            proxy_hide_header "X-Frame-Options";
+            proxy_set_header Accept-Encoding "";
+        hosts:
+        - host: &host qb.${SECRET_DOMAIN}
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.qbittorrent
+          hosts:
+            - *host
+
+    resources:
+      requests:
+        cpu: 35m
+        memory: 765M
+      limits:
+        memory: 1426M
