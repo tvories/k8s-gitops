@@ -23,8 +23,8 @@ spec:
 
     hostname: qb
 
-    # podAnnotations:
-    #   setGateway: "true"
+    podAnnotations:
+      setGateway: "true"
 
     initContainers:
       copy-config:
