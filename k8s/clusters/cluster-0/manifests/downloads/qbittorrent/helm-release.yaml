@@ -8,7 +8,6 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: qbittorrent
       version: 13.4.3
       sourceRef:
@@ -42,18 +41,17 @@ spec:
             mountPath: /data/configfiles
 
     podSecurityContext:
-      fsGroup: 568
-      runAsUser: 568
-      runAsGroup: 568
-      # runAsUser: 1000
-      # fsGroup: 1000
-      fsGroupChangePolicy: OnRootMismatch
+      # fsGroup: 568
+      # runAsUser: 568
+      # runAsGroup: 568
+      # # runAsUser: 1000
+      # # fsGroup: 1000
+      # fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
         - 65539
-  
 
-    # settings:
-    #   automaticPortSetup: true
+    settings:
+      automaticPortSetup: false
 
     env:
       TZ: "${TIMEZONE}"
@@ -70,7 +68,7 @@ spec:
         enabled: true
         type: emptyDir
         mountPath: /config/qBittorrent/config
-      
+
       configfiles:
         enabled: true
         type: configMap
