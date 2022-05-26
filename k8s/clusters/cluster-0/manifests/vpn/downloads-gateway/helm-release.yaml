@@ -47,6 +47,7 @@ spec:
       # Traffic to these IPs will be send through the K8S gateway
       # change if your K8S cluster or home network uses a different CIDR
       VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_POD_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR} ${NETWORK_LOCAL_CIDR}"
+      VXLAN_GATEWAY_FIRST_DYNAMIC_IP: 20
 
     webhook:
       image:
