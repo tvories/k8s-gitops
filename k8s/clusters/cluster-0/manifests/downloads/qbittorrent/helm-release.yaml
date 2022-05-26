@@ -42,6 +42,8 @@ spec:
             mountPath: /data/configfiles
 
     podSecurityContext:
+      fsGroup: 568
+      runAsUser: 568
       supplementalGroups:
         - 65539
     #   runAsUser: 1000
