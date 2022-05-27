@@ -13,7 +13,7 @@ spec:
     path: /mnt/fatguys/Media
     server: ${SECRET_NAS1}
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=4.1
     - tcp
     - intr
     - hard
@@ -37,7 +37,7 @@ spec:
     path: /mnt/fatguys/Backup/k8s
     server: ${SECRET_NAS1}
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=4.1
     - tcp
     - intr
     - hard
