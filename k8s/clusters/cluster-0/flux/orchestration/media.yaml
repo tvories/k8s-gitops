@@ -12,6 +12,22 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: media-pvc
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: media-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/media/_pvc"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
