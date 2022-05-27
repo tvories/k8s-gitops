@@ -36,19 +36,15 @@ spec:
         existingClaim: sonarr-config
       media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Media
+        type: nfs
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Media
         mountPath: /media
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Backup/k8s/applications/sonarr
+        type: nfs
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Backup/k8s/applications/sonarr
         mountPath: /config/Backups
 
     ingress:

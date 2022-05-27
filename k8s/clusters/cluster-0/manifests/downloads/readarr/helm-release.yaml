@@ -35,19 +35,15 @@ spec:
         existingClaim: readarr-config
       media:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Media
+        type: nfs
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Media
         mountPath: /media
       backup:
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Backup/k8s/applications/readarr
+        type: nfs
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Backup/k8s/applications/readarr
         mountPath: /config/Backups
 
     ingress:
@@ -61,9 +57,24 @@ spec:
             paths:
               - path: /
         tls:
-          - secretName: tls.readarr
+          - secretName: &tls tls.readarr
             hosts:
               - *host
+
+      api:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: *host
+            paths:
+              - path: /api
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+            secretName: *tls
 
     resources:
       requests:
