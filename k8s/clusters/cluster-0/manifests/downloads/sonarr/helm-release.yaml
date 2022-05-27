@@ -37,9 +37,11 @@ spec:
       media:
         enabled: true
         existingClaim: downloads-nfs-media
+        mountPath: /media
       backup:
         enabled: true
-        existingClaim: downloads-nfs-backup
+        existingClaim: sonarr-nfs-backup
+        mountPath: /config/Backups
 
     ingress:
       main:

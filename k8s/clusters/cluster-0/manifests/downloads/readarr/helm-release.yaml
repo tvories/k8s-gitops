@@ -41,10 +41,13 @@ spec:
         mountPath: /media
       ebooks:
         enabled: true
-        existingClaim: downloads-nfs-media
+        existingClaim: downloads-nfs-ebooks
+        mountPath: /ebooks
       backup:
         enabled: true
-        existingClaim: downloads-nfs-backup
+        existingClaim: readarr-nfs-backup
+        mountPath: /config/Backups
+
 
     ingress:
       main:
