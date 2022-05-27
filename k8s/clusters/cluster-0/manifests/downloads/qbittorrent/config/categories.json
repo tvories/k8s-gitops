@@ -1,17 +1,20 @@
 {
-  "Movies": {
+  "movies": {
       "save_path": "/media/movies"
   },
-  "Music": {
+  "music": {
       "save_path": "/media/music"
   },
-  "Books": {
+  "books": {
       "save_path": "/media/books"
   },
-  "TV": {
+  "tv": {
       "save_path": "/media/tv"
   },
-  "Downloads": {
+  "downloads": {
       "save_path": "/media/downloads"
+  },
+  "tv-sonarr": {
+      "save_path": "/media/tv"
   }
 }
