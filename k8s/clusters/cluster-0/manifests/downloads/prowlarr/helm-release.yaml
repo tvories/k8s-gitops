@@ -45,7 +45,8 @@ spec:
         mountPath: /shared
       backup:
         enabled: true
-        existingClaim: downloads-nfs-backup
+        existingClaim: prowlarr-nfs-backup
+        mountPath: /config/Backups
 
     ingress:
       main:

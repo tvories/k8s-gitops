@@ -83,6 +83,7 @@ spec:
       media:
         enabled: true
         existingClaim: downloads-nfs-media
+        mountPath: /media
 
     ingress:
       main:
