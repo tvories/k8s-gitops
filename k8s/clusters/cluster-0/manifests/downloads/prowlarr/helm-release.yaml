@@ -27,8 +27,8 @@ spec:
       setGateway: "true"
 
     podSecurityContext:
-      # fsGroup: 568
-      # runAsUser: 568
+      fsGroup: 568
+      runAsUser: 568
       supplementalGroups:
         - 65539
 
