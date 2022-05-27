@@ -82,10 +82,7 @@ spec:
 
       media:
         enabled: true
-        type: nfs
-        server: ${SECRET_NAS1}
-        path: /mnt/fatguys/Media
-        mountPath: /media
+        existingClaim: downloads-nfs-media
 
     ingress:
       main:

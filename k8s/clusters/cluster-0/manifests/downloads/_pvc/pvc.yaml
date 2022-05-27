@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: downloads-nfs-media
+spec:
+  storageClassName: downloads-nfs-media
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/Media
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.2
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: downloads-nfs-backup
+spec:
+  storageClassName: downloads-nfs-backup
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/Backup/k8s
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.2
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: downloads-nfs-media
+  namespace: downloads
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: downloads-nfs-media
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: downloads-nfs-backup
+  namespace: downloads
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: downloads-nfs-backup
+  resources:
+    requests:
+      storage: 1Mi

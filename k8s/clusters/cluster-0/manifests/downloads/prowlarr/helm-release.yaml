@@ -45,10 +45,7 @@ spec:
         mountPath: /shared
       backup:
         enabled: true
-        type: nfs
-        server: "${SECRET_NAS1}"
-        path: /mnt/fatguys/Backup/k8s/applications/prowlarr
-        mountPath: /config/Backups
+        existingClaim: downloads-nfs-backup
 
     ingress:
       main:

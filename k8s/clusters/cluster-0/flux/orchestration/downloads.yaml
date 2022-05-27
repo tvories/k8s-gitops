@@ -48,12 +48,29 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
+  name: downloads-pvc
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/_pvc"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
   name: downloads-prowlarr
   namespace: flux-system
 spec:
   dependsOn:
     - name: downloads-namespace
     - name: vpn-downloads-gateway
+    - name: downloads-pvc
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/prowlarr"
   prune: true
@@ -71,6 +88,7 @@ spec:
   dependsOn:
     - name: downloads-namespace
     - name: vpn-downloads-gateway
+    - name: downloads-pvc
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/qbittorrent"
   prune: true
@@ -87,6 +105,7 @@ metadata:
 spec:
   dependsOn:
     - name: downloads-namespace
+    - name: downloads-pvc
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/radarr"
   prune: true
@@ -103,6 +122,7 @@ metadata:
 spec:
   dependsOn:
     - name: downloads-namespace
+    - name: downloads-pvc
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/readarr"
   prune: true
@@ -119,6 +139,7 @@ metadata:
 spec:
   dependsOn:
     - name: downloads-namespace
+    - name: downloads-pvc
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/sonarr"
   prune: true
