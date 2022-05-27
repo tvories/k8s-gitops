@@ -64,7 +64,7 @@ spec:
         tls:
         - hosts:
           - *host
-          secretName: tls.sonarr
+          secretName: &tls tls.sonarr
 
       api:
         enabled: true
