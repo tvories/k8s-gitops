@@ -28,7 +28,7 @@ spec:
 
     podSecurityContext:
       fsGroup: 568
-      runAsUser: 568
+      # runAsUser: 568
       supplementalGroups:
         - 65539
 
