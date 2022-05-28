@@ -41,10 +41,10 @@ spec:
     #         mountPath: /data/configfiles
 
     podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
+      # runAsUser: 568
+      # runAsGroup: 568
+      # fsGroup: 568
+      # fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
         - 65539
 
