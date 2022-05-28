@@ -76,7 +76,8 @@ spec:
 
       backup:
         enabled: true
-        existingClaim: media-nfs-backup
+        existingClaim: plex-nfs-backup
+        mountPath: /config/Backups
 
     resources:
       requests:
