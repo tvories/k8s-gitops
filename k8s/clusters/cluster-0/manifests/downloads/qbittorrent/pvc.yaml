@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/nfs-qb-config
+    path: /mnt/fatguys/k8s/qbittorent-nfs-config
     server: ${SECRET_NAS1}
   mountOptions:
     - nfsvers=4.1
