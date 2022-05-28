@@ -65,7 +65,7 @@ spec:
       config:
         enabled: true
         existingClaim: qbittorrent-nfs-config
-        mountPath: /config
+        # mountPath: /config
 
       # configfiles:
       #   enabled: true
