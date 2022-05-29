@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: plex-config
+  name: audiobookshelf-config
   namespace: media
   labels:
     triliovault.trilio.io/backup: "true"
@@ -12,22 +12,39 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: 2Gi
+  storageClassName: ceph-block
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-metadata
+  namespace: media
+  labels:
+    triliovault.trilio.io/backup: "true"
+  #   kasten.io/backup-volume: "enabled"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
   storageClassName: ceph-block
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: plex-nfs-backup
+  name: audiobookshelf-nfs-backup
 spec:
-  storageClassName: plex-nfs-backup
+  storageClassName: audiobookshelf-nfs-backup
   capacity:
     storage: 1Mi
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/Backup/k8s/applications/plex
+    path: /mnt/fatguys/Backup/k8s/applications/audiobookshelf
     server: ${SECRET_NAS1}
   mountOptions:
     - nfsvers=4.1
@@ -42,12 +59,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: plex-nfs-backup
+  name: audiobookshelf-nfs-backup
   namespace: media
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: plex-nfs-backup
+  storageClassName: audiobookshelf-nfs-backup
   resources:
     requests:
       storage: 1Mi
