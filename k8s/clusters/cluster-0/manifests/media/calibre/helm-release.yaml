@@ -34,13 +34,13 @@ spec:
         existingClaim: media-nfs-media
         mountPath: /media
 
-      books-download:
+      ebooks:
         enabled: true
         type: nfs
         nfs:
         server: ${SECRET_NAS1}
-        path: /mnt/fatguys/Media/books
-        mountPath: /downloads
+        path: /mnt/fatguys/Books
+        mountPath: /books
 
     service:
       webserver:
