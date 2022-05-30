@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# shellscript disable=SC2153
 
 set -o nounset
 set -o errexit
