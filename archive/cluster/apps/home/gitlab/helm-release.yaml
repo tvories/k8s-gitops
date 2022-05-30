@@ -1,0 +1,32 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: gitlab
+  namespace: home
+spec:
+  releaseName: gitlab
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.gitlab.io
+      chart: gitlab
+      version: 5.7.0
+      sourceRef:
+        kind: HelmRepository
+        name: gitlab-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    global:
+      edition: ce
+      gitlabVersion: 14.7
+      hosts:
+        domain: ${SECRET_DOMAIN}
+        externalIP: ${GITLAB_LB_IP}
+
+      ## https://docs.gitlab.com/charts/charts/globals#configure-ingress-settings
+      ingress:
+        enabled: false
+      psql:
+        
