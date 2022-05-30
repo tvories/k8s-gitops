@@ -29,7 +29,7 @@ spec:
         enabled: false
     image:
       repository: jacobalberty/unifi
-      tag: v7.1.61
+      tag: v7.1.66
     podAnnotations:
       backup.velero.io/backup-volumes: data
       pre.hook.backup.velero.io/container: fsfreeze
