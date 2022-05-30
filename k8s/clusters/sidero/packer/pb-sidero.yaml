@@ -1,0 +1,293 @@
+---
+# playbook.yml
+- name: 'Provision Image'
+  hosts: default
+  become: true
+
+  vars:
+    apt_install:
+    - apt-transport-https
+    - arptables
+    - ca-certificates
+    - curl
+    - dnsutils
+    - ebtables
+    - ethtool
+    - git
+    - gnupg-agent
+    - gnupg2
+    - haveged
+    - hdparm
+    - iperf3
+    - iputils-ping
+    - ipvsadm
+    - jq
+    - lvm2
+    - neofetch
+    - net-tools
+    - netcat
+    - nfs-common
+    - nano
+    - nmap
+    - ntpdate
+    - open-iscsi
+    - pigz
+    - psmisc
+    - python3
+    - python3-openssl
+    - python3-pip
+    - rclone
+    - rsync
+    - scsitools
+    - socat
+    - software-properties-common
+    - traceroute
+    - tree
+    - unattended-upgrades
+    - unzip
+    - vim
+    apt_remove:
+    # - apparmor
+    # - apport
+    # - bcache-tools
+    # - btrfs-progs
+    # - friendly-recovery
+    # - fwupd
+    # - landscape-common
+    # - lxd-agent-loader
+    # - ntfs-3g
+    # - plymouth
+    # - plymouth-theme-ubuntu-text
+    # - popularity-contest
+    # - snapd
+    # - sosreport
+    # - tmux
+    # - ubuntu-advantage-tools
+    - ufw
+
+  tasks:
+    - name: Add ansible user
+      ansible.builtin.user:
+        name: "{{ ansible_username }}"
+        shell: /bin/bash
+
+    - name: Add ansible user key
+      ansible.posix.authorized_key:
+        user: "{{ ansible_username }}"
+        state: present
+        key: "{{ ansible_user_key }}"
+      
+    - name: Add ansible user to sudoers
+      ansible.builtin.lineinfile:
+        path: "/etc/sudoers.d/{{ ansible_username }}"
+        line: "{{ ansible_username }} ALL=(ALL) NOPASSWD: ALL"
+        state: present
+        mode: 0440
+        create: yes
+        validate: 'visudo -cf %s'
+
+    - name: packages | disable recommends
+      copy:
+        content: |
+          APT::Install-Recommends "false";
+          APT::Install-Suggests "false";
+          APT::Get::Install-Recommends "false";
+          APT::Get::Install-Suggests "false";
+        dest: /etc/apt/apt.conf.d/02norecommends
+
+    - name: packages | upgrade all packages
+      apt:
+        upgrade: full
+        update_cache: yes
+        cache_valid_time: 3600
+        autoclean: yes
+        autoremove: yes
+      register: apt_upgrade
+      retries: 10
+      delay: 20
+      until: apt_upgrade is success
+
+    - name: install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ apt_install }}"
+      register: apt_status
+      until: apt_status is success
+      retries: 5
+      delay: 8
+
+    - name: packages | remove packages
+      apt:
+        name: "{{ apt_remove }}"
+        state: absent
+        autoremove: true
+      when:
+      - apt_remove is defined
+      - apt_remove is iterable
+      - apt_remove | length > 0
+
+    - name: motd | disable
+      lineinfile:
+        dest: /etc/default/motd-news
+        state: present
+        regexp: '^ENABLED='
+        line: 'ENABLED=0'
+    
+    - name: kernel | enable modules on boot
+      copy:
+        content: "{{ item }}"
+        dest: "/etc/modules-load.d/{{ item }}.conf"
+      loop:
+      - br_netfilter
+      - overlay
+      - rbd
+      - ip_vs
+
+    - name: kernel | enable modules
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+      - br_netfilter
+      - nf_conntrack
+      - overlay
+      - rbd
+      - ip_vs
+
+    # k3s still recommended use legacy iptables
+    # https://rancher.com/docs/k3s/latest/en/known-issues/
+    # - name: network | configure nodes to use legacy iptables
+    #   community.general.alternatives:
+    #     name: "{{ item }}"
+    #     path: /usr/sbin/{{ item }}-legacy
+    #   loop:
+    #   - "iptables"
+    #   # - "ebtables"
+
+    # # k3s still recommended use legacy iptables
+    # # https://rancher.com/docs/k3s/latest/en/known-issues/
+    # - name: network | configure nodes to use legacy ip6tables
+    #   community.general.alternatives:
+    #     name: "{{ item }}"
+    #     path: /usr/sbin/{{ item }}-legacy
+    #   loop:
+    #   - "ip6tables"
+
+    - name: network | sysctl
+      blockinfile:
+        path: /etc/sysctl.d/99-kubernetes-cri.conf
+        create: true
+        block: |
+          net.ipv4.ip_forward = 1
+          net.bridge.bridge-nf-call-arptables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+      register: sysctl_network
+
+    - name: network | reload sysctl
+      shell: sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
+      when: sysctl_network.changed
+
+    - name: Enable iscsid
+      systemd:
+        name: iscsid
+        enabled: yes
+        state: started
+        daemon_reload: yes
+      failed_when: false
+      
+      # Updates kernel to 5.11
+    # - name: Download kernel files
+    #   get_url:
+    #     url: "{{ item }}"
+    #     dest: /tmp/
+    #   loop:
+    #     - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.11/amd64/linux-headers-5.11.0-051100_5.11.0-051100.202102142330_all.deb
+    #     - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.11/amd64/linux-headers-5.11.0-051100-generic_5.11.0-051100.202102142330_amd64.deb
+    #     - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.11/amd64/linux-image-unsigned-5.11.0-051100-generic_5.11.0-051100.202102142330_amd64.deb
+    #     - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.11/amd64/linux-modules-5.11.0-051100-generic_5.11.0-051100.202102142330_amd64.deb
+    
+    # # This is set to retry because sometimes apt comes back with a lock, so we retry until the lock is gone
+    # - name: Install kernel files
+    #   ansible.builtin.shell: dpkg -i /tmp/*.deb      
+    #   register: apt_status
+    #   until: apt_status is success
+    #   retries: 10
+    #   delay: 15
+
+    # - name: reboot after kernal
+    #   reboot:
+      
+    - name: Check kernel
+      shell: uname -r
+      register: uname
+    
+    - name: disable SWAP for kubernetes
+      ansible.builtin.shell: swapoff -a
+
+    - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+    
+    - name: Update all packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+      register: apt_status
+      until: apt_status is success
+      retries: 5
+      delay: 8
+
+    - name: Install kubectl CLI tools
+      get_url:
+        url: https://dl.k8s.io/release/v1.23.3/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: 0755
+
+    - name: Install clusterctl
+      get_url:
+        url: https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.7/clusterctl-linux-amd64
+        dest: /usr/local/bin/clusterctl
+        mode: 0755
+
+    - name: Install talosctl
+      get_url:
+        url: https://github.com/talos-systems/talos/releases/latest/download/talosctl-linux-amd64
+        dest: /usr/local/bin/talosctl
+        mode: 0755
+    
+    - name: Install prerequisites for Docker repository
+      apt:
+        pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg2
+        - software-properties-common
+
+    - name: add docker apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: add docker apt repo
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+        state: present
+        update_cache: yes
+      
+    - name: install docker and it's dependencies
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: start and enable docker daemon
+      service:
+        name: docker
+        state: started
+        enabled: yes

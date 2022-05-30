@@ -1,0 +1,71 @@
+# TrilioVault License
+apiVersion: triliovault.trilio.io/v1
+kind: License
+metadata:
+    name: trilio-license-1
+    namespace: trilio
+spec:
+    key: ENC[AES256_GCM,data:nWZ8T/1PUeb7OtLsTe3nslv9kkSKqEbz2bSdN7fK2zCnSZTLScCuELefAPKbLBzww4HhpeJELKpllK2BTnvOxtvh3AZCf3oe+QDeDrA0mexpxgk+q4jeIv0YCfme+fHBx2XL4CYnnwelm05cs3NATMiSwuRXEqI9C8LvyvGuNlECeOeDwIaFtPChDtoSOZnOaXnCn7RyBxEW3vKusqH3+kY2EDzMBEoHSKHRFAs9hpyf6Sg+9Ifl+qFhJz8Gejoz4W5r8mvqzPkV9HfUEbroh0vHrPo/3sbMZqrWqsKpCTcjEpNjFdpCs+90OLjr/1XEKCnmV76kqsZXc/w9bbg5AuDqhj2NQwhn7Y3hRsw0Fax4OS+hiKpJkZBbPnCZd5BmDBSiEk7F54ru8x3+QQA2yuMPl6Z3VITNE2yqgXZL3O9P23Ree2JzWPIlBmUx/MbEZO85wk7US+EDQKaLIWS7v4ibPA8ZL1a0Vjfepl6nSET48LeWj2rlKSfsVXkVGjWpravMMDslqUFOspKgeRMXImZHfC2HK0Qbyh9jSlQW3Q79NaYUppC/L6xYM663IS2Lm/cNL2YIkpnmc3mi26MmApWtE0OR3LxmAy8OVSiTO6ovEMG83cmw/1plCT6mwEu0g4aNN5K2+DQr0pUakQiZw8M=,iv:HwHUf/gF7x+wr79mYSTDp79fe6K/P/bE+2dZdegaqjg=,tag:3CLDCjYdmUdca8usyeaJGQ==,type:str]
+sops:
+    kms: []
+    gcp_kms:
+        - resource_id: projects/taylor-cloud/locations/global/keyRings/sops/cryptoKeys/sops-key
+          created_at: "2022-05-23T17:48:50Z"
+          enc: CiQAXmmCQhnP0RbqgKEfsbdor0uBiIHuknrBIBm+kbLgBo6Q7uUSSQA+M8UoQpwu6YnOOyxyrUlTtp9CmSYBwXmwwcw53Bfve8+zeHCr8wKgEXUMydjXslAiT0kBARrHPGMr/NUJgDs7j0zy+d8ZFKs=
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1q07mwz002uj9fe262u0uz4xhp2v0jqdppjpald0e259zx3u9yu5sx4klhy
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjdGgyby85Z0lZQThxVitG
+            Ulpab25ma2h0RWJ5MUFTcStTbnROYjNKT2tBCkhQVXFHNy8zQlh0MzZBNm55dThi
+            SXF3dTBMQ2gwUE85YUMvVlhOWk9LRE0KLS0tIFFhNHVCeTc1eEZsUk81NEVpdDQ3
+            TS9DdTgyVUc2dk9vUUJVb3VoaTRCeTgK/f/KmfhJciCad2M29c9oejK6lxscQufF
+            CpDsbkLDZeLv/k/sRKFaACiN6/ZYhYO8ryFL15ogkEW8Yq6rlXUM3w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-05-28T02:10:14Z"
+    mac: ENC[AES256_GCM,data:Imvt+419ziHuGKjGhMSGn709HCYh2CiZpvPGpFTpmnwOK3rRBMZW90UZJ4OZVa+3150NvZCd2nczCFZz7TcVTOI528F7NUPm/V3JgIwA9asYGVF53KyZzWkZGlSqtX9AUIMA65kL4XqES6CnK3nbWl/enHrv15rYgZfRSZiJ0Ag=,iv:x43/SrPHMTs5vA3eyU0H0ItdC5rTN9HWF5COG3adc6k=,tag:Qfu7Ze4/ipgdN5n5XKt+Nw==,type:str]
+    pgp:
+        - created_at: "2022-05-23T17:48:50Z"
+          enc: |
+            -----BEGIN PGP MESSAGE-----
+
+            hQIMAwIXOJznC/BzAQ/+K08zEsiBp7OwijB8jKMKuMB7oo1aMUP1nSFGtXsbmjiB
+            /lQ9uBGYslbrb5qdkQ34NaTsEiS95PtMDmBxyr1IpEIfBxpFemVnXHrRGKB5bjv7
+            6tw7bGjaPgFWY1xmSATvo8SQBt8UFt3nYKLZdPTX2MUEouVEVZcBlaTb28VL8kNQ
+            mz86hOz6G0gvssa8FfsBLDrzhyaRelqTe37kVi5zzl+/zX0jnzFDi0j3MRRgy4f2
+            ubjV890a0nryy5aP4jw4qflb/CJZN13RbdVzdm237f+NIEXoxtjGLKALhdYd7yzc
+            wvZuxRtW9u36D+EvJW0nADpGRQYOXwae/2+PgHvtgcozjLyGbfMQCH5QWqxWoeMD
+            vplGw07ZKaigDdFMZhGVByNgT9cWBJPy1ugqX6M32smvey18LtFUBzDwDL5Ryk9E
+            PFRxnNDqhexBJWBKH1rCE82Vi/qqWsBbzAkNjJhxL0Ptoih/hIro4AZf0w1oomi0
+            5pXhRo2Mm1NTDNegZcCPisJz+GWpnzlaAH8+mUG3DVPJ7eCsNQtJIpNT0nGxI75p
+            sRFSHFFACLE3TJSXLA8to5ucuxScjTlkxM20jVYLqHLhdkS8TcBgFDgPj+2qscyE
+            BFHgwWn3CwAhbNP/xHkUTJR8wtWtuTby5DTDOa2ks0FJukFGzU1Bt+fmGNEy+JnS
+            XgFw6cJcMM5SzcZsNLruNbNUW7VVu8kXXoZcadHMcCWzjSr2+GL4iNIa4C5Y35O/
+            yJh3y8ztqL/+pdEA065DhPLkN2gcK+NQ1cBVA6jmZKogNXkyYTuh3R21Q8k4WrU=
+            =A8bV
+            -----END PGP MESSAGE-----
+          fp: 6C9D6C1B579041C3F9A189F9A889A030A843122F
+        - created_at: "2022-05-23T17:48:50Z"
+          enc: |
+            -----BEGIN PGP MESSAGE-----
+
+            hQIMA4gPaNBkmDmPARAA0IOMivcgnwqR3GoRFW7nm72gGbOF5OZ3W5nt3pMHoneU
+            SFZxO+uojK2m5ee99HHObq9QGoo8pQWrCFhDZ27lChl5jJrHn1k7NqAmlHNND+yp
+            8iwYZVZ0Lv68xjw3s11HIxz9hO4+KAu9Ey/PH/pBlSJsPCqG7DR1Qiwsl955khn1
+            vqcG1tZC3M4ZBKDh7dIvpm/V/egY+TRXX9htwFXBpRDCm8+PHPxX/vN+d3A0MjJU
+            Z3wCKS9PoQBwPMt9cz0pEPb289EmuevC388Ctu0iCuyHSMj6jto1ag1YGhhWyXGZ
+            IGd+ZnQvtPcfmaz4ELHt3aFBbk+mSJa02p/JoGKrUw8EbNRcrTEyUb4f/JN1O25U
+            rqYUKOI4/yJzGpm/YQavNnNghrexzZpt7B5SoGRe8rhXJ6rqUgSRqX33s6380aUp
+            0oHYRASl1b+X37PNaj1VyBJojqeQOZ1xK76XT6LMCVPUsVrzqrhzBHtTHo7uboOp
+            v+mZNoh+t7PdNnqnC7bvXoFoBjI7Ii9UdksWrUblkJqH/7Nz8v09tI5l7YD+QMCc
+            TupCwIN4DHNTKsoUiyxSqN+RQFaTfCzeBs+8nBxn3wEJEXhnfuNBQRwK0gPEv4n4
+            l+sPq1mnzrKtaARGV/xbkP6UGdjMyERLoj+Go1xvnbgvjXwJ8msrGfTCArIgYv7S
+            XgEmYys4BGIUwq7O7YrSVGSSVhD8bJ6RUuLnnJa0wgmDA4phiWFfmFvqO9ZBwjGG
+            VO8SVrGfTupFJsCyWEa4arjY1LaZPztXbMoRek4t8+KAv2u4Yjw70u5LPkVBa0o=
+            =PPch
+            -----END PGP MESSAGE-----
+          fp: 84EEAB5ACBE82B101D59A1025752228D92EE8D9B
+    encrypted_regex: ((?i)(pass|secret($|[^N])|key|token|^data$|^stringData))
+    version: 3.7.3

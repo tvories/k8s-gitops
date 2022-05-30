@@ -5,5 +5,16 @@ tasks:
   sync:
     desc: Sync flux-system with the Git Repository
     cmds:
-      - flux reconcile source git flux-system
+      - flux reconcile source git flux-system && flux reconcile kustomization apps
     silent: true
+
+  flux-apply-first-time:
+    desc: Creates flux-system namespace, exports gpg key, and applies flux to bootstrap a cluster
+    cmds:
+      - kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f -
+      - |
+        gpg --export-secret-keys --armor "$FLUX_KEY_FP" |
+        kubectl --kubeconfig=./kubeconfig create secret generic sops-gpg
+        --namespace=flux-system
+        --from-file=sops.asc=/dev/stdin
+      - kubectl apply --kustomize=./cluster/base/flux-system

@@ -1,0 +1,164 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: home-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-mosquitto
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/mosquitto"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-amcrest2mqtt
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#     - name: home-mosquitto
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/amcrest2mqtt"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-esphome
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/esphome"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-dsmr-reader-database
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/dsmr-reader/database"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-dsmr-reader
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#     - name: home-dsmr-reader-database
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/dsmr-reader/application"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-frigate
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#     - name: home-mosquitto
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/frigate"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-zigbee2mqtt
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#     - name: home-mosquitto
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/zigbee2mqtt"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-home-assistant-database
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant/database"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: home-home-assistant-core
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: home-namespace
+#     - name: home-mosquitto
+#     - name: home-home-assistant-database
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/home-automation/home-assistant/core"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
