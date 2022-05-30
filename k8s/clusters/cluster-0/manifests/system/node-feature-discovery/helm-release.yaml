@@ -67,6 +67,7 @@ spec:
         sources:
           usb:
             deviceClassWhitelist:
+              - "00"
               - "02"
               - "03"
               - "0e"
