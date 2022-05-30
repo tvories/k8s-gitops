@@ -31,13 +31,13 @@ spec:
     clusterName: k8s
     ingress:
       create: true
-      class: nginx
+      class: nginx-internal
       host: "k10.${SECRET_DOMAIN}"
       urlPath: k10
       hosts:
         - k10.${SECRET_DOMAIN}
-      annotations:
-        kubernetes.io/ingress.class: "nginx-internal"
+      # annotations:
+      #   kubernetes.io/ingress.class: "nginx-internal"
       tls:
         enabled: true
         secretName: k10-tls

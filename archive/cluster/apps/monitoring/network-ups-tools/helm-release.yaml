@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
       chart: network-ups-tools
-      version: 6.3.2
+      version: 6.3.3
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home-charts
@@ -18,23 +18,24 @@ spec:
       interval: 5m
   values:
     image:
-      tag: v2.7.4
+      tag: v2.8.0
     env:
       TZ: "${TIMEZONE}"
     service:
       main:
-        enabled: false
         type: LoadBalancer
         loadBalancerIP: "${LB_NUT}"
         externalTrafficPolicy: Local
         ports:
+          http:
+            enabled: false
           server:
             enabled: true
             protocol: TCP
             port: 3493
     ingress:
       main:
-        enabled: false
+        enabled: true
         ingressClassName: "nginx-internal"
         annotations:
           kubernetes.io/tls-acme: "true"
