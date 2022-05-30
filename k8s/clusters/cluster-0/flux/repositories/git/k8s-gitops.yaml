@@ -7,7 +7,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: feat/infra
+    branch: main
   url: https://github.com/tvories/k8s-gitops.git
   ignore: |
     # exclude all
