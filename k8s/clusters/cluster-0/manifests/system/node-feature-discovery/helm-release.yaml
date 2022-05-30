@@ -87,18 +87,18 @@ spec:
               - 'vendor'
               - 'device'
           custom:
-          - name: "zigbee"
-            matchOn:
-            - usbId:
-              class: ["ff"]
-              vendor: ["1a86"]
-              device: ["7523"]
-          - name: "zwave"
-            matchOn:
-            - usbId:
-              class: ["02"]
-              vendor: ["0658"]
-              device: ["0200"]
+          # - name: "zigbee"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["ff"]
+          #     vendor: ["1a86"]
+          #     device: ["7523"]
+          # - name: "zwave"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["02"]
+          #     vendor: ["0658"]
+          #     device: ["0200"]
           - name: "cyberpower-ups"
             matchOn:
             - usbId:
@@ -111,37 +111,37 @@ spec:
           #     class: ["02"]
           #     vendor: ["2974"]
           #     device: ["0503"]
-          - name: "3dprinter-ender"
-            matchOn:
-            - usbId:
-              class: ["02"]
-              vendor: ["0483"]
-              device: ["5740"]
-          - name: "webcam-c270"
-            matchOn:
-            - usbId:
-              class: ["ef"]
-              vendor: ["046d"]
-              device: ["0825"]
-          - name: "canon-dslr"
-            matchOn:
-            - usbId:
-              class: ["00"]
-              vendor: ["04a9"]
-              device: ["317b"]
-          - name: "tplink-bluetooth"
-            matchOn:
-            - usbId:
-              class: ["224"]
-              vendor: ["2357"]
-              device: ["0604"]
-          - name: 'coral-tpu'
-            matchOn:
-              - pciId:
-                  vendor: ['1ac1']
-                  device: ['089a']
-          - name: "intel-gpu"
-            matchOn:
-              - pciId:
-                  class: ["0162"]
-                  vendor: ["8086"]
+          # - name: "3dprinter-ender"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["02"]
+          #     vendor: ["0483"]
+          #     device: ["5740"]
+          # - name: "webcam-c270"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["ef"]
+          #     vendor: ["046d"]
+          #     device: ["0825"]
+          # - name: "canon-dslr"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["00"]
+          #     vendor: ["04a9"]
+          #     device: ["317b"]
+          # - name: "tplink-bluetooth"
+          #   matchOn:
+          #   - usbId:
+          #     class: ["224"]
+          #     vendor: ["2357"]
+          #     device: ["0604"]
+          # - name: 'coral-tpu'
+          #   matchOn:
+          #     - pciId:
+          #         vendor: ['1ac1']
+          #         device: ['089a']
+          # - name: "intel-gpu"
+          #   matchOn:
+          #     - pciId:
+          #         class: ["0162"]
+          #         vendor: ["8086"]
