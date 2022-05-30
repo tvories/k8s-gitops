@@ -33,6 +33,13 @@ spec:
         enabled: true
         existingClaim: media-nfs-media
         mountPath: /media
+      ebooks:
+        enabled: true
+        type: nfs
+        nfs:
+        server: ${SECRET_NAS1}
+        path: /mnt/fatguys/Books
+        mountPath: /books
 
     ingress:
       main:
