@@ -1,0 +1,23 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: app-admin-name-read-monitoring_RB
+  namespace: monitoring
+subjects:
+- kind: User
+  name: app-admin-name
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: monitoring_read_R
+  apiGroup: ""
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: monitoring
+  name: monitoring_read_R
+rules:
+- apiGroups: ["*"]
+  resources: ["*", "pods/log"]
+  verbs: ["get", "list", "watch"]

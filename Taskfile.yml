@@ -14,3 +14,4 @@ includes:
   format: .taskfiles/format.yml
   lint: .taskfiles/lint.yml
   pre-commit: .taskfiles/pre-commit.yml
+  cluster: .taskfiles/cluster.yml

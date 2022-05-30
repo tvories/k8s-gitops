@@ -1,0 +1,79 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: network-external-dns
+#   namespace: flux-system
+# spec:
+#   dependsOn:
+#     - name: network-namespace
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/network/external-dns"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-ingress-nginx
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/ingress-nginx"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-unifi
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/unifi"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-wildcard-certificate
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+    - name: cert-manager-certmanager-config
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/wildcard-certificate"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
