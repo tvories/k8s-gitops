@@ -2,7 +2,7 @@ terraform {
   backend "gcs" { }
   required_providers {
     vsphere = {
-      version = "2.0.2"
+      version = "2.1.1"
     }
     dns = {
       source = "hashicorp/dns"
