@@ -16,7 +16,7 @@
     ],
     "ignorePaths": [
       "cluster/base/",
-      "archive"
+      "archive/"
     ],
   },
   "regexManagers": [
