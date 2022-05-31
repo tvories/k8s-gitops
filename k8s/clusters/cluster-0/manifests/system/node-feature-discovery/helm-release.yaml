@@ -73,7 +73,6 @@ spec:
         sources:
           usb:
             deviceClassWhitelist:
-              - "00"
               - "02"
               - "03"
               - "0e"
@@ -147,8 +146,8 @@ spec:
           #     - pciId:
           #         vendor: ['1ac1']
           #         device: ['089a']
-          # - name: "intel-gpu"
-          #   matchOn:
-          #     - pciId:
-          #         class: ["0162"]
-          #         vendor: ["8086"]
+          - name: "intel-gpu"
+            matchOn:
+              - pciId:
+                  class: ["0162"]
+                  vendor: ["8086"]
