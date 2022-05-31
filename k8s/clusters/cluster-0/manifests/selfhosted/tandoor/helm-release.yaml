@@ -24,7 +24,7 @@ spec:
       TIMEZONE: "${TIMEZONE}"
       DEBUG: "0"
       ALLOWED_HOSTS: "*"
-      #SECRET_KEY: set in secret
+      SECRET_KEY: ${SECRET_RECIPES_SECRET_KEY}
       DB_ENGINE: django.db.backends.sqlite3
       # DB_OPTIONS: '{"sslmode":"require"}'
       # POSTGRES_HOST: 
