@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: frigate-data
+  name: data
   namespace: home
   labels:
     triliovault.trilio.io/backup: "true"
@@ -19,9 +19,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: frigate-nfs-media
+  name: nfs-media
 spec:
-  storageClassName: frigate-nfs-media
+  storageClassName: nfs-media
   capacity:
     storage: 1Mi
   accessModes:
@@ -42,12 +42,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: frigate-nfs-media
+  name: nfs-media
   namespace: home
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: frigate-nfs-media
+  storageClassName: nfs-media
   resources:
     requests:
       storage: 1Mi
