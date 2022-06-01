@@ -21,7 +21,7 @@ kind: PersistentVolume
 metadata:
   name: nfs-media
 spec:
-  storageClassName: nfs-media
+  storageClassName: frigate-nfs-media
   capacity:
     storage: 1Mi
   accessModes:
@@ -47,7 +47,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: nfs-media
+  storageClassName: frigate-nfs-media
   resources:
     requests:
       storage: 1Mi
