@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: frigate
+  name: &app frigate
   namespace: home
 spec:
   interval: 5m
@@ -17,15 +17,18 @@ spec:
       interval: 5m
   values:
     image:
-      repository: blakeblackshear/frigate
+      repository: docker.io/blakeblackshear/frigate
       # repository: ghcr.io/k8s-at-home/frigate
-      tag: 0.10.1-amd64
+      tag: 0.11.0-beta2
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
 
     env:
       TZ: ${TIMEZONE}
+    envFrom:
+      - secretRef:
+          name: *app
 
     persistence:
       data:
@@ -35,7 +38,7 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: frigate-config
+        name: *app
         subPath: config.yaml
         mountPath: /config/config.yml
         readOnly: true
@@ -107,59 +110,59 @@ spec:
       limits:
         memory: 4000Mi
 
-  valuesFrom:
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_password
-      targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_host
-      targetPath: env.SECRET_DOORBELL_IP_ADDRESS
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_user
-      targetPath: env.SECRET_DOORBELL_CAMERA_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_camera_password
-      targetPath: env.SECRET_DOORBELL_CAMERA_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_password
-      targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_viewer_password
-      targetPath: env.SECRET_FRONT_DOOR_VIEWER_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_host
-      targetPath: env.SECRET_FRONT_DOOR_IP_ADDRESS
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_user
-      targetPath: env.SECRET_FRONT_DOOR_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_viewer_password
-      targetPath: env.SECRET_GARAGE_VIEWER_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_user
-      targetPath: env.SECRET_GARAGE_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_host
-      targetPath: env.SECRET_GARAGE_IP_ADDRESS
-      optional: false
+  # valuesFrom:
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_password
+  #     targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_host
+  #     targetPath: env.SECRET_DOORBELL_IP_ADDRESS
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_user
+  #     targetPath: env.SECRET_DOORBELL_CAMERA_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_camera_password
+  #     targetPath: env.SECRET_DOORBELL_CAMERA_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_password
+  #     targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_viewer_password
+  #     targetPath: env.SECRET_FRONT_DOOR_VIEWER_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_host
+  #     targetPath: env.SECRET_FRONT_DOOR_IP_ADDRESS
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_user
+  #     targetPath: env.SECRET_FRONT_DOOR_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_viewer_password
+  #     targetPath: env.SECRET_GARAGE_VIEWER_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_user
+  #     targetPath: env.SECRET_GARAGE_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_host
+  #     targetPath: env.SECRET_GARAGE_IP_ADDRESS
+  #     optional: false
