@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: &app frigate
+  name: frigate
   namespace: home
 spec:
   interval: 5m
@@ -29,7 +29,7 @@ spec:
       TZ: ${TIMEZONE}
     envFrom:
       - secretRef:
-          name: *app
+          name: frigate
 
     persistence:
       data:
@@ -39,7 +39,7 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: *app
+        name: frigate-config
         subPath: config.yaml
         mountPath: /config/config.yml
         readOnly: true
