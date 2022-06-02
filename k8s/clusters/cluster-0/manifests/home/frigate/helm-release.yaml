@@ -73,7 +73,7 @@ spec:
 
     configmap:
       config:
-        enabled: true
+        enabled: false
 
     securityContext:
       privileged: true
@@ -92,7 +92,7 @@ spec:
           httpGet:
             path: /api/version
             port: *port
-          initialDelaySeconds: 0
+          initialDelaySeconds: 40
           periodSeconds: 10
           timeoutSeconds: 1
           failureThreshold: 3
