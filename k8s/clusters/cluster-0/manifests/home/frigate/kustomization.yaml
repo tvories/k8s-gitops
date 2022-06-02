@@ -7,10 +7,10 @@ resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
   - ./helm-release.yaml
-configMapGenerator:
-  - name: frigate-config
-    files:
-      - config.yaml
+# configMapGenerator:
+#   - name: frigate-config
+#     files:
+#       - config.yaml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
