@@ -111,7 +111,7 @@ spec:
             - usbId:
               # class: ["00"]
               vendor: ["0746"]
-              device: ["0501"]
+              # device: ["0501"]
           # - name: "3dprinter-mpsm"
           #   matchOn:
           #   - usbId:
