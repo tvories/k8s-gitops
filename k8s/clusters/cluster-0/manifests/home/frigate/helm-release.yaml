@@ -152,8 +152,8 @@ spec:
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_DOORBELL_CAMERA_PASSWORD
-      targetPath: env.SECRET_DOORBELL_CAMERA_PASSWORD
+      valuesKey: SECRET_DOORBELL_VIEWER_PASSWORD
+      targetPath: env.SECRET_DOORBELL_VIEWER_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
