@@ -137,56 +137,56 @@ spec:
   valuesFrom:
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_FRIGATE_MQTT_PASSWORD
+      valuesKey: mqtt_password
       targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_DOORBELL_IP_ADDRESS
+      valuesKey: doorbell_ip
       targetPath: env.SECRET_DOORBELL_IP_ADDRESS
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_DOORBELL_CAMERA_USER
+      valuesKey: doorbell_user
       targetPath: env.SECRET_DOORBELL_CAMERA_USER
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_DOORBELL_VIEWER_PASSWORD
+      valuesKey: doorbell_password
       targetPath: env.SECRET_DOORBELL_VIEWER_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_FRIGATE_MQTT_PASSWORD
-      targetPath: env.SECRET_FRIGATE_MQTT_PASSWORD
+      valuesKey: mqtt_user
+      targetPath: env.SECRET_FRIGATE_MQTT_USER
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_FRONT_DOOR_VIEWER_PASSWORD
+      valuesKey: front_door_password
       targetPath: env.SECRET_FRONT_DOOR_VIEWER_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_FRONT_DOOR_IP_ADDRESS
+      valuesKey: front_door_ip
       targetPath: env.SECRET_FRONT_DOOR_IP_ADDRESS
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_FRONT_DOOR_USER
+      valuesKey: front_door_user
       targetPath: env.SECRET_FRONT_DOOR_USER
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_GARAGE_VIEWER_PASSWORD
+      valuesKey: garage_password
       targetPath: env.SECRET_GARAGE_VIEWER_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_GARAGE_USER
+      valuesKey: garage_user
       targetPath: env.SECRET_GARAGE_USER
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: SECRET_GARAGE_IP_ADDRESS
+      valuesKey: garage_ip
       targetPath: env.SECRET_GARAGE_IP_ADDRESS
       optional: false
