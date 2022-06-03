@@ -158,7 +158,7 @@ spec:
     - kind: Secret
       name: frigate
       valuesKey: mqtt_user
-      targetPath: env.FRIGATE_FRIGATE_MQTT_USER
+      targetPath: env.FRIGATE_MQTT_USER
       optional: false
     - kind: Secret
       name: frigate
