@@ -109,7 +109,7 @@ spec:
           - name: "cyberpower-ups"
             matchOn:
             - usbId:
-              class: ["03"]
+              class: ["00"]
               vendor: ["0746"]
               device: ["0501"]
           # - name: "3dprinter-mpsm"
