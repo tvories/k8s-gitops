@@ -111,6 +111,9 @@ spec:
           - name: "physical2"
             devices:
               - name: "sdb"
+          - name: "sff1"
+            devices:
+              - name: "sdb"
 
     ingress:
       dashboard:

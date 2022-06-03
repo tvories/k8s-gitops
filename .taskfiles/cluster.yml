@@ -27,6 +27,7 @@ tasks:
     desc: Wipe physical nodes for re-apply
     cmds:
       - talosctl reset --nodes physical2 --endpoints physical2 --reboot
+      - talosctl reset --nodes sff1 --endpoints sff1 --reboot
 
   talos-bootstrap-cluster:
     desc: Bootstrap first etcd node

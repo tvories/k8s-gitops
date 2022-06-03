@@ -141,11 +141,11 @@ spec:
           #     class: ["224"]
           #     vendor: ["2357"]
           #     device: ["0604"]
-          # - name: 'coral-tpu'
-          #   matchOn:
-          #     - pciId:
-          #         vendor: ['1ac1']
-          #         device: ['089a']
+          - name: 'coral-tpu'
+            matchOn:
+              - pciId:
+                  vendor: ['1ac1']
+                  device: ['089a']
           - name: "intel-gpu"
             matchOn:
               - pciId:
