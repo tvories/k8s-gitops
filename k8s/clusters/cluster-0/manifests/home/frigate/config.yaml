@@ -1,8 +1,8 @@
 mqtt:
   host: emqx
   topic_prefix: frigate
-  user: "{SECRET_FRIGATE_MQTT_USER}"
-  password: "{SECRET_FRIGATE_MQTT_PASSWORD}"
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
 database:
   path: /data/frigate.db
 detectors:
@@ -40,11 +40,11 @@ cameras:
     ffmpeg:
       inputs:
       # Sub Stream
-      # - path: rtsp://{SECRET_DOORBELL_CAMERA_USER}:{SECRET_DOORBELL_VIEWER_PASSWORD}@{SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
+      # - path: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
       #   roles:
       #   - detect
       # Main Stream
-      - path: "rtsp://{SECRET_DOORBELL_CAMERA_USER}:{SECRET_DOORBELL_VIEWER_PASSWORD}@{SECRET_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101"
+      - path: "rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101"
         roles:
         - rtmp
         - detect
@@ -79,12 +79,12 @@ cameras:
     ffmpeg:
       inputs:
       # Main Stream
-      - path: "rtsp://{SECRET_FRONT_DOOR_USER}:{SECRET_FRONT_DOOR_VIEWER_PASSWORD}@{SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101"
+      - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101"
         roles:
         # - rtmp
         # - detect
         - record
-      - path: "rtsp://{SECRET_FRONT_DOOR_USER}:{SECRET_FRONT_DOOR_VIEWER_PASSWORD}@{SECRET_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102"
+      - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102"
         roles:
         - rtmp
         - detect
@@ -121,12 +121,12 @@ cameras:
     ffmpeg:
       inputs:
       # Main Stream
-      - path: "rtsp://{SECRET_GARAGE_USER}:{SECRET_GARAGE_VIEWER_PASSWORD}@{SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101"
+      - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101"
         roles:
         # - rtmp
         # - detect
         - record
-      - path: "rtsp://{SECRET_GARAGE_USER}:{SECRET_GARAGE_VIEWER_PASSWORD}@{SECRET_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102"
+      - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102"
         roles:
         - rtmp
         - detect
