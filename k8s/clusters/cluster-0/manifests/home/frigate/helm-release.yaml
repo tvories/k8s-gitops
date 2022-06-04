@@ -55,6 +55,12 @@ spec:
         medium: Memory
         sizeLimit: 4Gi
         mountPath: /dev/shm
+      
+      coral:
+        enabled: true
+        type: hostPath
+        hostPath: /dev
+        mountPath: /dev
 
     ingress:
       main:
