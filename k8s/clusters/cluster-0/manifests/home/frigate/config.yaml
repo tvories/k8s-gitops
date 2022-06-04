@@ -7,10 +7,10 @@ database:
   path: /data/frigate.db
 detectors:
   coral:
-    type: edgetpu
-    device: pci
-    # type: cpu
-    # num_threads: 4
+    # type: edgetpu
+    # device: pci
+    type: cpu
+    num_threads: 4
 objects:
   track:
   - person
