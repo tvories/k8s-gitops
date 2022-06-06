@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taylorvories-com
+  namespace: selfhosted
+  labels:
+    k8s-app: taylorvories-com
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: taylorvories-com
+  template:
+    metadata:
+      labels:
+        k8s-app: taylorvories-com
+    spec:
+      containers:
+      - name: taylorvories-com
+        image: tvories/taylorvories-com:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
