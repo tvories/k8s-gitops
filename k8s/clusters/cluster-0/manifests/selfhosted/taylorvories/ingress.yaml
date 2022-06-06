@@ -1,0 +1,32 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: taylorvories-com-ingress
+  namespace: selfhosted
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      error_page 404 "https://taylorvories.com/404.html";
+      proxy_intercept_errors on;
+spec:
+  ingressClassName: "nginx-external"
+  rules:
+  - host: taylorvories.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: taylorvories-com
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - taylorvories.com
+    - www.taylorvories.com
+    secretName: tls.taylorvories.com
+status:
+  loadBalancer: {}

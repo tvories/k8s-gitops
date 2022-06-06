@@ -1,0 +1,70 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmtech-landing
+  namespace: selfhosted
+  labels:
+    k8s-app: tmtech-landing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: tmtech-landing
+  template:
+    metadata:
+      labels:
+        k8s-app: tmtech-landing
+    spec:
+      containers:
+      - name: tmtech-landing
+        image: tvories/tmtechme:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: tmtech-landing
+  name: tmtech-landing
+  namespace: selfhosted
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: tmtech-landing
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tmtech-ingress
+  namespace: selfhosted
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+spec:
+  ingressClassName: "nginx-external"
+  tls:
+  - hosts:
+    - tmtech.me
+    - www.tmtech.me
+    secretName: tls.tmtech.me
+  rules:
+  - host: tmtech.me
+    http:
+      paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: tmtech-landing
+            port:
+              number: 80
+status:
+  loadBalancer: {}
