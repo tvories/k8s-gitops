@@ -1,0 +1,29 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: boobereats-ingress
+  namespace: selfhosted
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+spec:
+  ingressClassName: "nginx-external"
+  rules:
+  - host: boobereats.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: boobereats
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - boobereats.com
+    - www.boobereats.com
+    secretName: tls.boobereats
+status:
+  loadBalancer: {}
