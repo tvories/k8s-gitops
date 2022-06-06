@@ -51,6 +51,10 @@ spec:
       data:
         enabled: true
         existingClaim: unifi-config
+      backup:
+        enabled: true
+        existingClaim: unifi-nfs-backup
+        mountPath: /data/backup
 
     resources:
       requests:
