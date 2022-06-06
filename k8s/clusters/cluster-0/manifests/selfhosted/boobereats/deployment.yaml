@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boobereats
+  namespace: selfhosted
+  labels:
+    k8s-app: boobereats
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: boobereats
+  template:
+    metadata:
+      labels:
+        k8s-app: boobereats
+    spec:
+      containers:
+      - name: boobereats
+        image: tvories/boobereats:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
