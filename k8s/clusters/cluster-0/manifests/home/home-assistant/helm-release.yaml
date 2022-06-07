@@ -63,7 +63,7 @@ spec:
     mariadb:
       enabled: false
     postgresql:
-      enabled: true
+      enabled: false
       # diagnosticMode:
       #   enabled: true
       # image:
