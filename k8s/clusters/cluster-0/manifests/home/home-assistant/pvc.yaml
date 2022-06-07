@@ -42,6 +42,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: homeassistant-postgres
   namespace: home
+  labels:
+    triliovault.trilio.io/backup: "true"
 spec:
   accessModes:
   - ReadWriteOnce
