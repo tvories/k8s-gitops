@@ -1,0 +1,118 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home
+spec:
+  releaseName: home-assistant
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://k8s-at-home.com/charts/
+      chart: home-assistant
+      version: 13.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    # probes:
+    #   liveness:
+    #     enabled: false
+    #   readiness:
+    #     enabled: false
+    # imagePullSecrets:
+    # - name: regcred
+    image:
+      repository: homeassistant/home-assistant
+      tag: 2022.6.2
+    persistence:
+      config:
+        enabled: true
+        existingClaim: homeassistant-config
+    extraEnv:
+      TZ: "${TIMEZONE}"
+    # envFrom:
+    # - secretRef:
+    #     name: home-assistant-secrets
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx-external"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+        hosts:
+        - host: &host "ha.${SECRET_DOMAIN}"
+          paths:
+          - path: /
+        tls:
+        - secretName: tls.homeassistant
+          hosts:
+          - *host
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_HOMEASSISTANT}"
+        externalTrafficPolicy: Local
+    mariadb:
+      enabled: false
+    postgresql:
+      enabled: true
+      # diagnosticMode:
+      #   enabled: true
+      # image:
+      #   tag: 12.9.0
+      existingSecret: home-assistant-postgresql-secret
+      persistence:
+        enabled: true
+        existingClaim: homeassistant-postgres
+    addons:
+      codeserver:
+        enabled: true
+        image:
+          # repository: codercom/code-server
+          tag: 4.4.0
+        workingDir: "/config"
+        #TODO: Eventually add a git secret here
+        # git:
+        #   deployKeySecret: home-assistant-code-server-secret
+        env:
+          password: ${SECRET_CODESERVER_PASSWORD}
+        args:
+        - --auth
+        - "none"
+        - --user-data-dir
+        - "/config/.vscode"
+        - --extensions-dir
+        - "/config/.vscode"
+        ingress:
+          enabled: true
+          ingressClassName: "nginx-internal"
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+            cert-manager.io/cluster-issuer: letsencrypt-production
+          hosts:
+          - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
+            paths:
+            - path: /
+          tls:
+          - secretName: tls.ha-vscode
+            hosts:
+            - *vscodehost
+        volumeMounts:
+        - name: config
+          mountPath: /config
+    # podAnnotations:
+    #   secret.reloader.stakater.com/reload: home-assistant-secrets
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #       - matchExpressions:
+    #         - {key: "feature.node.kubernetes.io/custom-tplink-bluetooth", operator: In, values: ["true"]}
