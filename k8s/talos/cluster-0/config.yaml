@@ -29,6 +29,9 @@ nodes:
   - hostname: sff1
     domain: ${domains.hardware}
     ip_address: 192.168.80.97
+  - hostname: physical1
+    domain: ${domains.hardware}
+    ip_address: 192.168.80.98
 
 controlplane:
   endpoint: "https://cluster-0.${domains.hardware}:6443"
