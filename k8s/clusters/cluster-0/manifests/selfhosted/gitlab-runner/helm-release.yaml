@@ -20,7 +20,7 @@ spec:
     replicas: 2
     imagePullSecrets:
       - name: regcred
-    # image: gitlab/gitlab-runner:alpine-v15.0.2
+    image: gitlab/gitlab-runner:alpine-v15.0.2
     imagePullPolicy: IfNotPresent
     gitlabUrl: https://gitlab.${SECRET_DOMAIN}
     runnerRegistrationToken: ${SECRET_GITLAB_RUNNER_TOKEN}
