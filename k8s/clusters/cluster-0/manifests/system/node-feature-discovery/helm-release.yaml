@@ -74,11 +74,11 @@ spec:
           usb:
             deviceClassWhitelist:
               - "02"
-              - "00"
+              # - "00"
               - "03"
-              - "0e"
-              - "ef"
-              - "fe"
+              # - "0e"
+              # - "ef"
+              # - "fe"
               - "ff"
             deviceLabelFields:
               - "class"
