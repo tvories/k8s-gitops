@@ -97,21 +97,21 @@ spec:
           - name: "zigbee"
             matchOn:
             - usbId:
-              class: ["ff"]
-              vendor: ["1a86"]
-              device: ["7523"]
+                class: ["ff"]
+                vendor: ["1a86"]
+                device: ["7523"]
           - name: "zwave"
             matchOn:
             - usbId:
-              class: ["02"]
-              vendor: ["0658"]
-              device: ["0200"]
+                class: ["02"]
+                vendor: ["0658"]
+                device: ["0200"]
           - name: "cyberpower-ups"
             matchOn:
             - usbId:
-              class: ["03"]
-              vendor: ["0746"]
-              device: ["0501"]
+                class: ["03"]
+                vendor: ["0746"]
+                device: ["0501"]
           # - name: "3dprinter-mpsm"
           #   matchOn:
           #   - usbId:
