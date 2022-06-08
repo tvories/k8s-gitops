@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mealie-config
-  namespace: home
+  namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
 spec:
