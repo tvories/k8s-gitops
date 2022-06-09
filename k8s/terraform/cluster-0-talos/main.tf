@@ -57,7 +57,7 @@ resource "vsphere_virtual_machine" "talos-cp" {
   wait_for_guest_net_timeout = -1
   host_system_id = data.vsphere_host.host.id
   num_cpus = "4"
-  memory = 4096
+  memory = 8192
   folder = "k8"
   # firmware = "efi"
 
