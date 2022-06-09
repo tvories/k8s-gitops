@@ -80,8 +80,18 @@ spec:
       limits:
         memory: 1500Mi
 
-    prometheus:
-      podMonitor:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        interval: 3m
+        scrapeTimeout: 1m
+      prometheusRule:
         enabled: true
-        interval: 10m
-        scrapeTimeout: 2s
+      exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.0.0
+        env:
+          port: 9794
+          additionalMetrics: true
+          unknownQueueItems: true
