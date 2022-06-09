@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-nfs-config
+spec:
+  storageClassName: nextcloud-nfs-config
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/k8s/nextcloud
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.1
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-nfs-database
+spec:
+  storageClassName: nextcloud-nfs-database
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/k8s/nextcloud-db
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.1
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nextcloud
+  namespace: selfhosted
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nextcloud-nfs-config
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nextcloud-db
+  namespace: selfhosted
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nextcloud-nfs-database
+  resources:
+    requests:
+      storage: 1Mi

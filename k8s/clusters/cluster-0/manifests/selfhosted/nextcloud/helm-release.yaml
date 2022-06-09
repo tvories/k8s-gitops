@@ -1,0 +1,130 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: selfhosted
+spec:
+  releaseName: nextcloud
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://nextcloud.github.io/helm/
+      chart: nextcloud
+      version: 2.13.2
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      tag: 23.0.0-fpm
+
+    ingress:
+      enabled: true
+      className: "nginx-external"
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-production"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+        nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+        nginx.ingress.kubernetes.io/proxy-buffering: "off"
+        nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+        nginx.ingress.kubernetes.io/server-snippet: |-
+          server_tokens off;
+          proxy_hide_header X-Powered-By;
+          rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+          rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+          rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+
+      tls:
+        - hosts:
+          - &host nc.${SECRET_DOMAIN}
+          secretName: tls.nextcloud
+        
+    nextcloud:
+      host: *host
+      username: admin
+      password: ${SECRET_NEXTCLOUD_ADMIN_PASSWORD}
+      mail:
+        enabled: true
+        fromAddress: owncloud
+        domain: ${SECRET_DOMAIN}
+        smtp:
+          host: ${SECRET_SMTP_HOST}
+          secure: ssl
+          port: 465
+          authtype: LOGIN
+          name: ${SECRET_NEXTCLOUD_MAIL_USER}
+          password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
+      extraVolumes:
+        - name: media
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Media
+      extraVolumeMounts:
+        - name: media
+          mountPath: /media
+      # extraVolumes:
+      #   - name: media
+      #     type: custom
+      #     volumeSpec:
+      #       nfs:
+      #         server: ${SECRET_NAS1}
+      #         path: /mnt/fatguys/Media
+      #     mountPath: /media
+      #     readOnly: true
+
+    nginx:
+      ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
+      enabled: true
+
+    internalDatabase:
+      enabled: false
+
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: nextcloud-postgresql
+      database: nextcloud
+      password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
+      user: ncuser
+
+    redis:
+      enabled: true
+      cluster:
+        enabled: false
+      auth:
+        enabled: true
+        password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
+      master:
+        persistence:
+          enabled: false
+
+    postgresql:
+      enabled: true
+      persistence:
+        enabled: true
+        existingClaim: pvc-nextcloud-db
+        size: 1Mi
+      global:
+        postgresql:
+          postgresqlUsername: ncuser
+          postgresqlPassword: ${SECRET_NEXTCLOUD_DB_PASSWORD}
+          postgresqlDatabase: nextcloud
+
+    cronjob:
+      enabled: true
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteMany
+      size: 1Mi
+      existingClaim: pvc-nextcloud
+
+    livenessProbe:
+      enabled: false
+
+    readinessProbe:
+      enabled: false
