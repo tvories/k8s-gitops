@@ -57,3 +57,7 @@ spec:
         enabled: true
         mountPath: /metadata/backups
         existingClaim: audiobookshelf-nfs-backup
+      audiobooks:
+        enabled: true
+        mountPath: /audiobooks
+        existingClaim: audiobookshelf-nfs-audiobooks
