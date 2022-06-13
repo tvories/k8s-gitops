@@ -48,7 +48,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-nextcloud
+  name: nextcloud-nfs-config
   namespace: selfhosted
 spec:
   accessModes:
