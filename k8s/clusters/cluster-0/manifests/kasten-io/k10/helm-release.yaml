@@ -45,6 +45,7 @@ spec:
 
     ingress:
       create: true
+      class: nginx-internal
       host: k10.${CLUSTER_NAME}.${SECRET_DOMAIN}
       annotations:
         kubernetes.io/ingress.class: "nginx-internal"
