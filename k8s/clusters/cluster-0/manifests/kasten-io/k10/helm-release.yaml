@@ -51,7 +51,7 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-production
       urlPath: "k10"
       hosts:
-        - k10.${SECRET_DOMAIN}
+        - k10.${CLUSTER_NAME}.${SECRET_DOMAIN}
       tls:
         enabled: true
         secretName: tls.k10
