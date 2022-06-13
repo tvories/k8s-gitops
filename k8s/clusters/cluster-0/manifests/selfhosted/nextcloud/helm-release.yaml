@@ -121,7 +121,7 @@ spec:
       enabled: true
       accessMode: ReadWriteMany
       size: 1Mi
-      existingClaim: pvc-nextcloud
+      existingClaim: nextcloud-nfs-config
 
     livenessProbe:
       enabled: false
