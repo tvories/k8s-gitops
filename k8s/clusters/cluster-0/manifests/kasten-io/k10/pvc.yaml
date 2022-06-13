@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: k10-nfs-backup
+spec:
+  storageClassName: k10-nfs-backup
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: "${SECRET_NAS1}"
+    path: /mnt/fatguys/k8s/Backup/k8s/applications/k10
+  mountOptions:
+    - nfsvers=4.1
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: k10-nfs-backup
+  namespace: kasten-io
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: k10-nfs-backup
+  resources:
+    requests:
+      storage: 1Mi

@@ -17,3 +17,4 @@ resources:
   - ./system.yaml
   - ./trilio.yaml
   - ./vpn.yaml
+  - ./kasten-io.yaml
