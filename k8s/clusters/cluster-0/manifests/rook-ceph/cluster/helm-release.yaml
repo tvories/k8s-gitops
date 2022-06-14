@@ -105,9 +105,9 @@ spec:
           - name: "talos-worker-2"
             devices:
               - name: "sdb"
-          - name: "talos-worker-3"
-            devices:
-              - name: "sdb"
+          # - name: "talos-worker-3"
+          #   devices:
+          #     - name: "sdb"
           - name: "physical1"
             devices:
               - name: "sdb"
