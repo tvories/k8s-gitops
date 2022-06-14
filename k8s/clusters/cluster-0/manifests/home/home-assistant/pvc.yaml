@@ -44,6 +44,7 @@ metadata:
   namespace: home
   labels:
     triliovault.trilio.io/backup: "true"
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
   - ReadWriteOnce

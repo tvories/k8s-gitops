@@ -6,7 +6,7 @@ metadata:
   namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
-  #   kasten.io/backup-volume: "enabled"
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -22,7 +22,7 @@ metadata:
   namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
-  #   kasten.io/backup-volume: "enabled"
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -38,7 +38,7 @@ metadata:
   namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
-  #   kasten.io/backup-volume: "enabled"
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
