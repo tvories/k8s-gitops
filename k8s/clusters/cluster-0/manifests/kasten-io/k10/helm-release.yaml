@@ -45,7 +45,7 @@ spec:
 
     ingress:
       create: true
-      class: nginx-internal
+      # class: nginx-internal
       host: k10.${CLUSTER_NAME}.${SECRET_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
