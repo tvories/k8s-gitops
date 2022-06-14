@@ -19,23 +19,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: audiobookshelf-test
-  namespace: media
-  # labels:
-  #   triliovault.trilio.io/backup: "true"
-  #   kasten.io/backup-volume: "enabled"
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: ceph-block
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: audiobookshelf-metadata
   namespace: media
   labels:
