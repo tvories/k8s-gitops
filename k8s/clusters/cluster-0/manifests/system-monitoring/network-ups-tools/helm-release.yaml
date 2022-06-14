@@ -106,4 +106,4 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
           - matchExpressions:
-            - {key: "feature.node.kubernetes.io/custom-cyberpower-ups", operator: In, values: ["true"]}
+            - {key: "feature.node.kubernetes.io/usb-03_0764_0501.present", operator: In, values: ["true"]}
