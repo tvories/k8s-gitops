@@ -43,6 +43,17 @@ spec:
                   operator: In
                   values:
                     - enabled
+          excludeResources:
+            - name: downloads-nfs-ebooks
+              resource: persistentvolumeclaims
+            - name: nextcloud-nfs-config
+              resource: persistentvolumeclaims
+            - name: audiobookshelf-nfs-audiobooks
+              resource: persistentvolumeclaims
+            - name: downloads-nfs-ebooks
+              resource: persistentvolumeclaims
+            - name: esphome-nfs-config
+              resource: persistentvolumeclaims
         profile:
           name: k10-disaster-recovery
           namespace: kasten-io
