@@ -54,6 +54,8 @@ spec:
               resource: persistentvolumeclaims
             - name: esphome-nfs-config
               resource: persistentvolumeclaims
+            - name: audiobookshelf-nfs-audiobooks
+              resource: persistentvolumeclaims
         profile:
           name: k10-disaster-recovery
           namespace: kasten-io
