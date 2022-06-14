@@ -103,7 +103,6 @@ spec:
             .__host = replace(.__host, "192.168.80.97", "sff1")
             .__host = replace(.__host, "192.168.80.94", "talos-worker-1")
             .__host = replace(.__host, "192.168.80.95", "talos-worker-2")
-            .__host = replace(.__host, "192.168.80.96", "talos-worker-3")
         talos_service_logs_xform:
           type: remap
           inputs:
@@ -117,7 +116,6 @@ spec:
             .__host = replace(.__host, "192.168.80.97", "sff1")
             .__host = replace(.__host, "192.168.80.94", "talos-worker-1")
             .__host = replace(.__host, "192.168.80.95", "talos-worker-2")
-            .__host = replace(.__host, "192.168.80.96", "talos-worker-3")
 
       # Sinks
       sinks:
