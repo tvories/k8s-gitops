@@ -61,3 +61,4 @@ spec:
         enabled: true
         mountPath: /audiobooks
         existingClaim: audiobookshelf-nfs-audiobooks
+        readOnly: true
