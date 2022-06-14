@@ -58,11 +58,15 @@ spec:
         mountPath: /metadata/backups
         existingClaim: audiobookshelf-nfs-backup
       audiobooks:
+        # enabled: true
+        # mountPath: /audiobooks
+        # existingClaim: audiobookshelf-nfs-audiobooks
+        # readOnly: true
         enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Media/books
         mountPath: /audiobooks
-        existingClaim: audiobookshelf-nfs-audiobooks
         readOnly: true
-      test:
-        enabled: true
-        mountPath: /test
-        existingClaim: audiobookshelf-test
