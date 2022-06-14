@@ -59,3 +59,12 @@ spec:
 
     grafana:
       enabled: false
+    
+    patches:
+    - target:
+        kind: Ingress
+        name: k10-ingress
+      patch: |-
+        - op: replace
+          path: /spec/ingressClassName
+          value: nginx-internal
