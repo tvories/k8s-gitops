@@ -22,8 +22,8 @@ spec:
       # pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
-      AUDIOBOOKSHELF_UID: 568
-      AUDIOBOOKSHELF_GID: 568
+      # AUDIOBOOKSHELF_UID: 568
+      # AUDIOBOOKSHELF_GID: 568
     
     ingress:
       main:
@@ -49,24 +49,16 @@ spec:
         enabled: true
         mountPath: /metadata
         existingClaim: audiobookshelf-metadata
-      media:
-        enabled: true
-        mountPath: /media
-        existingClaim: media-nfs-media
+      # media:
+      #   enabled: true
+      #   mountPath: /media
+      #   existingClaim: media-nfs-media
       backup:
         enabled: true
         mountPath: /metadata/backups
         existingClaim: audiobookshelf-nfs-backup
       audiobooks:
-        # enabled: true
-        # mountPath: /audiobooks
-        # existingClaim: audiobookshelf-nfs-audiobooks
-        # readOnly: true
         enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            server: ${SECRET_NAS1}
-            path: /mnt/fatguys/Media/books
         mountPath: /audiobooks
+        existingClaim: audiobookshelf-nfs-audiobooks
         readOnly: true
