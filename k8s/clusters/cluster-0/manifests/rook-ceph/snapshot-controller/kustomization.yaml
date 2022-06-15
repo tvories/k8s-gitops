@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./rbac.yaml
   - ./deployment.yaml
+  - ./volume-snapshot-class.yaml
