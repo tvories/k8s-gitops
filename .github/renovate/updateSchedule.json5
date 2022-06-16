@@ -1,0 +1,11 @@
+{
+  packageRules: [
+    {
+      matchPackageNames: [
+        "ghcr.io/k8s-at-home/radarr",
+        "ghcr.io/k8s-at-home/sonarr",
+      ],
+      schedule: ["after 8am and before 3pm on saturday"],
+    },
+  ],
+}
