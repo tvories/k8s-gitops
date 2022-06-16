@@ -27,7 +27,7 @@
   suppressNotifications: ["prIgnoreNotification"],
   commitBodyTable: true,
   rebaseWhen: "conflicted",
-  "ignorePaths": ["**/archive/**"]
+  "ignorePaths": ["**/examples/**"],
   // Set up Renovate Managers
   flux: {
     fileMatch: ["kubernetes/.+\\.yaml$"],
