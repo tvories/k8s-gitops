@@ -18,8 +18,8 @@ jobs:
         uses: tibdex/github-app-token@v1
         id: generate-token
         with:
-          app_id: ${{ secrets.TBOT_APP_ID }}
-          private_key: ${{ secrets.TBOT_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.TVORIES_APP_ID }}
+          private_key: ${{ secrets.TVORIES_APP_PRIVATE_KEY }}
 
       - name: Sync Labels
         uses: EndBug/label-sync@v2
