@@ -1,7 +1,7 @@
 kind: Policy
 apiVersion: config.kio.kasten.io/v1alpha1
 metadata:
-  name: backup-all-pvc
+  name: backup-all
   namespace: kasten-io
 spec:
   comment: Policy to backup all resources daily.  Daily snapshot/backup
@@ -62,12 +62,12 @@ spec:
     - action: export
       exportParameters:
         frequency: "@daily"
-        # receiveString: bIzAPpoanmFT7A59vRRyoc9cYW4LDUackDOG0388WsAhaelHjUS4XZWyQJSNl8AHHlf0zKuNGU+u7zELhTr9rj82uztLCrqce4OSq/i+1sKI7rZ13Tp6A1Sns47TXrgwSLBShXt1nLxqt7OQ7NyT53enH9LW5Uthz3DfH12Wh/iE4rcSMxiNzWqNqUfXDhlM3eNyQbmemDpY00o3MTiL9929XXSzHSjrpihO/IrbWJdep4bOOnTYbsUDs6SuidqyZJbfIPjMK990Wzb/s1tgtzKarbWBaf3En17ACjYnBmF6RXHUr2AguWa+s9DU8Nt0i0AlPM1Hk31Ii4ZojieOHaIUtJJIZxgw/pg2jdG08uXhhAzVgNfZ8CIpjEH+3nI1qJ60M5Zd+/u/AjVyw8/zaVfpew9jUNViWuhf2eM9tQfT
+        receiveString: bIzAPpoanmEV5gpgrg9R0px5RkwtEEuY2Ain5nIfW58fG74Yxke+WLaeQ5LW6uN1IwX0zKuNGU+u7zELhTr9sDA1lwQrAruZQbK3y8Cw6cWkrJps7F9uIg6EvtWNTZViGqItmnlz3tVCq7OQ7NzV7XO6DMn1lhhE6FL5AlCSz8Ol17oxMkezvz3S4kTRCzpg3uUpPJrspWhY00o3MTiL9929XXSzHSjrpihO/IrbWJdep4bOOnTYbsUDs6SuidqyZJbfIPjMK990Wzb/s1tgtzKarbWBaf3En17ACjYnBmF6RXHUr2AguWa+s9DU8Nt0i0whK9FdkTsLmsZoh3LcDPle8/YbKTsK5pIXnJy7u+XqzVzQjMrEu3d1glmvnTw6opGsP5pHxPGjJzlv3oSmNgizwqEhaDoAQ3KXKJmrK7TKnmqw
         profile:
           name: k10-disaster-recovery
           namespace: kasten-io
         migrationToken:
-          name: backup-all-pvc-migration-token-khxnl
+          name: backup-all-migration-token-5hsjk
           namespace: kasten-io
         exportData:
           enabled: true
