@@ -62,7 +62,7 @@ spec:
     - action: export
       exportParameters:
         frequency: "@daily"
-        receiveString: bIzAPpoanmFT7A59vRRyoc9cYW4LDUackDOG0388WsAhaelHjUS4XZWyQJSNl8AHHlf0zKuNGU+u7zELhTr9rj82uztLCrqce4OSq/i+1sKI7rZ13Tp6A1Sns47TXrgwSLBShXt1nLxqt7OQ7NyT53enH9LW5Uthz3DfH12Wh/iE4rcSMxiNzWqNqUfXDhlM3eNyQbmemDpY00o3MTiL9929XXSzHSjrpihO/IrbWJdep4bOOnTYbsUDs6SuidqyZJbfIPjMK990Wzb/s1tgtzKarbWBaf3En17ACjYnBmF6RXHUr2AguWa+s9DU8Nt0i0AlPM1Hk31Ii4ZojieOHaIUtJJIZxgw/pg2jdG08uXhhAzVgNfZ8CIpjEH+3nI1qJ60M5Zd+/u/AjVyw8/zaVfpew9jUNViWuhf2eM9tQfT
+        # receiveString: bIzAPpoanmFT7A59vRRyoc9cYW4LDUackDOG0388WsAhaelHjUS4XZWyQJSNl8AHHlf0zKuNGU+u7zELhTr9rj82uztLCrqce4OSq/i+1sKI7rZ13Tp6A1Sns47TXrgwSLBShXt1nLxqt7OQ7NyT53enH9LW5Uthz3DfH12Wh/iE4rcSMxiNzWqNqUfXDhlM3eNyQbmemDpY00o3MTiL9929XXSzHSjrpihO/IrbWJdep4bOOnTYbsUDs6SuidqyZJbfIPjMK990Wzb/s1tgtzKarbWBaf3En17ACjYnBmF6RXHUr2AguWa+s9DU8Nt0i0AlPM1Hk31Ii4ZojieOHaIUtJJIZxgw/pg2jdG08uXhhAzVgNfZ8CIpjEH+3nI1qJ60M5Zd+/u/AjVyw8/zaVfpew9jUNViWuhf2eM9tQfT
         profile:
           name: k10-disaster-recovery
           namespace: kasten-io
