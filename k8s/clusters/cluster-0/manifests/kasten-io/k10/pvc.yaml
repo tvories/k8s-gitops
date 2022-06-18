@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: "${SECRET_NAS1}"
-    path: /mnt/fatguys/k8s/Backup/k8s/applications/k10
+    path: /mnt/fatguys/Backup/k8s/applications/k10
   mountOptions:
     - nfsvers=4.1
     - tcp
