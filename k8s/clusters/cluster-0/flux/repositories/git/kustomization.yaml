@@ -6,3 +6,4 @@ resources:
   - external-snapshotter.yaml
   - k8s-gitops.yaml
   - kube-prometheus-stack.yaml
+  - kubegres.yaml
