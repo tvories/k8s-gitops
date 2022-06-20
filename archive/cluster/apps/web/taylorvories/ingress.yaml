@@ -31,6 +31,6 @@ spec:
   - hosts:
     - taylorvories.com
     - www.taylorvories.com
-    secretName: taylorvories-com
+    secretName: tls.taylorvories-com
 status:
   loadBalancer: {}
