@@ -18,3 +18,4 @@ resources:
   - ./trilio.yaml
   - ./vpn.yaml
   - ./kasten-io.yaml
+  - ./database.yaml
