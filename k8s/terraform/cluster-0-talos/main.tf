@@ -121,7 +121,7 @@ resource "vsphere_virtual_machine" "talos-worker" {
 
   disk {
     label = "talos-cp-${count.index + 1}-disk1"
-    size = "100"
+    size = "200"
     unit_number = 1
   }
 
