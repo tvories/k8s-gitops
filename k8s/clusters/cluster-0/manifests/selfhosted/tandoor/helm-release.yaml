@@ -25,18 +25,18 @@ spec:
       DEBUG: "0"
       ALLOWED_HOSTS: "*"
       SECRET_KEY: ${SECRET_RECIPES_SECRET_KEY}
-      DB_ENGINE: django.db.backends.sqlite3
       EMAIL_HOST: ${SECRET_SMTP_HOST}
       EMAIL_PORT: 465
       EMAIL_HOST_USER: ${SECRET_RECIPE_EMAIL}
       EMAIL_HOST_PASSWORD: ${SECRET_RECIPE_EMAIL_PASSWORD}
       EMAIL_USE_TLS: 1
       DEFAULT_FROM_EMAIL: ${SECRET_RECIPE_EMAIL}
-      # DB_OPTIONS: '{"sslmode":"require"}'
-      # POSTGRES_HOST: 
-      # POSTGRES_PORT: "5432"
-      # POSTGRES_DB: postgres
-      # POSTGRES_USER: postgres
+      DB_ENGINE: django.db.backends.postgresql
+      DB_OPTIONS: '{"sslmode":"require"}'
+      POSTGRES_HOST: tandoor-postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: djangodb
+      POSTGRES_USER: djangodb
       #POSTGRES_PASSWORD: set in secret
       REVERSE_PROXY_AUTH: 1
     ingress:
