@@ -1,0 +1,9 @@
+-talos-cp-1.mcbadass.local.yaml
+-talos-cp-2.mcbadass.local.yaml
+-talos-cp-3.mcbadass.local.yaml
+-talos-worker-1.mcbadass.local.yaml
+-talos-worker-2.mcbadass.local.yaml
+-physical2.mcbadass.local.yaml
+-sff1.mcbadass.local.yaml
+-physical1.mcbadass.local.yaml
+talosconfig
