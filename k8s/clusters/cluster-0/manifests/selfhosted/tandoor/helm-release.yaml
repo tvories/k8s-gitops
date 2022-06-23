@@ -39,6 +39,9 @@ spec:
       POSTGRES_USER: djangodb
       #POSTGRES_PASSWORD: set in secret
       REVERSE_PROXY_AUTH: 1
+    envFrom:
+      - secretRef:
+          name: tandoor-postgres-secret
     ingress:
       main:
         enabled: true
