@@ -10,14 +10,17 @@ spec:
   database:
     size: 10Gi
     storageClassName: ceph-block
-  env:
-    - name: POSTGRES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: tandoor-postgres-secret
-          key: superUserPassword
-    - name: POSTGRES_REPLICATION_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: tandoor-postgres-secret
-          key: replicationUserPassword
+  envFrom:
+    - secretRef:
+        name: tandoor-postgres-secret
+  # env:
+  #   - name: POSTGRES_PASSWORD
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: tandoor-postgres-secret
+  #         key: POSTGRES_PASSWORD
+  #   - name: POSTGRES_REPLICATION_PASSWORD
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: tandoor-postgres-secret
+  #         key: POSTGRES_REPLICATION_PASSWORD
