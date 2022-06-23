@@ -101,6 +101,9 @@ spec:
       master:
         persistence:
           enabled: false
+      replica:
+        persistence:
+          enabled: false
 
     postgresql:
       enabled: true
