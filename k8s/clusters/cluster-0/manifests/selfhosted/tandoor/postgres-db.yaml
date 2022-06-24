@@ -10,17 +10,21 @@ spec:
   database:
     size: 10Gi
     storageClassName: ceph-block
-  envFrom:
-    - secretRef:
-        name: tandoor-postgres-secret
-  # env:
-  #   - name: POSTGRES_PASSWORD
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: tandoor-postgres-secret
-  #         key: POSTGRES_PASSWORD
-  #   - name: POSTGRES_REPLICATION_PASSWORD
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: tandoor-postgres-secret
-  #         key: POSTGRES_REPLICATION_PASSWORD
+  # envFrom:
+  #   - secretRef:
+  #       name: tandoor-postgres-secret
+  backup:
+    schedule: "0 0 * * *"
+    pvcName: tandoor-pg-nfs-backup
+    volumeMount: /var/lib/backup
+  env:
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: tandoor-postgres-secret
+          key: POSTGRES_PASSWORD
+    - name: POSTGRES_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: tandoor-postgres-secret
+          key: POSTGRES_REPLICATION_PASSWORD
