@@ -19,3 +19,5 @@ spec:
       value: ${TANDOOR_PG_PASSWORD}
     - name: POSTGRES_REPLICATION_PASSWORD
       value: ${TANDOOR_PG_REPLICATION_PASSWORD}
+    - name: PGPASSWORD
+      value: ${TANDOOR_PG_PASSWORD}
