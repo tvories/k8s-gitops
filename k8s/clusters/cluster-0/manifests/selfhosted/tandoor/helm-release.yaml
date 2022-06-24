@@ -32,7 +32,6 @@ spec:
       EMAIL_USE_TLS: 1
       DEFAULT_FROM_EMAIL: ${SECRET_RECIPE_EMAIL}
       DB_ENGINE: django.db.backends.postgresql
-      # DB_OPTIONS: '{"sslmode":"require"}'
       POSTGRES_HOST: tandoor-postgres
       POSTGRES_PORT: "5432"
       POSTGRES_DB: postgres
