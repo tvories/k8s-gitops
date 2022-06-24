@@ -35,8 +35,8 @@ spec:
       # DB_OPTIONS: '{"sslmode":"require"}'
       POSTGRES_HOST: tandoor-postgres
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: djangodb
-      POSTGRES_USER: djangodb
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
       #POSTGRES_PASSWORD: set in secret
       REVERSE_PROXY_AUTH: 1
     envFrom:
