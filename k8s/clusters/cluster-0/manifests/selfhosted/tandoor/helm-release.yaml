@@ -39,6 +39,7 @@ spec:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${TANDOOR_PG_PASSWORD}
+      PGPASSWORD: ${TANDOOR_PG_PASSWORD}
       REVERSE_PROXY_AUTH: 1
     ingress:
       main:
