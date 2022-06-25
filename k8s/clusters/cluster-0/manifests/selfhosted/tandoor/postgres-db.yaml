@@ -16,6 +16,12 @@ spec:
     volumeMount: /var/lib/backup
   env:
     - name: POSTGRES_PASSWORD
-      value: ${TANDOOR_PG_PASSWORD}
+      valueFrom:
+        secretKeyRef:
+          name: tandoor-postgres-secret
+          key: superUserPassword
     - name: POSTGRES_REPLICATION_PASSWORD
-      value: ${TANDOOR_PG_REPLICATION_PASSWORD}
+      valueFrom:
+        secretKeyRef:
+          name: tandoor-postgres-secret
+          key: replicationUserPassword
