@@ -27,21 +27,24 @@
   suppressNotifications: ["prIgnoreNotification"],
   commitBodyTable: true,
   rebaseWhen: "conflicted",
-  "ignorePaths": ["**/examples/**"],
+  "ignorePaths": [
+      "**/examples/**",
+      "**/archive/**"
+    ],
   // Set up Renovate Managers
   flux: {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   "helm-values": {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   kubernetes: {
-    fileMatch: ["kubernetes/.+\\.yaml$"],
+    fileMatch: ["kubernetes/.+\\.ya?ml$"],
   },
   regexManagers: [
     {
       description: "Process various dependencies",
-      fileMatch: ["kubernetes/.+\\.ya?ml$"],
+      fileMatch: ["k8s/.+\\.ya?ml$"],
       matchStrings: [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*=?))?\n .*: (?<currentValue>.*=?)",
       ],
@@ -54,6 +57,24 @@
         "# renovate: registryUrl=(?<registryUrl>\\S+) chart=(?<depName>\\S+)\n.*?(?<currentValue>[^-\\s]*)\n",
       ],
       datasourceTemplate: "helm",
+    },
+    {
+      description: "Generic Docker image Regex manager",
+      fileMatch: ["k8s/.+\\.ya?ml$"],
+      matchStrings: [
+        "# renovate: docker-image( versioning=(?<versioning>.*=?))?\n .*: (?<depName>.*?):(?<currentValue>.*=?)",
+      ],
+      datasourceTemplate: "docker",
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+    },
+    {
+      description: "Raw GitHub URL Regex manager",
+      fileMatch: ["k8s/.+\\.ya?ml$", "kubernetes/.+\\.ya?ml$"],
+      matchStrings: [
+        "https:\\/\\/raw.githubusercontent.com\\/(?<depName>[\\w\\d\\-_]+\\/[\\w\\d\\-_]+)\\/(?<currentValue>[\\w\\d\\.\\-_]+)\\/.*",
+      ],
+      datasourceTemplate: "github-releases",
+      versioningTemplate: "semver",
     },
   ],
   packageRules: [
@@ -71,7 +92,7 @@
     {
       matchDatasources: ["docker"],
       matchPackageNames: ["xirixiz/dsmr-reader-docker"],
-      versioning: "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-\\d+\\.\\d+\\.\\d+$",
+      versioning: "regex:^(?<compatibility>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+\\.\\d+\\.\\d+)$",
     },
     {
       matchDatasources: ["docker"],
@@ -80,6 +101,11 @@
         "ghcr.io/linuxserver/calibre-web",
       ],
       versioning: "regex:^version-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+    },
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/timberio/vector"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$",
     },
     // Version strategies
     {
