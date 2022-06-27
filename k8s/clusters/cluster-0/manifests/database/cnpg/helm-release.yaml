@@ -9,7 +9,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: cnpg
+      chart: cloudnative-pg
       version: 0.13.1
       sourceRef:
         kind: HelmRepository
