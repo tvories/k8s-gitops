@@ -20,7 +20,7 @@ spec:
   backup:
     barmanObjectStore:
       destinationPath: s3://cnpg/
-      endpointURL: http://${SECRET_NAS1}:9000
+      endpointURL: https://${SECRET_NAS1}:9000
       s3Credentials:
         accessKeyId: 
           name: minio-creds
