@@ -22,9 +22,20 @@ spec:
       destinationPath: s3://cnpg/
       endpointURL: http://${SECRET_NAS1}:9000
       s3Credentials:
-        accessKeyId:
+        accessKeyId: 
           name: minio-creds
-          key: ${SECRET_MINIO_ACCESS_KEY}
+          key: ACCESS_KEY_ID
         secretAccessKey:
           name: minio-creds
           key: ${SECRET_MINIO_SECRET_KEY}
+
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: minio-creds
+  namespace: home
+stringData:
+  ACCESS_KEY_ID: ${SECRET_MINIO_ACCESS_KEY}
+  ACCESS_SECRET_KEY: ${SECRET_MINIO_SECRET_KEY}
