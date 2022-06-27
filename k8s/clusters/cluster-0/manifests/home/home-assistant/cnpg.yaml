@@ -16,3 +16,15 @@ spec:
 
   storage:
     size: 10Gi
+    storageClass: ceph-block
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://cnpg/
+      endpointURL: http://${SECRET_NAS1}:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-creds
+          key: ${SECRET_MINIO_ACCESS_KEY}
+        secretAccessKey:
+          name: minio-creds
+          key: ${SECRET_MINIO_SECRET_KEY}
