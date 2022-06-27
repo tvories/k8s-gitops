@@ -27,3 +27,4 @@ resources:
   - vector-charts.yaml
   - kubernetes-sigs-descheduler-charts.yaml
   - trilio-charts.yaml
+  - cnpg-charts.yaml
