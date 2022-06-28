@@ -14,6 +14,17 @@ spec:
   #               the switchover of the primary
   primaryUpdateStrategy: unsupervised
 
+  # superuserSecret:
+  #   name: superuser-secret
+
+  bootstrap:
+    initdb:
+      database: hass
+      owner: ${SECRET_HASS_PGUSER}
+      secret:
+        name: app-secret
+
+
   storage:
     size: 10Gi
     storageClass: ceph-block
@@ -39,3 +50,25 @@ metadata:
 stringData:
   ACCESS_KEY_ID: ${SECRET_CLUSTER_MINIO_ACCESS_KEY}
   ACCESS_SECRET_KEY: ${SECRET_CLUSTER_MINIO_SECRET_KEY}
+
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: app-secret
+  namespace: home
+stringData:
+  username: ${SECRET_HASS_PGUSER}
+  password: ${SECRET_HASS_PGPASSWORD}
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-test
+  namespace: home
+spec:
+  schedule: "@daily"
+  cluster:
+    name: cnpg-homeassistant

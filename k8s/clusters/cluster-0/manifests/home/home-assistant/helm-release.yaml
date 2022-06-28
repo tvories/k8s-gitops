@@ -64,14 +64,13 @@ spec:
       enabled: false
     postgresql:
       enabled: false
-      # diagnosticMode:
-      #   enabled: true
-      # image:
-      #   tag: 12.9.0
-      existingSecret: home-assistant-postgresql-secret
-      persistence:
-        enabled: true
-        existingClaim: homeassistant-postgres
+    
+    metrics:
+      enabled: true
+      bearerTokenSecret:
+        name: ${SECRET_HASS_USERNAME}
+        key: ${SECRET_HASS_PROMETHEUS_TOKEN}
+
     addons:
       codeserver:
         enabled: true
