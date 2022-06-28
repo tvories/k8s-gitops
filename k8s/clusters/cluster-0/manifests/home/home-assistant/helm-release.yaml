@@ -68,7 +68,7 @@ spec:
     metrics:
       enabled: true
       bearerTokenSecret:
-        name: ${SECRET_HASS_USERNAME}
+        # name: ${SECRET_HASS_USERNAME}
         key: ${SECRET_HASS_PROMETHEUS_TOKEN}
 
     addons:
