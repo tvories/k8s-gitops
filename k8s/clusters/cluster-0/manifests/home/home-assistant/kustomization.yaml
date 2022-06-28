@@ -6,7 +6,7 @@ resources:
 # - home-assistant-code-server-secret.enc.yaml
 # - home-assistant-postgresql-secret.enc.yaml
 # - home-assistant-secrets.enc.yaml
-- ha-postgress-secret.sops.yaml
+# - ha-postgress-secret.sops.yaml
 - pvc.yaml
 - ./cnpg.yaml
 - helm-release.yaml
