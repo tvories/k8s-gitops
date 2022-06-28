@@ -21,9 +21,6 @@ spec:
     barmanObjectStore:
       destinationPath: s3://cnpg/
       endpointURL: http://minio.selfhosted.svc.cluster.local:9000
-      endpointCA:
-        name: minio-creds
-        key: INTERNAL_CA
       s3Credentials:
         accessKeyId: 
           name: minio-creds
@@ -42,4 +39,3 @@ metadata:
 stringData:
   ACCESS_KEY_ID: ${SECRET_CLUSTER_MINIO_ACCESS_KEY}
   ACCESS_SECRET_KEY: ${SECRET_CLUSTER_MINIO_SECRET_KEY}
-  INTERNAL_CA: ${ROOT_CA}
