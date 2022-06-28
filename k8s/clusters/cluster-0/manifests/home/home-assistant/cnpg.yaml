@@ -69,6 +69,6 @@ metadata:
   name: backup-test
   namespace: home
 spec:
-  schedule: "@daily"
+  # schedule: "@daily"
   cluster:
     name: cnpg-homeassistant
