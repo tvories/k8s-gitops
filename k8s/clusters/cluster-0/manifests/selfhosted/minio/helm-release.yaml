@@ -1,0 +1,112 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: selfhosted
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kah-common-chart
+      version: 1.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2022-06-10T16-59-15Z
+
+    nameOverride: "minio"
+
+    env:
+      TZ: "${TIMEZONE}"
+      MINIO_UPDATE: "off"
+      MINIO_ROOT_USER:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-user
+      MINIO_ROOT_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: minio
+            key: root-password
+
+    args:
+      - server
+      - /data
+      - --console-address
+      - :9001
+
+    podSecurityContext:
+      runAsUser: 1120
+      runAsGroup: 100
+      fsGroup: 100
+      supplementalGroups:
+        - 34
+        - 100
+      fsGroupChangePolicy: "OnRootMismatch"
+
+    persistence:
+      config:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            server: "${SECRET_NAS1}"
+            path: /mnt/fatguys/k8s/minio/config
+        mountPath: /root/.minio
+      data:
+        enabled: true
+        existingClaim: minio-nfs-data
+        readOnly: false
+        mountPath: /data
+
+    service:
+      main:
+        ports:
+          http:
+            enabled: true
+            port: 9001
+          api:
+            enabled: true
+            port: 9000
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: &host-minio "minio.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9001
+          - host: &host-s3 "s3.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: 9000
+        tls:
+          - secretName: tls.minio
+            hosts:
+              - *host-minio
+              - *host-s3
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: "minio"
+
+    resources:
+      requests:
+        cpu: 350m
+        memory: 979M
+      limits:
+        memory: 2843M

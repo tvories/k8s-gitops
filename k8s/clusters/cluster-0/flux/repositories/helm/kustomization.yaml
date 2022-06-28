@@ -28,3 +28,4 @@ resources:
   - kubernetes-sigs-descheduler-charts.yaml
   - trilio-charts.yaml
   - cnpg-charts.yaml
+  - minio-charts.yaml
