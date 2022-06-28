@@ -180,6 +180,16 @@ spec:
                   - "physical2.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "talos-worker-1.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "talos-worker-2.${SECRET_INTERNAL_DOMAIN}:9100"
+                  - "physical1.${SECRET_INTERNAL_DOMAIN}:9100"
+                  - "sff1.${SECRET_INTERNAL_DOMAIN}:9100"
+          - job_name: "home-assistant"
+            scrape_interval: 60s
+            metrics_path: "/api/prometheus"
+            bearer_token: "${SECRET_HASS_PROMETHEUS_TOKEN}"
+            scheme: http
+            static_configs:
+              - targets:
+                  - home-assistant.home.svc:8123
 
     ###
     ### Alertmanager values
