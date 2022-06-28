@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-test
+  namespace: home
+spec:
+  cluster:
+    name: cnpg-homeassistant
