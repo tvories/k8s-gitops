@@ -8,13 +8,13 @@ spec:
   instances: 1
   primaryUpdateStrategy: unsupervised
 
-  superuserSecret:
-    name: tandoor-cnpg-secret
+  # superuserSecret:
+  #   name: tandoor-cnpg-secret
 
   bootstrap:
     initdb:
-      # database: postgres
-      # owner: postgres
+      database: tandoor
+      owner: tandoor
       secret:
         name: tandoor-cnpg-secret
 
@@ -55,8 +55,8 @@ metadata:
   name: tandoor-cnpg-secret
   namespace: selfhosted
 stringData:
-  superuser-secret: ${TANDOOR_PG_PASSWORD}
-  username: postgres
+  # superuser-secret: ${TANDOOR_PG_PASSWORD}
+  username: tandoor
   password: ${TANDOOR_PG_PASSWORD}
 
 ---
