@@ -11,12 +11,12 @@ spec:
   superuserSecret:
     name: tandoor-superuser-secret
 
-  # bootstrap:
-  #   initdb:
-  #     database: postgres
-  #     owner: postgres
-      # secret:
-      #   name: tandoor-superuser-secret
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+      secret:
+        name: tandoor-superuser-secret
 
   storage:
     size: 10Gi
