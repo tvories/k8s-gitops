@@ -33,8 +33,8 @@ spec:
       # EMAIL_USE_SSL: 1
       DEFAULT_FROM_EMAIL: ${SECRET_RECIPE_EMAIL}
       DB_ENGINE: django.db.backends.postgresql
-      ENABLE_SIGNUP: 1
-      POSTGRES_HOST: tandoor-postgres
+      ENABLE_SIGNUP: 0
+      POSTGRES_HOST: cnpg-tandoor-rw
       POSTGRES_PORT: "5432"
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
