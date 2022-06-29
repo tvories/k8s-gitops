@@ -29,6 +29,7 @@ spec:
     size: 10Gi
     storageClass: ceph-block
   backup:
+    retentionPolicy: "30d"
     barmanObjectStore:
       destinationPath: s3://cnpg/
       endpointURL: http://minio.database.svc.cluster.local:9000
