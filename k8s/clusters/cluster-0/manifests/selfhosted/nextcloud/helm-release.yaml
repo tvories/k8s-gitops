@@ -86,7 +86,7 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: nextcloud-postgresql
+      host: cnpg-nextcloud-rw
       database: nextcloud
       password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
       user: ncuser
@@ -106,7 +106,7 @@ spec:
           enabled: false
 
     postgresql:
-      enabled: true
+      enabled: false
       persistence:
         enabled: true
         existingClaim: pvc-nextcloud-db
