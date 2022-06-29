@@ -19,10 +19,10 @@ spec:
     size: 10Gi
     storageClass: ceph-block
   backup:
-    wal:
-      compression: bzip2
     retentionPolicy: "30d"
     barmanObjectStore:
+      wal:
+        compression: bzip2
       destinationPath: s3://cnpg/
       endpointURL: http://minio.database.svc.cluster.local:9000
       s3Credentials:
