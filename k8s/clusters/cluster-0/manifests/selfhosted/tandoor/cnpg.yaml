@@ -13,8 +13,8 @@ spec:
 
   bootstrap:
     initdb:
-      database: postgres
-      owner: postgres
+      # database: postgres
+      # owner: postgres
       secret:
         name: tandoor-cnpg-secret
 
