@@ -36,8 +36,8 @@ spec:
       ENABLE_SIGNUP: 0
       POSTGRES_HOST: cnpg-tandoor-rw
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
+      POSTGRES_DB: tandoor
+      POSTGRES_USER: tandoor
       POSTGRES_PASSWORD: ${TANDOOR_PG_PASSWORD}
       REVERSE_PROXY_AUTH: 1
     ingress:
