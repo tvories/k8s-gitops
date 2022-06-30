@@ -59,9 +59,19 @@ stringData:
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: daily-backup
+  name: daily-backup-nextcloud
   namespace: database
 spec:
   schedule: "@daily"
+  cluster:
+    name: cnpg-nextcloud
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-nextcloud
+  namespace: selfhosted
+spec:
   cluster:
     name: cnpg-nextcloud

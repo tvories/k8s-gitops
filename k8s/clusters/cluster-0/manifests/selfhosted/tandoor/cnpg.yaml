@@ -63,9 +63,19 @@ stringData:
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: daily-backup
+  name: daily-backup-tandoor
   namespace: database
 spec:
   schedule: "@daily"
+  cluster:
+    name: cnpg-tandoor
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-tandoor
+  namespace: selfhosted
+spec:
   cluster:
     name: cnpg-tandoor
