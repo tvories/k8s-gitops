@@ -69,20 +69,19 @@ stringData:
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: daily-backup
+  name: daily-backup-homeassistant
   namespace: database
 spec:
   schedule: "@daily"
   cluster:
     name: cnpg-homeassistant
 
-# ---
-# apiVersion: postgresql.cnpg.io/v1
-# kind: Backup
-# metadata:
-#   name: backup-test
-#   namespace: home
-# spec:
-#   # schedule: "@daily"
-#   cluster:
-#     name: cnpg-homeassistant
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: backup-homeassistant
+  namespace: home
+spec:
+  cluster:
+    name: cnpg-homeassistant
