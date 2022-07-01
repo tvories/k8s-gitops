@@ -62,7 +62,7 @@ spec:
         ports:
           http:
             port: 3334
-      octo_tunnel:
+      octo-tunnel:
         enabled: true
         primary: false
         type: LoadBalancer
