@@ -20,7 +20,7 @@ spec:
   values:
     image:
       repository: hkotel/mealie
-      tag: v0.5.6
+      tag: frontend-v1.0.0beta-3
     env:
       TZ: "${TIMEZONE}"
       DEFAULT_EMAIL: ${SECRET_PERSONAL_EMAIL}
@@ -41,5 +41,14 @@ spec:
           secretName: tls.meals
     persistence:
       config:
-        enabled: true
+        enabled: false
         existingClaim: mealie-config
+      api-data:
+        enabled: true
+        existingClaim: mealie-api-data
+    api:
+      image:
+        repository: hkotel/mealie
+        tag: api-v1.0.0beta-3
+      env:
+        TZ: ${TIMEZONE}
