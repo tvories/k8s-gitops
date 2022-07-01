@@ -19,7 +19,7 @@ spec:
     global:
       nameOverride: *app
     image:
-      repository: docker.io/thespaghettidetective/web
+      repository: docker.io/thespaghettidetective/web:base-1.8
       tag: 
       pullPolicy: IfNotPresent
     command: 
