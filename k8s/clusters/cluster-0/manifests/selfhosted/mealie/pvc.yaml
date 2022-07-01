@@ -14,3 +14,19 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mealie-api-data
+  namespace: selfhosted
+  labels:
+    triliovault.trilio.io/backup: "true"
+    kasten.io/backup-volume: "enabled"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: ceph-block
