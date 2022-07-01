@@ -371,7 +371,7 @@ cluster:
     image: k8s.gcr.io/kube-controller-manager:v1.23.6 # The container image used in the controller manager manifest.
   # Kube-proxy server-specific configuration options
   proxy:
-    image: k8s.gcr.io/kube-proxy:v1.23.6 # The container image used in the kube-proxy manifest.
+    image: k8s.gcr.io/kube-proxy:v1.24.2 # The container image used in the kube-proxy manifest.
   # Scheduler server specific configuration options.
   scheduler:
     image: k8s.gcr.io/kube-scheduler:v1.23.6 # The container image used in the scheduler manifest.
