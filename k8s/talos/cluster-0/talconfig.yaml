@@ -1,7 +1,6 @@
 ---
-name: cluster-0
-
-talosVersion: v1.0.6
+clusterName: cluster-0
+talosVersion: v1.1.0
 kubernetesVersion: v1.23.7
 endpoint: https://cluster-0.${domainName}:6443
 
@@ -37,6 +36,11 @@ nodes:
     installDisk: /dev/sda
   - hostname: sff1.${domainName}
     ipAddress: 192.168.80.97
+    inlinePatch:
+      machine:
+        install:
+          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.0-20220622213801
+
     installDisk: /dev/sda
   - hostname: physical1.${domainName}
     ipAddress: 192.168.80.98
