@@ -144,7 +144,7 @@ spec:
           limits:
             memory: 32M
 
-      - name: ml_api
+      - name: ml-api
         image: docker.io/thespaghettidetective/ml_api:base-1.2-linux-amd64
         imagePullPolicy: IfNotPresent
         command: 
