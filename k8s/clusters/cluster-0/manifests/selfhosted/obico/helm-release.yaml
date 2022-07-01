@@ -62,7 +62,7 @@ spec:
         ports:
           http:
             port: 3334
-      octoprint_tunnel:
+      octo_tunnel:
         enabled: true
         primary: false
         type: LoadBalancer
