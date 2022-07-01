@@ -19,8 +19,8 @@ spec:
     global:
       nameOverride: *app
     image:
-      repository: docker.io/thespaghettidetective/web:base-1.8
-      tag: 
+      repository: docker.io/thespaghettidetective/web
+      tag: base-1.8
       pullPolicy: IfNotPresent
     command: 
       - python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334
