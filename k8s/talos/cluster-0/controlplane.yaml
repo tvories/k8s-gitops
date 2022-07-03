@@ -18,7 +18,7 @@ machine:
 
   # Used to provide additional options to the kubelet.
   kubelet:
-    image: ghcr.io/siderolabs/kubelet:v1.23.6 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/siderolabs/kubelet:v1.24.2 # The `image` field is an optional reference to an alternative kubelet image.
 
     # # The `ClusterDNS` field is an optional reference to an alternative kubelet clusterDNS ip list.
     # clusterDNS:
