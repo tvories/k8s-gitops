@@ -19,7 +19,7 @@ spec:
   values:
     image:
       tag: edge
-      # pullPolicy: Always
+      pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
       # AUDIOBOOKSHELF_UID: 568
