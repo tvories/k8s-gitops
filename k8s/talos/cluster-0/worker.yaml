@@ -18,7 +18,7 @@ machine:
 
   # Used to provide additional options to the kubelet.
   kubelet:
-    image: ghcr.io/siderolabs/kubelet:v1.23.6 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/siderolabs/kubelet:v1.24.2 # The `image` field is an optional reference to an alternative kubelet image.
 
     # # The `ClusterDNS` field is an optional reference to an alternative kubelet clusterDNS ip list.
     # clusterDNS:
@@ -130,7 +130,7 @@ machine:
   # Used to provide instructions for installations.
   install:
     disk: /dev/sda # The disk used for installations.
-    image: ghcr.io/siderolabs/installer:v1.0.5 # Allows for supplying the image used to perform the installation.
+    image: ghcr.io/siderolabs/installer:v1.1.0 # Allows for supplying the image used to perform the installation.
     bootloader: true # Indicates if a bootloader should be installed.
     wipe: false # Indicates if the installation disk should be wiped at installation time.
 
