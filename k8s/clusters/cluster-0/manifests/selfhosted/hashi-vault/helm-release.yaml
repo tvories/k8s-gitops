@@ -53,7 +53,7 @@ spec:
               path = "/vault/data"
             }
             seal "gcpckms" {
-              project     = "kms-vault"
+              project     = "taylor-cloud"
               region      = "global"
               key_ring    = "vault-unseal"
               crypto_key  = "vault-key"
