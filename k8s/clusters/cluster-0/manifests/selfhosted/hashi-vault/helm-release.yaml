@@ -57,15 +57,18 @@ spec:
                 unauthenticated_metrics_access = "true"
               }
             }
-            telemetry {
-              prometheus_retention_time = "24h",
-              disable_hostname = true
+            storage "raft" {
+              path = "/vault/data"
             }
             seal "gcpckms" {
               project     = "taylor-cloud"
               region      = "global"
               key_ring    = "vault-unseal"
               crypto_key  = "vault-key"
+            }
+            telemetry {
+              prometheus_retention_time = "24h",
+              disable_hostname = true
             }
             service_registration "kubernetes" {}
       ingress:
@@ -75,8 +78,8 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
           - host: &host hashi-vault.${SECRET_DOMAIN}
-            # paths:
-            #   - path: /
+            paths:
+              - path: /
         tls:
           - secretName: tls.hashi-vault
             hosts:
