@@ -50,28 +50,16 @@ spec:
           config: |
             ui = true
             listener "tcp" {
+              tls_disable = 1
               address = "[::]:8200"
               cluster_address = "[::]:8201"
+              telemetry {
+                unauthenticated_metrics_access = "true"
+              }
             }
-            storage "raft" {
-              path = "/vault/data"
-              retry_join {
-                leader_api_addr = "https://hashi-vault-0.hashi-vault-internal:8200"
-              }
-              retry_join {
-                leader_api_addr = "https://hashi-vault-1.hashi-vault-internal:8200"
-              }
-              retry_join {
-                leader_api_addr = "https://hashi-vault-.hashi-vault-internal:8200"
-              }
-              autopilot {
-                cleanup_dead_servers = "true"
-                last_contact_threshold = "200ms"
-                last_contact_failure_threshold = "10m"
-                max_trailing_logs = 250
-                min_quorum = 3
-                server_stabilization_time = "10s"
-              }
+            telemetry {
+              prometheus_retention_time = "24h",
+              disable_hostname = true
             }
             seal "gcpckms" {
               project     = "taylor-cloud"
