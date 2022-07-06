@@ -15,6 +15,9 @@ spec:
         name: hashicorp-charts
         namespace: flux-system
   values:
+    global:
+      enabled: true
+      tlsDisable: false
     server:
       dataStorage:
         enabled: true
@@ -54,13 +57,13 @@ spec:
             storage "raft" {
               path = "/vault/data"
               retry_join {
-                leader_api_addr = "http://hashi-vault-0:8200"
+                leader_api_addr = "https://hashi-vault-0.hashi-vault-internal:8200"
               }
               retry_join {
-                leader_api_addr = "http://hashi-vault-1:8200"
+                leader_api_addr = "https://hashi-vault-1.hashi-vault-internal:8200"
               }
               retry_join {
-                leader_api_addr = "http://hashi-vault-3:8200"
+                leader_api_addr = "https://hashi-vault-.hashi-vault-internal:8200"
               }
               autopilot {
                 cleanup_dead_servers = "true"
@@ -80,20 +83,21 @@ spec:
             service_registration "kubernetes" {}
     ui:
       enabled: true
-      serviceType: LoadBalancer
-      loadBalancerIP: ${LB_VAULT}
-      externalTrafficPolicy: Local
+      # serviceType: LoadBalancer
+      # loadBalancerIP: ${LB_VAULT}
+      # externalTrafficPolicy: Local
+      # externalPort: 443
 
-    # ingress:
-    #   enabled: true
-    #   ingressClassName: "nginx-internal"
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: letsencrypt-production
-    #   hosts:
-    #     - host: &host hashi-vault.${SECRET_DOMAIN}
-    #       paths:
-    #         - path: /
-    #   tls:
-    #     - hosts:
-    #         - *host
-    #       secretName: tls.hashi-vault
+    ingress:
+      enabled: true
+      ingressClassName: "nginx-internal"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - host: &host hashi-vault.${SECRET_DOMAIN}
+          paths:
+            - path: /
+      tls:
+        - secretName: tls.hashi-vault
+          hosts:
+            - *host
