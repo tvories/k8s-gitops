@@ -80,17 +80,20 @@ spec:
             service_registration "kubernetes" {}
     ui:
       enabled: true
+      serviceType: LoadBalancer
+      loadBalancerIP: ${LB_VAULT}
+      externalTrafficPolicy: Local
 
-    ingress:
-      enabled: true
-      ingressClassName: "nginx-internal"
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-      hosts:
-        - host: &host hashi-vault.${SECRET_DOMAIN}
-          paths:
-            - path: /
-      tls:
-        - hosts:
-            - *host
-          secretName: tls.hashi-vault
+    # ingress:
+    #   enabled: true
+    #   ingressClassName: "nginx-internal"
+    #   annotations:
+    #     cert-manager.io/cluster-issuer: letsencrypt-production
+    #   hosts:
+    #     - host: &host hashi-vault.${SECRET_DOMAIN}
+    #       paths:
+    #         - path: /
+    #   tls:
+    #     - hosts:
+    #         - *host
+    #       secretName: tls.hashi-vault
