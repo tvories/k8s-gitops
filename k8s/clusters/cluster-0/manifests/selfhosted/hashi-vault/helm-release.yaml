@@ -24,6 +24,8 @@ spec:
         storageClass: "ceph-block"
       extraEnvironmentVars:
         GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/kms-vault/account.json
+        GOOGLE_PROJECT: taylor-cloud
+        GOOGLE_REGION: global
       extraVolumes:
         - type: secret
           name: kms-vault
@@ -51,6 +53,23 @@ spec:
             }
             storage "raft" {
               path = "/vault/data"
+              retry_join {
+                leader_api_addr = "http://hashi-vault-0:8200"
+              }
+              retry_join {
+                leader_api_addr = "http://hashi-vault-1:8200"
+              }
+              retry_join {
+                leader_api_addr = "http://hashi-vault-3:8200"
+              }
+              autopilot {
+                cleanup_dead_servers = "true"
+                last_contact_threshold = "200ms"
+                last_contact_failure_threshold = "10m"
+                max_trailing_logs = 250
+                min_quorum = 3
+                server_stabilization_time = "10s"
+              }
             }
             seal "gcpckms" {
               project     = "taylor-cloud"
