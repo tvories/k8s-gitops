@@ -79,7 +79,7 @@ spec:
             }
             service_registration "kubernetes" {}
     ui:
-      enabled: false
+      enabled: true
 
     ingress:
       enabled: true
