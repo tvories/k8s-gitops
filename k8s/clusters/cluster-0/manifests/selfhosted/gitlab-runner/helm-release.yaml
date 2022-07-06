@@ -8,9 +8,8 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://charts.gitlab.io
       chart: gitlab-runner
-      version: 0.42.0
+      version: 0.41.0
       sourceRef:
         kind: HelmRepository
         name: gitlab-charts
@@ -34,8 +33,8 @@ spec:
       # serviceAccountName: gitlab-admin
       namespace: default
       env:
-          DOCKER_HOST: tcp://docker:2375
-          DOCKER_TLS_CERTDIR: ""
+        DOCKER_HOST: tcp://docker:2375
+        DOCKER_TLS_CERTDIR: ""
 
     rbac:
       create: true
