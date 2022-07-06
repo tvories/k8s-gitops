@@ -39,6 +39,13 @@ spec:
       #     cpu: 250m
       #   limits:
       #     memory: 256Mi
+      readinessProbe:
+        enabled: true
+        path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+      livenessProbe:
+        enabled: true
+        path: "/v1/sys/health?standbyok=true"
+        initialDelaySeconds: 60
       standalone:
         enabled: false
       ha:
@@ -59,6 +66,24 @@ spec:
             }
             storage "raft" {
               path = "/vault/data"
+              retry_join {
+                leader_api_addr = "http://hashi-vault-0.vault-internal:8200"
+              }
+              retry_join {
+                leader_api_addr = "http://hashi-vault-1.vault-internal:8200"
+              }
+              retry_join {
+                leader_api_addr = "http://hashi-vault-2.vault-internal:8200"
+              }
+
+            autopilot {
+                cleanup_dead_servers = "true"
+                last_contact_threshold = "200ms"
+                last_contact_failure_threshold = "10m"
+                max_trailing_logs = 250000
+                min_quorum = 3
+                server_stabilization_time = "10s"
+              }
             }
             seal "gcpckms" {
               project     = "taylor-cloud"
