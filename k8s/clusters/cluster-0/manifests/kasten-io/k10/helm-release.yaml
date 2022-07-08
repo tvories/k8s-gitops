@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: k10
-      version: 5.0.2
+      version: 4.5.15
       sourceRef:
         kind: HelmRepository
         name: kasten-charts
@@ -59,12 +59,12 @@ spec:
 
     grafana:
       enabled: false
-    
+
     patches:
-    - target:
-        kind: Ingress
-        name: k10-ingress
-      patch: |-
-        - op: replace
-          path: /spec/ingressClassName
-          value: nginx-internal
+      - target:
+          kind: Ingress
+          name: k10-ingress
+        patch: |-
+          - op: replace
+            path: /spec/ingressClassName
+            value: nginx-internal
