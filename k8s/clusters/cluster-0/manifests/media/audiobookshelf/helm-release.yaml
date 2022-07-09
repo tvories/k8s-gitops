@@ -18,13 +18,13 @@ spec:
       interval: 5m
   values:
     image:
-      tag: edge
-      pullPolicy: Always
+      tag: v2.0.23
+      # pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
       # AUDIOBOOKSHELF_UID: 568
       # AUDIOBOOKSHELF_GID: 568
-    
+
     ingress:
       main:
         enabled: true
@@ -35,14 +35,14 @@ spec:
           nginx.ingress.kubernetes.io/proxy-buffering: "off"
           nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         hosts:
-        - host: &host "ab.${SECRET_DOMAIN}"
-          paths:
-          - path: /
-            pathType: Prefix
+          - host: &host "ab.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
         tls:
-        - hosts:
-          - *host
-          secretName: tls.audiobookshelf
+          - hosts:
+              - *host
+            secretName: tls.audiobookshelf
     persistence:
       config:
         enabled: true
