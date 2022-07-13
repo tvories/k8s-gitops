@@ -341,7 +341,7 @@ cluster:
     key: ${cluster.serviceAccount.key}
   # API server specific configuration options.
   apiServer:
-    image: k8s.gcr.io/kube-apiserver:v1.24.2 # The container image used in the API server manifest.
+    image: k8s.gcr.io/kube-apiserver:v1.24.3 # The container image used in the API server manifest.
     # Extra certificate subject alternative names for the API server's certificate.
     certSANs:
       - talos-prod.mcbadass.local
