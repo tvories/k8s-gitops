@@ -374,7 +374,7 @@ cluster:
     image: k8s.gcr.io/kube-proxy:v1.24.2 # The container image used in the kube-proxy manifest.
   # Scheduler server specific configuration options.
   scheduler:
-    image: k8s.gcr.io/kube-scheduler:v1.24.2 # The container image used in the scheduler manifest.
+    image: k8s.gcr.io/kube-scheduler:v1.24.3 # The container image used in the scheduler manifest.
   # Configures cluster member discovery.
   discovery:
     enabled: true # Enable the cluster membership discovery feature.
