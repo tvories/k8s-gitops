@@ -18,8 +18,8 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 2.0.24
-      # pullPolicy: Always
+      tag: edge
+      pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
       # AUDIOBOOKSHELF_UID: 568
