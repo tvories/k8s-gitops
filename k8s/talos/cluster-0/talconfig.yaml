@@ -50,6 +50,10 @@ nodes:
 controlPlane:
   inlinePatch:
     cluster:
+      etcd:
+        extraArgs:
+          election-timeout: 5000
+          heartbeat-interval: 250
       aescbcEncryptionSecret: ${aescbcEncryptionKey}
       aggregatorCA:
         crt: ${k8sAggregatorCert}
