@@ -1,13 +1,3 @@
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: mpsmpi
-#   namespace: web
-# spec:
-#   externalName: "mpsmpi.${SECRET_INTERNAL_DOMAIN}"
-#   type: ExternalName
-
 ---
 apiVersion: v1
 kind: Service
@@ -60,19 +50,19 @@ metadata:
 spec:
   ingressClassName: "nginx-internal"
   tls:
-  - hosts:
-    - &host enderpi.${SECRET_DOMAIN}
-    secretName: tls.enderpi
+    - hosts:
+        - &host enderpi.${SECRET_DOMAIN}
+      secretName: tls.enderpi
   rules:
-  - host: *host
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: enderpi
-            port:
-              number: 80
+    - host: *host
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: enderpi
+                port:
+                  number: 80
 status:
   loadBalancer: {}
