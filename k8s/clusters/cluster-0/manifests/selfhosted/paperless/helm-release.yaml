@@ -40,7 +40,7 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: paperless-nfs-data
+        existingClaim: paperless-data
 
     ingress:
       main:
