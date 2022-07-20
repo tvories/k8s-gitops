@@ -35,7 +35,7 @@ spec:
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASS}
       PAPERLESS_REDIS: redis://localhost:6379
       PAPERLESS_TIME_ZONE: "${TIMEZONE}"
-      USERMAP_GID: 65543
+      # USERMAP_GID: 65543
 
     persistence:
       data:
