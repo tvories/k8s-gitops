@@ -21,3 +21,17 @@ spec:
     - nodiratime
     - rsize=1048576
     - wsize=1048576
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-nfs-data
+  namespace: selfhosted
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: paperless-nfs-data
+  resources:
+    requests:
+      storage: 1Mi
