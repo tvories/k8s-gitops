@@ -49,24 +49,16 @@ spec:
     persistence:
       data:
         enabled: true
-        type: nfs
-        server: "${SECRET_NAS1}"
-        path: /mnt/fatguys/k8s/paperless/data
+        existingClaim: paperless-nfs-data
       media:
         enabled: true
-        type: nfs
-        server: "${SECRET_NAS1}"
-        path: /mnt/fatguys/k8s/paperless/media
+        existingClaim: paperless-nfs-media
       consume:
         enabled: true
-        type: nfs
-        server: "${SECRET_NAS1}"
-        path: /mnt/fatguys/k8s/paperless/incoming
+        existingClaim: paperless-nfs-incoming
       export:
         enabled: true
-        type: nfs
-        server: "${SECRET_NAS1}"
-        path: /mnt/fatguys/k8s/paperless/export
+        existingClaim: paperless-nfs-export
 
     ingress:
       main:
