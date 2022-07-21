@@ -75,13 +75,13 @@ spec:
             hosts:
               - *host
 
-    resources:
-      requests:
-        cpu: 1311m
-        memory: 324M
-      limits:
-        cpu: 1311m
-        memory: 324M
+    # resources:
+    #   requests:
+    #     cpu: 1311m
+    #     memory: 324M
+    #   limits:
+    #     cpu: 1311m
+    #     memory: 324M
 
     additionalContainers:
       - name: broker
