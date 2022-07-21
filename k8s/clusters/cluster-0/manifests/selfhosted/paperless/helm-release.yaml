@@ -44,7 +44,7 @@ spec:
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
       PAPERLESS_TASK_WORKERS: 2
       PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
-      # USERMAP_GID: 65543
+      USERMAP_GID: 20513
 
     persistence:
       data:
