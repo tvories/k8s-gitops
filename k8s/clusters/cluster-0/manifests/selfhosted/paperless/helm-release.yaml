@@ -35,12 +35,38 @@ spec:
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
       PAPERLESS_REDIS: redis://localhost:6379
       PAPERLESS_TIME_ZONE: "${TIMEZONE}"
+      PAPERLESS_DBHOST: cnpg-paperless-rw
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ${PAPERLESS_PG_PASSWORD}
+      PAPERLESS_CONSUMER_POLLING: "60"
+      PAPERLESS_CONSUMER_RECURSIVE: "true"
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+      PAPERLESS_TASK_WORKERS: 2
+      PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
       # USERMAP_GID: 65543
 
     persistence:
       data:
         enabled: true
-        existingClaim: paperless-nfs-data
+        type: nfs
+        server: "${SECRET_NAS1}"
+        path: /mnt/fatguys/k8s/paperless/data
+      media:
+        enabled: true
+        type: nfs
+        server: "${SECRET_NAS1}"
+        path: /mnt/fatguys/k8s/paperless/media
+      consume:
+        enabled: true
+        type: nfs
+        server: "${SECRET_NAS1}"
+        path: /mnt/fatguys/k8s/paperless/incoming
+      export:
+        enabled: true
+        type: nfs
+        server: "${SECRET_NAS1}"
+        path: /mnt/fatguys/k8s/paperless/export
 
     ingress:
       main:
