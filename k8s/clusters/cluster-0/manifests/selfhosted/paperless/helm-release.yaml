@@ -45,6 +45,7 @@ spec:
       # PAPERLESS_TASK_WORKERS: 2
       PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
       USERMAP_GID: 20513
+      PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
 
     persistence:
       data:
