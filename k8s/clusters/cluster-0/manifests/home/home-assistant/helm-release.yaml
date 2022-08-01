@@ -46,13 +46,13 @@ spec:
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         hosts:
-        - host: &host "ha.${SECRET_DOMAIN}"
-          paths:
-          - path: /
+          - host: &host "ha.${SECRET_DOMAIN}"
+            paths:
+              - path: /
         tls:
-        - secretName: tls.homeassistant
-          hosts:
-          - *host
+          - secretName: tls.homeassistant
+            hosts:
+              - *host
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
     service:
@@ -64,7 +64,7 @@ spec:
       enabled: false
     postgresql:
       enabled: false
-    
+
     metrics:
       enabled: false
       bearerTokenSecret:
@@ -76,7 +76,7 @@ spec:
         enabled: true
         image:
           # repository: codercom/code-server
-          tag: 4.4.0
+          tag: 4.5.1
         workingDir: "/config"
         #TODO: Eventually add a git secret here
         # git:
@@ -84,12 +84,12 @@ spec:
         env:
           password: ${SECRET_CODESERVER_PASSWORD}
         args:
-        - --auth
-        - "none"
-        - --user-data-dir
-        - "/config/.vscode"
-        - --extensions-dir
-        - "/config/.vscode"
+          - --auth
+          - "none"
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
         ingress:
           enabled: true
           ingressClassName: "nginx-internal"
@@ -97,16 +97,16 @@ spec:
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
             cert-manager.io/cluster-issuer: letsencrypt-production
           hosts:
-          - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
-            paths:
-            - path: /
+            - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
+              paths:
+                - path: /
           tls:
-          - secretName: tls.ha-vscode
-            hosts:
-            - *vscodehost
+            - secretName: tls.ha-vscode
+              hosts:
+                - *vscodehost
         volumeMounts:
-        - name: config
-          mountPath: /config
+          - name: config
+            mountPath: /config
     # podAnnotations:
     #   secret.reloader.stakater.com/reload: home-assistant-secrets
     # affinity:
