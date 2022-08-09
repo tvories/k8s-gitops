@@ -18,7 +18,7 @@ terraform {
 
 # This is block to be used after bootstrap.  Leverage the terraform approle
 provider "vault" {
-  address = "https://hashi-vault.${data.sops_file.secrets.data["external_domain"]}}"
+  address = "https://hashi-vault.${data.sops_file.secrets.data["external_domain"]}"
   auth_login {
     path = "auth/approle/login"
 
