@@ -110,7 +110,7 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-          - host: &host hashi-vault.${SECRET_DOMAIN}
+          - host: &host vault.${SECRET_DOMAIN}
             paths:
               - /
         tls:

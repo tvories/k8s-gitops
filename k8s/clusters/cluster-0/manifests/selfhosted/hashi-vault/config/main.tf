@@ -9,13 +9,13 @@ terraform {
 # This is used for the initial connection to bootstrap vault.  Uncomment for first use
 # Use the approle once first use has been created
 # provider "vault" {
-#   address = "https://hashi-vault.t-vo.us"
+#   address = "https://vault.${data.sops_file.secrets.data["external_domain"]}"
 #   token = data.sops_file.secrets.data["vault_token"]
 # }
 
 # This is block to be used after bootstrap.  Leverage the terraform approle
 provider "vault" {
-  address = "https://hashi-vault.${data.sops_file.secrets.data["external_domain"]}"
+  address = "https://vault.${data.sops_file.secrets.data["external_domain"]}"
   auth_login {
     path = "auth/approle/login"
 
