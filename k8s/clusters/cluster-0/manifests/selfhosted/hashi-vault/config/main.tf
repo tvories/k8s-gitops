@@ -10,9 +10,6 @@ terraform {
 # Use the approle once first use has been created
 # provider "vault" {
 #   address = "https://hashi-vault.t-vo.us"
-#   # auth_login {
-#   #   path = 
-#   # }
 #   token = data.sops_file.secrets.data["vault_token"]
 # }
 
