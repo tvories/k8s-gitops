@@ -1,12 +1,12 @@
 ---
 clusterName: cluster-0
-talosVersion: v1.1.0
+talosVersion: v1.1.1
 kubernetesVersion: v1.23.7
 endpoint: https://cluster-0.${domainName}:6443
 
 cniConfig:
   name: custom
-  urls: 
+  urls:
     - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml
 
 nodes:
@@ -39,18 +39,20 @@ nodes:
     inlinePatch:
       machine:
         install:
-          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.0-20220622213801
+          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.1-20220714174828
 
     installDisk: /dev/sda
   - hostname: physical1.${domainName}
     ipAddress: 192.168.80.98
     installDisk: /dev/sda
 
-
 controlPlane:
   inlinePatch:
     cluster:
       etcd:
+        ca:
+          crt: ${etcdCert}
+          key: ${etcdCertKey}
         extraArgs:
           election-timeout: 5000
           heartbeat-interval: 250
@@ -74,10 +76,6 @@ controlPlane:
         registries:
           service:
             disabled: true
-      etcd:
-        ca:
-          crt: ${etcdCert}
-          key: ${etcdCertKey}
       extraManifests:
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.5.1/deploy/ha-install.yaml
       proxy:
