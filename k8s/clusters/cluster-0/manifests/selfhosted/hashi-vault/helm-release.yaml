@@ -40,7 +40,7 @@ spec:
           path: /vault/userconfig
         - type: secret
           name:
-      extraArgs: "-config=/vault/userconfig/"
+      # extraArgs: "-config=/vault/userconfig/"
       # resources:
       #   requests:
       #     memory: 256Mi
