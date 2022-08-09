@@ -1,0 +1,88 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: gitlab
+  namespace: selfhosted
+spec:
+  releaseName: gitlab
+  interval: 5m
+  chart:
+    spec:
+      chart: gitlab
+      version: 6.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: gitlab-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    global:
+      edition: ce
+      gitlabVersion: 15.2.2
+      ingress:
+        class: nginx-external
+        annotations:
+          nginx.ingress.kubernetes.io/enable-global-auth: "false"
+        configureCertmanager: false
+        tls:
+          enabled: false
+      kas:
+        enabled: false
+      pages:
+        enabled: true
+      email:
+        display_name: GitLab
+        from: gitlab@${SECRET_DOMAIN}
+        reply_to: noreply@${SECRET_DOMAIN}
+      smtp:
+        enabled: true
+        address: ${SECRET_SMTP_HOST}
+        port: 587
+        user_name: ${SECRET_TVO_EMAIL}
+        domain: ${SECRET_DOMAIN}
+        starttls_auto: true
+        password:
+          secret: gitlab
+          key: smtp_password
+      psql:
+        host: cnpg-gitlab-rw
+        database: gitlab
+        username: ${SECRET_GITLAB_PGUSER}
+        password:
+          useSecret: true
+          secret: gitlab-cnpg-secret
+          key: password
+      hosts:
+        domain: ${SECRET_DOMAIN}
+        # https: true
+        # gitlab:
+        #   name: gitlab.${SECRET_DOMAIN}
+    gitlab:
+      gitaly:
+        resources:
+          requests:
+            cpu: 80m
+            memory: 340M
+          limits:
+            cpu: 1800m
+      webservice:
+        minReplicas: 1
+        maxReplicas: 1
+      sidekiq:
+        minReplicas: 1
+        maxReplicas: 1
+      gitlab-shell:
+        minReplicas: 1
+        maxReplicas: 1
+    certmanager:
+      install: false
+    nginx-ingress:
+      enabled: false
+    prometheus:
+      install: false
+    grafana:
+      enabled: false
+
+    minio:
+      enabled: false
