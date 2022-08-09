@@ -38,8 +38,8 @@ spec:
         - type: secret
           name: kms-vault
           path: /vault/userconfig
-        - type: secret
-          name:
+      #   - type: secret
+      #     name:
       # extraArgs: "-config=/vault/userconfig/"
       # resources:
       #   requests:
