@@ -18,7 +18,12 @@ spec:
     global:
       enabled: true
       # tlsDisable: false
+    injector:
+      agentImage:
+        tag: "1.11.2"
     server:
+      image:
+        tag: "1.11.2"
       dataStorage:
         enabled: true
         storageClass: "ceph-block"
@@ -33,6 +38,10 @@ spec:
         - type: secret
           name: kms-vault
           path: /vault/userconfig
+        - type: secret
+          name:
+      extraArgs:
+        - -config=/vault/userconfig/
       # resources:
       #   requests:
       #     memory: 256Mi
