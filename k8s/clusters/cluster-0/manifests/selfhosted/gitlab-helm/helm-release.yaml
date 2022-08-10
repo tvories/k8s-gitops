@@ -27,8 +27,8 @@ spec:
         configureCertmanager: false
         tls:
           enabled: false
-      minio:
-        enabled: false
+      # minio:
+      #   enabled: false
       kas:
         enabled: false
       pages:
