@@ -27,6 +27,8 @@ spec:
         configureCertmanager: false
         tls:
           enabled: false
+      minio:
+        enabled: false
       kas:
         enabled: false
       pages:
@@ -82,7 +84,4 @@ spec:
     prometheus:
       install: false
     grafana:
-      enabled: false
-
-    minio:
       enabled: false
