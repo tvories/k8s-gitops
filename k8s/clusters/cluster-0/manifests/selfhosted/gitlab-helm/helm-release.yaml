@@ -47,6 +47,8 @@ spec:
         password:
           secret: gitlab
           key: smtp_password
+      postgresql:
+        install: false
       psql:
         host: cnpg-gitlab-rw
         database: gitlab
