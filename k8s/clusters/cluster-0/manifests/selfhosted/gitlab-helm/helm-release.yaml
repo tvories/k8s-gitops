@@ -47,8 +47,6 @@ spec:
         password:
           secret: gitlab
           key: smtp_password
-      postgresql:
-        install: false
       psql:
         host: cnpg-gitlab-rw
         database: gitlab
@@ -62,6 +60,8 @@ spec:
         # https: true
         # gitlab:
         #   name: gitlab.${SECRET_DOMAIN}
+    postgresql:
+      install: false
     gitlab:
       gitaly:
         resources:
