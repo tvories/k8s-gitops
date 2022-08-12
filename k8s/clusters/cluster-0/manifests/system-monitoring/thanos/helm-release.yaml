@@ -83,8 +83,8 @@ spec:
         requests:
           cpu: 15m
           memory: 64M
-        limits:
-          memory: 64M
+        # limits:
+        #   memory: 64M
       persistence:
         enabled: true
         size: 512Mi
