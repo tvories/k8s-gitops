@@ -39,7 +39,7 @@ nodes:
     inlinePatch:
       machine:
         install:
-          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.1-20220714174828
+          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
 
     installDisk: /dev/sda
   - hostname: physical1.${domainName}
