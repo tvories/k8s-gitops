@@ -15,7 +15,7 @@ spec:
         name: cilium-charts
         namespace: flux-system
       interval: 5m
-  intall:
+  install:
     remediation:
       retries: 5
   upgrade:
