@@ -130,7 +130,7 @@ data:
   #   - disabled
   #   - vxlan (default)
   #   - geneve
-  tunnel: vxlan
+  tunnel: "vxlan"
   # Enables L7 proxy for L7 policy enforcement and visibility
   enable-l7-proxy: "true"
 
@@ -142,30 +142,44 @@ data:
   install-no-conntrack-iptables-rules: "false"
 
   auto-direct-node-routes: "false"
-  enable-bandwidth-manager: "false"
   enable-local-redirect-policy: "true"
 
   kube-proxy-replacement: "strict"
   kube-proxy-replacement-healthz-bind-address: ""
+  bpf-lb-sock: "false"
   enable-health-check-nodeport: "true"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
-  enable-session-affinity: "true"
+  enable-svc-source-range-check: "true"
   enable-l2-neigh-discovery: "true"
   arping-refresh-period: "30s"
   enable-endpoint-health-checking: "true"
   enable-health-checking: "true"
   enable-well-known-identities: "false"
   enable-remote-node-identity: "true"
+  synchronize-k8s-nodes: "true"
   operator-api-serve-addr: "127.0.0.1:9234"
   ipam: "kubernetes"
   disable-cnp-status-updates: "true"
+  enable-vtep: "false"
+  vtep-endpoint: ""
+  vtep-cidr: ""
+  vtep-mask: ""
+  vtep-mac: ""
+  enable-bgp-control-plane: "false"
+  bpf-root: "/sys/fs/bpf"
   cgroup-root: "/run/cilium/cgroupv2"
   enable-k8s-terminating-endpoint: "true"
-  annotate-k8s-node: "true"
   remove-cilium-node-taints: "true"
   set-cilium-is-up-condition: "true"
   unmanaged-pod-watcher-interval: "15"
+  tofqdns-dns-reject-response-code: "refused"
+  tofqdns-enable-dns-compression: "true"
+  tofqdns-endpoint-max-ip-per-hostname: "50"
+  tofqdns-idle-connection-grace-period: "0s"
+  tofqdns-max-deferred-connection-deletes: "10000"
+  tofqdns-min-ttl: "3600"
+  tofqdns-proxy-response-max-delay: "100ms"
   agent-not-ready-taint-key: "node.cilium.io/agent-not-ready"
 ---
 # Source: cilium/templates/cilium-agent/clusterrole.yaml
@@ -208,23 +222,12 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ""
-    resources:
-      - nodes/status
-    verbs:
-      # To annotate the k8s node with Cilium's metadata
-      - patch
-  - apiGroups:
       - apiextensions.k8s.io
     resources:
       - customresourcedefinitions
     verbs:
-      # Deprecated for removal in v1.10
-      - create
       - list
       - watch
-      - update
-
       # This is used when validating policies in preflight. This will need to stay
       # until we figure out how to avoid "get" inside the preflight, and then
       # should be removed ideally.
@@ -232,21 +235,61 @@ rules:
   - apiGroups:
       - cilium.io
     resources:
-      - ciliumnetworkpolicies
-      - ciliumnetworkpolicies/status
+      - ciliumbgploadbalancerippools
+      - ciliumbgppeeringpolicies
+      - ciliumclusterwideenvoyconfigs
       - ciliumclusterwidenetworkpolicies
-      - ciliumclusterwidenetworkpolicies/status
+      - ciliumegressgatewaypolicies
+      - ciliumegressnatpolicies
       - ciliumendpoints
-      - ciliumendpoints/status
-      - ciliumnodes
-      - ciliumnodes/status
+      - ciliumendpointslices
+      - ciliumenvoyconfigs
       - ciliumidentities
       - ciliumlocalredirectpolicies
-      - ciliumlocalredirectpolicies/status
-      - ciliumegressnatpolicies
-      - ciliumendpointslices
+      - ciliumnetworkpolicies
+      - ciliumnodes
     verbs:
-      - "*"
+      - list
+      - watch
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumidentities
+      - ciliumendpoints
+      - ciliumnodes
+    verbs:
+      - create
+  - apiGroups:
+      - cilium.io
+    # To synchronize garbage collection of such resources
+    resources:
+      - ciliumidentities
+    verbs:
+      - update
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumendpoints
+    verbs:
+      - delete
+      - get
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnodes
+      - ciliumnodes/status
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnetworkpolicies/status
+      - ciliumclusterwidenetworkpolicies/status
+      - ciliumendpoints/status
+      - ciliumendpoints
+    verbs:
+      - patch
 ---
 # Source: cilium/templates/cilium-operator/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -297,14 +340,6 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - services
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
       # to perform LB IP allocation for BGP
       - services/status
     verbs:
@@ -312,11 +347,18 @@ rules:
   - apiGroups:
       - ""
     resources:
+      # to check apiserver connectivity
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       # to perform the translation of a CNP that contains `ToGroup` to its endpoints
       - services
       - endpoints
-      # to check apiserver connectivity
-      - namespaces
     verbs:
       - get
       - list
@@ -325,26 +367,73 @@ rules:
       - cilium.io
     resources:
       - ciliumnetworkpolicies
-      - ciliumnetworkpolicies/status
-      - ciliumnetworkpolicies/finalizers
       - ciliumclusterwidenetworkpolicies
-      - ciliumclusterwidenetworkpolicies/status
-      - ciliumclusterwidenetworkpolicies/finalizers
-      - ciliumendpoints
-      - ciliumendpoints/status
-      - ciliumendpoints/finalizers
-      - ciliumnodes
-      - ciliumnodes/status
-      - ciliumnodes/finalizers
-      - ciliumidentities
-      - ciliumendpointslices
-      - ciliumidentities/status
-      - ciliumidentities/finalizers
-      - ciliumlocalredirectpolicies
-      - ciliumlocalredirectpolicies/status
-      - ciliumlocalredirectpolicies/finalizers
     verbs:
-      - "*"
+      # Create auto-generated CNPs and CCNPs from Policies that have 'toGroups'
+      - create
+      - update
+      - deletecollection
+      # To update the status of the CNPs and CCNPs
+      - patch
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnetworkpolicies/status
+      - ciliumclusterwidenetworkpolicies/status
+    verbs:
+      # Update the auto-generated CNPs and CCNPs status.
+      - patch
+      - update
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumendpoints
+      - ciliumidentities
+    verbs:
+      # To perform garbage collection of such resources
+      - delete
+      - list
+      - watch
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumidentities
+    verbs:
+      # To synchronize garbage collection of such resources
+      - update
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnodes
+    verbs:
+      - create
+      - update
+      - get
+      - list
+      - watch
+        # To perform CiliumNode garbage collector
+      - delete
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumnodes/status
+    verbs:
+      - update
+  - apiGroups:
+      - cilium.io
+    resources:
+      - ciliumendpointslices
+      - ciliumenvoyconfigs
+    verbs:
+      - create
+      - update
+      - get
+      - list
+      - watch
+      - delete
   - apiGroups:
       - apiextensions.k8s.io
     resources:
@@ -353,8 +442,28 @@ rules:
       - create
       - get
       - list
-      - update
       - watch
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - update
+    resourceNames:
+      - ciliumbgploadbalancerippools.cilium.io
+      - ciliumbgppeeringpolicies.cilium.io
+      - ciliumclusterwideenvoyconfigs.cilium.io
+      - ciliumclusterwidenetworkpolicies.cilium.io
+      - ciliumegressgatewaypolicies.cilium.io
+      - ciliumegressnatpolicies.cilium.io
+      - ciliumendpoints.cilium.io
+      - ciliumendpointslices.cilium.io
+      - ciliumenvoyconfigs.cilium.io
+      - ciliumexternalworkloads.cilium.io
+      - ciliumidentities.cilium.io
+      - ciliumlocalredirectpolicies.cilium.io
+      - ciliumnetworkpolicies.cilium.io
+      - ciliumnodes.cilium.io
   # For cilium-operator running in HA mode.
   #
   # Cilium operator running in HA mode requires the use of ResourceLock for Leader Election
@@ -388,7 +497,6 @@ subjects:
   - kind: ServiceAccount
     name: "cilium"
     namespace: kube-system
-
 ---
 # Source: cilium/templates/cilium-operator/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -435,37 +543,14 @@ spec:
         meta.helm.sh/release-name: cilium
         meta.helm.sh/release-namespace: kube-system
         # ensure pods roll when configmap updates
-        cilium.io/cilium-configmap-checksum: "29b678099888e27173f8f2baaa97150ccf4449468d7c94a208975300c22a0346"
+        cilium.io/cilium-configmap-checksum: "9bba1edfff8fd8d98de3bbd98b07ba243a6bd4dd6c24f1987173fff8834e55bc"
       labels:
         app.kubernetes.io/managed-by: Helm
         k8s-app: cilium
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/os
-                    operator: In
-                    values:
-                      - linux
-              - matchExpressions:
-                  - key: beta.kubernetes.io/os
-                    operator: In
-                    values:
-                      - linux
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: k8s-app
-                    operator: In
-                    values:
-                      - cilium
-              topologyKey: kubernetes.io/hostname
       containers:
         - name: cilium-agent
-          image: "quay.io/cilium/cilium:v1.11.8@sha256:7f030cfb166a8aeabcb8208844d96abe5b00a3feb251e8ca47f21cf7b3a74f88"
+          image: "quay.io/cilium/cilium:v1.12.1@sha256:ea2db1ee21b88127b5c18a96ad155c25485d0815a667ef77c2b7c7f31cab601b"
           imagePullPolicy: IfNotPresent
           command:
             - cilium-agent
@@ -545,6 +630,7 @@ spec:
                   - "/cni-install.sh"
                   - "--enable-debug=false"
                   - "--cni-exclusive=true"
+                  - "--log-file=/var/run/cilium/cilium-cni.log"
             preStop:
               exec:
                 command:
@@ -573,12 +659,11 @@ spec:
               readOnly: true
             - name: xtables-lock
               mountPath: /run/xtables.lock
-      hostNetwork: true
       initContainers:
         # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
         # We use nsenter command with host's cgroup and mount namespaces enabled.
         - name: mount-cgroup
-          image: "quay.io/cilium/cilium:v1.11.8@sha256:7f030cfb166a8aeabcb8208844d96abe5b00a3feb251e8ca47f21cf7b3a74f88"
+          image: "quay.io/cilium/cilium:v1.12.1@sha256:ea2db1ee21b88127b5c18a96ad155c25485d0815a667ef77c2b7c7f31cab601b"
           imagePullPolicy: IfNotPresent
           env:
             - name: CGROUP_ROOT
@@ -604,8 +689,33 @@ spec:
               mountPath: /hostbin
           securityContext:
             privileged: true
+        - name: apply-sysctl-overwrites
+          image: "quay.io/cilium/cilium:v1.12.1@sha256:ea2db1ee21b88127b5c18a96ad155c25485d0815a667ef77c2b7c7f31cab601b"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BIN_PATH
+              value: /opt/cni/bin
+          command:
+            - sh
+            - -ec
+            # The statically linked Go program binary is invoked to avoid any
+            # dependency on utilities like sh that can be missing on certain
+            # distros installed on the underlying host. Copy the binary to the
+            # same directory where we install cilium cni plugin so that exec permissions
+            # are available.
+            - |
+              cp /usr/bin/cilium-sysctlfix /hostbin/cilium-sysctlfix;
+              nsenter --mount=/hostproc/1/ns/mnt "${BIN_PATH}/cilium-sysctlfix";
+              rm /hostbin/cilium-sysctlfix
+          volumeMounts:
+            - name: hostproc
+              mountPath: /hostproc
+            - name: cni-path
+              mountPath: /hostbin
+          securityContext:
+            privileged: true
         - name: clean-cilium-state
-          image: "quay.io/cilium/cilium:v1.11.8@sha256:7f030cfb166a8aeabcb8208844d96abe5b00a3feb251e8ca47f21cf7b3a74f88"
+          image: "quay.io/cilium/cilium:v1.12.1@sha256:ea2db1ee21b88127b5c18a96ad155c25485d0815a667ef77c2b7c7f31cab601b"
           imagePullPolicy: IfNotPresent
           command:
             - /init-container.sh
@@ -640,12 +750,22 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 100Mi # wait-for-kube-proxy
       restartPolicy: Always
       priorityClassName: system-node-critical
       serviceAccount: "cilium"
       serviceAccountName: "cilium"
       terminationGracePeriodSeconds: 1
+      hostNetwork: true
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  k8s-app: cilium
+              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        kubernetes.io/os: linux
       tolerations:
         - operator: Exists
       volumes:
@@ -736,21 +856,9 @@ spec:
         io.cilium/app: operator
         name: cilium-operator
     spec:
-      # In HA mode, cilium-operator pods must not be scheduled on the same
-      # node as they will clash with each other.
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: io.cilium/app
-                    operator: In
-                    values:
-                      - operator
-              topologyKey: kubernetes.io/hostname
       containers:
         - name: cilium-operator
-          image: quay.io/cilium/operator-generic:v1.11.8@sha256:7f030cfb166a8aeabcb8208844d96abe5b00a3feb251e8ca47f21cf7b3a74f88
+          image: quay.io/cilium/operator-generic:v1.12.1@sha256:93d5aaeda37d59e6c4325ff05030d7b48fabde6576478e3fdbfb9bb4a68ec4a1
           imagePullPolicy: IfNotPresent
           command:
             - cilium-operator-generic
@@ -796,6 +904,17 @@ spec:
       priorityClassName: system-cluster-critical
       serviceAccount: "cilium-operator"
       serviceAccountName: "cilium-operator"
+      # In HA mode, cilium-operator pods must not be scheduled on the same
+      # node as they will clash with each other.
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  io.cilium/app: operator
+              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        kubernetes.io/os: linux
       tolerations:
         - operator: Exists
       volumes:
