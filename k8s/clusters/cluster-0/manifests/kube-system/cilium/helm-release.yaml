@@ -18,7 +18,7 @@ spec:
   values:
     cluster:
       name: "${CLUSTER_NAME}"
-      id: "${CLUSTER_ID}"
+      id: 1
 
     rollOutCiliumPods: true
 
