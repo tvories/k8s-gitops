@@ -63,7 +63,7 @@ resource "vsphere_virtual_machine" "talos-cp" {
 
 
   ovf_deploy {
-    remote_ovf_url = "https://github.com/siderolabs/talos/releases/download/v1.0.5/vmware-amd64.ova"
+    remote_ovf_url = "https://github.com/siderolabs/talos/releases/download/v1.2.0/vmware-amd64.ova"
     disk_provisioning = "thin"
   }
 

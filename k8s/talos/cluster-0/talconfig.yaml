@@ -1,7 +1,7 @@
 ---
 clusterName: cluster-0
-talosVersion: v1.1.1
-kubernetesVersion: v1.23.7
+talosVersion: v1.2.0
+kubernetesVersion: v1.24.3
 endpoint: https://cluster-0.${domainName}:6443
 
 cniConfig:
@@ -34,6 +34,10 @@ nodes:
   - hostname: physical2.${domainName}
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
+    inlinePatch:
+      machine:
+        install:
+          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
   - hostname: sff1.${domainName}
     ipAddress: 192.168.80.97
     inlinePatch:
@@ -45,6 +49,10 @@ nodes:
   - hostname: physical1.${domainName}
     ipAddress: 192.168.80.98
     installDisk: /dev/sda
+    inlinePatch:
+      machine:
+        install:
+          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
 
 controlPlane:
   inlinePatch:
@@ -108,11 +116,11 @@ controlPlane:
         destinations:
           - endpoint: "udp://192.168.83.42:6051/"
             format: json_lines
-      network:
-        extraHostEntries:
-          - ip: ${clusterEndpointIP}
-            aliases:
-              - cluster-0.${domainName}
+      # network:
+      #   extraHostEntries:
+      #     - ip: ${clusterEndpointIP}
+      #       aliases:
+      #         - cluster-0.${domainName}
       time:
         disabled: false
         servers:
