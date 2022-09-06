@@ -60,6 +60,9 @@ spec:
     grafana:
       enabled: false
 
+    prometheus:
+      enabled: false
+
     patches:
       - target:
           kind: Ingress
