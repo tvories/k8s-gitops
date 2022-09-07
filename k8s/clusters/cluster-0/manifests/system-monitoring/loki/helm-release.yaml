@@ -86,21 +86,26 @@ spec:
               category: logs
             annotations:
               summary: "Frigate is unable to reach MQTT"
-
-    ingress:
+    gateway:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-production
-      ingressClassName: nginx-internal
-      # paths:
-      #   - path: /
-      #     pathType: prefix
-      hosts:
-        - &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
-      tls:
-        - secretName: loki-${CLUSTER_NAME}-tls
-          hosts:
-            - *host
+      replicas: 1
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        ingressClassName: nginx-internal
+        # paths:
+        #   - path: /
+        #     pathType: prefix
+        hosts:
+          - host: &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: loki-${CLUSTER_NAME}-tls
+            hosts:
+              - *host
 
     persistence:
       enabled: false
