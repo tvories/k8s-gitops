@@ -95,7 +95,8 @@ spec:
       hosts:
         - host: &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
           paths:
-            - /
+            - path: /
+              pathType: prefix
       tls:
         - secretName: loki-${CLUSTER_NAME}-tls
           hosts:
