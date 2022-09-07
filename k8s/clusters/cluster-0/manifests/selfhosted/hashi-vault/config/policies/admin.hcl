@@ -87,3 +87,8 @@ path "sys/policy/*"
 {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
+
+# Backup raft snapshots
+path "sys/storage/raft/snapshot" {
+  capabilities = ["read"]
+}
