@@ -92,11 +92,11 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
       ingressClassName: nginx-internal
+      # paths:
+      #   - path: /
+      #     pathType: prefix
       hosts:
-        - host: &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
-          paths:
-            - path: /
-              pathType: prefix
+        - &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
       tls:
         - secretName: loki-${CLUSTER_NAME}-tls
           hosts:
