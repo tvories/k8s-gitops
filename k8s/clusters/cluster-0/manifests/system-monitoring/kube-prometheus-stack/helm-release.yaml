@@ -28,7 +28,15 @@ spec:
       enabled: false
 
     kubeEtcd:
-      enabled: false
+      enabled: true
+      endpoints:
+        - talos-cp-1.${SECRET_INTERNAL_DOMAIN}
+        - talos-cp-2.${SECRET_INTERNAL_DOMAIN}
+        - talos-cp-3.${SECRET_INTERNAL_DOMAIN}
+      service:
+        enabled: true
+        port: 2381
+        targetPort: 2381
 
     kubelet:
       enabled: true
