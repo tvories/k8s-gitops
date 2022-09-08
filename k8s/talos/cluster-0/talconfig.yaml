@@ -7,7 +7,7 @@ endpoint: https://cluster-0.${domainName}:6443
 cniConfig:
   name: custom
   urls:
-    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml
+    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yamlni
 
 nodes:
   - hostname: talos-cp-1.${domainName}
@@ -70,6 +70,7 @@ controlPlane:
         extraArgs:
           election-timeout: 5000
           heartbeat-interval: 250
+          listen-metrics-urls: http://0.0.0.0:2381
       aescbcEncryptionSecret: ${aescbcEncryptionKey}
       aggregatorCA:
         crt: ${k8sAggregatorCert}

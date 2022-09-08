@@ -19,18 +19,18 @@ spec:
       interval: 5m
   values:
     image:
-      repository: ghcr.io/k8s-at-home/plex
-      tag: v1.28.2.6151-914ddd2b3
+      repository: ghcr.io/onedr0p/plex
+      tag: 1.28.2.6151-914ddd2b3
 
     podSecurityContext:
-      runAsUser: 568                                                                                                                                                                                                                                                                         
-      runAsGroup: 568                                                                                                                                                                                                                                                                        
+      runAsUser: 568
+      runAsGroup: 568
       fsGroup: 568
       supplementalGroups:
-      - 44
-      - 109
-      - 100
-      - 65539
+        - 44
+        - 109
+        - 100
+        - 65539
       # - 109
 
     env:
@@ -51,14 +51,14 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         hosts:
-        - host: &host "plex.${SECRET_DOMAIN}"
-          paths:
-          - path: /
-            pathType: Prefix
+          - host: &host "plex.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
         tls:
           - secretName: plex-cert
             hosts:
-            - *host
+              - *host
 
     persistence:
       config:
@@ -83,9 +83,9 @@ spec:
       requests:
         cpu: 49m
         memory: 4282M
-    #     gpu.intel.com/i915: 1
+      #     gpu.intel.com/i915: 1
       limits:
-    #     gpu.intel.com/i915: 1
+        #     gpu.intel.com/i915: 1
         memory: 7982M
 
     # affinity:
