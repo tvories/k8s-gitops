@@ -21,8 +21,8 @@ spec:
     deploymentStrategy:
       type: Recreate
 
-    image:
-      repository: ghcr.io/k8s-at-home/grafana
+    # image:
+    #   repository: ghcr.io/k8s-at-home/grafana
 
     env:
       GF_EXPLORE_ENABLED: true
