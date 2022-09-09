@@ -29,3 +29,4 @@ resources:
   - trilio-charts.yaml
   - cnpg-charts.yaml
   - minio-charts.yaml
+  - bjw-s-charts.yaml
