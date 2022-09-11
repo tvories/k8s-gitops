@@ -27,7 +27,7 @@ spec:
   values:
     image:
       repository: ghcr.io/paperless-ngx/paperless-ngx
-      tag: 1.8.0-beta.rc1
+      tag: 1.9.0-beta.rc1
 
     env:
       TZ: "${TIMEZONE}"
