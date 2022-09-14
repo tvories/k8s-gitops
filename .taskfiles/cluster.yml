@@ -15,15 +15,15 @@ tasks:
   talos-apply:
     desc: Apply manifests to talos nodes
     cmds:
-      - talosctl -n talos-cp-1 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-cp-1.mcbadass.local.yaml --insecure
-      - talosctl -n talos-cp-2 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-cp-2.mcbadass.local.yaml --insecure
-      - talosctl -n talos-cp-3 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-cp-3.mcbadass.local.yaml --insecure
-      - talosctl -n talos-worker-1 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-worker-1.mcbadass.local.yaml --insecure
-      - talosctl -n talos-worker-2 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-worker-2.mcbadass.local.yaml --insecure
+      - talosctl -n talos-cp-1 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-talos-cp-1.mcbadass.local.yaml --insecure
+      - talosctl -n talos-cp-2 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-talos-cp-2.mcbadass.local.yaml --insecure
+      - talosctl -n talos-cp-3 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-talos-cp-3.mcbadass.local.yaml --insecure
+      - talosctl -n talos-worker-1 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-talos-worker-1.mcbadass.local.yaml --insecure
+      - talosctl -n talos-worker-2 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-talos-worker-2.mcbadass.local.yaml --insecure
       # - talosctl -n talos-worker-3 apply-config -f k8s/talos/cluster-0/clusterconfig/-talos-worker-3.yaml --insecure
-      - talosctl -n physical2 apply-config -f k8s/talos/cluster-0/clusterconfig/-physical2.mcbadass.local.yaml --insecure
-      - talosctl -n physical1 apply-config -f k8s/talos/cluster-0/clusterconfig/-physical1.mcbadass.local.yaml --insecure
-      - talosctl -n sff1 apply-config -f k8s/talos/cluster-0/clusterconfig/-sff1.mcbadass.local.yaml --insecure
+      - talosctl -n physical2 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-physical2.mcbadass.local.yaml --insecure
+      - talosctl -n physical1 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-physical1.mcbadass.local.yaml --insecure
+      - talosctl -n sff1 apply-config -f k8s/talos/cluster-0/clusterconfig/cluster-0-sff1.mcbadass.local.yaml --insecure
 
   talos-wipe-physical:
     desc: Wipe physical nodes for re-apply
