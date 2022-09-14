@@ -1,6 +1,7 @@
 ---
 clusterName: cluster-0
-talosVersion: v1.2.0
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.2.2
 kubernetesVersion: v1.24.3
 endpoint: https://cluster-0.${domainName}:6443
 
@@ -39,6 +40,7 @@ nodes:
     inlinePatch:
       machine:
         install:
+          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
   - hostname: sff1.${domainName}
     controlPlane: true
@@ -47,6 +49,7 @@ nodes:
     inlinePatch:
       machine:
         install:
+          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
 
     installDisk: /dev/sda
@@ -58,6 +61,7 @@ nodes:
     inlinePatch:
       machine:
         install:
+          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
 
 controlPlane:
@@ -162,11 +166,11 @@ worker:
         destinations:
           - endpoint: "udp://192.168.83.42:6051/"
             format: json_lines
-      network:
-        extraHostEntries:
-          - ip: ${clusterEndpointIP}
-            aliases:
-              - cluster-0.${domainName}
+      # network:
+      #   extraHostEntries:
+      #     - ip: ${clusterEndpointIP}
+      #       aliases:
+      #         - cluster-0.${domainName}
       sysctls:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
