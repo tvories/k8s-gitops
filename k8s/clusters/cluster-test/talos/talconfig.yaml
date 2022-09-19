@@ -1,0 +1,95 @@
+---
+clusterName: ${cluster_name}
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.2.2
+kubernetesVersion: v1.24.4
+endpoint: https://${cluster_name}.${domain_name}:6443
+
+cniConfig:
+  name: custom
+  urls:
+    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml
+
+nodes:
+  - hostname: talos-test-cp-1.${domain_name}
+    controlPlane: true
+    ipAddress: 192.168.80.190
+    installDisk: /dev/sda
+  - hostname: talos-test-worker-1.${domain_name}
+    controlPlane: false
+    ipAddress: 192.168.80.200
+    installDisk: /dev/sda
+
+controlPlane:
+  configPatches:
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: "true"
+        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+    - op: add
+      path: /cluster/controllerManager/extraArgs
+      value:
+        bind-address: 0.0.0.0
+    - op: add
+      path: /cluster/scheduler/extraArgs
+      value:
+        bind-address: 0.0.0.0
+    - op: add
+      path: /cluster/proxy/extraArgs
+      value:
+        bind-address: 0.0.0.0
+  inlinePatch:
+    cluster:
+      etcd:
+        extraArgs:
+          election-timeout: 5000
+          heartbeat-interval: 250
+          listen-metrics-urls: http://0.0.0.0:2381
+      apiServer:
+        certSANs:
+          - ${cluster_name}.${domain_name}
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      controllerManager:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      discovery:
+        registries:
+          service:
+            disabled: true
+      extraManifests:
+        - https://raw.githubusercontent.com/mologie/talos-vmtoolsd/master/deploy/unstable.yaml
+        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
+        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+      proxy:
+        disabled: true
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      scheduler:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+    machine:
+      time:
+        disabled: false
+        servers:
+          - us.pool.ntp.org
+
+worker:
+  configPatches:
+    - op: add
+      path: /machine/kubelet/extraArgs
+      value:
+        rotate-server-certificates: "true"
+        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+  inlinePatch:
+    cluster:
+      extraManifests:
+        - https://raw.githubusercontent.com/mologie/talos-vmtoolsd/master/deploy/unstable.yaml
+        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
+        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    machine:
+      time:
+        disabled: false
+        servers:
+          - us.pool.ntp.org
