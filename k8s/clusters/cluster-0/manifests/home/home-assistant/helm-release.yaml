@@ -27,7 +27,7 @@ spec:
     # - name: regcred
     image:
       repository: homeassistant/home-assistant
-      tag: 2022.9.4
+      tag: 2022.9.5
     persistence:
       config:
         enabled: true
