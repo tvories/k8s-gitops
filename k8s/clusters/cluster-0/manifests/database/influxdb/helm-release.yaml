@@ -5,7 +5,6 @@ metadata:
   name: influxdb
   namespace: database
 spec:
-  releaseName: cnpg
   interval: 5m
   chart:
     spec:
