@@ -6,7 +6,7 @@ metadata:
   namespace: kube-system
 spec:
   interval: 5m
-  timeout: 20m
+  timeout: 30m
   chart:
     spec:
       chart: cilium
@@ -18,10 +18,10 @@ spec:
       interval: 5m
   install:
     remediation:
-      retries: 5
+      retries: 2
   upgrade:
     remediation:
-      retries: 5
+      retries: 2
   values:
     securityContext:
       privileged: true
