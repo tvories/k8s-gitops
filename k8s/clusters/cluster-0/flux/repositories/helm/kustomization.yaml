@@ -30,3 +30,4 @@ resources:
   - cnpg-charts.yaml
   - minio-charts.yaml
   - bjw-s-charts.yaml
+  - influxdata-charts.yaml
