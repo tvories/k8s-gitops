@@ -33,17 +33,22 @@ variable "dc_server" {
 
 variable "instance_id" {
   description = "The instance-id that re-triggers a cloud-init run"
-  type = string
-  default = "tfubuntu01"
+  type        = string
+  default     = "tfubuntu01"
 }
 
 variable "controlplane_instances" {
   description = "The number of control plane systems"
-  type = number
-  default = 1
+  type        = number
+  default     = 1
 }
 variable "worker_instances" {
   description = "The number of control plane systems"
-  type = number
-  default = 1
+  type        = number
+  default     = 1
+}
+
+variable "name_prefix" {
+  description = "The name-prefix for naming the name."
+  type        = string
 }

@@ -5,8 +5,8 @@ provider "google" {
 }
 
 resource "google_service_account" "cluster_0_flux" {
-  account_id   = "svc-${var.svc_account_name}-flux"
-  display_name = "svc-${var.svc_account_name}-flux"
+  account_id   = "svc-${var.cluster_name}-flux"
+  display_name = "svc-${var.cluster_name}-flux"
 }
 
 resource "google_kms_key_ring_iam_member" "cluster_0_flux" {
@@ -22,5 +22,5 @@ resource "google_service_account_key" "cluster_0_flux" {
 
 resource "local_file" "cluster_0_flux" {
   content  = base64decode(google_service_account_key.cluster_0_flux.private_key)
-  filename = "${path.module}/${var.svc_account_name}-flux-sa.json"
+  filename = "${path.module}/${var.cluster_name}-flux-sa.json"
 }
