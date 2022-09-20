@@ -8,9 +8,10 @@ endpoint: https://${cluster_name}.${domain_name}:6443
 cniConfig:
   name: custom
   urls:
-    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml
+    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-test/integrations/cilium-quick-install/quick-install.yaml
 
 nodes:
+
   - hostname: talos-test-cp-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.190
@@ -59,7 +60,6 @@ controlPlane:
           service:
             disabled: true
       extraManifests:
-        - https://raw.githubusercontent.com/mologie/talos-vmtoolsd/master/deploy/unstable.yaml
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
         - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
       proxy:
@@ -85,7 +85,6 @@ worker:
   inlinePatch:
     cluster:
       extraManifests:
-        - https://raw.githubusercontent.com/mologie/talos-vmtoolsd/master/deploy/unstable.yaml
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
         - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
     machine:
