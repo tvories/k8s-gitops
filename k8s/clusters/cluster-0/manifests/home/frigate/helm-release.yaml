@@ -17,9 +17,9 @@ spec:
       interval: 5m
   values:
     image:
-      repository: docker.io/blakeblackshear/frigate
+      # repository: docker.io/blakeblackshear/frigate
       # repository: ghcr.io/k8s-at-home/frigate
-      tag: 0.11.0-beta2
+      tag: 0.11.0
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
