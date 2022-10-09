@@ -136,7 +136,6 @@ metadata:
 spec:
   dependsOn:
     - name: home-namespace
-    - name: home-emqx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/amcrest2mqtt"
   prune: true
