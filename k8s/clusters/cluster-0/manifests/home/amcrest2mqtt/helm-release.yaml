@@ -34,7 +34,7 @@ spec:
 
     envFrom:
       - secretRef:
-        name: amcrest2mqtt-secrets
+          name: amcrest2mqtt-secrets
 
     service:
       main:
