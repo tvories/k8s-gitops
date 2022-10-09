@@ -28,7 +28,7 @@ spec:
       TZ: "${TIMEZONE}"
       MQTT_HOST: emqx.home
       MQTT_PORT: 1883
-      HOME_ASSITANT: "true"
+      HOME_ASSISTANT: "true"
       MQTT_USERNAME: "${SECRET_AMCREST_MQTT_USER}"
       MQTT_PASSWORD: "${SECRET_AMCREST_MQTT_PASSWORD}"
 
