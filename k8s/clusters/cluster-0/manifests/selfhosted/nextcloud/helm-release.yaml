@@ -19,7 +19,7 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 24.0.5-fpm
+      tag: 24.0.6-fpm
 
     ingress:
       enabled: true
