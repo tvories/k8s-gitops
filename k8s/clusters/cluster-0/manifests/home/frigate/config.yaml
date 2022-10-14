@@ -72,6 +72,7 @@ cameras:
     snapshots:
       enabled: True
       timestamp: False
+      bounding_box: true
       retain:
         default: 14
     rtmp:
@@ -114,6 +115,7 @@ cameras:
     snapshots:
       enabled: True
       timestamp: False
+      bounding_box: true
       retain:
         default: 14
     # rtmp:
@@ -156,6 +158,7 @@ cameras:
     snapshots:
       enabled: True
       timestamp: False
+      bounding_box: true
       retain:
         default: 14
     # rtmp:
