@@ -63,9 +63,16 @@ spec:
           nfs:
             server: ${SECRET_NAS1}
             path: /mnt/fatguys/Media
+        - name: photos
+          nfs:
+            server: ${SECRET_NAS1}
+            path: /mnt/fatguys/Photos
       extraVolumeMounts:
         - name: media
           mountPath: /media
+        - name: photos
+          mountPath: /photos
+
       # extraVolumes:
       #   - name: media
       #     type: custom
