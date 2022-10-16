@@ -199,6 +199,10 @@ spec:
           datasource: Prometheus
 
       networking:
+        opnsense:
+          gnetId: 9291
+          revision: 1
+          datasource: Prometheus
         blackbox:
           url: https://raw.githubusercontent.com/jr0dd/grafana-dashboards/main/blackbox.json
           datasource: Prometheus
