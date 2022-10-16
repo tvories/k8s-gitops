@@ -46,6 +46,30 @@ spec:
     - wsize=1048576
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-nfs-photos
+spec:
+  storageClassName: nextcloud-nfs-photos
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /mnt/fatguys/Photos
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.1
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nextcloud-nfs-config
@@ -54,6 +78,20 @@ spec:
   accessModes:
   - ReadWriteMany
   storageClassName: nextcloud-nfs-config
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-nfs-photos
+  namespace: selfhosted
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nextcloud-nfs-photos
   resources:
     requests:
       storage: 1Mi
