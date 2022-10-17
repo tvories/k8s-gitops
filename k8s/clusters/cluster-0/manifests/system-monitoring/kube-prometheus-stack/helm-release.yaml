@@ -200,7 +200,7 @@ spec:
                   - home-assistant.home.svc:8123
           - job_name: "opnsense"
             scrape_interval: 30s
-            metrics_path: "/metrics"
+            # metrics_path: "/metrics"
             # honor_timestamps: true
             scrape_timeout: 20s
             scheme: http
