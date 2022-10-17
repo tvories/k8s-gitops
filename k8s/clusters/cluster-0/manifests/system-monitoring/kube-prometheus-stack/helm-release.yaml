@@ -203,6 +203,7 @@ spec:
             metrics_path: "/metrics"
             # honor_timestamps: true
             scrape_timeout: 20s
+            scheme: http
             static_configs:
               - targets:
                 - "opnsense.${SECRET_INTERNAL_DOMAIN}:9100"
