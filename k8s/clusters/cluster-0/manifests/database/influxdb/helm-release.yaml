@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: "influxdb"
-      tag: "1.8.10"
+      tag: "2.4.0"
 
     service:
       type: LoadBalancer
@@ -49,7 +49,7 @@ spec:
     config:
       http:
         enabled: true
-        # flux-enabled: true
+        flux-enabled: true
       opentsdb:
         enabled: true
       graphite:
