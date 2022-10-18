@@ -47,6 +47,9 @@ spec:
       failureThreshold: 10
       periodSeconds: 10
     config:
+      http:
+        enabled: true
+        flux-enabled: true
       opentsdb:
         enabled: true
       graphite:
