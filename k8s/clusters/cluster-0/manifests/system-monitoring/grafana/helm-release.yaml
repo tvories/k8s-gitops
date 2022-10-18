@@ -331,7 +331,8 @@ spec:
             - "grafana.${CLUSTER_NAME}.${SECRET_DOMAIN}"
 
     persistence:
-      enabled: false
+      enabled: true
+      existingClaim: grafana-config
 
     resources:
       requests:
