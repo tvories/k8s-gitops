@@ -9,16 +9,16 @@ spec:
   chart:
     spec:
       chart: influxdb
-      version: 4.12.0
+      version: 5.4.6
       sourceRef:
         kind: HelmRepository
-        name: influxdata-charts
+        name: bitnami-charts
         namespace: flux-system
       interval: 5m
   values:
     image:
-      repository: "influxdb"
-      tag: "2.4.0"
+      # repository: "influxdb"
+      tag: 2.4.0-debian-11-r11
 
     service:
       type: LoadBalancer
@@ -32,33 +32,34 @@ spec:
       enabled: true
       tls: true
       hostname: influx.${SECRET_DOMAIN}
-      className: nginx-internal
+      ingressClassName: nginx-internal
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
         # kubernetes.io/ingress.class: "nginx-internal"
-      secretName: influx-tls
+      # secretName: influx-tls
     
-    livenessProbe:
-      timeoutSeconds: 10
-    readinessProbe:
-      timeoutSeconds: 10
-    startupProbe:
-      enabled: true
-      failureThreshold: 10
-      periodSeconds: 10
-    config:
-      http:
-        enabled: true
-        flux-enabled: true
-      opentsdb:
-        enabled: true
-      graphite:
-        enabled: true
-        database: graphitedb
-        retention-policy: ""
-        bind-address: ":2003"
-        protocol: tcp
-        consistency-lvel: one
-        templates:
-        - "*.app env.service.resource.measurement"
-        - "servers.* .host.resource.measurement.field*"
+    # livenessProbe:
+    #   timeoutSeconds: 10
+    # readinessProbe:
+    #   timeoutSeconds: 10
+    # startupProbe:
+    #   enabled: true
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    # influxdb:
+    #   configuration: |-
+    #     http:
+    #       enabled: true
+    #       flux-enabled: true
+    #     opentsdb:
+    #       enabled: true
+    #     graphite:
+    #       enabled: true
+    #       database: graphitedb
+    #       retention-policy: ""
+    #       bind-address: ":2003"
+    #       protocol: tcp
+    #       consistency-lvel: one
+    #       templates:
+    #       - "*.app env.service.resource.measurement"
+    #       - "servers.* .host.resource.measurement.field*"
