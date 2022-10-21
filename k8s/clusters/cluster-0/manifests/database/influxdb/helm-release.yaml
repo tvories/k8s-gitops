@@ -20,9 +20,7 @@ spec:
       # repository: "influxdb"
       tag: 2.4.0-debian-11-r11
 
-    service:
-      type: LoadBalancer
-      loadBalancerIP: "${LB_INFLUXDB}"
+    
 
     auth:
       enabled: true
@@ -52,7 +50,10 @@ spec:
     #   enabled: true
     #   failureThreshold: 10
     #   periodSeconds: 10
-    # influxdb:
+    influxdb:
+      service:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_INFLUXDB}"
     #   configuration: |-
     #     http:
     #       enabled: true
