@@ -29,6 +29,7 @@ spec:
       admin:
         username: "${GRAFANA_ADMIN_USER}"
         password: "${GRAFANA_ADMIN_PASSWORD}"
+        token: "${GRAFANA_ADMIN_TOKEN}"
     persistence:
       enabled: true
       existingClaim: influxdb-data
