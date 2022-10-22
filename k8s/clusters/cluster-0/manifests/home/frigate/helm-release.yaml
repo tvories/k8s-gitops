@@ -198,17 +198,17 @@ spec:
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: 1035main_user
-      targetPath: env.1035MAIN_USER
+      valuesKey: cdale_doorbell_user
+      targetPath: env.CDALE_DOORBELL_USER
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: 1035main_password
-      targetPath: env.1035MAIN_PASSWORD
+      valuesKey: cdale_doorbell_password
+      targetPath: env.CDALE_DOORBELL_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
-      valuesKey: 1035main_ip
-      targetPath: env.1035MAIN_IP
+      valuesKey: cdale_doorbell_ip
+      targetPath: env.CDALE_DOORBELL_IP
       optional: false
 

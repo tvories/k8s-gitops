@@ -78,7 +78,7 @@ cameras:
     rtmp:
       enabled: True
     
-  1035main:
+  cdale_doorbell:
     ffmpeg:
       inputs:
       # Sub Stream
@@ -86,7 +86,7 @@ cameras:
       #   roles:
       #   - detect
       # Main Stream
-      - path: "rtsp://{1035MAIN_USER}:{1035MAIN_PASSWORD}@{1035MAIN_IP_ADDRESS}:554/Streaming/Channels/101"
+      - path: "rtsp://{CDALE_DOORBELL_USER}:{CDALE_DOORBELL_PASSWORD}@{CDALE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101"
         roles:
         - rtmp
         - detect
