@@ -196,3 +196,19 @@ spec:
       valuesKey: garage_ip
       targetPath: env.FRIGATE_GARAGE_IP_ADDRESS
       optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: 1035main_user
+      targetPath: env.1035MAIN_USER
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: 1035main_password
+      targetPath: env.1035MAIN_PASSWORD
+      optional: false
+    - kind: Secret
+      name: frigate
+      valuesKey: 1035main_ip
+      targetPath: env.1035MAIN_IP
+      optional: false
+
