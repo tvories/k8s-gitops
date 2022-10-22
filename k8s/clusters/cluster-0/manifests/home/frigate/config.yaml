@@ -78,6 +78,43 @@ cameras:
     rtmp:
       enabled: True
     
+  1035main:
+    ffmpeg:
+      inputs:
+      # Sub Stream
+      # - path: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
+      #   roles:
+      #   - detect
+      # Main Stream
+      - path: "rtsp://{1035MAIN_USER}:{1035MAIN_PASSWORD}@{1035MAIN_IP_ADDRESS}:554/Streaming/Channels/101"
+        roles:
+        - rtmp
+        - detect
+        - record
+    detect:
+      width: 720
+      height: 576
+      fps: 15
+    record:
+      enabled: True
+      retain:
+        days: 0
+        mode: active_objects
+      events:
+        retain:
+          default: 14
+        objects:
+          - person
+          - dog
+          - cat
+    snapshots:
+      enabled: True
+      timestamp: False
+      retain:
+        default: 14
+    rtmp:
+      enabled: True
+
   front_door:
     # rtmp:
     #   enabled: false
