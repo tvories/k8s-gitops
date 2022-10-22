@@ -82,15 +82,15 @@ cameras:
     ffmpeg:
       inputs:
       # Sub Stream
-      - path: rtsp://{FRIGATE_CDALE_DOORBELL_USER}:{FRIGATE_CDALE_DOORBELL_PASSWORD}@{FRIGATE_CDALE_DOORBELL_IP}:56999/Streaming/Channels/102
-        roles:
-        - detect
-        - rtmp
+      # - path: rtsp://{FRIGATE_CDALE_DOORBELL_USER}:{FRIGATE_CDALE_DOORBELL_PASSWORD}@{FRIGATE_CDALE_DOORBELL_IP}:56999/Streaming/Channels/102
+      #   roles:
+      #   - detect
+      #   - rtmp
       # Main Stream
       - path: "rtsp://{FRIGATE_CDALE_DOORBELL_USER}:{FRIGATE_CDALE_DOORBELL_PASSWORD}@{FRIGATE_CDALE_DOORBELL_IP}:56999/Streaming/Channels/101"
         roles:
-        # - rtmp
-        # - detect
+        - rtmp
+        - detect
         - record
     detect:
       width: 720
