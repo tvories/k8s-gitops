@@ -199,16 +199,16 @@ spec:
     - kind: Secret
       name: frigate
       valuesKey: cdale_doorbell_user
-      targetPath: env.CDALE_DOORBELL_USER
+      targetPath: env.FRIGATE_CDALE_DOORBELL_USER
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: cdale_doorbell_password
-      targetPath: env.CDALE_DOORBELL_PASSWORD
+      targetPath: env.FRIGATE_CDALE_DOORBELL_PASSWORD
       optional: false
     - kind: Secret
       name: frigate
       valuesKey: cdale_doorbell_ip
-      targetPath: env.CDALE_DOORBELL_IP
+      targetPath: env.FRIGATE_CDALE_DOORBELL_IP
       optional: false
 
