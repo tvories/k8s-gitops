@@ -86,7 +86,7 @@ cameras:
       #   roles:
       #   - detect
       # Main Stream
-      - path: "rtsp://{CDALE_DOORBELL_USER}:{CDALE_DOORBELL_PASSWORD}@{CDALE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101"
+      - path: "rtsp://{FRIGATE_CDALE_DOORBELL_USER}:{FRIGATE_CDALE_DOORBELL_PASSWORD}@{FRIGATE_CDALE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/101"
         roles:
         - rtmp
         - detect
