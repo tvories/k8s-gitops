@@ -8,11 +8,11 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: calibre
-      version: 5.4.2
+      chart: app-template
+      version: 0.2.2
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
       interval: 5m
   values:
@@ -22,7 +22,8 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      PGID: 65539
+      PUID: "568"
+      PGID: "65539"
 
     persistence:
       config:
@@ -43,8 +44,19 @@ spec:
         mountPath: /books
 
     service:
+      main:
+        ports:
+          http:
+            port: 8080
       webserver:
         enabled: true
+        ports:
+          webserver:
+            enabled: true
+            port: 8081
+            protocol: TCP
+            targetPort: 8081
+        type: ClusterIP
 
     ingress:
       main:
@@ -61,10 +73,3 @@ spec:
           - secretName: tls.calibre
             hosts:
               - *host
-
-    resources:
-      requests:
-        cpu: 0.003
-        memory: 768Mi
-      limits:
-        memory: 1Gi
