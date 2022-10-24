@@ -57,6 +57,9 @@ spec:
             protocol: TCP
             targetPort: 8081
         type: ClusterIP
+    probes:
+      startup:
+        enabled: false
 
     ingress:
       main:
