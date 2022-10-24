@@ -93,8 +93,8 @@ spec:
           topologyKey: "kubernetes.io/hostname"
     resources:
       requests:
-        cpu: 100m
-        memory: 150Mi
+        cpu: 23m
+        memory: 204M
       limits:
         memory: 512Mi
   # postRenderers:
