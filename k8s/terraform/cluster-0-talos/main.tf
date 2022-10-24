@@ -63,7 +63,7 @@ resource "vsphere_virtual_machine" "talos-cp" {
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.2/vmware-amd64.ova"
+    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.5/vmware-amd64.ova"
     disk_provisioning = "thin"
   }
 
@@ -90,7 +90,8 @@ resource "vsphere_virtual_machine" "talos-cp" {
       disk[0].io_share_count,
       disk[0].thin_provisioned,
       disk[1].io_share_count,
-      disk[1].io_share_count
+      disk[1].io_share_count,
+      ovf_deploy
     ]
   }
 }
@@ -104,13 +105,13 @@ resource "vsphere_virtual_machine" "talos-worker" {
   wait_for_guest_net_timeout = -1
   host_system_id             = data.vsphere_host.host.id
   num_cpus                   = "8"
-  memory                     = 12288
+  memory                     = 16384
   folder                     = "k8"
   # firmware = "efi"
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.2/vmware-amd64.ova"
+    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.5/vmware-amd64.ova"
     disk_provisioning = "thin"
   }
 
@@ -137,7 +138,8 @@ resource "vsphere_virtual_machine" "talos-worker" {
       disk[0].io_share_count,
       disk[0].thin_provisioned,
       disk[1].io_share_count,
-      disk[1].io_share_count
+      disk[1].io_share_count,
+      ovf_deploy
     ]
   }
 }
