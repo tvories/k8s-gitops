@@ -32,7 +32,7 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      PUID: "568"
+      PUID: "1000"
       PGID: "65539"
       UMASK_SET: "022"
 
