@@ -47,7 +47,7 @@ spec:
           secretName: tls.node-red
     resources:
       requests:
-        memory: 350Mi
-        cpu: 25m
+        cpu: 15m
+        memory: 110M
       limits:
-        memory: 500Mi
+        memory: 700Mi

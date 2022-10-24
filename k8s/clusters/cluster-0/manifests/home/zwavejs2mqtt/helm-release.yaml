@@ -62,3 +62,7 @@ spec:
           nodeSelectorTerms:
           - matchExpressions:
             - {key: "feature.node.kubernetes.io/custom-zwave", operator: In, values: ["true"]}
+    resources:
+      requests:
+        cpu: 23m
+        memory: 110M

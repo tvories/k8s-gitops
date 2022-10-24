@@ -43,6 +43,11 @@ spec:
     ingress:
       main:
         enabled: false
+
+    resources:
+      requests:
+        cpu: 15m
+        memory: 64M
     
     probes:
       liveness:

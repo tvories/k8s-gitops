@@ -43,3 +43,8 @@ spec:
       config:
         enabled: true
         existingClaim: esphome-config
+    
+    resources:
+      requests:
+        cpu: 15m
+        memory: 79M

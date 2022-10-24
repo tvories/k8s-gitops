@@ -71,6 +71,11 @@ spec:
         # name: ${SECRET_HASS_USERNAME}
         key: ${SECRET_HASS_PROMETHEUS_TOKEN}
 
+    resources:
+      requests:
+        cpu: 109m
+        memory: 588M
+
     addons:
       codeserver:
         enabled: true
@@ -107,6 +112,11 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /config
+
+        resources:
+          requests:
+            cpu: 11m
+            memory: 94M
     # podAnnotations:
     #   secret.reloader.stakater.com/reload: home-assistant-secrets
     # affinity:
