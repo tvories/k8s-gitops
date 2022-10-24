@@ -76,3 +76,7 @@ spec:
           - secretName: tls.calibre
             hosts:
               - *host
+    resources:
+      requests:
+        cpu: 224m
+        memory: 64M

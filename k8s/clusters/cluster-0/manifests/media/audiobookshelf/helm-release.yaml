@@ -65,3 +65,7 @@ spec:
         mountPath: /audiobooks
         existingClaim: audiobookshelf-nfs-audiobooks
         readOnly: true
+    resources:
+      requests:
+        cpu: 15m
+        memory: 204M
