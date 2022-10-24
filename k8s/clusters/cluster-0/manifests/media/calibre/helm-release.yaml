@@ -60,6 +60,10 @@ spec:
     probes:
       startup:
         enabled: false
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
 
     ingress:
       main:
