@@ -29,6 +29,7 @@ spec:
       config:
         enabled: true
         existingClaim: calibre-config
+        mountPath: /config
 
       media:
         enabled: true
