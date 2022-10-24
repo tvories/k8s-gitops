@@ -1,0 +1,705 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: snmp-exporter-cisco-switch
+  namespace: system-monitoring
+data:
+  snmp.yaml: |
+    #http://www.oidview.com/mibs/0/IF-MIB.html
+    #http://www.net-snmp.org/docs/mibs/interfaces.html
+    cisco_custom:
+      version: 2
+      auth:
+        community: public
+      walk:
+      - 1.3.6.1.2.1.2.2.1
+      - 1.3.6.1.2.1.31.1.1.1
+      metrics:
+      - name: snmp_ifNumber
+        oid: 1.3.6.1.2.1.2.1
+        type: gauge
+
+      - name: snmp_ifMtu
+        oid: 1.3.6.1.2.1.2.2.1.4
+        type: gauge
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifSpeed
+        oid: 1.3.6.1.2.1.2.2.1.5
+        type: gauge
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHighSpeed
+        oid: 1.3.6.1.2.1.31.1.1.1.15
+        type: gauge
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifConnectorPresent
+        oid: 1.3.6.1.2.1.31.1.1.1.17
+        type: gauge
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifOperStatus
+        oid: 1.3.6.1.2.1.2.2.1.8
+        type: gauge
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifInDiscards
+        oid: 1.3.6.1.2.1.2.2.1.13
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifInErrors
+        oid: 1.3.6.1.2.1.31.1.1.1.14
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifInUnknownProtos
+        oid: 1.3.6.1.2.1.2.2.1.15
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifOutDiscards
+        oid: 1.3.6.1.2.1.31.1.1.1.19
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifOutErrors
+        oid: 1.3.6.1.2.1.31.1.1.1.20
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCOutOctets
+        oid: 1.3.6.1.2.1.31.1.1.1.10
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCOutUcastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.11
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCOutMulticastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.12
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCOutBroadcastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.13
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCInOctets
+        oid: 1.3.6.1.2.1.31.1.1.1.6
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCInUcastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.7
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCInMulticastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.8
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
+
+      - name: snmp_ifHCInBroadcastPkts
+        oid: 1.3.6.1.2.1.31.1.1.1.9
+        type: counter
+        indexes:
+          - labelname: ifIndex
+            type: Integer
+          - labelname: ifDescr
+            type: gauge
+          - labelname: ifType
+            type: gauge
+          - labelname: ifPhysAddress
+            type: gauge
+          - labelname: ifName
+            type: gauge
+          - labelname: ifAlias
+            type: gauge
+        lookups:
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.2
+            labelname: ifDescr
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.3
+            labelname: ifType
+            type: Integer
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.2.2.1.6
+            labelname: ifPhysAddress
+            type: PhysAddress48
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.1
+            labelname: ifName
+            type: DisplayString
+          - labels: [ifIndex]
+            oid: 1.3.6.1.2.1.31.1.1.1.18
+            labelname: ifAlias
+            type: DisplayString
