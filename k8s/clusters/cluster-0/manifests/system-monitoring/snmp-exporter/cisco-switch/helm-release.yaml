@@ -39,7 +39,7 @@ spec:
       params:
         - name: cisco-switch
           module:
-            - if_mib
+            - cisco
           target: cisco-switch.${SECRET_DOMAIN}
       path: /snmp
       scrapeTimeout: 10s
