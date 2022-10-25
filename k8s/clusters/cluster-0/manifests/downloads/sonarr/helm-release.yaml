@@ -19,8 +19,8 @@ spec:
   values:
     image:
       # renovate: docker-image
-      repository: ghcr.io/k8s-at-home/sonarr
-      tag: v3.0.9.1549
+      repository: ghcr.io/onedr0p/sonarr
+      tag: "3.0.9.1549"
 
     podSecurityContext:
       fsGroup: 568
@@ -80,3 +80,19 @@ spec:
         memory: 273M
       limits:
         memory: 728M
+
+    metrics:
+      enabled: true
+      serviceMonitor:
+        interval: 3m
+        scrapeTimeout: 1m
+      prometheusRule:
+        enabled: true
+      exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.1.0
+        env:
+          port: 9794
+          additionalMetrics: true
+          unknownQueueItems: true
