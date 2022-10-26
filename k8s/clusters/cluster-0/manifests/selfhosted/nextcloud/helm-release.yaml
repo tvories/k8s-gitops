@@ -49,7 +49,7 @@ spec:
       password: ${SECRET_NEXTCLOUD_ADMIN_PASSWORD}
       mail:
         enabled: true
-        fromAddress: owncloud
+        fromAddress: nc
         domain: ${SECRET_DOMAIN}
         smtp:
           host: ${SECRET_SMTP_HOST}
