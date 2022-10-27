@@ -156,9 +156,6 @@ spec:
           secret:
             secretName: *certname
 
-    nodeSelector:
-      node-role.kubernetes.io/worker: "true"
-
     resources:
       requests:
         memory: 200M
