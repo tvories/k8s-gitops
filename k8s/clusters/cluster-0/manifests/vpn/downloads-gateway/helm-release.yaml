@@ -126,3 +126,8 @@ spec:
             #       cidr: ${NETWORK_K8S_SERVICE_CIDR}
             - to:
                 - namespaceSelector: {}
+
+    resources:
+      requests:
+        cpu: 11m
+        memory: 22M
