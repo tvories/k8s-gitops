@@ -77,20 +77,19 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
-# ---
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: network-blocky
-#   namespace: flux-system
-# spec:
-#   dependsOn:
-#     - name: network-namespace
-#     - name: cert-manager-certmanager-config
-#   interval: 5m
-#   path: "./k8s/clusters/cluster-0/manifests/network/blocky"
-#   prune: true
-#   wait: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: network-omada-controller
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/omada-controller"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
