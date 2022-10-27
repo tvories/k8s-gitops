@@ -65,3 +65,10 @@ spec:
       media:
         enabled: true
         existingClaim: tandoor-media
+    
+    resources:
+      requests:
+        cpu: 11m
+        memory: 324M
+      # limits:
+      #   memory: 508M

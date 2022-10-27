@@ -81,7 +81,7 @@ spec:
         existingClaim: vaultwarden-config
     resources:
       requests:
-        memory: 100Mi
-        cpu: 100m
+        memory: 64Mi
+        cpu: 15m
       limits:
         memory: 2000Mi
