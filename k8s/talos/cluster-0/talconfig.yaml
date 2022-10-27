@@ -1,14 +1,14 @@
 ---
-clusterName: cluster-0
+clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
 talosVersion: v1.2.5
 kubernetesVersion: v1.24.7
-endpoint: https://cluster-0.${domainName}:6443
+endpoint: https://${cluster_name}.${domainName}:6443
 
 cniConfig:
   name: custom
   urls:
-    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yamlni
+    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-0/integrations/cilium-quick-install/quick-install.yaml
 
 nodes:
   - hostname: talos-cp-1.${domainName}
@@ -41,7 +41,7 @@ nodes:
       machine:
         install:
           # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
-          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
+          image: ${gasket_image}
   - hostname: sff1.${domainName}
     controlPlane: true
     allowSchedulingOnMasters: true
@@ -50,7 +50,7 @@ nodes:
       machine:
         install:
           # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
-          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
+          image: ${gasket_image}
 
     installDisk: /dev/sda
   - hostname: physical1.${domainName}
@@ -62,7 +62,7 @@ nodes:
       machine:
         install:
           # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
-          image: ghcr.io/ammmze/talos-gasket-installer:v1.1.2-20220727215216
+          image: ${gasket_image}
 
 controlPlane:
   inlinePatch:
@@ -81,8 +81,8 @@ controlPlane:
         key: ${k8sAggregatorCertKey}
       apiServer:
         certSANs:
-          - ${clusterEndpointIP}
-          - cluster-0.${domainName}
+          # - ${clusterEndpointIP}
+          - ${cluster_name}.${domainName}
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
       ca:
@@ -114,8 +114,8 @@ controlPlane:
         crt: ${machineCert}
         key: ${machineCertKey}
       certSANs:
-        - ${clusterEndpointIP}
-        - cluster-0.${domainName}
+        # - ${clusterEndpointIP}
+        - ${cluster_name}.${domainName}
       kubelet:
         extraArgs:
           feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
@@ -131,7 +131,7 @@ controlPlane:
       #   extraHostEntries:
       #     - ip: ${clusterEndpointIP}
       #       aliases:
-      #         - cluster-0.${domainName}
+      #         - ${cluster_name}.${domainName}
       time:
         disabled: false
         servers:
@@ -157,8 +157,8 @@ worker:
         crt: ${machineCert}
         key: ${machineCertKey}
       certSANs:
-        - ${clusterEndpointIP}
-        - cluster-0.${domainName}
+        # - ${clusterEndpointIP}
+        - ${cluster_name}.${domainName}
       install:
         extraKernelArgs:
           - "talos.logging.kernel=udp://192.168.83.42:6050/"
@@ -170,7 +170,7 @@ worker:
       #   extraHostEntries:
       #     - ip: ${clusterEndpointIP}
       #       aliases:
-      #         - cluster-0.${domainName}
+      #         - ${cluster_name}.${domainName}
       sysctls:
         fs.inotify.max_user_watches: "1048576"
         fs.inotify.max_user_instances: "8192"
