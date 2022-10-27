@@ -1,0 +1,6 @@
+# required for omada on nginx-ingress
+# https://community.tp-link.com/en/business/forum/topic/557218?replyId=1127058
+- op: replace
+  path: /machine/sysctls
+  value:
+    net.ipv4.ip_unprivileged_port_start: 0
