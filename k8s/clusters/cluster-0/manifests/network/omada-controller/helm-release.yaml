@@ -68,7 +68,7 @@ spec:
       main:
         enabled: true
         ports:
-          https:
+          http:
             enabled: true
             port: 443
             targetPort: 443
@@ -84,11 +84,11 @@ spec:
             port: 8088
             targetPort: 8088
             protocol: TCP
-          mgmt-443-tcp:
-            enabled: true
-            port: 443
-            targetPort: 443
-            protocol: TCP
+          # mgmt-443-tcp:
+          #   enabled: true
+          #   port: 443
+          #   targetPort: 443
+          #   protocol: TCP
           portal-8843-tcp:
             enabled: true
             port: 8843
