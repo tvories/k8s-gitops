@@ -52,3 +52,10 @@ spec:
         tag: api-v1.0.0beta-3
       env:
         TZ: ${TIMEZONE}
+
+    resources:
+      requests:
+        cpu: 11m
+        memory: 127M
+      # limits:
+      #   memory: 508M

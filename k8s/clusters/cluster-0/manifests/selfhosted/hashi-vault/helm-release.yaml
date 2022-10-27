@@ -123,3 +123,10 @@ spec:
       # loadBalancerIP: ${LB_VAULT}
       # externalTrafficPolicy: Local
       # externalPort: 443
+
+    resources:
+      requests:
+        cpu: 49m
+        memory: 79M
+      # limits:
+      #   memory: 508M
