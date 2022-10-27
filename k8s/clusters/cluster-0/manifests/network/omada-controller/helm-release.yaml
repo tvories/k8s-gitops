@@ -68,7 +68,7 @@ spec:
       main:
         enabled: true
         ports:
-          http:
+          https:
             enabled: true
             port: 443
             targetPort: 443
