@@ -8,11 +8,11 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: app-template
-      version: 0.2.2
+      chart: omada-controller
+      version: 4.4.0
       sourceRef:
         kind: HelmRepository
-        name: bjw-s-charts
+        name: k8s-at-home
         namespace: flux-system
       interval: 5m
   values:
