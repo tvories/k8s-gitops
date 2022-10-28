@@ -38,7 +38,6 @@ spec:
   dependsOn:
     - name: rook-ceph-namespace
     - name: rook-ceph-operator
-    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph/cluster"
   prune: true
