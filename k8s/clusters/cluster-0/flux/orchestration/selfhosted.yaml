@@ -33,6 +33,8 @@ metadata:
   name: selfhosted-tandoor
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/tandoor"
   prune: true
@@ -47,6 +49,8 @@ metadata:
   name: selfhosted-mealie
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/mealie"
   prune: true
@@ -110,20 +114,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-octopi
-  namespace: flux-system
-spec:
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/octopi"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-octopi
+#   namespace: flux-system
+# spec:
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/octopi"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
@@ -145,6 +149,8 @@ metadata:
   name: selfhosted-vaultwarden
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
   prune: true
@@ -159,6 +165,8 @@ metadata:
   name: selfhosted-nextcloud
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
   prune: true
@@ -194,20 +202,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: selfhosted-obico-docker
-  namespace: flux-system
-spec:
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/obico-docker"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-obico-docker
+#   namespace: flux-system
+# spec:
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/obico-docker"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -215,6 +223,8 @@ metadata:
   name: selfhosted-hashi-vault
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/hashi-vault"
   prune: true
@@ -229,6 +239,8 @@ metadata:
   name: selfhosted-paperless
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless"
   prune: true
