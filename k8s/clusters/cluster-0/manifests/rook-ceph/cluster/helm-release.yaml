@@ -99,12 +99,18 @@ spec:
         config:
           osdsPerDevice: "1"
         nodes:
-          - name: "talos-worker-1"
+          - name: "talos-cp-1"
             devices:
               - name: "sdb"
-          - name: "talos-worker-2"
+          - name: "talos-cp-2"
             devices:
               - name: "sdb"
+          # - name: "talos-worker-1"
+          #   devices:
+          #     - name: "sdb"
+          # - name: "talos-worker-2"
+          #   devices:
+          #     - name: "sdb"
           # - name: "talos-worker-3"
           #   devices:
           #     - name: "sdb"
