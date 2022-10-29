@@ -72,6 +72,7 @@ spec:
     - name: vpn-downloads-gateway
     - name: downloads-pvc
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/prowlarr"
   prune: true
@@ -90,6 +91,8 @@ spec:
     - name: downloads-namespace
     - name: vpn-downloads-gateway
     - name: downloads-pvc
+    - name: network-ingress-nginx
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/qbittorrent"
   prune: true
@@ -108,6 +111,7 @@ spec:
     - name: downloads-namespace
     - name: downloads-pvc
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/radarr"
   prune: true
@@ -126,6 +130,7 @@ spec:
     - name: downloads-namespace
     - name: downloads-pvc
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/readarr"
   prune: true
@@ -144,6 +149,7 @@ spec:
     - name: downloads-namespace
     - name: downloads-pvc
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/downloads/sonarr"
   prune: true
