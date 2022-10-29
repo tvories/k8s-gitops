@@ -19,6 +19,8 @@ metadata:
   name: kube-system-cilium
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/cilium"
   prune: false

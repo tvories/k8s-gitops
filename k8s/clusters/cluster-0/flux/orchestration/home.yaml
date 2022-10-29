@@ -37,6 +37,7 @@ metadata:
 spec:
   dependsOn:
     - name: home-namespace
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/node-red"
   prune: true
@@ -54,6 +55,7 @@ spec:
   dependsOn:
     - name: home-emqx
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/frigate"
   prune: true
@@ -70,6 +72,7 @@ metadata:
 spec:
   dependsOn:
     - name: home-namespace
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/esphome"
   prune: true
@@ -88,6 +91,7 @@ spec:
     - name: home-namespace
     - name: home-emqx
     - name: rook-ceph-cluster
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/home-assistant"
   prune: true
@@ -105,6 +109,7 @@ spec:
   dependsOn:
     - name: home-namespace
     - name: home-emqx
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/zwavejs2mqtt"
   prune: true
@@ -122,6 +127,7 @@ spec:
   dependsOn:
     - name: home-namespace
     - name: home-emqx
+    - name: network-ingress-nginx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/zigbee2mqtt"
   prune: true
