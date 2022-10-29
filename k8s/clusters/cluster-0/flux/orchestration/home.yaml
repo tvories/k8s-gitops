@@ -53,6 +53,7 @@ metadata:
 spec:
   dependsOn:
     - name: home-emqx
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/frigate"
   prune: true
@@ -86,6 +87,7 @@ spec:
   dependsOn:
     - name: home-namespace
     - name: home-emqx
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/home-assistant"
   prune: true

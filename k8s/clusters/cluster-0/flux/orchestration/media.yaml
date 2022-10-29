@@ -54,6 +54,7 @@ spec:
   dependsOn:
     - name: media-namespace
     - name: media-pvc
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/plex"
   prune: true
@@ -71,6 +72,7 @@ spec:
   dependsOn:
     - name: media-namespace
     - name: media-pvc
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/audiobookshelf"
   prune: true
@@ -103,6 +105,7 @@ metadata:
 spec:
   dependsOn:
     - name: media-namespace
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/calibre"
   prune: true
@@ -119,6 +122,7 @@ metadata:
 spec:
   dependsOn:
     - name: media-namespace
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/calibre-web"
   prune: true
