@@ -53,6 +53,8 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
+    - name: network-ingress-nginx
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/unifi"
   prune: true
@@ -86,6 +88,8 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
+    - name: network-ingress-nginx
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/omada-controller"
   prune: true
