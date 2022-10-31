@@ -37,6 +37,8 @@ spec:
       persistence:
         storageClass: ceph-block
 
+    serviceaccount:
+      create: true
     auth:
       tokenAuth:
         enabled: true
