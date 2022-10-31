@@ -45,11 +45,11 @@ spec:
 
     ingress:
       create: true
-      # class: nginx-internal
+      class: nginx
       host: k10.${CLUSTER_NAME}.${SECRET_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-        kubernetes.io/ingress.class: nginx-internal
+        # kubernetes.io/ingress.class: nginx-internal
       urlPath: "k10"
       hosts:
         - k10.${CLUSTER_NAME}.${SECRET_DOMAIN}
