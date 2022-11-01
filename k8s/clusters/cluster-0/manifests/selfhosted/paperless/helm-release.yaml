@@ -35,7 +35,7 @@ spec:
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
       PAPERLESS_REDIS: redis://localhost:6379
       PAPERLESS_TIME_ZONE: "${TIMEZONE}"
-      PAPERLESS_DBHOST: cnpg-paperless-rw
+      PAPERLESS_DBHOST: cnpg-paperless-restore-rw
       PAPERLESS_DBNAME: paperless
       PAPERLESS_DBUSER: paperless
       PAPERLESS_DBPASS: ${PAPERLESS_PG_PASSWORD}
