@@ -53,17 +53,17 @@ spec:
     - name: postgres
       barmanObjectStore:
         destinationPath: s3://cnpg/
-      endpointURL: http://${SECRET_NAS1}:9000
-      s3Credentials:
-        accessKeyId:
-          name: minio-creds
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: minio-creds
-          key: ACCESS_SECRET_KEY
-      wal:
-        compression: bzip2
-        maxParallel: 12
+        endpointURL: http://${SECRET_NAS1}:9000
+        s3Credentials:
+          accessKeyId:
+            name: minio-creds
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: minio-creds
+            key: ACCESS_SECRET_KEY
+        wal:
+          compression: bzip2
+          maxParallel: 12
 
 # Minio secret
 ---
