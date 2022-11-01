@@ -81,7 +81,6 @@ spec:
   resources:
     requests:
       storage: 1Mi
-
 # ---
 # apiVersion: v1
 # kind: PersistentVolumeClaim
@@ -96,16 +95,16 @@ spec:
 #     requests:
 #       storage: 1Mi
 
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-nextcloud-db
-  namespace: selfhosted
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: nextcloud-nfs-database
-  resources:
-    requests:
-      storage: 1Mi
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: pvc-nextcloud-db
+#   namespace: selfhosted
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: nextcloud-nfs-database
+#   resources:
+#     requests:
+#       storage: 1Mi
