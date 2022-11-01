@@ -30,25 +30,8 @@ metadata:
   namespace: home
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   storageClassName: homeassistant-nfs-config
   resources:
     requests:
       storage: 1Mi
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: homeassistant-postgres
-  namespace: home
-  labels:
-    triliovault.trilio.io/backup: "true"
-    kasten.io/backup-volume: "enabled"
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: ceph-block
-  resources:
-    requests:
-      storage: 2Gi
