@@ -1,0 +1,112 @@
+# Example of PostgreSQL cluster
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+  namespace: database
+spec:
+  instances: 3
+
+  bootstrap:
+    recovery:
+      source: postgres
+
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+
+  storage:
+    size: 50Gi
+    storageClass: ceph-block
+
+  monitoring:
+    enablePodMonitor: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    # limits:
+    #   cpu: 250m
+    #   memory: 640Mi
+
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      wal:
+        compression: bzip2
+      destinationPath: s3://cnpg/
+      endpointURL: http://${SECRET_NAS1}:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: minio-creds
+          key: ACCESS_SECRET_KEY
+
+  # Restore location
+  externalClusters:
+    - name: postgres
+      barmanObjectStore:
+        destinationPath: s3://cnpg/
+      endpointURL: http://${SECRET_NAS1}:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: minio-creds
+          key: ACCESS_SECRET_KEY
+      wal:
+        compression: bzip2
+        maxParallel: 12
+
+# Minio secret
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: minio-creds
+  namespace: database
+stringData:
+  ACCESS_KEY_ID: ${SECRET_MINIO_ACCESS_KEY}
+  ACCESS_SECRET_KEY: ${SECRET_MINIO_SECRET_KEY}
+
+# Scheduled Backup
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres
+  namespace: database
+spec:
+  schedule: "@daily"
+  immediate: true
+  backupOwnerReference: self
+  cluster:
+    name: postgres
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: database
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: "${LB_POSTGRES}"
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    postgresql: postgres
+    role: primary
