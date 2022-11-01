@@ -7,9 +7,9 @@ metadata:
 spec:
   instances: 3
 
-  bootstrap:
-    recovery:
-      source: postgres
+  # bootstrap:
+  #   recovery:
+  #     source: postgres
 
   # Example of rolling update strategy:
   # - unsupervised: automated update of the primary once all
@@ -38,7 +38,7 @@ spec:
     barmanObjectStore:
       wal:
         compression: bzip2
-      destinationPath: s3://cnpg/
+      destinationPath: s3://cnpg/v2
       endpointURL: http://${SECRET_NAS1}:9000
       s3Credentials:
         accessKeyId:
@@ -52,7 +52,7 @@ spec:
   externalClusters:
     - name: postgres
       barmanObjectStore:
-        destinationPath: s3://cnpg/
+        destinationPath: s3://cnpg/v1
         endpointURL: http://${SECRET_NAS1}:9000
         s3Credentials:
           accessKeyId:
