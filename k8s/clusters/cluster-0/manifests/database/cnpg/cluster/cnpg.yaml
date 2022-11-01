@@ -39,7 +39,7 @@ spec:
       wal:
         compression: bzip2
       destinationPath: s3://cnpg/v2
-      endpointURL: http://${SECRET_NAS1}:9000
+      endpointURL: https://${SECRET_NAS1}:9000
       s3Credentials:
         accessKeyId:
           name: minio-creds
@@ -53,7 +53,7 @@ spec:
     - name: postgres
       barmanObjectStore:
         destinationPath: s3://cnpg/v1
-        endpointURL: http://${SECRET_NAS1}:9000
+        endpointURL: https://${SECRET_NAS1}:9000
         s3Credentials:
           accessKeyId:
             name: minio-creds
