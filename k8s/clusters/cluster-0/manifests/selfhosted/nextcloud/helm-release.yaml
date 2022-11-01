@@ -40,9 +40,9 @@ spec:
 
       tls:
         - hosts:
-          - &host nc.${SECRET_DOMAIN}
+            - &host nc.${SECRET_DOMAIN}
           secretName: tls.nextcloud
-        
+
     nextcloud:
       host: *host
       username: admin
@@ -93,7 +93,7 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: cnpg-nextcloud-rw
+      host: postgres-rw.database
       database: nextcloud
       password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
       user: ncuser
@@ -138,7 +138,7 @@ spec:
 
     readinessProbe:
       enabled: false
-    
+
     resources:
       requests:
         cpu: 35m
