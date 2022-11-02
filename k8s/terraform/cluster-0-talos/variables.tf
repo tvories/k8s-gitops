@@ -52,3 +52,18 @@ variable "name_prefix" {
   description = "The name-prefix for naming the name."
   type        = string
 }
+
+variable "worker_memory" {
+  description = "The amount of memory for worker nodes"
+  type        = number
+}
+
+variable "cp_memory" {
+  description = "The amount of memory for controlplane nodes"
+  type        = number
+}
+
+variable "ovf_url" {
+  description = "The ofv url for the deployment"
+  type        = string
+}
