@@ -26,7 +26,7 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       MANAGE_HTTP_PORT: "8088"
-      MANAGE_HTTPS_PORT: "8043"
+      MANAGE_HTTPS_PORT: "443"
       PORTAL_HTTP_PORT: "8088"
       PORTAL_HTTPS_PORT: "8843"
       SHOW_SERVER_LOGS: "true"
@@ -40,9 +40,9 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-          nginx.ingress.kubernetes.io/upstream-vhost: "tplink.${SECRET_DOMAIN}:8043"
-          nginx.ingress.kubernetes.io/proxy-redirect-from: "https://(.+):8043/(.+)/$"
-          nginx.ingress.kubernetes.io/proxy-redirect-to: "https://$http_host/$2/"
+          nginx.ingress.kubernetes.io/upstream-vhost: "tplink.${SECRET_DOMAIN}"
+          # nginx.ingress.kubernetes.io/proxy-redirect-from: "https://(.+):8043/(.+)/$"
+          # nginx.ingress.kubernetes.io/proxy-redirect-to: "https://$http_host/$2/"
 
           # Add a few more headers to make Omada happy
           nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -69,10 +69,10 @@ spec:
         ports:
           http:
             enabled: true
-            port: 8043
-        # port: 443
-        # targetPort: 443
-        # protocol: TCP
+            # port: 8043
+            port: 443
+            targetPort: 443
+            protocol: TCP
       controller:
         enabled: true
         type: LoadBalancer
@@ -84,11 +84,11 @@ spec:
             port: 8088
             protocol: TCP
             targetPort: 8088
-          mgmt-8043-tcp:
+          mgmt-443-tcp:
             enabled: true
-            port: 8043
+            port: 443
             protocol: TCP
-            targetPort: 8043
+            targetPort: 443
           portal-8843-tcp:
             enabled: true
             port: 8843
