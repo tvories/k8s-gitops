@@ -40,7 +40,7 @@ spec:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
           nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-          nginx.ingress.kubernetes.io/upstream-vhost: "omada.${SECRET_DOMAIN}"
+          nginx.ingress.kubernetes.io/upstream-vhost: *host
           # nginx.ingress.kubernetes.io/upstream-vhost: "omada.${SECRET_DOMAIN}:8043"
           # nginx.ingress.kubernetes.io/proxy-redirect-from: "~https://(.+):8043/(.+)/login$"
           # nginx.ingress.kubernetes.io/proxy-redirect-to: "https://$http_host/$2/login"
@@ -55,7 +55,7 @@ spec:
           #   proxy_set_header        Connection                "upgrade";
 
         hosts:
-          - host: &host omada.${SECRET_DOMAIN}
+          - host: &host tplink.${SECRET_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
