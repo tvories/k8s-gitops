@@ -67,9 +67,10 @@ spec:
     service:
       main:
         enabled: true
-        # ports:
-        #   http:
-        #     enabled: true
+        ports:
+          http:
+            enabled: true
+            port: 8043
         # port: 443
         # targetPort: 443
         # protocol: TCP
@@ -82,23 +83,23 @@ spec:
           mgmt-8088-tcp:
             enabled: true
             port: 8088
-            targetPort: 8088
             protocol: TCP
+            targetPort: 8088
           mgmt-8043-tcp:
             enabled: true
             port: 8043
-            targetPort: 8043
             protocol: TCP
+            targetPort: 8043
           portal-8843-tcp:
             enabled: true
             port: 8843
-            targetPort: 8843
             protocol: TCP
+            targetPort: 8843
           eap-discovery:
             enabled: true
             port: 29810
-            targetPort: 29810
             protocol: UDP
+            targetPort: 29810
           old-eap-mgmt:
             enabled: true
             port: 29811
@@ -117,13 +118,13 @@ spec:
           eap-adopt:
             enabled: true
             port: 29814
-            targetPort: 29814
             protocol: TCP
+            targetPort: 29814
           init-check:
             enabled: true
             port: 27001
-            targetPort: 27001
             protocol: UDP
+            targetPort: 27001
           old-init-info:
             enabled: true
             port: 27002
@@ -137,8 +138,8 @@ spec:
           db-access:
             enabled: true
             port: 27217
-            targetPort: 27217
             protocol: TCP
+            targetPort: 27217
 
     persistence:
       data:
