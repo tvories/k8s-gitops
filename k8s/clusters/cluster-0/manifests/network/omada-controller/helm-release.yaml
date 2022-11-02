@@ -62,6 +62,8 @@ spec:
           - hosts:
               - *host
             secretName: &certname tls.omada
+    securityContext:
+      privileged: true
 
     service:
       main:
