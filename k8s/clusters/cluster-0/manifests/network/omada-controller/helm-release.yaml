@@ -67,12 +67,12 @@ spec:
     service:
       main:
         enabled: true
-        ports:
-          http:
-            enabled: true
-            # port: 443
-            # targetPort: 443
-            # protocol: TCP
+        # ports:
+        #   http:
+        #     enabled: true
+        # port: 443
+        # targetPort: 443
+        # protocol: TCP
       controller:
         enabled: true
         type: LoadBalancer
