@@ -32,6 +32,8 @@ spec:
           - network
           - home
           - media
+          - database
+          - system-monitoring
   actions:
     - action: backup
       backupParameters:
