@@ -57,13 +57,13 @@ resource "vsphere_virtual_machine" "talos-cp" {
   wait_for_guest_net_timeout = -1
   host_system_id             = data.vsphere_host.host.id
   num_cpus                   = "4"
-  memory                     = 8192
+  memory                     = var.cp_memory
   folder                     = "k8"
   # firmware = "efi"
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.5/vmware-amd64.ova"
+    remote_ovf_url    = var.ovf_url
     disk_provisioning = "thin"
   }
 
@@ -105,13 +105,13 @@ resource "vsphere_virtual_machine" "talos-worker" {
   wait_for_guest_net_timeout = -1
   host_system_id             = data.vsphere_host.host.id
   num_cpus                   = "8"
-  memory                     = 16384
+  memory                     = var.worker_memory
   folder                     = "k8"
   # firmware = "efi"
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.5/vmware-amd64.ova"
+    remote_ovf_url    = var.ovf_url
     disk_provisioning = "thin"
   }
 
