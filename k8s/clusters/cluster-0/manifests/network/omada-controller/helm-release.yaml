@@ -33,7 +33,7 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       MANAGE_HTTP_PORT: "8088"
-      MANAGE_HTTPS_PORT: "443"
+      MANAGE_HTTPS_PORT: "8043"
       PORTAL_HTTP_PORT: "8088"
       PORTAL_HTTPS_PORT: "8843"
       SHOW_SERVER_LOGS: "true"
@@ -79,8 +79,8 @@ spec:
         ports:
           http:
             enabled: true
-            port: 443
-            targetPort: 443
+            port: 8043
+            targetPort: 8043
             protocol: TCP
       controller:
         primary: true
@@ -94,11 +94,11 @@ spec:
             port: 8088
             targetPort: 8088
             protocol: TCP
-          mgmt-443-tcp:
+          mgmt-8043-tcp:
             enabled: true
-            port: 443
+            port: 8043
             protocol: TCP
-            targetPort: 443
+            targetPort: 8043
           portal-8843-tcp:
             enabled: true
             port: 8843
