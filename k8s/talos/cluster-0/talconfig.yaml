@@ -1,7 +1,7 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.2.5
+talosVersion: v1.2.6
 kubernetesVersion: v1.24.7
 endpoint: https://${cluster_name}.${domainName}:6443
 
@@ -34,34 +34,27 @@ nodes:
   #   installDisk: /dev/sda
   - hostname: physical2.${domainName}
     controlPlane: true
-    allowSchedulingOnMasters: true
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
     inlinePatch:
       machine:
         install:
-          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ${gasket_image}
   - hostname: sff1.${domainName}
     controlPlane: true
-    allowSchedulingOnMasters: true
     ipAddress: 192.168.80.97
     inlinePatch:
       machine:
         install:
-          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ${gasket_image}
-
     installDisk: /dev/sda
   - hostname: physical1.${domainName}
     controlPlane: true
-    allowSchedulingOnMasters: true
     ipAddress: 192.168.80.98
     installDisk: /dev/sda
     inlinePatch:
       machine:
         install:
-          # renovate: datasource=gitlab-packages depName=ammmze/talos-gasket-installer
           image: ${gasket_image}
 
 controlPlane:
