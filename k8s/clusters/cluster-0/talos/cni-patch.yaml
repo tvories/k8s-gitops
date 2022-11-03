@@ -1,0 +1,8 @@
+# Run this patch after initial cluster build.
+# This allows upgrading kubernetes without re-applying
+# the custom cilium cni install that is required
+# during the bootstrap
+- op: replace
+  path: /cluster/network/cni
+  value:
+    name: none

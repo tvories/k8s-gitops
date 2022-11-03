@@ -1,0 +1,3 @@
+# Removes admission control value
+- op: remove
+  path: /cluster/apiServer/admissionControl
