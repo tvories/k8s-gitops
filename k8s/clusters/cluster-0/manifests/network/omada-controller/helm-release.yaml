@@ -75,7 +75,7 @@ spec:
     service:
       main:
         enabled: true
-        primary: false
+        # primary: false
         ports:
           http:
             enabled: true
@@ -84,7 +84,7 @@ spec:
             protocol: TCP
       controller:
         primary: true
-        enabled: true
+        # enabled: true
         type: LoadBalancer
         loadBalancerIP: "${LB_OMADA_CONTROLLER}"
         externalTrafficPolicy: Local
