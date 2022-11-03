@@ -10,3 +10,4 @@ resources:
   - ./prometheus-community-charts.yaml
   - ./stakater-charts.yaml
   - ./vmware-tanzu-charts.yaml
+  - ./kyverno-charts.yaml
