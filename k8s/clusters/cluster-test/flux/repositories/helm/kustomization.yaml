@@ -1,0 +1,32 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../../global/flux/repositories/helm
+  # - bitnami-charts.yaml
+  - ingress-nginx-charts.yaml
+  - cilium-charts.yaml
+  # - jetstack-charts.yaml
+  # - k8s-at-home-charts.yaml
+  - metallb-charts.yaml
+  - kubernetes-dashboard-charts.yaml
+  - kubernetes-sigs.yaml
+  - vernemq.yaml
+  - gitlab-charts.yaml
+  - nextcloud-charts.yaml
+  - minecraft-charts.yaml
+  - emqx-charts.yaml
+  - hashicorp-charts.yaml
+  # - prometheus-community-charts.yaml
+  - rook-ceph-charts.yaml
+  # - vmware-tanzu-charts.yaml
+  - grafana-charts.yaml
+  # - banzaicloud-charts.yaml
+  - kasten-charts.yaml
+  - fairwinds-charts.yaml
+  - vector-charts.yaml
+  - kubernetes-sigs-descheduler-charts.yaml
+  - trilio-charts.yaml
+  - cnpg-charts.yaml
+  - minio-charts.yaml
+  - bjw-s-charts.yaml
