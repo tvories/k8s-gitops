@@ -83,8 +83,8 @@ spec:
             targetPort: 8043
             protocol: TCP
       controller:
-        primary: true
-        # enabled: true
+        # primary: true
+        enabled: true
         type: LoadBalancer
         loadBalancerIP: "${LB_OMADA_CONTROLLER}"
         externalTrafficPolicy: Local
