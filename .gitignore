@@ -19,3 +19,4 @@ backend.conf
 
 *.log
 *sa.json
+compare.yaml
