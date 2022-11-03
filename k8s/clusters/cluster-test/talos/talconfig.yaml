@@ -1,9 +1,15 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.2.2
-kubernetesVersion: v1.24.4
+talosVersion: v1.2.5
+kubernetesVersion: v1.24.7
 endpoint: https://${cluster_name}.${domain_name}:6443
+domain: ${domain_name}
+allowSchedulingOnMasters: true
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
 
 cniConfig:
   name: custom
@@ -11,7 +17,6 @@ cniConfig:
     - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-test/integrations/cilium-quick-install/quick-install.yaml
 
 nodes:
-
   - hostname: talos-test-cp-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.190
@@ -19,7 +24,34 @@ nodes:
   - hostname: talos-test-worker-1.${domain_name}
     controlPlane: false
     ipAddress: 192.168.80.200
+
     installDisk: /dev/sda
+  - hostname: talos-cp-2.${domain_name}
+    controlPlane: true
+    ipAddress: 192.168.80.92
+    installDisk: /dev/sda
+  - hostname: talos-cp-3.${domain_name}
+    controlPlane: true
+    ipAddress: 192.168.80.93
+    installDisk: /dev/sda
+  - hostname: talos-worker-1.${domain_name}
+    ipAddress: 192.168.80.94
+    installDisk: /dev/sda
+  - hostname: talos-worker-2.${domain_name}
+    ipAddress: 192.168.80.95
+    installDisk: /dev/sda
+  # - hostname: talos-worker-3.${domain_name}
+  #   ipAddress: 192.168.80.96
+  #   installDisk: /dev/sda
+  - hostname: physical2.${domain_name}
+    controlPlane: true
+    ipAddress: 192.168.80.90
+    installDisk: /dev/sda
+    patches:
+      - |-
+        machine:
+          install:
+            image: ${gasket_image}
 
 controlPlane:
   configPatches:
@@ -28,6 +60,7 @@ controlPlane:
       value:
         rotate-server-certificates: "true"
         feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+      # These are for metrics
     - op: add
       path: /cluster/controllerManager/extraArgs
       value:
@@ -40,6 +73,7 @@ controlPlane:
       path: /cluster/proxy/extraArgs
       value:
         bind-address: 0.0.0.0
+
   inlinePatch:
     cluster:
       etcd:
@@ -70,10 +104,25 @@ controlPlane:
         extraArgs:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     machine:
+      install:
+        extraKernelArgs:
+          - "talos.logging.kernel=udp://192.168.83.42:6050/"
+      logging:
+        destinations:
+          - endpoint: "udp://192.168.83.42:6051/"
+            format: json_lines
+      sysctls:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+        net.ipv4.ip_unprivileged_port_start: 0
       time:
         disabled: false
         servers:
           - us.pool.ntp.org
+      # kubelet:
+      #   extraArgs:
+      #     rotate-server-certificates: "true"
+      #     feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
 
 worker:
   configPatches:
@@ -88,7 +137,22 @@ worker:
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
         - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
     machine:
+      install:
+        extraKernelArgs:
+          - "talos.logging.kernel=udp://192.168.83.42:6050/"
+      logging:
+        destinations:
+          - endpoint: "udp://192.168.83.42:6051/"
+            format: json_lines
+      sysctls:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+        net.ipv4.ip_unprivileged_port_start: 0
       time:
         disabled: false
         servers:
           - us.pool.ntp.org
+      # kubelet:
+      #   extraArgs:
+      #     rotate-server-certificates: "true"
+      #     feature-gates: MixedProtocolLBService=true,EphemeralContainers=True

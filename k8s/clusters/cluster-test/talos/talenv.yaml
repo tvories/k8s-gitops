@@ -1,2 +1,3 @@
 domain_name: mcbadass.local
 cluster_name: cluster-test
+gasket_image: ghcr.io/ammmze/talos-gasket-installer:v1.2.6-20221026175612
