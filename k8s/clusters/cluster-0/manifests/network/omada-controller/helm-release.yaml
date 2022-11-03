@@ -69,7 +69,7 @@ spec:
       main:
         enabled: true
         ports:
-          https:
+          http:
             enabled: true
             port: 8043
             # port: 443
