@@ -28,50 +28,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: kube-system-kyverno
-  namespace: flux-system
-spec:
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/system/kyverno"
-  prune: false
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: GitRepository
-metadata:
-  name: kube-system-kyverno-git
-  namespace: flux-system
-spec:
-  interval: 12h
-  url: https://github.com/kyverno/kyverno.git
-  ref:
-    # renovate: registryUrl=https://kyverno.github.io/kyverno chart=kyverno
-    tag: kyverno-chart-2.6.1
-  ignore: |
-    # exclude all
-    /*
-    # include crd directory
-    !/config/crds
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: kube-system-kyverno-crds
-  namespace: flux-system
-spec:
-  interval: 30m
-  prune: false
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: kube-system-kyverno-git
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
