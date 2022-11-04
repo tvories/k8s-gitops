@@ -1,7 +1,7 @@
 ---
 kind: HelmRelease
 metadata:
-  name: &app home-assistant
+  name: home-assistant
   namespace: home
 spec:
   values:
