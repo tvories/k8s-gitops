@@ -81,7 +81,7 @@ spec:
         enabled: true
         image:
           # repository: codercom/code-server
-          tag: 4.5.1
+          tag: 4.8.2
         workingDir: "/config"
         #TODO: Eventually add a git secret here
         # git:
