@@ -8,5 +8,7 @@ resources:
   # - home-assistant-secrets.enc.yaml
   # - ha-postgress-secret.sops.yaml
   - pvc.yaml
-  - ./cnpg.yaml
+  # - ./cnpg.yaml
   - helm-release.yaml
+patchesStrategicMerge:
+  - patches/postgres.yaml

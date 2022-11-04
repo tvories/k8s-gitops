@@ -1,0 +1,24 @@
+---
+kind: HelmRelease
+metadata:
+  name: &app home-assistant
+  namespace: home
+spec:
+  values:
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.5
+        env:
+          - name: POSTGRES_HOST
+            value: postgres-rw.database
+          - name: POSTGRES_DB
+            value: hass
+          - name: POSTGRES_USER
+            value: ${SECRET_HASS_PGUSER}
+          - name: POSTGRES_PASS
+            value: ${SECRET_HASS_PGPASSWORD}
+          - name: POSTGRES_SUPER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: postgres-superuser
+                key: password
