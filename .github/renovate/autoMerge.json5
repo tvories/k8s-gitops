@@ -11,6 +11,11 @@
         "ghcr.io/k8s-at-home/prowlarr",
         "ghcr.io/k8s-at-home/radarr",
         "ghcr.io/k8s-at-home/sonarr",
+        "ghcr.io/onedr0p/plex",
+        "ghcr.io/onedr0p/sonarr",
+        "ghcr.io/onedr0p/radarr-nightly",
+        "ghcr.io/onedr0p/prowlarr-nightly",
+        "ghcr.io/onedr0p/readarr-nightly",
       ],
     },
     // {
