@@ -5,5 +5,4 @@ resources:
   - ./pvc.yaml
   # - ./cnpg.yaml
   # - ./pg-secret.sops.yaml
-  # - ./postgres-db.yaml
   - ./helm-release.yaml
