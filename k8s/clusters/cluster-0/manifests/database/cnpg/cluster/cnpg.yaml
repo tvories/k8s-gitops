@@ -62,7 +62,7 @@ spec:
             name: minio-creds
             key: ACCESS_SECRET_KEY
         wal:
-          compression: bzip2
+          compression: gzip
           maxParallel: 12
 
 # Minio secret
