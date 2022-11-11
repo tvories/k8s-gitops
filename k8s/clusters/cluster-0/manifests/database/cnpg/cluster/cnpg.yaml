@@ -37,7 +37,7 @@ spec:
     retentionPolicy: 30d
     barmanObjectStore:
       wal:
-        compression: bzip2
+        compression: gzip
       destinationPath: s3://cnpg/v2
       endpointURL: https://nas1.${SECRET_DOMAIN}:9000
       s3Credentials:
