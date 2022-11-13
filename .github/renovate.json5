@@ -27,10 +27,7 @@
   suppressNotifications: ["prIgnoreNotification"],
   commitBodyTable: true,
   rebaseWhen: "conflicted",
-  "ignorePaths": [
-      "**/examples/**",
-      "**/archive/**"
-    ],
+  ignorePaths: ["**/examples/**", "**/archive/**"],
   // Set up Renovate Managers
   flux: {
     fileMatch: ["k8s/.+\\.ya?ml$"],
@@ -109,9 +106,14 @@
     },
     // Version strategies
     {
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/k8s-at-home/plex"],
+      description: "Use loose versioning for certain dependencies",
+      matchDatasources: ["docker", "github-releases"],
       versioning: "loose",
+      matchPackageNames: [
+        "ghcr.io/onedr0p/plex",
+        "ghcr.io/onedr0p/qbittorrent",
+        "Hypfer/Valetudo",
+      ],
     },
     {
       matchDatasources: ["docker"],
