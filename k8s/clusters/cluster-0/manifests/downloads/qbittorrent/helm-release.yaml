@@ -32,6 +32,7 @@ spec:
       fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
         - 65539
+        - 100
 
     settings:
       automaticPortSetup: false
@@ -40,7 +41,7 @@ spec:
       TZ: "${TIMEZONE}"
       UMASK: "022"
       USE_PROFILE: "true"
-      QBITTORRENT__PORT: &port 8080
+      QBITTORRENT__PORT: &port 80
       QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
 
     service:
