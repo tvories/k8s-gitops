@@ -39,8 +39,8 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
-      UMASK: "022"
-      USE_PROFILE: "true"
+      # UMASK: "022"
+      # USE_PROFILE: "true"
       QBITTORRENT__PORT: &port 80
       QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
 
