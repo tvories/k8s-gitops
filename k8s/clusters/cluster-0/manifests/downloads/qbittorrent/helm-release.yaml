@@ -5,57 +5,60 @@ metadata:
   name: qbittorrent
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: qbittorrent
-      version: 13.5.2
+      chart: app-template
+      version: 1.0.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
   values:
     image:
       # renovate: docker-image
       repository: ghcr.io/onedr0p/qbittorrent
       tag: 4.4.5
-      pullPolicy: Always
 
     hostname: qb
 
     podAnnotations:
       setGateway: "true"
 
-    # initContainers:
-    #   copy-config:
-    #     image: busybox:latest
-    #     command:
-    #       - "/bin/sh"
-    #       - -c
-    #     args:
-    #       - cp /data/configfiles/* /data/config/; chown -R 568:568 /data/config
-    #     volumeMounts:
-    #       - name: config
-    #         mountPath: /data/config
-    #       - name: configfiles
-    #         mountPath: /data/configfiles
-
     podSecurityContext:
-      # runAsUser: 568
-      # runAsGroup: 568
-      # fsGroup: 568
-      # fsGroupChangePolicy: OnRootMismatch
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
         - 65539
 
-    settings:
-      automaticPortSetup: false
+    # settings:
+    #   automaticPortSetup: false
 
     env:
       TZ: "${TIMEZONE}"
       UMASK: "022"
       USE_PROFILE: "true"
+      QBITTORRENT__PORT: &port 80
+      QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+      bittorrent:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: ${LB_QBITTORRENT}
+        externalTrafficPolicy: Local
+        ports:
+          bittorrent:
+            enabled: true
+            port: *port-bt
+            protocol: TCP
+            targetPort: *port-bt
 
     persistence:
       cache:
@@ -66,7 +69,7 @@ spec:
       config:
         enabled: true
         existingClaim: qbittorrent-nfs-config
-        # mountPath: /config
+        mountPath: /config
 
       # configfiles:
       #   enabled: true
