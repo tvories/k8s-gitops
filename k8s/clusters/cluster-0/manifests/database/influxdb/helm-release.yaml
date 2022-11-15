@@ -17,17 +17,15 @@ spec:
       interval: 5m
   values:
     image:
-      # repository: "influxdb"
-      tag: 2.4.0-debian-11-r11
-
-    
+    # repository: "influxdb"
+    # tag: 2.5.0-debian-11-r11
 
     auth:
       enabled: true
       admin:
-        username: "${GRAFANA_ADMIN_USER}"
-        password: "${GRAFANA_ADMIN_PASSWORD}"
-        token: "${GRAFANA_ADMIN_TOKEN}"
+        username: "${INFLUXDB_ADMIN_USER}"
+        password: "${INFLUXDB_ADMIN_PASSWORD}"
+        token: "${INFLUXDB_ADMIN_TOKEN}"
     persistence:
       enabled: true
       existingClaim: influxdb-data
@@ -41,7 +39,7 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-production
         # kubernetes.io/ingress.class: "nginx-internal"
       # secretName: influx-tls
-    
+
     # livenessProbe:
     #   timeoutSeconds: 10
     # readinessProbe:
