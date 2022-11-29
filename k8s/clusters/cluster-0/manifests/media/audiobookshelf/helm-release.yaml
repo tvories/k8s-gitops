@@ -18,7 +18,7 @@ spec:
       interval: 5m
   values:
     image:
-      tag: 2.2.5
+      tag: 2.2.6
       # pullPolicy: Always
     env:
       TZ: "${TIMEZONE}"
