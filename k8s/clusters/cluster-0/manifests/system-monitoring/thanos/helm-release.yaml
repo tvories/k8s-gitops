@@ -38,8 +38,8 @@ spec:
         requests:
           cpu: 15m
           memory: 64M
-        limits:
-          memory: 99M
+        # limits:
+        #   memory: 99M
 
       ingress:
         enabled: true
@@ -58,8 +58,8 @@ spec:
         requests:
           cpu: 15m
           memory: 64M
-        limits:
-          memory: 64M
+        # limits:
+        #   memory: 64M
 
     compactor:
       enabled: true
@@ -70,8 +70,8 @@ spec:
         requests:
           cpu: 15m
           memory: 204M
-        limits:
-          memory: 270M
+        # limits:
+        #   memory: 270M
       persistence:
         enabled: true
         storageClass: "ceph-block"
@@ -110,8 +110,8 @@ spec:
         requests:
           cpu: 15m
           memory: 94M
-        limits:
-          memory: 113M
+        # limits:
+        #   memory: 113M
 
     metrics:
       enabled: true
