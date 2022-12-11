@@ -75,6 +75,7 @@ spec:
         tls:
           - hosts:
               - *host
+            secretName: tls.valheim
 
     persistence:
       config:
