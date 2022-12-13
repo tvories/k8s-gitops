@@ -20,10 +20,10 @@ spec:
       # tlsDisable: false
     injector:
       agentImage:
-        tag: "1.11.2"
+        tag: "1.12.2"
     server:
       image:
-        tag: "1.11.2"
+        tag: "1.12.2"
       dataStorage:
         enabled: true
         storageClass: "ceph-block"
