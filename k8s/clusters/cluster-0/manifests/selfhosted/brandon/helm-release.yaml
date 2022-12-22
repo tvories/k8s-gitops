@@ -31,8 +31,8 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
       tls: true
-      secrets:
-        - name: brandon-wordpress.tls
+      # secrets:
+      #   - name: brandon-wordpress.tls
 
     persistence:
       enabled: true
