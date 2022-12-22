@@ -2,9 +2,9 @@
 creation_rules:
   - path_regex: (global|clusters|manifests|talos)/.*\.sops\.ya?ml
     encrypted_regex: "((?i)(pass|secret($|[^N])|key|token|ldap|app_role|vault|ad|domain|^data$|^stringData))"
-    pgp: >-
-      6C9D6C1B579041C3F9A189F9A889A030A843122F,
-      84EEAB5ACBE82B101D59A1025752228D92EE8D9B
+    # pgp: >-
+    #   6C9D6C1B579041C3F9A189F9A889A030A843122F,
+    #   84EEAB5ACBE82B101D59A1025752228D92EE8D9B
     gcp_kms: projects/taylor-cloud/locations/global/keyRings/sops/cryptoKeys/sops-key
     age: >-
       age1q07mwz002uj9fe262u0uz4xhp2v0jqdppjpald0e259zx3u9yu5sx4klhy
