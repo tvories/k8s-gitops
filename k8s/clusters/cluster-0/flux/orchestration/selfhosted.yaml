@@ -290,3 +290,17 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: selfhosted-brandon-wordpress
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/selfhosted/brandon"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
