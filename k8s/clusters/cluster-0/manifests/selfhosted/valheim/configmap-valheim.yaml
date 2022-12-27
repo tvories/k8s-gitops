@@ -14,7 +14,7 @@ data:
   BACKUPS_FILE_PERMISSIONS: "644"
   BACKUPS_IDLE_GRACE_PERIOD: "3600" # max(1200, BACKUPS_INTERVAL)
   BACKUPS_IF_IDLE: "false" # only back up if recent activity
-  BACKUPS_INTERVAL: "3600" # every hour
+  BACKUPS_INTERVAL: "600" # every 10 minutes
   BACKUPS_MAX_AGE: "14" # days
   BACKUPS_MAX_COUNT: "72"
   ### files

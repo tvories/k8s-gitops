@@ -30,6 +30,7 @@ spec:
     image:
       repository: lloesche/valheim-server
       tag: latest
+      pullPolicy: Always
 
     # env:
     #   ...
@@ -92,6 +93,10 @@ spec:
         - 100 # Users
         - 65537 # NAS Permission group
 
+    resources:
+      requests:
+        cpu: 511m
+        memory: 5528M
 
     # affinity:
     #   nodeAffinity:
