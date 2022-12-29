@@ -39,8 +39,8 @@ spec:
           name: valheim-secret
       - configMapRef:
           name: valheim-config
-      # - configMapRef:
-      #     name: valheimplus-config
+      - configMapRef:
+          name: valheimplus-config
 
     service:
       main:
