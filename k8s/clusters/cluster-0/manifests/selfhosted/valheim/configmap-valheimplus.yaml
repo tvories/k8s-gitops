@@ -126,8 +126,8 @@ data:
   ### server
   VPCFG_Server_enabled: "true"
   VPCFG_Server_maxPlayers: "5"
-  VPCFG_Server_enforceMod: "true"
-  #VPCFG_Server_serverSyncsConfig: "true"
+  # VPCFG_Server_enforceMod: "true"
+  VPCFG_Server_serverSyncsConfig: "true"
   ### smelter
   VPCFG_Smelter_enabled: "true"
   VPCFG_Smelter_maximumOre: "50" # default "10"
