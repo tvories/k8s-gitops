@@ -125,7 +125,7 @@ data:
   # VPCFG_PlayerProjectile_enableScaleWithSkillLevel: true
   ### server
   VPCFG_Server_enabled: "true"
-  VPCFG_Server_maxPlayers: "5"
+  VPCFG_Server_maxPlayers: "10"
   # VPCFG_Server_enforceMod: "true"
   VPCFG_Server_serverSyncsConfig: "true"
   ### smelter
