@@ -75,44 +75,44 @@ spec:
         networkPolicy:
           enabled: true
 
-        egress:
-          - to:
-              - ipBlock:
-                  cidr: 0.0.0.0/0
-            ports:
-              # VPN traffic
-              - port: ${VPN_PORT}
-                protocol: UDP
-          - to:
-              - ipBlock:
-                  cidr: 10.0.0.0/8
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                # VPN traffic
+                - port: ${VPN_PORT}
+                  protocol: UDP
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/8
 
-        routed_namespaces:
-          - vpn
+    routed_namespaces:
+      - vpn
 
-        settings:
-          # -- If using a VPN, interface name created by it
-          VPN_INTERFACE: wg0
-          # -- Prevent non VPN traffic to leave the gateway
-          VPN_BLOCK_OTHER_TRAFFIC: true
-          # -- If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
-          VPN_TRAFFIC_PORT: ${VPN_PORT}
-          # -- Traffic to these IPs will be send through the K8S gateway
-          VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_POD_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR} ${NETWORK_LOCAL_CIDR}"
+    settings:
+      # -- If using a VPN, interface name created by it
+      VPN_INTERFACE: wg0
+      # -- Prevent non VPN traffic to leave the gateway
+      VPN_BLOCK_OTHER_TRAFFIC: true
+      # -- If VPN_BLOCK_OTHER_TRAFFIC is true, allow VPN traffic over this port
+      VPN_TRAFFIC_PORT: ${VPN_PORT}
+      # -- Traffic to these IPs will be send through the K8S gateway
+      VPN_LOCAL_CIDRS: "172.16.0.0/12 ${NETWORK_K8S_POD_CIDR} ${NETWORK_K8S_SERVICE_CIDR} ${NETWORK_MANAGEMENT_CIDR} ${NETWORK_LOCAL_CIDR}"
 
-        publicPorts:
-          - hostname: qb #hostname assigned to the pod
-            IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
-            ports:
-              - type: udp
-                port: ${VPN_FORWARDED_PORT_1}
-              - type: tcp
-                port: ${VPN_FORWARDED_PORT_1}
+    publicPorts:
+      - hostname: qb #hostname assigned to the pod
+        IP: 10 # must be an integer between 2 and VXLAN_GATEWAY_FIRST_DYNAMIC_IP (20 by default)
+        ports:
+          - type: udp
+            port: ${VPN_FORWARDED_PORT_1}
+          - type: tcp
+            port: ${VPN_FORWARDED_PORT_1}
 
-        resources:
-          requests:
-            cpu: 11m
-            memory: 22M
+    resources:
+      requests:
+        cpu: 11m
+        memory: 22M
 
     # DNS: 172.16.1.1
 
