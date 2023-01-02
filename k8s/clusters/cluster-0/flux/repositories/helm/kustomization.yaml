@@ -31,3 +31,4 @@ resources:
   - minio-charts.yaml
   - bjw-s-charts.yaml
   - influxdata-charts.yaml
+  - angelnu-helm-charts.yaml
