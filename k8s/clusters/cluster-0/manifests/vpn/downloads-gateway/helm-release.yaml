@@ -5,7 +5,7 @@ metadata:
   name: pod-gateway
   namespace: vpn
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       chart: pod-gateway
@@ -21,6 +21,9 @@ spec:
       tag: v1.8.1
 
     webhook:
+      gatewayAnnotation: setGateway
+      gatewayDefault: false
+      gatewayLabel: setGateway
       image:
         repository: ghcr.io/angelnu/gateway-admision-controller
         # Use dev version
@@ -33,11 +36,9 @@ spec:
       vpn:
         enabled: true
         type: gluetun
-        gluetun:
-          image:
-            repository:
-              repository: docker.io/qmcgaw/gluetun
-              tag: v3.32.0
+        image:
+          repository: docker.io/qmcgaw/gluetun
+          tag: v3.32.0@sha256:70e2b9fe66941d6de31419c3207b525293f2e6a92a3788869bb337a17e0e5ec8
         env:
           - name: VPN_SERVICE_PROVIDER
             value: mullvad
