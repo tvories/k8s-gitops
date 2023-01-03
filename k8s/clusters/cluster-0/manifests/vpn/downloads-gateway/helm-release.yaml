@@ -109,6 +109,11 @@ spec:
           - type: tcp
             port: "${VPN_FORWARDED_PORT_1}"
 
+    securityContext:
+      capabilities:
+        drop:
+          - "SYS_MODULE"
+
     resources:
       requests:
         cpu: 11m
