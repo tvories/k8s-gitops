@@ -111,9 +111,10 @@ spec:
             port: "${VPN_FORWARDED_PORT_1}"
 
     securityContext:
-      capabilities:
-        add:
-          - NET_ADMIN
+      privileged: true
+      # capabilities:
+      #   add:
+      #     - NET_ADMIN
 
     resources:
       requests:
