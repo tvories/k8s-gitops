@@ -111,8 +111,8 @@ spec:
 
     securityContext:
       capabilities:
-        drop:
-          - "SYS_MODULE"
+        add:
+          - NET_ADMIN
 
     resources:
       requests:
