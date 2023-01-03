@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: pod-gateway
+  name: downloads-gateway
   namespace: vpn
 spec:
   interval: 15m
@@ -61,7 +61,7 @@ spec:
 
         envFrom:
           - secretRef:
-              name: pod-gateway-vpnconfig
+              name: downloads-gateway-vpnconfig
 
         livenessProbe:
           exec:
@@ -111,10 +111,10 @@ spec:
             port: "${VPN_FORWARDED_PORT_1}"
 
     securityContext:
-      privileged: true
-      # capabilities:
-      #   add:
-      #     - NET_ADMIN
+      # privileged: true
+      capabilities:
+        add:
+          - NET_ADMIN
 
     resources:
       requests:
