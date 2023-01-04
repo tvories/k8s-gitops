@@ -59,6 +59,17 @@ spec:
 
         networkPolicy:
           enabled: true
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                # VPN traffic
+                - port: 51820
+                  protocol: UDP
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/8
 
       netshoot:
         enabled: true
