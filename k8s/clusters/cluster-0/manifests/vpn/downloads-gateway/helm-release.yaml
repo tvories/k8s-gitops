@@ -57,6 +57,9 @@ spec:
             add:
               - NET_ADMIN
 
+        networkPolicy:
+          enabled: true
+
       netshoot:
         enabled: true
 
