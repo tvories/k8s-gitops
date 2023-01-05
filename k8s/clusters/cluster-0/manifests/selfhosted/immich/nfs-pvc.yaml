@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-nfs
+spec:
+  storageClassName: immich-nfs
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/fatguys/k8s/immich
+    server: ${SECRET_NAS1}
+  mountOptions:
+    - nfsvers=4.1
+    - tcp
+    - intr
+    - hard
+    - noatime
+    - nodiratime
+    - rsize=1048576
+    - wsize=1048576
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-nfs
+  namespace: selfhosted
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: immich-nfs
+  resources:
+    requests:
+      storage: 1Mi
