@@ -8,7 +8,8 @@ data:
   DB_DATABASE_NAME: immich
   DB_HOSTNAME: postgres-rw.database
   DB_PORT: "5432"
-  DISABLE_REVERSE_GEOCODING: "true"
+  DISABLE_REVERSE_GEOCODING: "false"
+  REVERSE_GEOCODING_PRECISION: "2"
   ENABLE_MAPBOX: "false"
   LOG_LEVEL: verbose
   NODE_ENV: "production"
