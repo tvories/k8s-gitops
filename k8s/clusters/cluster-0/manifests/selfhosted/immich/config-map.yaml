@@ -18,7 +18,7 @@ data:
   IMMICH_WEB_URL: http://immich-web.selfhosted.svc.cluster.local:3000
   IMMICH_SERVER_URL: http://immich-server.selfhosted.svc.cluster.local:3001
   IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning.selfhosted.svc.cluster.local:3003
-  # OAUTH_ENABLED: "false"
+  OAUTH_ENABLED: "false"
   # OAUTH_ISSUER_URL: "https://auth.${SECRET_DOMAIN}/.well-known/openid-configuration"
   # OAUTH_CLIENT_ID: immich
   # OAUTH_CLIENT_SECRET: "${SECRET_IMMICH_OAUTH_CLIENT_SECRET}"
