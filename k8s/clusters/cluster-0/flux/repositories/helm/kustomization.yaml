@@ -32,3 +32,4 @@ resources:
   - bjw-s-charts.yaml
   - influxdata-charts.yaml
   - angelnu-helm-charts.yaml
+  - external-secrets.yaml
