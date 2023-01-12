@@ -7,9 +7,9 @@ metadata:
 spec:
   instances: 3
 
-  bootstrap:
-    recovery:
-      source: postgres
+  # bootstrap:
+  #   recovery:
+  #     source: postgres
 
   # Example of rolling update strategy:
   # - unsupervised: automated update of the primary once all
