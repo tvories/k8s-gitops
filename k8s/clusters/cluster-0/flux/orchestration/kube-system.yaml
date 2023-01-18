@@ -60,11 +60,25 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: kube-system-external-secrets
+  name: kube-system-external-secrets-app
   namespace: flux-system
 spec:
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets"
+  path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets/app"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: kube-system-external-secrets-stores
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets/stores"
   prune: true
   wait: true
   sourceRef:
