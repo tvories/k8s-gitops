@@ -46,6 +46,7 @@ spec:
       PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
       USERMAP_GID: 20513
       PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
+      PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN}"
 
     persistence:
       data:
