@@ -68,7 +68,8 @@ spec:
             port: 8081
             protocol: TCP
             targetPort: 8081
-        type: ClusterIP
+        type: LoadBalancer
+        loadBalancerIP: ${LB_CALIBRE}
     probes:
       startup:
         enabled: false
