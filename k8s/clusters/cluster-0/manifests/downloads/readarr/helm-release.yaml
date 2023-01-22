@@ -19,7 +19,7 @@ spec:
     image:
       # renovate: docker-image
       repository: ghcr.io/onedr0p/readarr-nightly
-      tag: "0.1.2.1532"
+      tag: "0.1.2.1533"
 
     env:
       TZ: "${TIMEZONE}"
