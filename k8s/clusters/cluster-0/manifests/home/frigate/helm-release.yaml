@@ -19,7 +19,7 @@ spec:
     image:
       # repository: docker.io/blakeblackshear/frigate
       # repository: ghcr.io/k8s-at-home/frigate
-      tag: 0.11.0
+      tag: 0.11.1
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "frigate-config"
@@ -55,7 +55,7 @@ spec:
         medium: Memory
         sizeLimit: 4Gi
         mountPath: /dev/shm
-      
+
       coral:
         enabled: true
         type: hostPath
@@ -211,4 +211,3 @@ spec:
       valuesKey: cdale_doorbell_ip
       targetPath: env.FRIGATE_CDALE_DOORBELL_IP
       optional: false
-
