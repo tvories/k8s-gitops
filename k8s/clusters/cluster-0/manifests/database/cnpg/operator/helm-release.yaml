@@ -22,7 +22,7 @@ spec:
     #   configmap.reloader.stakater.com/reload: cnpg-controller-manager-config
     image:
       repository: ghcr.io/cloudnative-pg/cloudnative-pg
-      tag: "v1.19.0"
+      tag: "1.19.0"
     resources:
       requests:
         cpu: 15m
