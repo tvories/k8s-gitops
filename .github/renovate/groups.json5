@@ -1,11 +1,34 @@
 {
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
+      description: "1Password Connect and Sync images",
+      groupName: "1Password",
+      matchPackagePatterns: ["1password"],
+      matchDatasources: ["docker"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      separateMinorPatch: true,
+    },
+    {
+      description: "Immich images",
+      groupName: "Immich",
+      matchPackagePatterns: ["immich"],
+      matchDatasources: ["docker"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      separateMinorPatch: true,
+    },
+    {
       description: "Rook-Ceph image and chart",
-      groupName: "Rook Ceph",
+      groupName: "Rook-Ceph",
       matchPackagePatterns: ["rook.ceph"],
       matchDatasources: ["docker", "helm"],
-      group: { commitMessageTopic: "{{{groupName}}} group" },
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
       separateMinorPatch: true,
       stabilityDays: 2,
     },
@@ -22,24 +45,24 @@
       stabilityDays: 2,
     },
     {
-      description: "External Snapshotter image and kustomization",
+      description: "External Snapshotter charts",
       groupName: "External Snapshotter",
-      matchPackagePatterns: ["external-snapshotter", "snapshot-controller"],
-      matchDatasources: ["docker", "github-releases"],
-      group: { commitMessageTopic: "{{{groupName}}} group" },
+      matchPackageNames: ["snapshot-controller", "snapshot-validation-webhook"],
+      matchDatasources: ["helm"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
       separateMinorPatch: true,
-      stabilityDays: 2,
     },
     {
-      description: "Thanos image and chart - versions do not match",
+      description: "Thanos image and chart - mismatched versions",
       groupName: "Thanos",
+      matchPackagePatterns: ["thanos"],
       matchDatasources: ["docker", "github-releases", "helm"],
-      matchPackagePatterns: ["quay.io/thanos/thanos", "thanos"],
       matchUpdateTypes: ["minor", "patch"],
-      group: { commitMessageTopic: "{{{groupName}}} group" },
-      separateMinorPatch: false,
-      stabilityDays: 2,
-    },
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
     {
       description: "Vector image and chart - versions do not match",
       groupName: "Vector",
