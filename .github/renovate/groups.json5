@@ -30,7 +30,6 @@
         commitMessageTopic: "{{{groupName}}} group",
       },
       separateMinorPatch: true,
-      stabilityDays: 2,
     },
     {
       matchDatasources: ["helm", "docker"],
@@ -63,6 +62,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+    },
     {
       description: "Vector image and chart - versions do not match",
       groupName: "Vector",
@@ -71,7 +71,6 @@
       matchUpdateTypes: ["minor", "patch"],
       group: { commitMessageTopic: "{{{groupName}}} group" },
       separateMinorPatch: false,
-      stabilityDays: 2,
     },
   ],
 }
