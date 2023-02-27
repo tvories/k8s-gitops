@@ -28,7 +28,7 @@ spec:
     # hostNetwork: true
     image:
       repository: mbentley/omada-controller
-      tag: "5.8"
+      tag: "5.9"
 
     env:
       TZ: "${TIMEZONE}"
