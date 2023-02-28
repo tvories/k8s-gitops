@@ -61,7 +61,7 @@ spec:
           #   proxy_set_header        Connection                "upgrade";
 
         hosts:
-          - host: &host tplink.${SECRET_DOMAIN}
+          - host: &host omada.${SECRET_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
