@@ -5,7 +5,7 @@ metadata:
   name: cluster-config
   namespace: flux-system
 data:
-  CLUSTER_NAME: cluster-0
+  CLUSTER_NAME: cluster-test
   CLUSTER_ID: "1"
 
   TIMEZONE: "America/Denver"
