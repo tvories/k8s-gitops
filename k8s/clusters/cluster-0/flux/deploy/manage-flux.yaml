@@ -40,7 +40,8 @@ spec:
         - op: add
           path: /spec/template/spec/containers/0/env
           value:
-            GOOGLE_APPLICATION_CREDENTIALS: /tmp/flux/fluxcd_gsa_keyfile.json
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /tmp/flux/fluxcd_gsa_keyfile.json
 
         - op: add
           path: /spec/template/spec/containers/0/volumeMounts
