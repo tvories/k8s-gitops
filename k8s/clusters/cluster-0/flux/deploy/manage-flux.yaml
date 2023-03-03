@@ -20,12 +20,24 @@ spec:
         kind: Deployment
         name: helm-controller
       patch: |-
-        - op: replace
-          path: /spec/template/spec/containers/0/resources/requests/memory
-          value: 512Mi
-        - op: replace
-          path: /spec/template/spec/containers/0/resources/limits/memory
-          value: 2Gi
+        - op: add
+          path: /spec/template/spec/containers/0/env
+          value:
+            GOOGLE_APPLICATION_CREDENTIALS: /tmp/flux/fluxcd_gsa_keyfile.json
+
+        - op: add
+          path: /spec/template/spec/containers/0/volumeMounts
+          value:
+            - mountPath: /tmp/flux/fluxcd_gsa_keyfile.json
+              name: fluxcd-google-sa-secret
+              subPath: fluxcd_gsa_keyfile.json
+
+        - op: add
+          path: /spec/template/spec/volumes
+          value:
+            - name: fluxcd-google-sa-secret
+              secret:
+                secretName: fluxcd-google-sa-secret
     - target:
         kind: Namespace
         name: flux-system
@@ -33,3 +45,13 @@ spec:
         - op: add
           path: /metadata/labels/goldilocks.fairwinds.com~1enabled
           value: "true"
+    - target:
+        kind: Deployment
+        name: kustomize-controller
+      patch: |-
+        - op: replace
+          path: /spec/template/spec/containers/0/resources/requests/memory
+          value: 512Mi
+        - op: replace
+          path: /spec/template/spec/containers/0/resources/limits/memory
+          value: 2Gi
