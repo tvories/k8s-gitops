@@ -16,5 +16,3 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
-    secretRef:
-      name: flux-sops-gcp

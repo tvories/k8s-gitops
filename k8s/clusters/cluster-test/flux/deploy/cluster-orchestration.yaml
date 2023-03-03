@@ -19,8 +19,6 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
-    secretRef:
-      name: flux-sops-gcp
   postBuild:
     substitute: {}
     substituteFrom:
@@ -42,8 +40,6 @@ spec:
         spec:
           decryption:
             provider: sops
-            secretRef:
-              name: flux-sops-gcp
           postBuild:
             substitute: {}
             substituteFrom:

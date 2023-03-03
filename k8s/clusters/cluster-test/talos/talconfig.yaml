@@ -1,10 +1,10 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.2.5
-kubernetesVersion: v1.24.7
+talosVersion: v1.3.5
+kubernetesVersion: v1.25.6
 endpoint: https://${cluster_name}.${domain_name}:6443
-domain: ${domain_name}
+domain: cluster.local
 allowSchedulingOnMasters: true
 clusterPodNets:
   - 10.244.0.0/16
@@ -14,44 +14,18 @@ clusterSvcNets:
 cniConfig:
   name: custom
   urls:
-    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/cluster-test/integrations/cilium-quick-install/quick-install.yaml
+    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
 
 nodes:
   - hostname: talos-test-cp-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.190
     installDisk: /dev/sda
+
   - hostname: talos-test-worker-1.${domain_name}
     controlPlane: false
     ipAddress: 192.168.80.200
-
     installDisk: /dev/sda
-  - hostname: talos-cp-2.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.92
-    installDisk: /dev/sda
-  - hostname: talos-cp-3.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.93
-    installDisk: /dev/sda
-  - hostname: talos-worker-1.${domain_name}
-    ipAddress: 192.168.80.94
-    installDisk: /dev/sda
-  - hostname: talos-worker-2.${domain_name}
-    ipAddress: 192.168.80.95
-    installDisk: /dev/sda
-  # - hostname: talos-worker-3.${domain_name}
-  #   ipAddress: 192.168.80.96
-  #   installDisk: /dev/sda
-  - hostname: physical2.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.90
-    installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            image: ${gasket_image}
 
 controlPlane:
   configPatches:
@@ -74,13 +48,11 @@ controlPlane:
       value:
         bind-address: 0.0.0.0
 
+    - op: remove
+      path: /cluster/apiServer/admissionControl
+
   inlinePatch:
     cluster:
-      etcd:
-        extraArgs:
-          election-timeout: 5000
-          heartbeat-interval: 250
-          listen-metrics-urls: http://0.0.0.0:2381
       apiServer:
         certSANs:
           - ${cluster_name}.${domain_name}
@@ -95,7 +67,7 @@ controlPlane:
             disabled: true
       extraManifests:
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+        # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
       proxy:
         disabled: true
         extraArgs:
@@ -105,6 +77,8 @@ controlPlane:
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
     machine:
       install:
+        extensions:
+          - image: ghcr.io/siderolabs/gasket-driver:97aeba58-v1.3.5
         extraKernelArgs:
           - "talos.logging.kernel=udp://192.168.83.42:6050/"
       logging:
@@ -119,10 +93,14 @@ controlPlane:
         disabled: false
         servers:
           - us.pool.ntp.org
-      # kubelet:
-      #   extraArgs:
-      #     rotate-server-certificates: "true"
-      #     feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      # kernel:
+      #   modules:
+      #     - name: gasket
+      #     - name: apex
+      kubelet:
+        extraArgs:
+          rotate-server-certificates: "true"
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
 
 worker:
   configPatches:
@@ -135,9 +113,11 @@ worker:
     cluster:
       extraManifests:
         - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-        - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+        # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
     machine:
       install:
+        extensions:
+          - image: ghcr.io/siderolabs/gasket-driver:97aeba58-v1.3.5
         extraKernelArgs:
           - "talos.logging.kernel=udp://192.168.83.42:6050/"
       logging:
@@ -152,7 +132,11 @@ worker:
         disabled: false
         servers:
           - us.pool.ntp.org
-      # kubelet:
-      #   extraArgs:
-      #     rotate-server-certificates: "true"
-      #     feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      # kernel:
+      #   modules:
+      #     - name: gasket
+      #     - name: apex
+      kubelet:
+        extraArgs:
+          rotate-server-certificates: "true"
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True

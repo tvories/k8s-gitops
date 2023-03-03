@@ -8,6 +8,10 @@ terraform {
     vsphere = {
       version = "2.3.1"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "4.54.0"
+    }
   }
 }
 
@@ -53,7 +57,7 @@ resource "vsphere_virtual_machine" "talos-cp" {
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.2/vmware-amd64.ova"
+    remote_ovf_url    = var.ovf_url
     disk_provisioning = "thin"
   }
 
@@ -80,6 +84,8 @@ resource "vsphere_virtual_machine" "talos-cp" {
       disk[0].io_share_count,
       disk[0].thin_provisioned,
       disk[1].io_share_count,
+      disk[1].io_share_count,
+      ovf_deploy
     ]
   }
 }
@@ -99,7 +105,7 @@ resource "vsphere_virtual_machine" "talos-worker" {
 
 
   ovf_deploy {
-    remote_ovf_url    = "https://github.com/siderolabs/talos/releases/download/v1.2.2/vmware-amd64.ova"
+    remote_ovf_url    = var.ovf_url
     disk_provisioning = "thin"
   }
 
@@ -110,7 +116,7 @@ resource "vsphere_virtual_machine" "talos-worker" {
 
   disk {
     label       = "${var.name_prefix}-worker-${count.index + 1}-disk1"
-    size        = "200"
+    size        = "100"
     unit_number = 1
   }
 
@@ -126,6 +132,8 @@ resource "vsphere_virtual_machine" "talos-worker" {
       disk[0].io_share_count,
       disk[0].thin_provisioned,
       disk[1].io_share_count,
+      disk[1].io_share_count,
+      ovf_deploy
     ]
   }
 }
