@@ -41,14 +41,14 @@ spec:
           path: /spec/template/spec/containers/0/env
           value:
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /tmp/flux/fluxcd_gsa_keyfile.json
+              value: /tmp/flux/cluster-0-flux-sa.json
 
         - op: add
           path: /spec/template/spec/containers/0/volumeMounts
           value:
-            - mountPath: /tmp/flux/fluxcd_gsa_keyfile.json
+            - mountPath: /tmp/flux/cluster-0-flux-sa.json
               name: fluxcd-google-sa-secret
-              subPath: fluxcd_gsa_keyfile.json
+              subPath: cluster-0-flux-sa.json
 
         - op: add
           path: /spec/template/spec/volumes
