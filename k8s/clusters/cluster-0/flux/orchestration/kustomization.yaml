@@ -15,7 +15,7 @@ resources:
   - ./selfhosted.yaml
   - ./system-monitoring.yaml
   - ./system.yaml
-  - ./trilio.yaml
+  # - ./trilio.yaml
   - ./vpn.yaml
   - ./kasten-io.yaml
   - ./database.yaml
