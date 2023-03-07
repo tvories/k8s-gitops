@@ -63,7 +63,11 @@ spec:
       # VERSION:
 
     command:
-      - sh -c 'python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334'
+      [
+        "/bin/sh",
+        "-c",
+        "python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334",
+      ]
 
     service:
       main:
@@ -94,7 +98,9 @@ spec:
           DEBUG: "True"
           FLASK_APP: "server.py"
         command:
-          - bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
+          - /bin/bash
+          - -c
+          - "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
       redis:
         name: redis
         image: redis:7.0-alpine
