@@ -81,6 +81,9 @@ spec:
 
     service:
       main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: "${LB_OBICO}"
         ports:
           http:
             port: 3334
