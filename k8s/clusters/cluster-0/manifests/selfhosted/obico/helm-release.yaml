@@ -26,6 +26,35 @@ spec:
       repository: ghcr.io/gabe565/obico/web
       tag: sha-72b26dfa6f35800388816c621870664e5501dd19
 
+    env:
+      OCTOPRINT_TUNNEL_PORT_RANGE: "0-0"
+      # EMAIL_HOST:
+      # EMAIL_HOST_USER:
+      # EMAIL_HOST_PASSWORD:
+      # EMAIL_PORT:
+      # EMAIL_USE_TLS:
+      # DEFAULT_FROM_EMAIL:
+      # DEBUG: false # Don't set DEBUG to True unless you know what you are doing. Otherwise the static files will be cached in browser until hard-refresh
+      # ADMIN_IP_WHITELIST:
+      SITE_USES_HTTPS: "True"
+      SITE_IS_PUBLIC: "False"
+      SOCIAL_LOGIN: "False"
+      REDIS_URL: "redis://redis:6379"
+      DATABASE_URL: "sqlite:////app/db.sqlite3"
+      INTERNAL_MEDIA_HOST: "http://web:3334"
+      ML_API_HOST: "http://ml_api:3333"
+      ACCOUNT_ALLOW_SIGN_UP: "False"
+      WEBPACK_LOADER_ENABLED: "False"
+      # TELEGRAM_BOT_TOKEN:
+      # TWILIO_ACCOUNT_SID:
+      # TWILIO_AUTH_TOKEN:
+      # TWILIO_FROM_NUMBER:
+      # SENTRY_DSN:
+      # PUSHOVER_APP_TOKEN:
+      # SLACK_CLIENT_ID:
+      # SLACK_CLIENT_SECRET:
+      # VERSION:
+
     command:
       - sh -c 'python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334'
 
@@ -51,8 +80,14 @@ spec:
             secretName: tls.obico
 
     sidecars:
-      ml-api:
-        name: ml-api
+      ml_api:
+        name: ml_api
         image: ghcr.io/gabe565/obico/ml-api:sha-72b26dfa6f35800388816c621870664e5501dd19
+        environment:
+          DEBUG: "True"
+          FLASK_APP: "server.py"
         command:
           - bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
+      redis:
+        name: redis
+        image: redis:7.0-alpine
