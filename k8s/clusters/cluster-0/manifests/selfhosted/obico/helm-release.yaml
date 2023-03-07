@@ -103,6 +103,11 @@ spec:
               - *host
             secretName: tls.obico
 
+    resources:
+      requests:
+        # cpu: 511m
+        memory: 4096M
+
     sidecars:
       ml-api:
         name: ml-api
