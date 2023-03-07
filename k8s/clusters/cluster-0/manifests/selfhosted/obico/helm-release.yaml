@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: valheim
+  name: obico
   namespace: selfhosted
 spec:
   interval: 15m
