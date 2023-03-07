@@ -92,7 +92,7 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-          - host: &host "obi.${SECRET_DOMAIN}"
+          - host: &host "obico.${SECRET_DOMAIN}"
             paths:
               - path: /
         tls:
