@@ -49,7 +49,7 @@ spec:
       REDIS_URL: "redis://redis:6379"
       DATABASE_URL: "sqlite:////app/db.sqlite3"
       INTERNAL_MEDIA_HOST: "http://web:3334"
-      ML_API_HOST: "http://ml_api:3333"
+      ML_API_HOST: "http://ml-api:3333"
       ACCOUNT_ALLOW_SIGN_UP: "False"
       WEBPACK_LOADER_ENABLED: "False"
       # TELEGRAM_BOT_TOKEN:
@@ -87,8 +87,8 @@ spec:
             secretName: tls.obico
 
     sidecars:
-      ml_api:
-        name: ml_api
+      ml-api:
+        name: ml-api
         image: ghcr.io/gabe565/obico/ml-api:sha-72b26dfa6f35800388816c621870664e5501dd19
         env:
           DEBUG: "True"
