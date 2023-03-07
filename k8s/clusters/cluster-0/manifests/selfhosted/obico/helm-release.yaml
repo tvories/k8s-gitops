@@ -90,7 +90,7 @@ spec:
       ml_api:
         name: ml_api
         image: ghcr.io/gabe565/obico/ml-api:sha-72b26dfa6f35800388816c621870664e5501dd19
-        environment:
+        env:
           DEBUG: "True"
           FLASK_APP: "server.py"
         command:
