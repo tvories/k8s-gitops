@@ -48,6 +48,7 @@ spec:
             secretName: tls.obico
 
     sidecars:
-      - name: ml-api
+      ml-api:
+        name: ml-api
         image: ghcr.io/gabe565/obico/ml-api
         tag: sha-72b26dfa6f35800388816c621870664e5501dd19
