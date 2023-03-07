@@ -69,6 +69,16 @@ spec:
         "python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334",
       ]
 
+    persistence:
+      config:
+        enabled: true
+        existingClaim: obico-config
+        mountPath: /app/db
+      media:
+        enabled: true
+        existingClaim: obico-media
+        mountPath: /app/static_build/media
+
     service:
       main:
         ports:
