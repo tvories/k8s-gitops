@@ -26,6 +26,9 @@ spec:
       repository: ghcr.io/gabe565/obico/web
       tag: sha-72b26dfa6f35800388816c621870664e5501dd19
 
+    command:
+      - sh -c 'python manage.py migrate && python manage.py collectstatic -v 2 --noinput && python manage.py runserver --nostatic --noreload 0.0.0.0:3334'
+
     service:
       main:
         ports:
@@ -51,3 +54,5 @@ spec:
       ml-api:
         name: ml-api
         image: ghcr.io/gabe565/obico/ml-api:sha-72b26dfa6f35800388816c621870664e5501dd19
+        command:
+          - bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
