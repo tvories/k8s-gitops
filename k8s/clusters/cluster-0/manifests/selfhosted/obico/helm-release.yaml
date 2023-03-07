@@ -47,16 +47,7 @@ spec:
               - *host
             secretName: tls.obico
 
-    addons:
-      ml-api:
-        enabled: true
-        image:
-          repository: ghcr.io/gabe565/obico/ml-api
-          tag: sha-72b26dfa6f35800388816c621870664e5501dd19
-
-        service:
-          main:
-            ports:
-              ml-api:
-                port: 3333
-                protocol: TCP
+    sidecars:
+      - name: ml-api
+        image: ghcr.io/gabe565/obico/ml-api
+        tag: sha-72b26dfa6f35800388816c621870664e5501dd19
