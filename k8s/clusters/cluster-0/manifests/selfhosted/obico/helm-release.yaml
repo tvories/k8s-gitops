@@ -48,7 +48,7 @@ spec:
       SOCIAL_LOGIN: "False"
       REDIS_URL: "redis://redis:6379"
       DATABASE_URL: "sqlite:////app/db/db.sqlite3"
-      INTERNAL_MEDIA_HOST: "http://obi:3334"
+      INTERNAL_MEDIA_HOST: "http://obico:3334"
       ML_API_HOST: "http://ml-api:3333"
       ACCOUNT_ALLOW_SIGN_UP: "False"
       WEBPACK_LOADER_ENABLED: "False"
