@@ -41,7 +41,7 @@ spec:
       # EMAIL_PORT:
       # EMAIL_USE_TLS:
       # DEFAULT_FROM_EMAIL:
-      # DEBUG: false # Don't set DEBUG to True unless you know what you are doing. Otherwise the static files will be cached in browser until hard-refresh
+      DEBUG: "true" # Don't set DEBUG to True unless you know what you are doing. Otherwise the static files will be cached in browser until hard-refresh
       # ADMIN_IP_WHITELIST:
       SITE_USES_HTTPS: "True"
       SITE_IS_PUBLIC: "False"
