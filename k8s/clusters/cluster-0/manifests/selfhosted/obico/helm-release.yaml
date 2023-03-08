@@ -46,7 +46,7 @@ spec:
       SITE_USES_HTTPS: "True"
       SITE_IS_PUBLIC: "False"
       SOCIAL_LOGIN: "False"
-      REDIS_URL: "redis://redis:6379"
+      REDIS_URL: "redis://localhost:6379"
       DATABASE_URL: "sqlite:////app/db/db.sqlite3"
       INTERNAL_MEDIA_HOST: "http://localhost:3334"
       ML_API_HOST: "http://localhost:3333"
