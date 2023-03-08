@@ -19,7 +19,7 @@ spec:
     image:
       # renovate: docker-image
       repository: ghcr.io/onedr0p/radarr-nightly
-      tag: "4.4.3.6983"
+      tag: "4.4.3.6991"
       pullPolicy: Always
 
     podSecurityContext:
