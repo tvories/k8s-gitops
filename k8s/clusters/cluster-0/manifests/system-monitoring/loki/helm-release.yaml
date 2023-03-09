@@ -2,30 +2,34 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: loki
-  namespace: system-monitoring
+  name: &app loki
+  namespace: monitoring
 spec:
-  interval: 5m
+  interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: loki
-      version: 3.10.0
+      version: 4.8.0
       sourceRef:
         kind: HelmRepository
         name: grafana-charts
         namespace: flux-system
-      interval: 5m
+      interval: 30m
+  install:
+    createNamespace: true
+    remediation: # perform remediation when helm install fails
+      retries: 2
+  upgrade:
+    remediation: # perform remediation when helm upgrade fails
+      retries: 2
+      remediateLastFailure: true # remediate the last failure, when no retries remain
+    cleanupOnFail: true
   values:
-    image:
-      repository: ghcr.io/k8s-at-home/loki
-
-    env:
-      - name: TZ
-        value: ${TIMEZONE}
-
     loki:
       structuredConfig:
         auth_enabled: false
+
         server:
           log_level: info
           http_listen_port: 3100
@@ -41,8 +45,10 @@ spec:
           reject_old_samples_max_age: 168h
           max_cache_freshness_per_query: 10m
           split_queries_by_interval: 15m
-          ingestion_rate_mb: 8
-          ingestion_burst_size_mb: 16
+          ingestion_rate_mb: 16
+          ingestion_burst_size_mb: 32
+          shard_streams:
+            enabled: true
 
         schema_config:
           configs:
@@ -53,6 +59,7 @@ spec:
               index:
                 prefix: loki_index_
                 period: 24h
+
         common:
           path_prefix: /var/loki
           replication_factor: 3
@@ -61,9 +68,14 @@ spec:
               s3: null
               insecure: true
               s3forcepathstyle: true
+              bucketnames: loki
+              endpoint: https://nas1.${SECRET_DOMAIN}:9000
+              access_key_id: ${SECRET_MINIO_ACCESS_KEY}
+              secret_access_key: ${SECRET_MINIO_SECRET_KEY}
           ring:
             kvstore:
               store: memberlist
+
         ruler:
           enable_api: true
           enable_alertmanager_v2: true
@@ -76,10 +88,12 @@ spec:
           ring:
             kvstore:
               store: memberlist
+
         distributor:
           ring:
             kvstore:
               store: memberlist
+
         compactor:
           working_directory: /var/loki/boltdb-shipper-compactor
           shared_store: s3
@@ -87,183 +101,115 @@ spec:
           retention_enabled: true
           retention_delete_delay: 2h
           retention_delete_worker_count: 150
+
         ingester:
           max_chunk_age: 1h
           lifecycler:
             ring:
               kvstore:
                 store: memberlist
+
         analytics:
           reporting_enabled: false
-    # gateway:
-    #   enabled: true
-    #   replicas: 3
-    #   affinity: |
-    #     podAntiAffinity:
-    #       preferredDuringSchedulingIgnoredDuringExecution:
-    #         - weight: 1
-    #           podAffinityTerm:
-    #             labelSelector:
-    #               matchLabels:
-    #                 {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
-    #             topologyKey: kubernetes.io/hostname
-    #   ingress:
-    #     enabled: true
-    #     ingressClassName: "nginx"
-    #     hosts:
-    #       - host: &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
-    #         paths:
-    #           - path: /
-    #             pathType: Prefix
-    #     tls:
-    #       - hosts:
-    #           - *host
-    write:
-      replicas: 3
-      affinity: |
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    {{- include "loki.writeSelectorLabels" . | nindent 12 }}
-                topologyKey: kubernetes.io/hostname
-      persistence:
-        size: 10Gi
-        storageClass: ceph-block
 
-    read:
-      replicas: 3
-      affinity: |
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    {{- include "loki.readSelectorLabels" . | nindent 12 }}
-                topologyKey: kubernetes.io/hostname
-      extraVolumeMounts:
-        - name: loki-rules
-          mountPath: /rules/fake
-        - name: loki-rules-tmp
-          mountPath: /tmp/scratch
-        - name: loki-tmp
-          mountPath: /tmp/loki-tmp
-      extraVolumes:
-        - name: loki-rules
-          configMap:
-            name: loki-alerting-rules
-        - name: loki-rules-tmp
-          emptyDir: {}
-        - name: loki-tmp
-          emptyDir: {}
-      persistence:
-        size: 10Gi
-        storageClass: ceph-block
-    monitoring:
-      selfMonitoring:
-        enabled: false
-        grafanaAgent:
-          installOperator: false
-
-    # valuesFrom:
-    #   - kind: Secret
-    #     name: loki-secret
-    #     valuesKey: S3_BUCKET_NAME
-    #     targetPath: loki.structuredConfig.common.storage.s3.bucketnames
-    #   - kind: Secret
-    #     name: loki-secret
-    #     valuesKey: S3_BUCKET_HOST
-    #     targetPath: loki.structuredConfig.common.storage.s3.endpoint
-    #   - kind: Secret
-    #     name: loki-secret
-    #     valuesKey: S3_ACCESS_KEY
-    #     targetPath: loki.structuredConfig.common.storage.s3.access_key_id
-    #   - kind: Secret
-    #     name: loki-secret
-    #     valuesKey: S3_SECRET_KEY
-    #     targetPath: loki.structuredConfig.common.storage.s3.secret_access_key
-
-    alerting_groups:
-      #
-      # zigbee2mqtt
-      #
-      - name: zigbee2mqtt
-        rules:
-          - alert: ZigbeeUnableToReachMQTT
-            expr: |
-              sum(count_over_time({app="zigbee2mqtt"} |~ "(?i)not connected to mqtt server"[2m])) > 0
-            for: 2m
-            labels:
-              severity: critical
-              category: logs
-            annotations:
-              summary: "Zigbee2mqtt is unable to reach MQTT"
-
-      #
-      # frigate
-      #
-      - name: frigate
-        rules:
-          - alert: FrigateUnableToReachMQTT
-            expr: |
-              sum(count_over_time({app="frigate"} |~ "(?i)unable to connect to mqtt server"[2m])) > 0
-            for: 2m
-            labels:
-              severity: critical
-              category: logs
-            annotations:
-              summary: "Frigate is unable to reach MQTT"
+      # podAnnotations:
+      #   secret.reloader.stakater.com/reload: loki-secret
     gateway:
       enabled: true
-      replicas: 1
+      replicas: 3
       ingress:
         enabled: true
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-        ingressClassName: nginx-internal
-        # paths:
-        #   - path: /
-        #     pathType: prefix
+        ingressClassName: "nginx-internal"
         hosts:
-          - host: &host "loki.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+          - host: &host "loki.${SECRET_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
         tls:
-          - secretName: loki-${CLUSTER_NAME}-tls
-            hosts:
+          - hosts:
               - *host
-
-    persistence:
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
+    write:
+      replicas: 3
+      persistence:
+        size: 10Gi
+        storageClass: ceph-block
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
+    read:
+      persistence:
+        size: 10Gi
+        storageClass: ceph-block
+      extraVolumeMounts:
+        - name: rules
+          mountPath: /rules
+      extraVolumes:
+        - name: rules
+          emptyDir: {}
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
+    backend:
+      replicas: 3
+      extraVolumeMounts:
+        - name: rules
+          mountPath: /rules
+        - name: scratch
+          mountPath: /tmp/scratch
+      extraVolumes:
+        - name: rules
+          emptyDir: {}
+        - name: scratch
+          emptyDir: {}
+      persistence:
+        size: 10Gi
+        storageClass: ceph-block
+      affinity: |
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "loki.gatewaySelectorLabels" . | nindent 12 }}
+                topologyKey: kubernetes.io/hostname
+    monitoring:
+      dashboards:
+        enabled: true
+        annotations:
+          kustomize.toolkit.fluxcd.io/substitute: disabled
+        labels:
+          grafana_dashboard: "true"
+      rules:
+        enabled: true
+      serviceMonitor:
+        enabled: false
+      selfMonitoring:
+        enabled: false
+        lokiCanary:
+          enabled: false
+        grafanaAgent:
+          installOperator: false
+    test:
       enabled: false
-
-    serviceMonitor:
-      enabled: true
-
-    resources:
-      requests:
-        cpu: 78m
-        memory: 325M
-      limits:
-        memory: 421M
-
-  valuesFrom:
-    - kind: ConfigMap
-      name: loki-ceph-bucket
-      valuesKey: BUCKET_NAME
-      targetPath: config.storage_config.aws.bucketnames
-    - kind: ConfigMap
-      name: loki-ceph-bucket
-      valuesKey: BUCKET_HOST
-      targetPath: config.storage_config.aws.endpoint
-    - kind: Secret
-      name: loki-ceph-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
-      targetPath: config.storage_config.aws.access_key_id
-    - kind: Secret
-      name: loki-ceph-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
-      targetPath: config.storage_config.aws.secret_access_key
