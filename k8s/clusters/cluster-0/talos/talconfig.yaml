@@ -1,7 +1,7 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.3.1
+talosVersion: v1.3.5
 kubernetesVersion: v1.24.9
 endpoint: https://${cluster_name}.${domain_name}:6443
 domain: cluster.local
@@ -41,7 +41,12 @@ nodes:
       - |-
         machine:
           install:
-            image: ${gasket_image}
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
 
   - hostname: physical2.${domain_name}
     controlPlane: true
@@ -51,7 +56,12 @@ nodes:
       - |-
         machine:
           install:
-            image: ${gasket_image}
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
 
   - hostname: sff1.${domain_name}
     controlPlane: true
@@ -61,7 +71,12 @@ nodes:
       - |-
         machine:
           install:
-            image: ${gasket_image}
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
 
   - hostname: talos-worker-1.${domain_name}
     ipAddress: 192.168.80.94
