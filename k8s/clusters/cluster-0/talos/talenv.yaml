@@ -1,3 +1,3 @@
 domain_name: mcbadass.local
 cluster_name: cluster-0
-gasket_image: ghcr.io/ammmze/talos-gasket-installer:v1.2.6-20221026175612
+gasket_image: ghcr.io/siderolabs/gasket-driver:97aeba58-v1.3.5
