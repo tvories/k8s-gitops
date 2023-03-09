@@ -94,39 +94,11 @@ spec:
 
       # Sinks
       sinks:
-        loki_kubernetes:
-          type: loki
-          inputs:
-            - kubernetes_logs
-          endpoint: http://loki-gateway.system-monitoring:3100
-          encoding:
-            codec: json
-          batch:
-            max_bytes: 400000
-          out_of_order_action: rewrite_timestamp
-          remove_label_fields: true
-          remove_timestamp: true
-          labels:
-            k8s_app: >-
-              {{`{{ "kubernetes.pod_labels.app\.kubernetes\.io/name" }}`}}
-            k8s_container: >-
-              {{`{{ "kubernetes.container_name" }}`}}
-            k8s_filename: >-
-              {{`{{ "kubernetes.file" }}`}}
-            k8s_instance: >-
-              {{`{{ "kubernetes.pod_labels.app\.kubernetes\.io/instance" }}`}}
-            k8s_namespace: >-
-              {{`{{ "kubernetes.pod_namespace" }}`}}
-            k8s_node: >-
-              {{`{{ "kubernetes.pod_node_name" }}`}}
-            k8s_pod: >-
-              {{`{{ "kubernetes.pod_name" }}`}}
-
         loki_journal:
           type: loki
           inputs:
             - journal_logs
-          endpoint: http://loki-gateway.system-monitoring:3100
+          endpoint: http://loki-gateway:80
           encoding:
             codec: json
           batch:
@@ -135,14 +107,47 @@ spec:
           remove_label_fields: true
           remove_timestamp: true
           labels:
-            hostname: >-
-              {{`{{ host }}`}}
-
+            hostname: "{{ host }}"
+        loki_kubernetes:
+          type: loki
+          inputs:
+            - kubernetes_logs
+          endpoint: http://loki-gateway:80
+          encoding:
+            codec: json
+          batch:
+            max_bytes: 2049000
+          out_of_order_action: rewrite_timestamp
+          remove_label_fields: true
+          remove_timestamp: true
+          labels:
+            k8s_app: "{{ custom_app_name }}"
+            k8s_container: "{{ kubernetes.container_name }}"
+            k8s_filename: "{{ kubernetes.file }}"
+            k8s_instance: '{{ kubernetes.pod_labels."app.kubernetes.io/instance" }}'
+            k8s_namespace: "{{ kubernetes.pod_namespace }}"
+            k8s_node: "{{ kubernetes.pod_node_name }}"
+            k8s_pod: "{{ kubernetes.pod_name }}"
+        loki_udmp:
+          type: loki
+          inputs:
+            - udmp_logs_xform
+          endpoint: http://loki-gateway:80
+          batch:
+            max_bytes: 1048576
+          out_of_order_action: rewrite_timestamp
+          remove_label_fields: true
+          remove_timestamp: true
+          encoding:
+            codec: json
+          labels:
+            hostname: udmpro
+            app: "{{ appname }}"
         talos_kernel:
           type: loki
           inputs:
             - talos_kernel_logs_xform
-          endpoint: http://loki-gateway.system-monitoring:3100
+          endpoint: http://loki-gateway:80
           encoding:
             codec: json
             except_fields:
@@ -151,28 +156,24 @@ spec:
             max_bytes: 1048576
           out_of_order_action: rewrite_timestamp
           labels:
-            hostname: >-
-              {{`{{ __host }}`}}
-            service: >-
-              {{`{{ facility }}`}}
-
+            hostname: "{{ __host }}"
+            service: "{{ facility }}"
         talos_service:
           type: loki
           inputs:
             - talos_service_logs_xform
-          endpoint: http://loki-gateway.system-monitoring:3100
+          endpoint: http://loki-gateway:80
           encoding:
             codec: json
             except_fields:
               - __host
           batch:
-            max_bytes: 400000
+            max_bytes: 524288
           out_of_order_action: rewrite_timestamp
           labels:
-            hostname: >-
-              {{`{{ __host }}`}}
-            service: >-
-              {{`{{ "talos-service" }}`}}
+            hostname: "{{ __host }}"
+            service: "talos-service"
+            namespace: "talos:service"
 
     podMonitor:
       enabled: true
