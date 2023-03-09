@@ -122,22 +122,6 @@ spec:
             k8s_pod: >-
               {{`{{ "kubernetes.pod_name" }}`}}
 
-        # loki_vyos:
-        #   type: loki
-        #   inputs:
-        #     - vyos_logs
-        #   endpoint: http://loki-gateway.system-monitoring:3100
-        #   encoding:
-        #     codec: json
-        #   batch:
-        #     max_bytes: 400000
-        #   out_of_order_action: rewrite_timestamp
-        #   labels:
-        #     hostname: >-
-        #       {{`{{ host }}`}}
-        #     syslog_identifier: >-
-        #       {{`{{ SYSLOG_IDENTIFIER }}`}}
-
         loki_journal:
           type: loki
           inputs:
