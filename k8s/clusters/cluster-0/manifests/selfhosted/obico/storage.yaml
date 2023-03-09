@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: obico-config
+  name: obico-data
   namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
