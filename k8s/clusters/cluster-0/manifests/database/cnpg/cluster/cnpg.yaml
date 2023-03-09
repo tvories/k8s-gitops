@@ -38,7 +38,7 @@ spec:
     barmanObjectStore:
       wal:
         compression: gzip
-      destinationPath: s3://cnpg/v3
+      destinationPath: s3://cnpg/v2
       endpointURL: https://nas1.${SECRET_DOMAIN}:9000
       s3Credentials:
         accessKeyId:
