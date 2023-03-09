@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: gabe565-charts
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://charts.gabe565.com
+  timeout: 3m
