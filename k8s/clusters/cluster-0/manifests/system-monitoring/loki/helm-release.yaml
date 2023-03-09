@@ -70,10 +70,7 @@ spec:
           enable_api: true
           enable_alertmanager_v2: true
           alertmanager_url: http://kube-prometheus-stack-alertmanager:9093
-          storage:
-            type: local
-            local:
-              directory: /rules
+          storage: {}
           rule_path: /tmp/scratch
           ring:
             kvstore:
