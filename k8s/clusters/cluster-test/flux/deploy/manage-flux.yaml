@@ -33,6 +33,8 @@ spec:
         - op: add
           path: /metadata/labels/goldilocks.fairwinds.com~1enabled
           value: "true"
+
+    # GCP KMS: https://github.com/fluxcd/kustomize-controller/blob/5056fbf6ac5c48de434680042c5979fa79a5de04/docs/spec/v1beta2/kustomization.md#gcp-kms
     - target:
         kind: Deployment
         name: kustomize-controller
@@ -41,13 +43,13 @@ spec:
           path: /spec/template/spec/containers/0/env/-
           value:
             name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /var/gcp/cluster-test-flux-sa.json
+            value: /var/gcp/gcp-flux-sa-credential.json
         - op: add
           path: /spec/template/spec/containers/0/volumeMounts/-
           value:
-            mountPath: /var/gcp/cluster-test-flux-sa.json
+            mountPath: /var/gcp/gcp-flux-sa-credential.json
             name: fluxcd-google-sa-secret
-            subPath: cluster-test-flux-sa.json
+            subPath: gcp-flux-sa-credential.json
             readOnly: true
         - op: add
           path: /spec/template/spec/volumes/-
@@ -55,24 +57,3 @@ spec:
             name: fluxcd-google-sa-secret
             secret:
               secretName: fluxcd-google-sa-secret
-
-# - op: add
-#   path: /spec/template/spec/containers/0/env/-
-#   value:
-#     - name: GOOGLE_APPLICATION_CREDENTIALS
-#       value: /var/gcp/cluster-test-flux-sa.json
-
-# - op: add
-#   path: /spec/template/spec/containers/0/volumeMounts/-
-#   value:
-#     - mountPath: /var/gcp/
-#       name: fluxcd-google-sa-secret
-#       subPath: cluster-test-flux-sa.json
-#       readOnly: true
-
-# - op: add
-#   path: /spec/template/spec/volumes/-
-#   value:
-#     - name: fluxcd-google-sa-secret
-#       secret:
-#         secretName: fluxcd-google-sa-secret

@@ -22,5 +22,5 @@ resource "google_service_account_key" "flux" {
 
 resource "local_file" "flux" {
   content  = base64decode(google_service_account_key.flux.private_key)
-  filename = "${path.module}/${var.cluster_name}-flux-sa.json"
+  filename = "${path.module}/gcp-flux-sa-credential.json"
 }
