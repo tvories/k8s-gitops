@@ -110,7 +110,7 @@ spec:
           remove_label_fields: true
           remove_timestamp: true
           labels:
-            hostname: "{{ __host }}"
+            hostname: "{{ host }}"
         loki_kubernetes:
           type: loki
           inputs:
@@ -144,7 +144,7 @@ spec:
             max_bytes: 1048576
           out_of_order_action: rewrite_timestamp
           labels:
-            hostname: "{{ __host }}"
+            hostname: "{{ host }}"
             service: "{{ facility }}"
         talos_service:
           type: loki
@@ -159,7 +159,7 @@ spec:
             max_bytes: 524288
           out_of_order_action: rewrite_timestamp
           labels:
-            hostname: "{{ __host }}"
+            hostname: "{{ host }}"
             service: "talos-service"
             namespace: "talos:service"
 
