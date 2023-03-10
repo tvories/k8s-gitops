@@ -41,8 +41,7 @@ spec:
           template:
             spec:
               containers:
-                - name: manager
-                  env:
+                - env:
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: /var/gcp/cluster-test-flux-sa.json
                   volumeMounts:
