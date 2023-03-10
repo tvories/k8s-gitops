@@ -48,7 +48,7 @@ spec:
           value:
             - mountPath: /var/gcp/
               name: fluxcd-google-sa-secret
-              subPath: cluster-test-flux-sa.json
+              subPath: /var/gcp/cluster-test-flux-sa.json
               readOnly: true
 
         - op: add
