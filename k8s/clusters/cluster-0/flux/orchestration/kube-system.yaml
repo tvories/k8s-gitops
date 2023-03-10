@@ -63,6 +63,8 @@ metadata:
   name: kube-system-external-secrets-app
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: cert-manager-certmanager
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets/app"
   prune: true
