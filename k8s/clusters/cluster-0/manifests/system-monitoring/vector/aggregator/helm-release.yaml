@@ -79,7 +79,7 @@ spec:
           inputs:
             - talos_kernel_logs
           source: |-
-            .__host,= replace(.__host, "192.168.80.91", "talos-cp-1")
+            .__host,= replace!(.__host, "192.168.80.91", "talos-cp-1")
             .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
             .__host = replace(.__host, "192.168.80.90", "physical2")
             .__host = replace(.__host, "192.168.80.98", "physical1")
@@ -89,7 +89,7 @@ spec:
           inputs:
             - talos_service_logs
           source: |-
-            .__host,= replace(.__host, "192.168.80.91", "talos-cp-1")
+            .__host,= replace!(.__host, "192.168.80.91", "talos-cp-1")
             .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
             .__host = replace(.__host, "192.168.80.98", "physical1")
             .__host = replace(.__host, "192.168.80.90", "physical2")
