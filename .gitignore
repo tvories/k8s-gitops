@@ -19,4 +19,5 @@ backend.conf
 
 *.log
 *sa.json
+*credential.json
 compare.yaml
