@@ -29,7 +29,7 @@ spec:
       data_dir: /vector-data-dir
 
       api:
-        # enabled: true
+        enabled: false
         # address: 0.0.0.0:8686
 
       # Sources
