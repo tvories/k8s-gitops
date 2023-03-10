@@ -29,8 +29,8 @@ spec:
       data_dir: /vector-data-dir
 
       api:
-        enabled: true
-        address: 0.0.0.0:8686
+        # enabled: true
+        # address: 0.0.0.0:8686
 
       # Sources
       sources:
@@ -67,13 +67,13 @@ spec:
 
       # Transformations
       transforms:
-        kubernetes_logs_remap:
-          type: remap
-          inputs:
-            - kubernetes_logs
-          source: |
-            # Standardize 'app' index
-            .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
+        # kubernetes_logs_remap:
+        #   type: remap
+        #   inputs:
+        #     - kubernetes_logs
+        #   source: |
+        #     # Standardize 'app' index
+        #     .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
         talos_kernel_logs_xform:
           type: remap
           inputs:
@@ -110,7 +110,7 @@ spec:
           remove_label_fields: true
           remove_timestamp: true
           labels:
-            hostname: "{{ host }}"
+            hostname: "{{ __host }}"
         loki_kubernetes:
           type: loki
           inputs:
