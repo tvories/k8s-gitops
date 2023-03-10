@@ -29,7 +29,8 @@ spec:
       data_dir: /vector-data-dir
 
       api:
-        enabled: false
+        enabled: true
+        address: 0.0.0.0:8686
 
       # Sources
       sources:
@@ -37,11 +38,6 @@ spec:
           address: 0.0.0.0:6000
           type: vector
           version: "2"
-
-        # vyos_logs:
-        #   address: 0.0.0.0:6001
-        #   type: vector
-        #   version: "2"
 
         journal_logs:
           type: vector
@@ -71,12 +67,19 @@ spec:
 
       # Transformations
       transforms:
+        kubernetes_logs_remap:
+          type: remap
+          inputs:
+            - kubernetes_logs
+          source: |
+            # Standardize 'app' index
+            .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
         talos_kernel_logs_xform:
           type: remap
           inputs:
             - talos_kernel_logs
           source: |-
-            .__host, .err = replace(.__host, "192.168.80.91", "talos-cp-1")
+            .__host,= replace(.__host, "192.168.80.91", "talos-cp-1")
             .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
             .__host = replace(.__host, "192.168.80.90", "physical2")
             .__host = replace(.__host, "192.168.80.98", "physical1")
@@ -86,7 +89,7 @@ spec:
           inputs:
             - talos_service_logs
           source: |-
-            .__host, .err = replace(.__host, "192.168.80.91", "talos-cp-1")
+            .__host,= replace(.__host, "192.168.80.91", "talos-cp-1")
             .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
             .__host = replace(.__host, "192.168.80.98", "physical1")
             .__host = replace(.__host, "192.168.80.90", "physical2")
@@ -128,21 +131,6 @@ spec:
             k8s_namespace: "{{ kubernetes.pod_namespace }}"
             k8s_node: "{{ kubernetes.pod_node_name }}"
             k8s_pod: "{{ kubernetes.pod_name }}"
-        loki_udmp:
-          type: loki
-          inputs:
-            - udmp_logs_xform
-          endpoint: http://loki-gateway:80
-          batch:
-            max_bytes: 1048576
-          out_of_order_action: rewrite_timestamp
-          remove_label_fields: true
-          remove_timestamp: true
-          encoding:
-            codec: json
-          labels:
-            hostname: udmpro
-            app: "{{ appname }}"
         talos_kernel:
           type: loki
           inputs:
