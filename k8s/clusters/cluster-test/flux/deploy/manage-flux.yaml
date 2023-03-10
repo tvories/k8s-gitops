@@ -36,23 +36,25 @@ spec:
     - target:
         kind: Deployment
         name: kustomize-controller
-      patch: |-
-        spec:
-          template:
-            spec:
-              containers:
-                - env:
-                    - name: GOOGLE_APPLICATION_CREDENTIALS
-                      value: /var/gcp/cluster-test-flux-sa.json
-                  volumeMounts:
-                    - mountPath: /var/gcp/
-                      name: fluxcd-google-sa-secret
-                      subPath: cluster-test-flux-sa.json
-                      readOnly: true
-            volumes:
-              - name: fluxcd-google-sa-secret
-                secret:
-                  secretName: fluxcd-google-sa-secret
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/gcp/cluster-test-flux-sa.json
+        - op: add
+          path: /spec/template/spec/containers/0/volumeMounts/-
+          value:
+            mountPath: /var/gcp/
+            name: fluxcd-google-sa-secret
+            subPath: cluster-test-flux-sa.json
+            readOnly: true
+        - op: add
+          path: /spec/template/spec/volumes/-
+          value:
+            name: fluxcd-google-sa-secret
+            secret:
+              secretName: fluxcd-google-sa-secret
 
 # - op: add
 #   path: /spec/template/spec/containers/0/env/-
