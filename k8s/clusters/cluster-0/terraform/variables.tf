@@ -67,3 +67,8 @@ variable "ovf_url" {
   description = "The ofv url for the deployment"
   type        = string
 }
+
+variable "cluster_name" {
+  description = "The unique name for the cluster"
+  type        = string
+}

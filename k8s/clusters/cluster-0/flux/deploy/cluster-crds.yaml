@@ -18,5 +18,3 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
-    secretRef:
-      name: sops-age
