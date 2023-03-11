@@ -52,7 +52,7 @@ tasks:
     desc: Bootstrap cluster
     cmds:
       - kubectl create ns flux-system
-      - cat ~/.config/sops/age/keys.txt | kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=/dev/stdin
+      - kubectl -n flux-system create secret generic fluxcd-google-sa-secret --from-file=./k8s/clusters/cluster-0/terraform/gcp-flux-sa-credential.json --type=Opaque
 
   bootstrap-flux:
     desc: Bootstrap flux (as per version in manifest)
