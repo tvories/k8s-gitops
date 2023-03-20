@@ -5,3 +5,8 @@ resources:
   - ./helm-release.yaml
 patchesStrategicMerge:
   - ./patches/postgres.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: immich-server
+      app.kubernetes.io/instance: immich-server
+      app.kubernetes.io/part-of: immich
