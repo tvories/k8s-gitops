@@ -7,8 +7,8 @@ resources:
   - ./microservices
   - ./machine-learning
   - ./web
-  - ./proxy
   - ./redis
+  - ./typesense
   - ./pvc.yaml
   - ./config-map.yaml
   - ./secret.sops.yaml
