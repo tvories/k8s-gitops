@@ -33,6 +33,11 @@ spec:
     #   cpu: 250m
     #   memory: 640Mi
 
+  postgresql:
+    parameters:
+      max_connections: "600"
+      shared_buffers: 512MB
+
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
