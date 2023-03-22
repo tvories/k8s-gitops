@@ -19,7 +19,7 @@ spec:
     server:
       image:
         repository: ghcr.io/gabe565/obico/web
-        tag: sha-72b26dfa6f35800388816c621870664e5501dd19
+        tag: sha-d5155dd2c3f97ade383898d0476d97ef7c98eae4
 
       persistence:
         data:
@@ -46,7 +46,7 @@ spec:
     ml-api:
       image:
         repository: ghcr.io/gabe565/obico/ml-api
-        tag: sha-72b26dfa6f35800388816c621870664e5501dd19
+        tag: sha-d5155dd2c3f97ade383898d0476d97ef7c98eae4
       env:
         DEBUG: "False"
 
