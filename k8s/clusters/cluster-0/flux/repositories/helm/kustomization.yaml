@@ -33,3 +33,4 @@ resources:
   - influxdata-charts.yaml
   - angelnu-helm-charts.yaml
   - external-secrets.yaml
+  - ./authentik-charts.yaml
