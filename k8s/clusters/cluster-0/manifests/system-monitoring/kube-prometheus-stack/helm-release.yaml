@@ -232,6 +232,15 @@ spec:
               - targets:
                   - "deskmonster.${SECRET_INTERNAL_DOMAIN}:9182"
 
+          - job_name: "nvidia_gpu_exporter"
+            metrics_path: /metrics
+            scrape_interval: 30s
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "deskmonster.${SECRET_INTERNAL_DOMAIN}:9835"
+
     ###
     ### Alertmanager values
     ###
