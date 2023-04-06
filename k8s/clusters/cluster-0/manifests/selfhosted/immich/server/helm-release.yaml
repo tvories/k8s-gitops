@@ -15,19 +15,22 @@ spec:
         name: bjw-s-charts
         namespace: flux-system
   install:
-    # createNamespace: true
+    createNamespace: true
     remediation:
-      retries: 5
+      retries: 3
   upgrade:
+    cleanupOnFail: true
     remediation:
-      retries: 5
+      retries: 3
+  uninstall:
+    keepHistory: false
   dependsOn:
+    - name: immich-typesense
     - name: immich-redis
-      namespace: selfhosted
   values:
     image:
       repository: ghcr.io/immich-app/immich-server
-      tag: v1.52.1
+      tag: v1.53.0
     command: /bin/sh
     args:
       - ./start-server.sh
@@ -46,9 +49,6 @@ spec:
         enabled: true
         existingClaim: immich-nfs
         mountPath: /usr/src/app/upload
-    podAnnotations:
-      secret.reloader.stakater.com/reload: immich
-      configmap.reloader.stakater.com/reload: immich
     resources:
       requests:
         cpu: 100m
