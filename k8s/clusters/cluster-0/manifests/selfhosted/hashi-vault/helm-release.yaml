@@ -20,10 +20,12 @@ spec:
       # tlsDisable: false
     injector:
       agentImage:
-        tag: "1.12.2"
+        repository: "hashicorp/vault"
+        tag: "1.13.1"
     server:
       image:
-        tag: "1.12.2"
+        repository: "hashicorp/vault"
+        tag: "1.13.1"
       dataStorage:
         enabled: true
         storageClass: "ceph-block"
