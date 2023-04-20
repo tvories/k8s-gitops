@@ -20,7 +20,7 @@ spec:
   values:
     image:
       repository: ghcr.io/onedr0p/plex
-      tag: 1.32.0.6950-8521b7d99
+      tag: 1.32.0.6973-a787c5a8e
 
     podSecurityContext:
       runAsUser: 568
