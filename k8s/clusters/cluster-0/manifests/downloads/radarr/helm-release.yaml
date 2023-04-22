@@ -76,6 +76,20 @@ spec:
           - secretName: &tls tls.radarr
             hosts:
               - *host
+      api:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: *host
+            paths:
+              - path: /api
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+            secretName: *tls
 
     podSecurityContext:
       runAsUser: 568
@@ -99,21 +113,6 @@ spec:
         enabled: true
         existingClaim: radarr-nfs-backup
         mountPath: /config/Backups
-
-      api:
-        enabled: true
-        ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-        hosts:
-          - host: *host
-            paths:
-              - path: /api
-                pathType: Prefix
-        tls:
-          - hosts:
-              - *host
-            secretName: *tls
 
     resources:
       requests:
