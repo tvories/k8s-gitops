@@ -40,21 +40,6 @@ spec:
         ports:
           http:
             port: &port 7878
-    # probes:
-    #   liveness: &probes
-    #     enabled: true
-    #     custom: true
-    #     spec:
-    #       httpGet:
-    #         path: /ping
-    #         port: *port
-    #       initialDelaySeconds: 0
-    #       periodSeconds: 10
-    #       timeoutSeconds: 1
-    #       failureThreshold: 3
-    #   readiness: *probes
-    #   startup:
-    #     enabled: false
 
     ingress:
       main:
@@ -121,18 +106,18 @@ spec:
       limits:
         memory: 2000Mi
 
-    # metrics:
-    #   enabled: true
-    #   serviceMonitor:
-    #     interval: 3m
-    #     scrapeTimeout: 1m
-    #   prometheusRule:
-    #     enabled: true
-    #   exporter:
-    #     image:
-    #       repository: ghcr.io/onedr0p/exportarr
-    #       tag: v1.3.1
-    #     env:
-    #       port: 9794
-    #       additionalMetrics: true
-    #       unknownQueueItems: true
+    metrics:
+      enabled: true
+      serviceMonitor:
+        interval: 3m
+        scrapeTimeout: 1m
+      prometheusRule:
+        enabled: true
+      exporter:
+        image:
+          repository: ghcr.io/onedr0p/exportarr
+          tag: v1.3.2
+        env:
+          port: 9794
+          additionalMetrics: true
+          unknownQueueItems: true
