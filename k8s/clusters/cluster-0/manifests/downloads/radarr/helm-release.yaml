@@ -32,14 +32,14 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       RADARR__INSTANCE_NAME: Radarr
-      RADARR__PORT: &port 7878
       RADARR__APPLICATION_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
+      RADARR__LOG_LEVEL: info
 
     service:
       main:
         ports:
           http:
-            port: *port
+            port: 7878
     probes:
       liveness: &probes
         enabled: true
