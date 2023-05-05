@@ -6,7 +6,7 @@ terraform {
   }
   required_providers {
     vsphere = {
-      version = "2.3.1"
+      version = "2.4.0"
     }
     google = {
       source  = "hashicorp/google"
