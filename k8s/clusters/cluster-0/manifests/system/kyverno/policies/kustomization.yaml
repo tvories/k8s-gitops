@@ -8,3 +8,4 @@ resources:
   - delete-cpu-limits.yaml
   # - snapshot-cronjob-controller.yaml
   - sync-postgres-secrets.yaml
+  - sync-zalando-postgres-secrets.yaml
