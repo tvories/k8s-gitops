@@ -5,3 +5,5 @@ resources:
   # - ./cnpg.yaml
   - ./pvc.yaml
   - ./helm-release.yaml
+patchesStrategicMerge:
+  - patches/postgres.yaml
