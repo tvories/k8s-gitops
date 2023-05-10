@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+  namespace: selfhosted
+spec:
+  values:
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-initdb:14.7
+        env:
+          - name: POSTGRES_HOST
+            value: postgres.database
+          - name: POSTGRES_DB
+            value: paperless
+          - name: POSTGRES_USER
+            value: paperless
+          - name: POSTGRES_PASS
+            value: ${PAPERLESS_PG_PASSWORD}
+          - name: POSTGRES_SUPER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: postgres.postgres.credentials.postgresql.acid.zalan.do
+                key: password
