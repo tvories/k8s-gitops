@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: node-feature-discovery
-      version: 0.12.2
+      version: 0.13.1
       sourceRef:
         kind: HelmRepository
         name: kubernetes-sigs-nfd-charts
@@ -44,7 +44,7 @@ spec:
           cpu: 23m
           memory: 64M
         limits:
-          memory: 64M
+          # memory: 64M
 
     worker:
       annotations:
@@ -55,7 +55,7 @@ spec:
           cpu: 15m
           memory: 64M
         limits:
-          memory: 64M
+          # memory: 64M
 
       tolerations:
         - effect: "NoExecute"
