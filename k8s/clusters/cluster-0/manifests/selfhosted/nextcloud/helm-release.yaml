@@ -95,7 +95,7 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: postgres-rw.database
+      host: postgres.database
       database: nextcloud
       password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
       user: ncuser
