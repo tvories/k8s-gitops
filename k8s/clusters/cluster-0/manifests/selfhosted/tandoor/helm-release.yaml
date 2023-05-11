@@ -34,7 +34,7 @@ spec:
       DEFAULT_FROM_EMAIL: ${SECRET_RECIPE_EMAIL}
       DB_ENGINE: django.db.backends.postgresql
       ENABLE_SIGNUP: 0
-      POSTGRES_HOST: postgres-rw.database
+      POSTGRES_HOST: postgres.database
       POSTGRES_PORT: "5432"
       POSTGRES_DB: tandoor
       POSTGRES_USER: tandoor
