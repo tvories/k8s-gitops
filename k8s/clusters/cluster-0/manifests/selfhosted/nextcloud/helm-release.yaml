@@ -33,12 +33,26 @@ spec:
         nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         nginx.ingress.kubernetes.io/server-snippet: |-
           server_tokens off;
-          proxy_hide_header X-Powered-By;
-          # rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
-          # rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
-          rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
-          rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
-          rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
+          location ^~ /.well-known {
+            location = /.well-known/carddav { return 301 /remote.php/dav/; }
+            location = /.well-known/caldav { return 301 /remote.php/dav/; }
+            location = /.well-known/acme-challenge { try_files $uri $uri/ =404; }
+            location = /.well-known/pki-validation { try_files $uri $uri/ =404; }
+            return 301 /index.php$request_uri;
+          }
+          location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)(?:$|/)  { return 404; }
+          location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console)                { return 404; }
+          location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+          }
+          location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+            deny all;
+          }
+          location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+            deny all;
+          }
 
       tls:
         - hosts:
@@ -102,8 +116,6 @@ spec:
 
     redis:
       enabled: true
-      cluster:
-        enabled: false
       auth:
         enabled: true
         password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
@@ -128,6 +140,8 @@ spec:
 
     cronjob:
       enabled: true
+      failedJobsHistoryLimit: 1
+      successfulJobsHistoryLimit: 1
 
     persistence:
       enabled: true
@@ -135,11 +149,20 @@ spec:
       size: 1Mi
       existingClaim: nextcloud-nfs-config
 
-    livenessProbe:
-      enabled: false
+    # this seems to be required for nextcloud initialization which takes a long time
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30
+      successThreshold: 1
 
-    readinessProbe:
-      enabled: false
+    # livenessProbe:
+    #   enabled: false
+
+    # readinessProbe:
+    #   enabled: false
 
     resources:
       requests:
