@@ -31,7 +31,7 @@ spec:
   values:
     image:
       repository: ghcr.io/onedr0p/theme-park
-      tag: 1.13.6@sha256:437b79c45c1eb8f3af933ade4d094e2320a0db44737e5f053534f889d5a7cb5e
+      tag: 1.13.8@sha256:db0c9070a34cae091e8013224309113efdd72e48ffc854ed5bc118a2e6b284e8
     service:
       main:
         ports:
