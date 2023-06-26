@@ -6,4 +6,4 @@ resources:
   - namespace.yaml
   - helm-release.yaml
   - rbac.yaml
-  # - policies
+  - policies
