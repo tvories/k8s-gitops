@@ -5,7 +5,7 @@ resources:
   # - apply-ingress-auth-annotations.yaml
   # - apply-ingress-external-dns-annotations.yaml
   # - apply-ingress-whitelist-annotations.yaml
-  - remove-cpu-limit.yaml
+  # - remove-cpu-limit.yaml
   # - snapshot-cronjob-controller.yaml
   - sync-postgres-secrets.yaml
   - sync-zalando-postgres-secrets.yaml
