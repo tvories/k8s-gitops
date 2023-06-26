@@ -78,7 +78,7 @@ resource "vsphere_virtual_machine" "talos-cp" {
 
   disk {
     label       = "talos-cp-${count.index + 1}-disk1"
-    size        = "200"
+    size        = "500"
     unit_number = 1
   }
 
