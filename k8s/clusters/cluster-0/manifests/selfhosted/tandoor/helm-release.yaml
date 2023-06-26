@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: vabene1111/recipes
-      tag: 1.4.12
+      tag: 1.5.3
     env:
       TIMEZONE: "${TIMEZONE}"
       DEBUG: "0"
