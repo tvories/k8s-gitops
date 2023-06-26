@@ -22,10 +22,23 @@ spec:
     remediation:
       retries: 5
   values:
-    installCRDs: false
+    # installCRDs: false
     replicaCount: 3
-    serviceMonitor:
-      enabled: true
+
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+
+    resources:
+      requests:
+        cpu: 247m
+        memory: 443M
+      limits:
+        memory: 1336M
+
+    # serviceMonitor:
+    #   enabled: true
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
