@@ -120,7 +120,7 @@ spec:
               done
           env:
             - name: REDIS_HOST
-              value: redis
+              value: nextcloud-redis-master
             - name: REDIS_HOST_PORT
               value: "6379"
 
