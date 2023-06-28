@@ -7,5 +7,5 @@ resources:
   # - apply-ingress-whitelist-annotations.yaml
   - remove-cpu-limit.yaml
   # - snapshot-cronjob-controller.yaml
-  - sync-postgres-secrets.yaml
+  # - sync-postgres-secrets.yaml
   - sync-zalando-postgres-secrets.yaml
