@@ -8,28 +8,78 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: frigate
-      version: 8.2.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+    install:
+      createNamespace: true
+      remediation:
+        retries: 3
+    upgrade:
+      remediation:
+        retries: 3
+    uninstall:
+      keepHistory: false
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
-      # repository: docker.io/blakeblackshear/frigate
-      # repository: ghcr.io/k8s-at-home/frigate
-      tag: 0.11.1
-
-    podAnnotations:
-      configmap.reloader.stakater.com/reload: "frigate-config"
-      secret.reloader.stakater.com/reload: "frigate-secrets"
+      repository: ghcr.io/blakeblackshear/frigate
+      tag: 0.12.1
 
     env:
       TZ: ${TIMEZONE}
     envFrom:
       - secretRef:
           name: frigate
+
+    service:
+      main:
+        ports:
+          http:
+            port: &port 5000
+          rtsp:
+            enabled: true
+            port: 8554
+
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /api/version
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: &host "frigate.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - secretName: tls.frigate
+            hosts:
+              - *host
+
+    securityContext:
+      privileged: true
 
     persistence:
       data:
@@ -62,66 +112,9 @@ spec:
         hostPath: /dev
         mountPath: /dev
 
-    ingress:
-      main:
-        enabled: true
-        ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-        hosts:
-          - host: &host "frigate.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-        tls:
-          - secretName: tls.frigate
-            hosts:
-              - *host
-
-    configmap:
-      config:
-        enabled: false
-
-    securityContext:
-      privileged: true
-
-    service:
-      main:
-        ports:
-          http:
-            port: &port 5000
-
-    probes:
-      liveness:
-        enabled: false
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 40
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      readiness:
-        enabled: false
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      startup:
-        enabled: false
-        custom: true
-        spec:
-          httpGet:
-            path: /api/version
-            port: *port
-          failureThreshold: 30
-          periodSeconds: 10
+    # configmap:
+    #   config:
+    #     enabled: false
 
     affinity:
       nodeAffinity:
