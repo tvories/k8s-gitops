@@ -14,15 +14,15 @@ spec:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-    install:
-      createNamespace: true
-      remediation:
-        retries: 3
-    upgrade:
-      remediation:
-        retries: 3
-    uninstall:
-      keepHistory: false
+      install:
+        createNamespace: true
+        remediation:
+          retries: 3
+      upgrade:
+        remediation:
+          retries: 3
+      uninstall:
+        keepHistory: false
   values:
     controller:
       type: statefulset
