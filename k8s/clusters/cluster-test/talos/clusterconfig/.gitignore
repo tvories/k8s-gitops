@@ -1,3 +1,11 @@
 cluster-test-talos-test-cp-1.mcbadass.local.yaml
 cluster-test-talos-test-worker-1.mcbadass.local.yaml
 talosconfig
+cluster-test-talos-cp-2.mcbadass.local.yaml
+cluster-test-talos-cp-3.mcbadass.local.yaml
+cluster-test-talos-worker-1.mcbadass.local.yaml
+cluster-test-talos-worker-2.mcbadass.local.yaml
+cluster-test-physical2.mcbadass.local.yaml
+cluster-test-sff1.mcbadass.local.yaml
+cluster-test-physical1.mcbadass.local.yaml
+cluster-test-talos-cp-1.mcbadass.local.yaml
