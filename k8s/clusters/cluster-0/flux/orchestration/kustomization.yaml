@@ -19,3 +19,5 @@ resources:
   - ./vpn.yaml
   - ./kasten-io.yaml
   - ./database.yaml
+  # - ./security.yaml
+  - ./gitlab.yaml
