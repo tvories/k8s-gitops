@@ -22,14 +22,15 @@ spec:
       time_zone: ${TIMEZONE}
       ingress:
         class: nginx-external
-        # annotations:
-        # nginx.ingress.kubernetes.io/enable-global-auth: "false"
+        annotations:
+        nginx.ingress.kubernetes.io/enable-global-auth: "false"
         configureCertmanager: false
-        # tls:
-        #   enabled: true
-        #   secretName: gitlab-tls
+        tls:
+          enabled: true
+          secretName: global-tls
       minio:
         enabled: true
+        # ingress:
         # credentials:
         #   secret: gitlab
       initialRootPassword:
@@ -73,6 +74,11 @@ spec:
         #   servicePort: 9000
     postgresql:
       install: false
+    minio:
+      ingress:
+        tls:
+          enabled: true
+          secretName: minio-tls
     gitlab:
       gitaly:
         persistence:
@@ -85,6 +91,10 @@ spec:
           limits:
             cpu: 1800m
       webservice:
+        ingress:
+          tls:
+            enabled: true
+            secretName: gitlab-webservice-tls
         minReplicas: 1
         maxReplicas: 1
       sidekiq:
@@ -97,6 +107,11 @@ spec:
       install: true
       existingSecret: gitlab
       existingSecretKey: redis_password
+    registry:
+      ingress:
+        tls:
+          enabled: true
+          secretName: registry-tls
     certmanager:
       install: false
     nginx-ingress:
