@@ -25,9 +25,9 @@ spec:
         # annotations:
         # nginx.ingress.kubernetes.io/enable-global-auth: "false"
         configureCertmanager: false
-        tls:
-          enabled: true
-          secretName: gitlab-tls
+        # tls:
+        #   enabled: true
+        #   secretName: gitlab-tls
       minio:
         enabled: true
         # credentials:
