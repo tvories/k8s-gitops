@@ -29,9 +29,9 @@ spec:
           enabled: true
           secretName: gitlab-tls
       minio:
-        enabled: false
-        credentials:
-          secret: gitlab
+        enabled: true
+        # credentials:
+        #   secret: gitlab
       initialRootPassword:
         secret: gitlab
         key: initial_root_password
@@ -67,10 +67,10 @@ spec:
         # https: true
         # gitlab:
         #   name: gitlab.${SECRET_DOMAIN}
-        minio:
-          https: true
-          name: nas1.${SECRET_DOMAIN}
-          servicePort: 9000
+        # minio:
+        #   https: true
+        #   name: nas1.${SECRET_DOMAIN}
+        #   servicePort: 9000
     postgresql:
       install: false
     gitlab:
