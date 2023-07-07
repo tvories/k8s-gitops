@@ -56,13 +56,16 @@ spec:
           secret: gitlab
           key: smtp_password
       psql:
-        host: cnpg-gitlab-rw
+        host: postgres.database
         database: gitlab
-        username: ${SECRET_GITLAB_PGUSER}
+        username:
+          useSecret: true
+          secret: gitlab
+          key: postgres_user
         password:
           useSecret: true
-          secret: gitlab-cnpg-secret
-          key: password
+          secret: gitlab
+          key: postgres_password
       hosts:
         domain: ${SECRET_DOMAIN}
         # https: true
