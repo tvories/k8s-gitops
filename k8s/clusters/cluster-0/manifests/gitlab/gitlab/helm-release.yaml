@@ -45,16 +45,16 @@ spec:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
         reply_to: ""
-      # smtp:
-      #   enabled: true
-      #   address: gitlab@${SECRET_DOMAIN}
-      #   port: 587
-      #   user_name: ${SECRET_TVO_EMAIL}
-      #   domain: ${SECRET_DOMAIN}
-      #   starttls_auto: true
-      #   password:
-      #     secret: gitlab
-      #     key: smtp_password
+      smtp:
+        enabled: true
+        address: gitlab@${SECRET_DOMAIN}
+        port: 587
+        user_name: ${SECRET_TVO_EMAIL}
+        domain: ${SECRET_DOMAIN}
+        starttls_auto: true
+        password:
+          secret: gitlab
+          key: smtp_password
       psql:
         host: postgres.database
         database: gitlab
