@@ -33,9 +33,9 @@ spec:
         # ingress:
         # credentials:
         #   secret: gitlab
-      initialRootPassword:
-        secret: gitlab
-        key: initial_root_password
+      # initialRootPassword:
+      #   secret: gitlab
+      #   key: initial_root_password
 
       kas:
         enabled: false
