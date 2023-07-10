@@ -33,9 +33,9 @@ spec:
         # ingress:
         # credentials:
         #   secret: gitlab
-      # initialRootPassword:
-      #   secret: gitlab
-      #   key: initial_root_password
+      initialRootPassword:
+        secret: gitlab
+        key: initial_root_password
 
       kas:
         enabled: false
@@ -79,16 +79,16 @@ spec:
     #       enabled: true
     #       secretName: minio-tls
     gitlab:
-      # gitaly:
-      #   persistence:
-      #     enabled: true
-      #     volumeName: gitlab-gitaly
-      #   resources:
-      #     requests:
-      #       cpu: 80m
-      #       memory: 340M
-      #     limits:
-      #       cpu: 1800m
+      gitaly:
+        persistence:
+          enabled: true
+          volumeName: gitlab-gitaly
+        resources:
+          requests:
+            cpu: 80m
+            memory: 340M
+          limits:
+            cpu: 1800m
       webservice:
         # ingress:
         #   tls:
@@ -104,8 +104,8 @@ spec:
         maxReplicas: 1
     redis:
       install: true
-      # existingSecret: gitlab
-      # existingSecretKey: redis_password
+      existingSecret: gitlab
+      existingSecretKey: redis_password
     # registry:
     # ingress:
     #   tls:
