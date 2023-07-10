@@ -115,8 +115,8 @@ spec:
     #   tls:
     #     enabled: true
     #     secretName: registry-tls
-    # certmanager:
-    #   install: false
+    certmanager:
+      install: false
     nginx-ingress:
       enabled: false
     prometheus:
