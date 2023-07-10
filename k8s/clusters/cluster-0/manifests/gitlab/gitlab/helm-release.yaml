@@ -37,24 +37,24 @@ spec:
         secret: gitlab
         key: initial_root_password
 
-      kas:
-        enabled: false
+      # kas:
+      #   enabled: false
       pages:
         enabled: true
       email:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
         reply_to: ""
-      smtp:
-        enabled: true
-        address: gitlab@${SECRET_DOMAIN}
-        port: 587
-        user_name: ${SECRET_TVO_EMAIL}
-        domain: ${SECRET_DOMAIN}
-        starttls_auto: true
-        password:
-          secret: gitlab
-          key: smtp_password
+      # smtp:
+      #   enabled: true
+      #   address: gitlab@${SECRET_DOMAIN}
+      #   port: 587
+      #   user_name: ${SECRET_TVO_EMAIL}
+      #   domain: ${SECRET_DOMAIN}
+      #   starttls_auto: true
+      #   password:
+      #     secret: gitlab
+      #     key: smtp_password
       psql:
         host: postgres.database
         database: gitlab
@@ -77,27 +77,27 @@ spec:
         #   servicePort: 9000
     postgresql:
       install: false
-    minio:
-      ingress:
-        tls:
-          enabled: true
-          secretName: minio-tls
+    # minio:
+    #   ingress:
+    #     tls:
+    #       enabled: true
+    #       secretName: minio-tls
     gitlab:
-      gitaly:
-        persistence:
-          enabled: true
-          volumeName: gitlab-gitaly
-        resources:
-          requests:
-            cpu: 80m
-            memory: 340M
-          limits:
-            cpu: 1800m
+      # gitaly:
+      #   persistence:
+      #     enabled: true
+      #     volumeName: gitlab-gitaly
+      #   resources:
+      #     requests:
+      #       cpu: 80m
+      #       memory: 340M
+      #     limits:
+      #       cpu: 1800m
       webservice:
-        ingress:
-          tls:
-            enabled: true
-            secretName: gitlab-webservice-tls
+        # ingress:
+        #   tls:
+        #     enabled: true
+        #     secretName: gitlab-webservice-tls
         minReplicas: 1
         maxReplicas: 1
       sidekiq:
@@ -108,15 +108,15 @@ spec:
         maxReplicas: 1
     redis:
       install: true
-      existingSecret: gitlab
-      existingSecretKey: redis_password
+      # existingSecret: gitlab
+      # existingSecretKey: redis_password
     registry:
-      ingress:
-        tls:
-          enabled: true
-          secretName: registry-tls
-    certmanager:
-      install: false
+      # ingress:
+      #   tls:
+      #     enabled: true
+      #     secretName: registry-tls
+    # certmanager:
+    #   install: false
     nginx-ingress:
       enabled: false
     prometheus:
