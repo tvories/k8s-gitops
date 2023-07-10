@@ -58,10 +58,7 @@ spec:
       psql:
         host: postgres.database
         database: gitlab
-        username:
-          useSecret: true
-          secret: gitlab
-          key: postgres_user
+        username: gitlab
         password:
           useSecret: true
           secret: gitlab
