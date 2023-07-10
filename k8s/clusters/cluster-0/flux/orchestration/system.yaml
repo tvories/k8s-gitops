@@ -12,20 +12,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-kind: Kustomization
-metadata:
-  name: system-kyverno
-  namespace: flux-system
-spec:
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/system/kyverno"
-  prune: false
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: system-kyverno
+#   namespace: flux-system
+# spec:
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/system/kyverno"
+#   prune: false
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
 # ---
 # apiVersion: source.toolkit.fluxcd.io/v1beta2
 # kind: GitRepository

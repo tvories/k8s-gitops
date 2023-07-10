@@ -21,3 +21,4 @@ resources:
   - ./database.yaml
   # - ./security.yaml
   - ./gitlab.yaml
+  - ./kyverno.yaml
