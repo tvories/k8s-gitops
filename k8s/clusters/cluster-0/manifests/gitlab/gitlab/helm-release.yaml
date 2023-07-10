@@ -37,8 +37,8 @@ spec:
         secret: gitlab
         key: initial_root_password
 
-      # kas:
-      #   enabled: false
+      kas:
+        enabled: false
       pages:
         enabled: true
       email:
