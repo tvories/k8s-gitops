@@ -51,6 +51,9 @@ spec:
         AUTHENTIK_EMAIL__HOST: "${SECRET_SMTP_HOST}"
         AUTHENTIK_EMAIL__PORT: 587
         AUTHENTIK_EMAIL__USE_TLS: true
+      envFrom:
+        - secretRef:
+          name: authentik-config
 
     # Password in clear text because this is a random test instance
     authentik:
