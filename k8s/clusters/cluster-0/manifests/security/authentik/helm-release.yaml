@@ -41,7 +41,8 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-production
       hosts:
         - host: authentik.${SECRET_DOMAIN}
-          paths:- path: /
+          paths:
+            - path: /
       tls:
         - hosts:
             - authentik.${SECRET_DOMAIN}
