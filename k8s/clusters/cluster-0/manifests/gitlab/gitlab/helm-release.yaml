@@ -59,7 +59,7 @@ spec:
         reply_to: "gitlab@${SECRET_DOMAIN}"
       smtp:
         enabled: true
-        address: gitlab@${SECRET_DOMAIN}
+        address: "${SECRET_SMTP_HOST}"
         port: 587
         user_name: ${SECRET_TVO_EMAIL}
         domain: ${SECRET_DOMAIN}
