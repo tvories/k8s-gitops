@@ -102,5 +102,5 @@ spec:
           - name: INIT_POSTGRES_SUPER_PASS
             valueFrom:
               secretKeyRef:
-                name: postgres.postgres.credentials.postgresql.acid.zalan.d
+                name: postgres.postgres.credentials.postgresql.acid.zalan.do
                 key: password
