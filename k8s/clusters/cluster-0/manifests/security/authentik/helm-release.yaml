@@ -78,30 +78,30 @@ spec:
         scrapeTimeout: 3s
       rules:
         create: true
-    initContainers:
-      init-db:
-        image: ghcr.io/onedr0p/postgres-init:14.8
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - secretRef:
-              name: authentik-config
-        env:
-          - name: INIT_POSTGRES_DBNAME
-            value: authentik
-          - name: INIT_POSTGRES_HOST
-            value: postgres.database
-          - name: INIT_POSTGRES_USER
-            valueFrom:
-              secretKeyRef:
-                name: authentik-config
-                key: AUTHENTIK_POSTGRESQL__USER
-          - name: INIT_POSTGRES_PASS
-            valueFrom:
-              secretKeyRef:
-                name: authentik-config
-                key: AUTHENTIK_POSTGRESQL__PASSWORD
-          - name: INIT_POSTGRES_SUPER_PASS
-            valueFrom:
-              secretKeyRef:
-                name: postgres.postgres.credentials.postgresql.acid.zalan.do
-                key: password
+    # initContainers:
+    #   init-db:
+    #     image: ghcr.io/onedr0p/postgres-init:14.8
+    #     imagePullPolicy: IfNotPresent
+    #     envFrom:
+    #       - secretRef:
+    #           name: authentik-config
+    #     env:
+    #       - name: INIT_POSTGRES_DBNAME
+    #         value: authentik
+    #       - name: INIT_POSTGRES_HOST
+    #         value: postgres.database
+    #       - name: INIT_POSTGRES_USER
+    #         valueFrom:
+    #           secretKeyRef:
+    #             name: authentik-config
+    #             key: AUTHENTIK_POSTGRESQL__USER
+    #       - name: INIT_POSTGRES_PASS
+    #         valueFrom:
+    #           secretKeyRef:
+    #             name: authentik-config
+    #             key: AUTHENTIK_POSTGRESQL__PASSWORD
+    #       - name: INIT_POSTGRES_SUPER_PASS
+    #         valueFrom:
+    #           secretKeyRef:
+    #             name: postgres.postgres.credentials.postgresql.acid.zalan.do
+    #             key: password
