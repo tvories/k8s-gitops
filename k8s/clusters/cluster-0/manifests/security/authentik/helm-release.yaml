@@ -83,7 +83,7 @@ spec:
         imagePullPolicy: IfNotPresent
         envFrom:
           - secretRef:
-              name: authentik
+              name: authentik-config
         env:
           - name: INIT_POSTGRES_DBNAME
             value: authentik
@@ -92,12 +92,12 @@ spec:
           - name: INIT_POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: authentik
+                name: authentik-config
                 key: AUTHENTIK_POSTGRESQL__USER
           - name: INIT_POSTGRES_PASS
             valueFrom:
               secretKeyRef:
-                name: authentik
+                name: authentik-config
                 key: AUTHENTIK_POSTGRESQL__PASSWORD
           - name: INIT_POSTGRES_SUPER_PASS
             valueFrom:
