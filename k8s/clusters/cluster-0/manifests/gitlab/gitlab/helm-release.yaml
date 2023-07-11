@@ -56,7 +56,7 @@ spec:
       email:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
-        reply_to: ""
+        reply_to: "gitlab@${SECRET_DOMAIN}"
       smtp:
         enabled: true
         address: gitlab@${SECRET_DOMAIN}
