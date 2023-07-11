@@ -5,6 +5,9 @@ kind: HelmRelease
 metadata:
   name: authentik
   namespace: security
+spec:
+  releaseName: authentik
+  interval: 15m
   chart:
     spec:
       # renovate: registryUrl=https://charts.goauthentik.io
@@ -14,7 +17,14 @@ metadata:
         kind: HelmRepository
         name: authentik-charts
         namespace: flux-system
-      interval: 5m
+      interval: 15m
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
   values:
     serviceAccount:
       create: false
