@@ -35,7 +35,7 @@ spec:
       AUTHENTIK_EMAIL__USE_TLS: "true"
     envFrom:
       - secretRef:
-        name: authentik-config
+          name: authentik-config
 
     ingress:
       enabled: true
