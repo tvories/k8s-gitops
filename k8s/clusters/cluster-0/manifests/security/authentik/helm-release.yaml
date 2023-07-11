@@ -1,0 +1,96 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: security
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.goauthentik.io
+      chart: authentik
+      version: 2023.6.2
+      sourceRef:
+        kind: HelmRepository
+        name: authentik-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    serviceAccount:
+      create: false
+
+    ingress:
+      enabled: true
+      ingressClassName: nginx-external
+      annotations:
+        nginx.ingress.kubernetes.io/router.entrypoints: websecure
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+        nginx.org/websocket-services: authentik
+        nginx.ingress.kubernetes.io/enable-global-auth: "false"
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - host: authentik.${SECRET_DOMAIN}
+          paths:- path: /
+      tls:
+        - hosts:
+            - authentik.${SECRET_DOMAIN}
+
+      env:
+        AUTHENTIK_EMAIL__HOST: "${SECRET_SMTP_HOST}"
+        AUTHENTIK_EMAIL__PORT: 587
+        AUTHENTIK_EMAIL__USE_TLS: true
+
+    # Password in clear text because this is a random test instance
+    authentik:
+      log_level: debug
+      error_reporting:
+        enabled: true
+      outposts:
+        docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
+      # postgresql:
+      #   host: nordrassil-storage-rw.storage.svc.cluster.local
+      #   user: authentik-admin
+      #   name: authentik
+      #   password: ${AUTHENTIK_PG_PASSWORD}
+    redis:
+      enabled: true
+      persistence:
+        enabled: false
+      auth:
+        enabled: false
+
+    prometheus:
+      serviceMonitor:
+        create: true
+        interval: 30s
+        scrapeTimeout: 3s
+      rules:
+        create: true
+    initContainers:
+      init-db:
+        image: ghcr.io/onedr0p/postgres-init:14.8
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - secretRef:
+              name: authentik
+        env:
+          - name: INIT_POSTGRES_DBNAME
+            value: authentik
+          - name: INIT_POSTGRES_HOST
+            value: postgres.database
+          - name: INIT_POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: authentik
+                key: AUTHENTIK_POSTGRESQL__USER
+          - name: INIT_POSTGRES_PASS
+            valueFrom:
+              secretKeyRef:
+                name: authentik
+                key: AUTHENTIK_POSTGRESQL__PASSWORD
+          - name: INIT_POSTGRES_SUPER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: postgres.postgres.credentials.postgresql.acid.zalan.d
+                key: password
