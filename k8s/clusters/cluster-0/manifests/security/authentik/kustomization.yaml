@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./helm-release.yaml
   - ./externalsecret.yaml
-  - ./outpost-ingress.yaml
+  # - ./outpost-ingress.yaml
