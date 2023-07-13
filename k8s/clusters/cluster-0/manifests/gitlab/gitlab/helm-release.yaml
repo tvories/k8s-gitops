@@ -32,65 +32,37 @@ spec:
         object_store:
           enabled: true
           proxy_download: true
-          storage_options:
-            {}
-            # server_side_encryption:
-            # server_side_encryption_kms_key_id
-          connection:
-            secret: gitlab
         lfs:
           enabled: true
           proxy_download: true
           bucket: gitlab-lfs
-          connection:
-            {}
-            # secret:
-            # key:
         artifacts:
           enabled: true
           proxy_download: true
           bucket: gitlab-artifacts
-          connection:
-            {}
-            # secret:
-            # key:
         uploads:
           enabled: true
           proxy_download: true
           bucket: gitlab-uploads
-          connection:
-            {}
-            # secret:
-            # key:
         packages:
           enabled: true
           proxy_download: true
           bucket: gitlab-packages
-          connection:
-            secret: gitlab
         externalDiffs:
           enabled: true
           when:
           proxy_download: true
           bucket: gitlab-mr-diffs
-          connection:
-            secret: gitlab
         terraformState:
           enabled: true
           bucket: gitlab-terraform-state
-          connection:
-            secret: gitlab
         ciSecureFiles:
           enabled: true
           bucket: gitlab-ci-secure-files
-          connection:
-            secret: gitlab
         dependencyProxy:
           enabled: true
           proxy_download: true
           bucket: gitlab-dependency-proxy
-          connection:
-            secret: gitlab
       minio:
         enabled: false
         # ingress:
