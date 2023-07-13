@@ -66,26 +66,31 @@ spec:
           enabled: true
           proxy_download: true
           bucket: gitlab-packages
-          connection: {}
+          connection:
+            secret: gitlab
         externalDiffs:
           enabled: true
           when:
           proxy_download: true
           bucket: gitlab-mr-diffs
-          connection: {}
+          connection:
+            secret: gitlab
         terraformState:
           enabled: true
           bucket: gitlab-terraform-state
-          connection: {}
+          connection:
+            secret: gitlab
         ciSecureFiles:
           enabled: true
           bucket: gitlab-ci-secure-files
-          connection: {}
+          connection:
+            secret: gitlab
         dependencyProxy:
           enabled: true
           proxy_download: true
           bucket: gitlab-dependency-proxy
-          connection: {}
+          connection:
+            secret: gitlab
       minio:
         enabled: false
         # ingress:
