@@ -68,7 +68,8 @@ spec:
         ciSecureFiles:
           enabled: true
           bucket: gitlab-ci-secure-files
-          connection: {}
+          connection:
+            secret: gitlab
         dependencyProxy:
           enabled: true
           proxy_download: true
