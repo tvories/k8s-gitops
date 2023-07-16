@@ -19,7 +19,7 @@ spec:
     image:
       # renovate: docker-image
       repository: ghcr.io/onedr0p/prowlarr-nightly
-      tag: "1.7.3.3719"
+      tag: "1.7.3.3720"
       pullPolicy: IfNotPresent
 
     hostname: prowlarr
