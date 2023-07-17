@@ -80,17 +80,17 @@ spec:
         # ingress:
         # credentials:
         #   secret: gitlab
-      praefect:
-        enabled: true
-        virtualStorages:
-          - name: default
-            gitalyReplicas: 3
-            maxUnavailable: 1
-        #     persistence:
-        #       enabled: true
-        #       size: 5Gi
-        #       accessMode: ReadWriteOnce
-        #       storageClass: ceph-block
+      # praefect:
+      #   enabled: true
+      #   virtualStorages:
+      #     - name: default
+      #       gitalyReplicas: 3
+      #       maxUnavailable: 1
+      #     persistence:
+      #       enabled: true
+      #       size: 5Gi
+      #       accessMode: ReadWriteOnce
+      #       storageClass: ceph-block
 
       initialRootPassword:
         secret: gitlab
