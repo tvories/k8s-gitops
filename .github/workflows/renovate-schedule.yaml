@@ -15,11 +15,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
-      - name: Renovate Helm Releases
-        uses: k8s-at-home/renovate-helm-releases@v1
-        with:
-          cluster-path: "./cluster"
-
       - name: Create pull request for renovatebot helm-release annotations
         uses: peter-evans/create-pull-request@v5
         with:
