@@ -139,9 +139,9 @@ spec:
     #       secretName: minio-tls
     gitlab:
       gitaly:
-        persistence:
-          enabled: true
-          volumeName: gitlab-gitaly
+        # persistence:
+        #   enabled: true
+        #   volumeName: gitlab-gitaly
         resources:
           requests:
             cpu: 80m
