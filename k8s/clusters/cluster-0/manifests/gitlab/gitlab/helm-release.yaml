@@ -82,10 +82,10 @@ spec:
         #   secret: gitlab
       praefect:
         enabled: true
-        # virtualStorages:
-        #   - name: default
-        #     gitalyReplicas: 3
-        #     maxUnavailable: 1
+        virtualStorages:
+          - name: default
+            gitalyReplicas: 3
+            maxUnavailable: 1
         #     persistence:
         #       enabled: true
         #       size: 5Gi
