@@ -28,53 +28,53 @@ spec:
         tls:
           enabled: true
           secretName: global-tls
-      appConfig:
-        object_store:
-          enabled: false
-          proxy_download: true
-          storage_options: {}
-          connection:
-            secret: gitlab-config
-        lfs:
-          enabled: true
-          proxy_download: true
-          bucket: gitlab-lfs
-          connection: {}
-        artifacts:
-          enabled: true
-          proxy_download: true
-          bucket: gitlab-artifacts
-          connection: {}
-        uploads:
-          enabled: true
-          proxy_download: true
-          bucket: gitlab-uploads
-          connection: {}
-        packages:
-          enabled: true
-          proxy_download: true
-          bucket: gitlab-packages
-          connection: {}
-        externalDiffs:
-          enabled: true
-          when:
-          proxy_download: true
-          bucket: gitlab-mr-diffs
-          connection: {}
-        terraformState:
-          enabled: true
-          bucket: gitlab-terraform-state
-          connection: {}
-        ciSecureFiles:
-          enabled: true
-          bucket: gitlab-ci-secure-files
-          connection:
-            secret: gitlab-config
-        dependencyProxy:
-          enabled: true
-          proxy_download: true
-          bucket: gitlab-dependency-proxy
-          connection: {}
+      # appConfig:
+      #   object_store:
+      #     enabled: true
+      #     proxy_download: true
+      #     storage_options: {}
+      #     connection:
+      #       secret: gitlab-config
+      #   lfs:
+      #     enabled: true
+      #     proxy_download: true
+      #     bucket: gitlab-lfs
+      #     connection: {}
+      #   artifacts:
+      #     enabled: true
+      #     proxy_download: true
+      #     bucket: gitlab-artifacts
+      #     connection: {}
+      #   uploads:
+      #     enabled: true
+      #     proxy_download: true
+      #     bucket: gitlab-uploads
+      #     connection: {}
+      #   packages:
+      #     enabled: true
+      #     proxy_download: true
+      #     bucket: gitlab-packages
+      #     connection: {}
+      #   externalDiffs:
+      #     enabled: true
+      #     when:
+      #     proxy_download: true
+      #     bucket: gitlab-mr-diffs
+      #     connection: {}
+      #   terraformState:
+      #     enabled: true
+      #     bucket: gitlab-terraform-state
+      #     connection: {}
+      #   ciSecureFiles:
+      #     enabled: true
+      #     bucket: gitlab-ci-secure-files
+      #     connection:
+      #       secret: gitlab-config
+      #   dependencyProxy:
+      #     enabled: true
+      #     proxy_download: true
+      #     bucket: gitlab-dependency-proxy
+      #     connection: {}
       minio:
         enabled: false
         # ingress:
