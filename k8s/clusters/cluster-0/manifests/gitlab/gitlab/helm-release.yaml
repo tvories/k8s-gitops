@@ -34,7 +34,7 @@ spec:
           proxy_download: true
           storage_options: {}
           connection:
-            secret: gitlab
+            secret: gitlab-config
         lfs:
           enabled: true
           proxy_download: true
@@ -69,7 +69,7 @@ spec:
           enabled: true
           bucket: gitlab-ci-secure-files
           connection:
-            secret: gitlab
+            secret: gitlab-config
         dependencyProxy:
           enabled: true
           proxy_download: true
@@ -79,7 +79,7 @@ spec:
         enabled: false
         # ingress:
         # credentials:
-        #   secret: gitlab
+        #   secret: gitlab-config
       # praefect:
       #   enabled: true
       #   virtualStorages:
@@ -93,13 +93,13 @@ spec:
       #       storageClass: ceph-block
 
       initialRootPassword:
-        secret: gitlab
+        secret: gitlab-config
         key: initial_root_password
 
       kas:
         enabled: false
       pages:
-        enabled: true
+        enabled: false
       email:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
@@ -112,7 +112,7 @@ spec:
         domain: ${SECRET_DOMAIN}
         starttls_auto: true
         password:
-          secret: gitlab
+          secret: gitlab-config
           key: smtp_password
       psql:
         host: postgres.database
@@ -120,7 +120,7 @@ spec:
         username: gitlab
         password:
           useSecret: true
-          secret: gitlab
+          secret: gitlab-config
           key: postgres_password
       hosts:
         domain: ${SECRET_DOMAIN}
@@ -163,7 +163,7 @@ spec:
         maxReplicas: 1
     redis:
       install: true
-      # existingSecret: gitlab
+      # existingsecret: gitlab-config
       # existingSecretKey: redis_password
     # registry:
     # ingress:
