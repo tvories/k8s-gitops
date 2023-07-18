@@ -30,7 +30,7 @@ spec:
           secretName: global-tls
       appConfig:
         object_store:
-          enabled: true
+          enabled: false
           proxy_download: true
           storage_options: {}
           connection:
