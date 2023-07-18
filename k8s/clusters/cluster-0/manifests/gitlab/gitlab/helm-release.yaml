@@ -97,9 +97,9 @@ spec:
         key: initial_root_password
 
       kas:
-        enabled: false
+        enabled: true
       pages:
-        enabled: false
+        enabled: true
       email:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
@@ -149,10 +149,10 @@ spec:
           limits:
             cpu: 1800m
       webservice:
-        # ingress:
-        #   tls:
-        #     enabled: true
-        #     secretName: gitlab-webservice-tls
+        ingress:
+          tls:
+            enabled: true
+            secretName: gitlab-webservice-tls
         minReplicas: 1
         maxReplicas: 1
       sidekiq:
@@ -165,11 +165,11 @@ spec:
       install: true
       # existingsecret: gitlab-config
       # existingSecretKey: redis_password
-    # registry:
-    # ingress:
-    #   tls:
-    #     enabled: true
-    #     secretName: registry-tls
+    registry:
+    ingress:
+      tls:
+        enabled: true
+        secretName: registry-tls
     certmanager:
       install: false
     nginx-ingress:
