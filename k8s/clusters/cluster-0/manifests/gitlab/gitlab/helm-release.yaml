@@ -76,7 +76,7 @@ spec:
       #     bucket: gitlab-dependency-proxy
       #     connection: {}
       minio:
-        enabled: false
+        enabled: true
         # ingress:
         # credentials:
         #   secret: gitlab-config
