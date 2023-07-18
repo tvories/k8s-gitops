@@ -127,16 +127,16 @@ spec:
         https: true
         gitlab:
           name: gitlab-helm.${SECRET_DOMAIN}
-        # minio:
-        #   https: true
-        #   name: minio-gitlab.${SECRET_DOMAIN}
+        minio:
+          https: true
+          name: minio-gitlab.${SECRET_DOMAIN}
     postgresql:
       install: false
-    # minio:
-    #   ingress:
-    #     tls:
-    #       enabled: true
-    #       secretName: minio-tls
+    minio:
+      ingress:
+        tls:
+          enabled: true
+          secretName: minio-tls
     gitlab:
       gitaly:
         #   persistence:
