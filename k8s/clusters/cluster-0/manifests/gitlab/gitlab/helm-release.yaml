@@ -165,11 +165,11 @@ spec:
       install: true
       # existingsecret: gitlab-config
       # existingSecretKey: redis_password
-    registry:
-      ingress:
-        tls:
-          enabled: true
-          secretName: registry-tls
+    # registry:
+    #   ingress:
+    #     tls:
+    #       enabled: true
+    #       secretName: registry-tls
     certmanager:
       install: false
     nginx-ingress:
