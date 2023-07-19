@@ -81,7 +81,7 @@ spec:
         # credentials:
         #   secret: gitlab-config
       praefect:
-        enabled: true
+        enabled: false
         virtualStorages:
           - name: default
             gitalyReplicas: 3
