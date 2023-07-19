@@ -158,6 +158,10 @@ spec:
       sidekiq:
         minReplicas: 1
         maxReplicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 600M
       gitlab-shell:
         minReplicas: 1
         maxReplicas: 1
