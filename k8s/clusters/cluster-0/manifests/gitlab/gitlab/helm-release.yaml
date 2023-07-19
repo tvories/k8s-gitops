@@ -80,12 +80,12 @@ spec:
         # ingress:
         # credentials:
         #   secret: gitlab-config
-      # praefect:
-      #   enabled: true
-      #   virtualStorages:
-      #     - name: default
-      #       gitalyReplicas: 3
-      #       maxUnavailable: 1
+      praefect:
+        enabled: true
+        virtualStorages:
+          - name: default
+            gitalyReplicas: 3
+            maxUnavailable: 1
       #     persistence:
       #       enabled: true
       #       size: 5Gi
@@ -138,16 +138,16 @@ spec:
           enabled: true
           secretName: minio-tls
     gitlab:
-      gitaly:
-        #   persistence:
-        #     enabled: true
-        #     volumeName: gitlab-gitaly
-        resources:
-          requests:
-            cpu: 80m
-            memory: 340M
-          limits:
-            cpu: 1800m
+      # gitaly:
+      #   #   persistence:
+      #   #     enabled: true
+      #   #     volumeName: gitlab-gitaly
+      #   resources:
+      #     requests:
+      #       cpu: 80m
+      #       memory: 340M
+      #     limits:
+      #       cpu: 1800m
       webservice:
         ingress:
           tls:
