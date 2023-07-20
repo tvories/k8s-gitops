@@ -10,15 +10,15 @@ spec:
       init-db:
         image: ghcr.io/onedr0p/postgres-init:14.8
         env:
-          - name: POSTGRES_HOST
+          - name: INIT_POSTGRES_HOST
             value: postgres.database
-          - name: POSTGRES_DB
+          - name: INIT_POSTGRES_DB
             value: hass
-          - name: POSTGRES_USER
+          - name: INIT_POSTGRES_USER
             value: ${SECRET_HASS_PGUSER}
-          - name: POSTGRES_PASS
+          - name: INIT_POSTGRES_PASS
             value: ${SECRET_HASS_PGPASSWORD}
-          - name: POSTGRES_SUPER_PASS
+          - name: INIT_POSTGRES_SUPER_PASS
             valueFrom:
               secretKeyRef:
                 name: postgres.postgres.credentials.postgresql.acid.zalan.do
