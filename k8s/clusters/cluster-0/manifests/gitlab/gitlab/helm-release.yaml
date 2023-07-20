@@ -99,7 +99,7 @@ spec:
       kas:
         enabled: true
       pages:
-        enabled: true
+        enabled: false
         resources:
           requests:
             cpu: 300m
