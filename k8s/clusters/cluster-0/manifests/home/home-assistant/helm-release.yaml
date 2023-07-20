@@ -55,6 +55,7 @@ spec:
 
     service:
       main:
+        externalTrafficPolicy: Local
         type: LoadBalancer
         loadBalancerIP: "${LB_HOMEASSISTANT}"
         ports:
