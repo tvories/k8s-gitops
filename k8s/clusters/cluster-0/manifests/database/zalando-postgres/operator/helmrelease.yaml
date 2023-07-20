@@ -80,6 +80,8 @@ spec:
   values:
     envs:
       targetNamespace: database
+      resourcesVisible: "True"
+      operatorApiUrl: "http://zalando-postgres-postgres-operator:8080"
     ingress:
       enabled: true
       ingressClassName: nginx-internal
