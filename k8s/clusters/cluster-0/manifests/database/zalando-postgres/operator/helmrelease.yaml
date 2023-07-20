@@ -89,8 +89,8 @@ spec:
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
       hosts:
         - host: &host "zalando.${SECRET_DOMAIN}"
-          paths:
-            - path: /
+          # paths:
+          #   - path: /
       tls:
         - secretName: *host
           hosts:
