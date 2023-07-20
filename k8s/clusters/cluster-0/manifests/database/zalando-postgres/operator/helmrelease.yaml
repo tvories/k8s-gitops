@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -57,3 +58,40 @@ spec:
       requests:
         cpu: 5m
         memory: 32M
+
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: zalando-postgres-operator-ui
+  namespace: database
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: postgres-operator-ui
+      version: 1.10.0
+      sourceRef:
+        kind: HelmRepository
+        name: zalando-postgres-operator
+        namespace: flux-system
+      interval: 5m
+  values:
+    envs:
+      targetNamespace: database
+    ingress:
+      enabled: true
+      ingressClassName: nginx-internal
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+      hosts:
+        - host: &host "zalando.${SECRET_DOMAIN}"
+          paths:
+            - path: /
+      tls:
+        - secretName: *host
+          hosts:
+            - *host
