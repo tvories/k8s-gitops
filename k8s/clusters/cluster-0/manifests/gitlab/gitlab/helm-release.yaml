@@ -17,7 +17,7 @@ spec:
         name: gitlab-charts
         namespace: flux-system
       interval: 15m
-  timeout: 20m
+  timeout: 30m
   values:
     global:
       edition: ee
@@ -102,10 +102,6 @@ spec:
         enabled: true
       pages:
         enabled: true
-        resources:
-          requests:
-            cpu: 300m
-            memory: 512M
       email:
         display_name: GitLab
         from: gitlab@${SECRET_DOMAIN}
