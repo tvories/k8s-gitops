@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -6,41 +7,67 @@ metadata:
   namespace: home
 spec:
   releaseName: home-assistant
-  interval: 5m
+  interval: 15m
   chart:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: home-assistant
-      version: 13.4.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+      interval: 15m
+  install:
+    remediation:
+      retries: 1
+  upgrade:
+    remediation:
+      retries: 1
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
   values:
-    # probes:
-    #   liveness:
-    #     enabled: false
-    #   readiness:
-    #     enabled: false
-    # imagePullSecrets:
-    # - name: regcred
+    initContainers:
+      01-init-db:
+        image: ghcr.io/onedr0p/postgres-init:14.8
+        imagePullPolicy: IfNotPresent
+        envFrom: &envFrom
+          - secretRef:
+              name: home-assistant-secret
+
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: homeassistant/home-assistant
       tag: 2023.7.2
-    persistence:
-      config:
-        enabled: true
-        existingClaim: homeassistant-config
-    extraEnv:
+
+    env:
       TZ: "${TIMEZONE}"
-    # envFrom:
-    # - secretRef:
-    #     name: home-assistant-secrets
+      POSTGRES_HOST: postgres-rw.database.svc.cluster.local
+      POSTGRES_DB: hass
+    envFrom:
+      - secretRef:
+          name: home-assistant-secret
+
+    service:
+      main:
+        type: LoadBalancer
+        loadBalancerIP: "${LB_HOMEASSISTANT}"
+        ports:
+          http:
+            port: 8123
+
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx-external"
+        ingressClassName: nginx-external
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
@@ -53,23 +80,11 @@ spec:
           - secretName: tls.homeassistant
             hosts:
               - *host
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
-    service:
-      main:
-        type: LoadBalancer
-        loadBalancerIP: "${LB_HOMEASSISTANT}"
-        externalTrafficPolicy: Local
-    mariadb:
-      enabled: false
-    postgresql:
-      enabled: false
 
-    metrics:
-      enabled: false
-      bearerTokenSecret:
-        # name: ${SECRET_HASS_USERNAME}
-        key: ${SECRET_HASS_PROMETHEUS_TOKEN}
+    persistence:
+      config:
+        enabled: true
+        existingClaim: homeassistant-config
 
     resources:
       requests:
@@ -80,14 +95,13 @@ spec:
       codeserver:
         enabled: true
         image:
-          # repository: codercom/code-server
-          tag: 4.8.2
+          repository: codercom/code-server
+          tag: 4.14.1
         workingDir: "/config"
-        #TODO: Eventually add a git secret here
-        # git:
-        #   deployKeySecret: home-assistant-code-server-secret
         env:
           password: ${SECRET_CODESERVER_PASSWORD}
+          TZ: "${TIMEZONE}"
+          HASS_SERVER: http://localhost:8123
         args:
           - --auth
           - "none"
@@ -117,11 +131,3 @@ spec:
           requests:
             cpu: 11m
             memory: 94M
-    # podAnnotations:
-    #   secret.reloader.stakater.com/reload: home-assistant-secrets
-    # affinity:
-    #   nodeAffinity:
-    #     requiredDuringSchedulingIgnoredDuringExecution:
-    #       nodeSelectorTerms:
-    #       - matchExpressions:
-    #         - {key: "feature.node.kubernetes.io/custom-tplink-bluetooth", operator: In, values: ["true"]}
