@@ -36,6 +36,8 @@ spec:
             value: "off"
           - name: DOT
             value: "off"
+          - name: TZ
+            value: ${TIMEZONE}
 
         envFrom:
           - secretRef:
