@@ -38,6 +38,8 @@ spec:
             value: "off"
           - name: TZ
             value: ${TIMEZONE}
+          - name: WIREGUARD_PRESHARED_KEY
+            value: ""
 
         envFrom:
           - secretRef:
