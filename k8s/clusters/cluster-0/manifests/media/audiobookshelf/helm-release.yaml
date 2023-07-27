@@ -34,7 +34,7 @@ spec:
     env:
       TZ: "${TIMEZONE}"
       CONFIG_PATH: /config
-      METADATA_PATH: /config/metadata
+      METADATA_PATH: /metadata
       # AUDIOBOOKSHELF_UID: 568
       # AUDIOBOOKSHELF_GID: 568
 
@@ -70,7 +70,7 @@ spec:
         existingClaim: audiobookshelf-config
       metadata:
         enabled: true
-        mountPath: /config/metadata
+        mountPath: /metadata
         existingClaim: audiobookshelf-metadata
       # media:
       #   enabled: true
