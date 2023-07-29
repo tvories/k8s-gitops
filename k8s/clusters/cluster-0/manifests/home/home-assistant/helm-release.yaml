@@ -97,7 +97,7 @@ spec:
         enabled: true
         image:
           repository: codercom/code-server
-          tag: 4.15.0
+          tag: 4.16.0
         workingDir: "/config"
         env:
           password: ${SECRET_CODESERVER_PASSWORD}
