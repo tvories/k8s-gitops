@@ -18,6 +18,9 @@ objects:
     - cat
     - car
   filters:
+    car:
+      mask:
+        - 633,437,732,423,695,366,439,373,442,449
     person:
       min_area: 2500
       max_area: 100000
