@@ -127,20 +127,16 @@ spec:
             hosts:
               - *host
 
-    initContainers:
-      mam:
-        image: ghcr.io/nicolaka/netshoot:v0.11
-        command:
-          [
-            "sh",
-            "-c",
-            "curl -c /config/qBittorrent/mam.cookies -b 'mam_id=${MAM_ID}' https://t.myanonamouse.net/json/dynamicSeedbox.php",
-          ]
-        volumeMounts:
-          - name: config
-            mountPath: /config
-        securityContext:
-          runAsUser: 568
+    lifecyle:
+      postStart:
+        exec:
+          command:
+            [
+              "curl",
+              "-c /config/qBittorrent/mam.cookies",
+              "-b 'mam_id=${MAM_ID}'",
+              "{$MAM_URL}",
+            ]
 
     resources:
       requests:
