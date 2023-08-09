@@ -9,14 +9,24 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.0.1
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 1
+  upgrade:
+    remediation:
+      retries: 1
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+
   values:
     image:
-      # renovate: docker-image
       repository: ghcr.io/onedr0p/qbittorrent
       tag: 4.5.4@sha256:f0a74313d750bc437ba2ad34f3412de5ab9a978f3f5b74227a1bda69271fef3e
 
@@ -43,6 +53,9 @@ spec:
       # USE_PROFILE: "true"
       QBITTORRENT__PORT: &port 8080
       QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
+    envFrom:
+      - secretRef:
+          name: qbittorrent-config
 
     service:
       main:
@@ -114,9 +127,24 @@ spec:
             hosts:
               - *host
 
+    initContainers:
+      mam:
+        image: ghcr.io/nicolaka/netshoot:v0.11
+        command:
+          [
+            "sh",
+            "-c",
+            "curl -c /config/qBittorrent/mam.cookies -b 'mam_id=${MAM_ID}' https://t.myanonamouse.net/json/dynamicSeedbox.php",
+          ]
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        securityContext:
+          runAsUser: 568
+
     resources:
       requests:
         cpu: 11m
         memory: 381M
-      limits:
-        memory: 1426M
+      # limits:
+      #   memory: 1426M

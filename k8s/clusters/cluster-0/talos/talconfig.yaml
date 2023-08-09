@@ -1,8 +1,8 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.4.5
-kubernetesVersion: v1.24.15
+talosVersion: v1.4.7
+kubernetesVersion: v1.26.7
 endpoint: https://${cluster_name}.${domain_name}:6443
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -66,6 +66,21 @@ nodes:
   - hostname: sff1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.97
+    installDisk: /dev/sda
+    patches:
+      - |-
+        machine:
+          install:
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
+
+  - hostname: m720q-1.${domain_name}
+    controlPlane: true
+    ipAddress: 192.168.80.99
     installDisk: /dev/sda
     patches:
       - |-

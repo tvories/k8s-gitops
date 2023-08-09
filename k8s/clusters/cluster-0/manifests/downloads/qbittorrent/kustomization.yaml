@@ -5,6 +5,7 @@ namespace: downloads
 resources:
   - ./pvc.yaml
   - ./helm-release.yaml
+  - ./externalsecret.yaml
 configMapGenerator:
   - name: qbittorrent-config
     files:
