@@ -133,7 +133,7 @@ spec:
           command:
             [
               "curl",
-              "-c /config/qBittorrent/mam.cookies",
+              "-c /config/qBittorrent/mam.cookie",
               "-b 'mam_id=${MAM_ID}'",
               "{$MAM_URL}",
             ]
