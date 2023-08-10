@@ -123,6 +123,9 @@ spec:
           - name: "sff1"
             devices:
               - name: "sdb"
+          - name: "m720q-1"
+            devices:
+              - name: "nvme0n1"
 
     ingress:
       dashboard:
