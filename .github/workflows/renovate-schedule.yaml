@@ -1,6 +1,10 @@
 ---
 name: Schedule - Renovate Helm Releases
 
+env:
+  RENOVATE_AUTODISCOVER: true
+  RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
+
 on: # yamllint disable-line rule:truthy
   workflow_dispatch:
   schedule:
