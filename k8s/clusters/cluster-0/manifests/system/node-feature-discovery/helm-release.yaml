@@ -152,3 +152,8 @@ spec:
                 - pciId:
                     vendor: ["8086"]
                     device: ["0162"]
+            - name: "intel-gpu"
+              matchOn:
+                - pciId:
+                    vendor: ["8086"]
+                    class: ["0600"]
