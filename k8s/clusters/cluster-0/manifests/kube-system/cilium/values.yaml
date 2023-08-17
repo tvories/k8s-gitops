@@ -1,6 +1,6 @@
 cluster:
-  name: "${CLUSTER_NAME}"
-  id: "${CLUSTER_ID}"
+  name: cluster-0
+  id: 1
 
 cni:
   exclusive: false
@@ -14,7 +14,7 @@ bgp:
 bgpControlPlane:
   enabled: true
 
-k8sServiceHost: cluster-0.${SECRET_INTERNAL_DOMAIN}
+k8sServiceHost: cluster-0.mcbadass.local
 k8sServicePort: 6443
 
 rollOutCiliumPods: true
