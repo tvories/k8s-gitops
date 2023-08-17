@@ -5,7 +5,7 @@ metadata:
   name: cilium
   namespace: kube-system
 spec:
-  interval: 5m
+  interval: 15m
   timeout: 30m
   chart:
     spec:
@@ -15,13 +15,16 @@ spec:
         kind: HelmRepository
         name: cilium-charts
         namespace: flux-system
-      interval: 5m
+      interval: 15m
   install:
     remediation:
       retries: 2
   upgrade:
     remediation:
       retries: 2
+  valuesFrom:
+    - kind: ConfigMap
+      name: cilium-values
   values:
     securityContext:
       privileged: true
@@ -29,21 +32,21 @@ spec:
       name: "${CLUSTER_NAME}"
       id: "${CLUSTER_ID}"
 
-    rollOutCiliumPods: true
+    # rollOutCiliumPods: true
 
-    localRedirectPolicy: true
+    # localRedirectPolicy: true
 
-    kubeProxyReplacement: "strict"
-    kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+    # kubeProxyReplacement: "strict"
+    # kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 
     ipv4NativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
 
-    k8sServiceHost: "cluster-0.${SECRET_INTERNAL_DOMAIN}"
-    k8sServicePort: 6443
+    # k8sServiceHost: "cluster-0.${SECRET_INTERNAL_DOMAIN}"
+    # k8sServicePort: 6443
 
-    loadBalancer:
-      algorithm: "maglev"
-      mode: "dsr"
+    # loadBalancer:
+    #   algorithm: "maglev"
+    #   mode: "dsr"
 
     tunnel: "disabled"
 
@@ -55,9 +58,6 @@ spec:
     ipam:
       mode: "kubernetes"
 
-    operator:
-      rollOutPods: true
-
     containerRuntime:
       integration: containerd
 
@@ -65,23 +65,33 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
-      metrics:
-        enabled:
-          - dns:query;ignoreAAAA
-          - drop
-          - tcp
-          - flow
-          - port-distribution
-          - icmp
-          - http
-      relay:
+      dashboards:
         enabled: true
-        rollOutPods: true
+        label: grafana_dashboard
+        namespace: monitoring
+        labelValue: "1"
+        annotations: {}
+      # metrics:
+      #   enabled:
+      #     - dns:query;ignoreAAAA
+      #     - drop
+      #     - tcp
+      #     - flow
+      #     - port-distribution
+      #     - icmp
+      #     - http
+      # relay:
+      #   enabled: true
+      #   rollOutPods: true
+      #   prometheus:
+      #     enabled: true
+      relay:
         prometheus:
-          enabled: true
+          serviceMonitor:
+            enabled: true
       ui:
         enabled: true
-        rollOutPods: true
+        # rollOutPods: true
         ingress:
           enabled: true
           className: nginx-internal
@@ -95,7 +105,16 @@ spec:
               hosts:
                 - "hubble.${CLUSTER_NAME}.${SECRET_DOMAIN}"
 
+    prometheus:
+      serviceMonitor:
+        enabled: true
+
+    operator:
+      prometheus:
+        serviceMonitor:
+          enabled: true
+
     bgp:
-      enabled: true
+      enabled: false
       announce:
         loadbalancerIP: true
