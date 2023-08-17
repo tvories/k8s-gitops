@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-controllers-namespace
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-controllers"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-controllers-kubelet-csr-approver
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-controllers/kubelet-csr-approver"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops

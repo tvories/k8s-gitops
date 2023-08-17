@@ -21,3 +21,4 @@ resources:
   - ./security.yaml
   - ./gitlab.yaml
   - ./kyverno.yaml
+  - ./system-controllers.yaml

@@ -1,0 +1,5 @@
+---
+providerRegex: |
+  ^(physical\d+|m720q-\d+|sff\d+)$
+
+bypassDnsResolution: true

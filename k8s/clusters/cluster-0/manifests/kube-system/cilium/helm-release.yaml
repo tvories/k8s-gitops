@@ -26,11 +26,11 @@ spec:
     - kind: ConfigMap
       name: cilium-values
   values:
-    securityContext:
-      privileged: true
-    cluster:
-      name: "${CLUSTER_NAME}"
-      id: "${CLUSTER_ID}"
+    # securityContext:
+    #   privileged: true
+    # cluster:
+    #   name: "${CLUSTER_NAME}"
+    #   id: "${CLUSTER_ID}"
 
     # rollOutCiliumPods: true
 
@@ -39,7 +39,7 @@ spec:
     # kubeProxyReplacement: "strict"
     # kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 
-    ipv4NativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
+    # ipv4NativeRoutingCIDR: ${NETWORK_K8S_POD_CIDR}
 
     # k8sServiceHost: "cluster-0.${SECRET_INTERNAL_DOMAIN}"
     # k8sServicePort: 6443
@@ -48,18 +48,18 @@ spec:
     #   algorithm: "maglev"
     #   mode: "dsr"
 
-    tunnel: "disabled"
+    # tunnel: "disabled"
 
-    autoDirectNodeRoutes: true
+    # autoDirectNodeRoutes: true
 
-    endpointRoutes:
-      enabled: true
+    # endpointRoutes:
+    #   enabled: true
 
-    ipam:
-      mode: "kubernetes"
+    # ipam:
+    #   mode: "kubernetes"
 
-    containerRuntime:
-      integration: containerd
+    # containerRuntime:
+    #   integration: containerd
 
     hubble:
       enabled: true
