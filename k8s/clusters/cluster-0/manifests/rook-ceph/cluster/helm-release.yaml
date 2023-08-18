@@ -126,6 +126,9 @@ spec:
           - name: "m720q-1"
             devices:
               - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2304210050300351"
+          - name: "m720q-2"
+            devices:
+              - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2305150020700998"
 
     ingress:
       dashboard:
