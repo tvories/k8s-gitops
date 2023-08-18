@@ -52,12 +52,12 @@ spec:
       main:
         enabled: false
     persistence:
-      devfs:
-        enabled: true
-        type: hostPath
-        hostPath: /dev/dri
-        hostPathType: Directory
-        readOnly: true
+      # devfs:
+      #   enabled: true
+      #   type: hostPath
+      #   hostPath: /dev/dri
+      #   hostPathType: Directory
+      #   readOnly: true
       sysfs:
         enabled: true
         type: hostPath
