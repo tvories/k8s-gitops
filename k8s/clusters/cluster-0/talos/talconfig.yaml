@@ -1,8 +1,8 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.4.7
-kubernetesVersion: v1.26.7
+talosVersion: v1.5.0
+kubernetesVersion: v1.27.4
 endpoint: https://${cluster_name}.${domain_name}:6443
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -12,21 +12,28 @@ clusterSvcNets:
   - 10.96.0.0/12
 
 cniConfig:
-  name: custom
-  urls:
-    - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
+  name: none
+  # urls:
+  #   - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
+
+additionalApiServerCertSans:
+  - ${cluster_endpoint_ip}
+
+additionalMachineCertSans:
+  - ${cluster_endpoint_ip}
+  - ${cluster_name}.${domain_name}
 
 nodes:
   # Two virtual cpnodes and 3 physical cpnodes
-  - hostname: talos-cp-1.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.91
-    installDisk: /dev/sda
+  # - hostname: talos-cp-1.${domain_name}
+  #   controlPlane: true
+  #   ipAddress: 192.168.80.91
+  #   installDisk: /dev/sda
 
-  - hostname: talos-cp-2.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.92
-    installDisk: /dev/sda
+  # - hostname: talos-cp-2.${domain_name}
+  #   controlPlane: true
+  #   ipAddress: 192.168.80.92
+  #   installDisk: /dev/sda
 
   # - hostname: talos-cp-3.${domain_name}
   #   controlPlane: true
@@ -35,37 +42,51 @@ nodes:
 
   - hostname: physical1.${domain_name}
     controlPlane: true
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:1f.2/ata5/host4/target4:0:0/4:0:0:0/
     ipAddress: 192.168.80.98
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+    # patches:
+    #   - |-
+    #     machine:
+    #       install:
+    #         extensions:
+    #           - image: ${gasket_image}
+    #       kernel:
+    #         modules:
+    #           - name: gasket
+    #           - name: apex
 
   - hostname: physical2.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
+    # patches:
+    #   - |-
+    #     machine:
+    #       install:
+    #         extensions:
+    #           - image: ${gasket_image}
+    #       kernel:
+    #         modules:
+    #           - name: gasket
+    #           - name: apex
 
   - hostname: sff1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.97
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
     patches:
       - |-
@@ -81,6 +102,10 @@ nodes:
   - hostname: m720q-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.99
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
     patches:
       - |-
@@ -93,121 +118,78 @@ nodes:
               - name: gasket
               - name: apex
 
-  - hostname: talos-worker-1.${domain_name}
-    ipAddress: 192.168.80.94
+  - hostname: m720q-2.${domain_name}
+    controlPlane: true
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+    ipAddress: 192.168.80.100
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
+    patches:
+      - |-
+        machine:
+          install:
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
 
-  - hostname: talos-worker-2.${domain_name}
-    ipAddress: 192.168.80.95
-    installDisk: /dev/sda
+  # - hostname: talos-worker-1.${domain_name}
+  #   ipAddress: 192.168.80.94
+  #   installDisk: /dev/sda
+
+  # - hostname: talos-worker-2.${domain_name}
+  #   ipAddress: 192.168.80.95
+  #   installDisk: /dev/sda
 
   # - hostname: talos-worker-3.${domain_name}
   #   ipAddress: 192.168.80.96
   #   installDisk: /dev/sda
 
 controlPlane:
-  configPatches:
-    - op: add
-      path: /machine/kubelet/extraArgs
-      value:
-        rotate-server-certificates: "true"
-        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
-      # These are for metrics
-    - op: add
-      path: /cluster/controllerManager/extraArgs
-      value:
-        bind-address: 0.0.0.0
-    - op: add
-      path: /cluster/scheduler/extraArgs
-      value:
-        bind-address: 0.0.0.0
-    - op: add
-      path: /cluster/proxy/extraArgs
-      value:
-        bind-address: 0.0.0.0
+  patches:
+    - |-
+      cluster:
+        allowSchedulingOnMasters: true
+        # This must be disabled or else cilium kube-proxy will conflict
+        proxy:
+          disabled: true
+        etcd:
+          advertisedSubnets:
+            - 192.168.80.0/24
+        apiServer:
+          extraArgs:
+            anonymous-auth: true
 
-    - op: remove
-      path: /cluster/apiServer/admissionControl
+    - |-
+      - op: remove
+        path: /cluster/apiServer/admissionControl
 
-  inlinePatch:
-    cluster:
-      # etcd:
-      #   extraArgs:
-      #     election-timeout: 5000
-      #     heartbeat-interval: 250
-      #     listen-metrics-urls: http://0.0.0.0:2381
-      apiServer:
-        certSANs:
-          - ${cluster_name}.${domain_name}
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      controllerManager:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      discovery:
-        registries:
-          service:
-            disabled: true
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-        # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-      proxy:
-        disabled: true
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-      scheduler:
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-    machine:
-      install:
-        extraKernelArgs:
-          - "talos.logging.kernel=udp://192.168.83.42:6050/"
-      logging:
-        destinations:
-          - endpoint: "udp://192.168.83.42:6051/"
-            format: json_lines
-      sysctls:
-        fs.inotify.max_user_watches: "1048576"
-        fs.inotify.max_user_instances: "8192"
-        net.ipv4.ip_unprivileged_port_start: 0
-      time:
-        disabled: false
-        servers:
-          - us.pool.ntp.org
-      kubelet:
-        extraArgs:
-          rotate-server-certificates: "true"
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
-
-worker:
-  configPatches:
-    - op: add
-      path: /machine/kubelet/extraArgs
-      value:
-        rotate-server-certificates: "true"
-        feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
-  inlinePatch:
-    cluster:
-      extraManifests:
-        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
-        # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    machine:
-      install:
-        extraKernelArgs:
-          - "talos.logging.kernel=udp://192.168.83.42:6050/"
-      logging:
-        destinations:
-          - endpoint: "udp://192.168.83.42:6051/"
-            format: json_lines
-      sysctls:
-        fs.inotify.max_user_watches: "1048576"
-        fs.inotify.max_user_instances: "8192"
-        net.ipv4.ip_unprivileged_port_start: 0
-      time:
-        disabled: false
-        servers:
-          - us.pool.ntp.org
-      kubelet:
-        extraArgs:
-          rotate-server-certificates: "true"
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+    - |-
+      machine:
+        features:
+          kubePrism:
+            enabled: true
+            port: 7445
+        kubelet:
+          extraArgs:
+            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+            rotate-server-certificates: "true"
+          extraConfig:
+            maxPods: 150
+          nodeIP:
+            validSubnets:
+                - 192.168.80.0/24
+        sysctls:
+          fs.inotify.max_user_watches: "1048576"
+          fs.inotify.max_user_instances: "8192"
+          net.ipv4.ip_unprivileged_port_start: 0
+        time:
+          disabled: false
+          servers:
+            - us.pool.ntp.org
