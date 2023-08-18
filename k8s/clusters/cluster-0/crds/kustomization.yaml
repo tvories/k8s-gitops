@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./external-snapshotter
   - ./kube-prometheus-stack
-  - ./externalsecrets
+  # - ./externalsecrets
