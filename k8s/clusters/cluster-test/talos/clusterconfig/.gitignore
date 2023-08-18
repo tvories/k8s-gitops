@@ -9,3 +9,5 @@ cluster-test-physical2.mcbadass.local.yaml
 cluster-test-sff1.mcbadass.local.yaml
 cluster-test-physical1.mcbadass.local.yaml
 cluster-test-talos-cp-1.mcbadass.local.yaml
+cluster-test-talos-test-cp-2.mcbadass.local.yaml
+cluster-test-talos-test-cp-3.mcbadass.local.yaml

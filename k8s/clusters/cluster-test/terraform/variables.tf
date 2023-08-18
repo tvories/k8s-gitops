@@ -60,3 +60,13 @@ variable "ovf_url" {
   description = "The ofv url for the deployment"
   type        = string
 }
+
+variable "dns_server" {
+  description = "DNS Server for setting dns records"
+  type        = string
+}
+
+variable "dns_domain" {
+  description = "DNS Zone for setting dns records"
+  type        = string
+}

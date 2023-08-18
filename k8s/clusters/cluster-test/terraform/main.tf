@@ -8,6 +8,10 @@ terraform {
     vsphere = {
       version = "2.4.1"
     }
+    dns = {
+      source  = "hashicorp/dns"
+      version = ">= 3.3"
+    }
     google = {
       source  = "hashicorp/google"
       version = "4.77.0"
@@ -20,6 +24,12 @@ provider "vsphere" {
   user                 = var.vsphere_user
   password             = var.vsphere_password
   allow_unverified_ssl = "true"
+}
+
+provider "dns" {
+  update {
+    server = var.dns_server
+  }
 }
 
 data "vsphere_datacenter" "dc" {
@@ -137,3 +147,16 @@ resource "vsphere_virtual_machine" "talos-worker" {
     ]
   }
 }
+
+# This is unfortunately hard-coded because these instances don't come up with vmware tools installed
+# I would have to integrate to dhcp some how and that's not worth it right now
+resource "dns_a_record_set" "talos-cp" {
+  count = var.controlplane_instances
+  name  = "${var.name_prefix}-cp-${count.index + 1}"
+  zone  = var.dns_domain
+  addresses = [
+    # vsphere_virtual_machine.talos-cp[count.index].guest_ip_addresses[0]
+    "192.168.80.${count.index + 190}"
+  ]
+}
+
