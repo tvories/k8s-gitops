@@ -120,9 +120,9 @@ spec:
           - name: "physical2"
             devices:
               - name: "sdb"
-          # - name: "sff1"
-          #   devices:
-          #     - name: "sdb"
+          - name: "sff1"
+            devices:
+              - name: "sdb"
           - name: "m720q-1"
             devices:
               - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2304210050300351"
