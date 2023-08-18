@@ -7,3 +7,4 @@ resources:
   - k8s-gitops.yaml
   - kube-prometheus-stack.yaml
   - kubegres.yaml
+  - ./kubernetes-csi-addons.yaml
