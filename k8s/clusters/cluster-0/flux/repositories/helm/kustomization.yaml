@@ -35,3 +35,4 @@ resources:
   - external-secrets.yaml
   - ./authentik-charts.yaml
   - ./zalando-helm-charts.yaml
+  - ./postfinance.yaml
