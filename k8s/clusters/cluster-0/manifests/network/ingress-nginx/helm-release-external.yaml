@@ -16,21 +16,41 @@ spec:
         name: ingress-nginx-charts
         namespace: flux-system
   values:
+    fullNameOverride: nginx-external
+
     controller:
       ingressClassResource:
         name: nginx-external
         default: false
+        controllerValue: k8s.io/ingress-nginx-external
+
       replicaCount: 3
+
       service:
+        enabled: true
+        type: LoadBalancer
         # type: LoadBalancer
-        # externalIPs: 
+        # externalIPs:
         # - "${EXTERNAL_NGINX_LB}"
-        loadBalancerIP: "${EXTERNAL_NGINX_LB}"
-        externalTrafficPolicy: Local
+        # loadBalancerIP: "${EXTERNAL_NGINX_LB}"
+        annotations:
+          io.cilium/lb-ipam-ips: ${EXTERNAL_NGINX_LB}
+        externalTrafficPolicy: Cluster # See https://github.com/JJGadgets/Biohazard/blob/main/kube/deploy/core/_networking/cilium/README.md#preserving-source-ips
+
+      publishService:
+        enabled: true
+
+      admissionWebhooks:
+        objectSelector:
+          matchExpressions:
+            - key: ingress-class
+              operator: In
+              values:
+                - nginx-external
 
       config:
         ssl-protocols: "TLSv1.3 TLSv1.2"
-        proxy-body-size: "100m"
+        proxy-body-size: 0
         use-forwarded-headers: "true"
         client-header-timeout: 120
         client-body-buffer-size: "100M"
@@ -41,6 +61,18 @@ spec:
         hsts-max-age: "31449600"
         keep-alive: 120
         keep-alive-requests: 10000
+        enable-brotli: "true"
+        enable-real-ip: "true"
+        log-format-escape-json: "true"
+        log-format-upstream: >
+          {"time": "$time_iso8601", "remote_addr": "$proxy_protocol_addr",
+          "x_forwarded_for": "$proxy_add_x_forwarded_for", "request_id": "$req_id",
+          "remote_user": "$remote_user", "bytes_sent": $bytes_sent, "request_time": $request_time,
+          "status": $status, "vhost": "$host", "request_proto": "$server_protocol",
+          "path": "$uri", "request_query": "$args", "request_length": $request_length,
+          "duration": $request_time,"method": "$request_method", "http_referrer": "$http_referer",
+          "http_user_agent": "$http_user_agent"}
+        proxy-buffer-size: "16k"
 
       metrics:
         enabled: true
@@ -49,20 +81,17 @@ spec:
           namespace: network
           namespaceSelector:
             any: true
-        prometheusRule:
-          enabled: false
 
       extraArgs:
         default-ssl-certificate: "network/${SECRET_DOMAIN/./-}-tls"
+
       resources:
         requests:
-          memory: 250Mi
-          cpu: 100m
-        limits:
-          memory: 350Mi
+          memory: 400Mi
+          cpu: 99m
 
     defaultBackend:
-      enabled: true
+      enabled: false
       image:
         repository: ghcr.io/tarampampam/error-pages
         tag: 2.24.0
