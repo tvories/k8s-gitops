@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: omada-data
   namespace: network
+  labels:
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,6 +19,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: omada-logs
   namespace: network
+  labels:
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -30,6 +34,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: omada-work
   namespace: network
+  labels:
+    kasten.io/backup-volume: "enabled"
 spec:
   accessModes:
     - ReadWriteOnce
