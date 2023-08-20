@@ -26,3 +26,17 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: system-controllers-snaptshot-controller
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system-controllers/snapshot-controller"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
