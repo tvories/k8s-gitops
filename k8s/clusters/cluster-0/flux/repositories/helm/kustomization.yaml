@@ -37,3 +37,4 @@ resources:
   - ./zalando-helm-charts.yaml
   - ./postfinance.yaml
   - ./piraeus.yaml
+  - ./backube.yaml
