@@ -36,3 +36,4 @@ resources:
   - ./authentik-charts.yaml
   - ./zalando-helm-charts.yaml
   - ./postfinance.yaml
+  - ./piraeus.yaml
