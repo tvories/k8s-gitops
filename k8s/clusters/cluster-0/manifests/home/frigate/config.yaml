@@ -16,7 +16,7 @@ objects:
     - person
     - dog
     - cat
-    - car
+    # - car
   filters:
     car:
       mask:
