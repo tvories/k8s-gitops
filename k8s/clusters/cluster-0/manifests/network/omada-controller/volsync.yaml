@@ -36,7 +36,6 @@ spec:
     pruneIntervalDays: 14
     repository: omada-restic-secret
     cacheCapacity: 8Gi
-    cacheStorageClassName: local-hostpath
     volumeSnapshotClassName: csi-ceph-blockpool
     storageClassName: ceph-block
     moverSecurityContext:
