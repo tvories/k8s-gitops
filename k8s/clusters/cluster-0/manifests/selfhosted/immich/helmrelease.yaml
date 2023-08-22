@@ -1,0 +1,104 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: selfhosted
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: immich
+      version: 0.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: immich-charts
+        namespace: flux-system
+      interval: 15m
+  values:
+    postgres:
+      enabled: false
+
+    redis:
+      enabled: true
+
+    typesense:
+      enabled: true
+      persistence:
+        tsdata:
+          enabled: true
+          storageClass: ceph-block
+      resources:
+        requests:
+          cpu: 15m
+          memory: 145M
+
+    immich:
+      persistence:
+        library:
+          existingClaim: immich-nfs
+
+    # env:
+    #   LOG_LEVEL: verbose
+
+    envFrom:
+      - secretRef:
+          name: immich
+      - configMapRef:
+          name: immich
+
+    image:
+      # renovate: datasource=github-releases depName=immich-app/immich
+      tag: "v1.74.0"
+
+    server:
+      resources:
+        requests:
+          cpu: 15m
+          memory: 512M
+
+    microservices:
+      controller:
+        replicas: 2
+      resources:
+        requests:
+          cpu: 1500m
+          memory: 2048M
+
+    machine-learning:
+      resources:
+        requests:
+          cpu: 500m
+          memory: 4096M
+      persistence:
+        cache:
+          size: 10Gi
+          type: pvc
+          accessMode: ReadWriteOnce
+          storageClass: rook-ceph
+
+    web:
+      resources:
+        requests:
+          cpu: 15m
+          memory: 105M
+
+    proxy:
+      resources:
+        requests:
+          cpu: 15m
+          memory: 105M
+      ingress:
+        main:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: nginx-internal
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          hosts:
+            - host: &host "photos.${SECRET_DOMAIN}"
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - hosts:
+                - *host
+              secretName: *host
