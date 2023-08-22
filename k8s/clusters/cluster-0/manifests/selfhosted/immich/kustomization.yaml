@@ -11,4 +11,6 @@ resources:
   # - ./typesense
   - ./pvc.yaml
   - ./config-map.yaml
-  - ./secret.sops.yaml
+  # - ./secret.sops.yaml
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
