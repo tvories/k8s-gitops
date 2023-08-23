@@ -20,6 +20,10 @@ spec:
 
     redis:
       enabled: true
+      auth:
+        enabled: true
+        existingSecret: immich-secret
+        existingSecretPasswordKey: REDIS_PASSWORD
 
     typesense:
       enabled: true
