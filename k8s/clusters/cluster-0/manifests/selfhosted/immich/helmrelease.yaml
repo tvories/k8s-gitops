@@ -114,12 +114,12 @@ spec:
         requests:
           cpu: 100m
           memory: 2048M
-      persistence:
-        cache:
-          size: 10Gi
-          type: pvc
-          accessMode: ReadWriteOnce
-          storageClass: ceph-block
+      # persistence:
+      #   cache:
+      #     size: 10Gi
+      #     type: pvc
+      #     accessMode: ReadWriteOnce
+      #     storageClass: ceph-block
 
     web:
       resources:
