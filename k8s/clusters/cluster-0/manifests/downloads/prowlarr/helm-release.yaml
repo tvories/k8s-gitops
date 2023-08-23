@@ -61,6 +61,13 @@ spec:
       # PROWLARR__AUTHENTICATION_METHOD: External
       PROWLARR__THEME: dark
 
+    envFrom: *envFrom
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
     probes:
       liveness: &probes
         enabled: true
