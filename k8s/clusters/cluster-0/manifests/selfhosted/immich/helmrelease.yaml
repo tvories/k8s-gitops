@@ -106,8 +106,8 @@ spec:
         replicas: 2
       resources:
         requests:
-          cpu: 1500m
-          memory: 2048M
+          cpu: 100m
+          memory: 250M
 
     machine-learning:
       resources:
