@@ -74,7 +74,7 @@ spec:
           size: 10Gi
           type: pvc
           accessMode: ReadWriteOnce
-          storageClass: rook-ceph
+          storageClass: ceph-block
 
     web:
       resources:
