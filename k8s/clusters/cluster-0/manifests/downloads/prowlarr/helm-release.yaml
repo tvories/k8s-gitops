@@ -5,19 +5,37 @@ metadata:
   name: prowlarr
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      chart: prowlarr
-      version: 4.5.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
-        namespace: flux-system
-      interval: 5m
+        name: bjw-s-charts
+        namespace: flux-
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    initContainers:
+      01-init-db:
+        image: ghcr.io/onedr0p/postgres-init:14.8
+        imagePullPolicy: IfNotPresent
+        envFrom: &envFrom
+          - secretRef:
+              name: prowlarr-secret
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
-      # renovate: docker-image
       repository: ghcr.io/onedr0p/prowlarr-nightly
       tag: "1.8.4.3883"
       pullPolicy: IfNotPresent
@@ -37,6 +55,27 @@ spec:
 
     env:
       TZ: "${TIMEZONE}"
+      PROWLARR__INSTANCE_NAME: Prowlarr
+      PROWLARR__PORT: &port 80
+      PROWLARR__LOG_LEVEL: info
+      # PROWLARR__AUTHENTICATION_METHOD: External
+      PROWLARR__THEME: dark
+
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /ping
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
 
     persistence:
       config:
@@ -55,12 +94,12 @@ spec:
       main:
         enabled: true
         ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          nginx.ingress.kubernetes.io/configuration-snippet: |
-            proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/prowlarr/nord.css"></head>';
-            sub_filter_once on;
+        # annotations:
+        #   cert-manager.io/cluster-issuer: letsencrypt-production
+        #   nginx.ingress.kubernetes.io/configuration-snippet: |
+        #     proxy_set_header Accept-Encoding "";
+        #     sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/prowlarr/nord.css"></head>';
+        #     sub_filter_once on;
         hosts:
           - host: &host "prowlarr.${SECRET_DOMAIN}"
             paths:
