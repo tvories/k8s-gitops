@@ -135,8 +135,9 @@ spec:
       ingress:
         main:
           enabled: true
+          ingressClassName: nginx-internal
           annotations:
-            kubernetes.io/ingress.class: nginx-internal
+            # kubernetes.io/ingress.class: nginx-internal
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
           hosts:
             - host: &host "photos.${SECRET_DOMAIN}"
