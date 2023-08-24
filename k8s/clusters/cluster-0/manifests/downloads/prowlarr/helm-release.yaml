@@ -36,9 +36,8 @@ spec:
       annotations:
         reloader.stakater.com/auto: "true"
     image:
-      repository: ghcr.io/onedr0p/prowlarr-nightly
-      tag: "1.8.4.3883"
-      pullPolicy: IfNotPresent
+      repository: ghcr.io/onedr0p/prowlarr-develop
+      tag: 1.8.3.3880@sha256:b17b18507fde48c020c49d3f632178d07cc7e9f17056abf9ec50d30ae63d6f6d
 
     # hostname: prowlarr
 
