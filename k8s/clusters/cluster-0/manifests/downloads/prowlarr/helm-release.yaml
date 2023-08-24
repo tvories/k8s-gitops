@@ -50,15 +50,15 @@ spec:
       runAsGroup: 568
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups:
-        - 65539
+      # supplementalGroups:
+      #   - 65539
 
     env:
       TZ: "${TIMEZONE}"
       PROWLARR__INSTANCE_NAME: Prowlarr
       PROWLARR__PORT: &port 80
       PROWLARR__LOG_LEVEL: info
-      # PROWLARR__AUTHENTICATION_METHOD: External
+      PROWLARR__AUTHENTICATION_METHOD: External
       PROWLARR__THEME: dark
 
     envFrom: *envFrom
