@@ -118,17 +118,17 @@ spec:
     persistence:
       config:
         enabled: true
-        type: emptyDir
-        # existingClaim: radarr-config
-        # mountPath: /config
+        # type: emptyDir
+        existingClaim: radarr-config
+        mountPath: /config
       media:
         enabled: true
         existingClaim: downloads-nfs-media
         mountPath: /media
-      # backup:
-      #   enabled: true
-      #   existingClaim: radarr-nfs-backup
-      #   mountPath: /config/Backups
+      backup:
+        enabled: true
+        existingClaim: radarr-nfs-backup
+        mountPath: /config/Backups
 
     resources:
       requests:
