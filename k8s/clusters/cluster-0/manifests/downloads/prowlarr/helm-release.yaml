@@ -25,19 +25,19 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    initContainers:
-      01-init-db:
-        image: ghcr.io/onedr0p/postgres-init:14.8
-        imagePullPolicy: IfNotPresent
-        envFrom: &envFrom
-          - secretRef:
-              name: prowlarr-secret
+    # initContainers:
+    #   01-init-db:
+    #     image: ghcr.io/onedr0p/postgres-init:14.8
+    #     imagePullPolicy: IfNotPresent
+    #     envFrom: &envFrom
+    #       - secretRef:
+    #           name: prowlarr-secret
     controller:
       annotations:
         reloader.stakater.com/auto: "true"
     image:
       repository: ghcr.io/onedr0p/prowlarr-nightly
-      tag: "1.8.4.3883"
+      tag: "1.8.3.3877"
       pullPolicy: IfNotPresent
 
     # hostname: prowlarr
@@ -61,7 +61,7 @@ spec:
       # PROWLARR__AUTHENTICATION_METHOD: External
       PROWLARR__THEME: dark
 
-    envFrom: *envFrom
+    # envFrom: *envFrom
     service:
       main:
         ports:
