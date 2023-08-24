@@ -40,10 +40,10 @@ spec:
       tag: "1.8.4.3883"
       pullPolicy: IfNotPresent
 
-    hostname: prowlarr
+    # hostname: prowlarr
 
-    podAnnotations:
-      setGateway: "true"
+    # podAnnotations:
+    #   setGateway: "true"
 
     podSecurityContext:
       runAsUser: 568
