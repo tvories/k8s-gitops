@@ -89,10 +89,11 @@ spec:
         enabled: true
         # existingClaim: prowlarr-config
         type: emptyDir
-      shared:
-        enabled: true
-        type: emptyDir
-        mountPath: /shared
+        # mountPath: /config
+      # shared:
+      #   enabled: true
+      #   type: emptyDir
+      #   mountPath: /shared
       # backup:
       #   enabled: true
       #   existingClaim: prowlarr-nfs-backup
