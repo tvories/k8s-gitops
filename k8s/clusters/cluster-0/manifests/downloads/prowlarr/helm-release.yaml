@@ -93,10 +93,10 @@ spec:
         enabled: true
         type: emptyDir
         mountPath: /shared
-      backup:
-        enabled: true
-        existingClaim: prowlarr-nfs-backup
-        mountPath: /config/Backups
+      # backup:
+      #   enabled: true
+      #   existingClaim: prowlarr-nfs-backup
+      #   mountPath: /config/Backups
 
     ingress:
       main:
