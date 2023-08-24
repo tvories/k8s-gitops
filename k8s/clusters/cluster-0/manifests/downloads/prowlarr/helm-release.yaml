@@ -83,20 +83,20 @@ spec:
       startup:
         enabled: false
 
-    persistence:
-      config:
-        enabled: true
-        # existingClaim: prowlarr-config
-        type: emptyDir
-        # mountPath: /config
-      # shared:
-      #   enabled: true
-      #   type: emptyDir
-      #   mountPath: /shared
-      # backup:
-      #   enabled: true
-      #   existingClaim: prowlarr-nfs-backup
-      #   mountPath: /config/Backups
+    # persistence:
+    #   config:
+    #     enabled: true
+    #     # existingClaim: prowlarr-config
+    #     type: emptyDir
+    #     # mountPath: /config
+    # shared:
+    #   enabled: true
+    #   type: emptyDir
+    #   mountPath: /shared
+    # backup:
+    #   enabled: true
+    #   existingClaim: prowlarr-nfs-backup
+    #   mountPath: /config/Backups
 
     ingress:
       main:
