@@ -49,13 +49,13 @@ spec:
       runAsGroup: 568
       fsGroup: 568
       fsGroupChangePolicy: OnRootMismatch
-      # supplementalGroups:
-      #   - 65539
+      supplementalGroups:
+        - 65539
 
     env:
       TZ: "${TIMEZONE}"
       PROWLARR__INSTANCE_NAME: Prowlarr
-      PROWLARR__PORT: &port 80
+      # PROWLARR__PORT: &port 80
       PROWLARR__LOG_LEVEL: debug
       PROWLARR__AUTHENTICATION_METHOD: External
       PROWLARR__THEME: dark
@@ -65,7 +65,7 @@ spec:
       main:
         ports:
           http:
-            port: *port
+            port: &port 9696
 
     probes:
       liveness: &probes
@@ -83,20 +83,20 @@ spec:
       startup:
         enabled: false
 
-    # persistence:
-    #   config:
-    #     enabled: true
-    #     # existingClaim: prowlarr-config
-    #     type: emptyDir
-    #     # mountPath: /config
+    persistence:
+      config:
+        enabled: true
+        # existingClaim: prowlarr-config
+        type: emptyDir
+        # mountPath: /config
     # shared:
     #   enabled: true
     #   type: emptyDir
     #   mountPath: /shared
-    # backup:
-    #   enabled: true
-    #   existingClaim: prowlarr-nfs-backup
-    #   mountPath: /config/Backups
+    backup:
+      enabled: true
+      existingClaim: prowlarr-nfs-backup
+      mountPath: /config/Backups
 
     ingress:
       main:
