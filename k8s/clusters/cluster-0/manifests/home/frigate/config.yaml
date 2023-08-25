@@ -1,26 +1,47 @@
+logger:
+  default: info
+
 mqtt:
   host: emqx
   topic_prefix: frigate
-  user: frig
+  user: "{FRIGATE_MQTT_USERNAME}"
   password: "{FRIGATE_MQTT_PASSWORD}"
+
 database:
   path: /data/frigate.db
+
 detectors:
   coral:
     type: edgetpu
     device: pci
     # type: cpu
     # num_threads: 4
+
+snapshots:
+  enabled: true
+  timestamp: false
+  bounding_box: true
+  retain:
+    default: 5
+
+record:
+  enabled: true
+  retain:
+    days: 2
+    mode: all
+  events:
+    retain:
+      default: 14
+      mode: active_objects
+
 objects:
   track:
     - person
     - dog
     - cat
     # - car
+
   filters:
-    car:
-      mask:
-        - 633,437,732,423,695,366,439,373,442,449
     person:
       min_area: 2500
       max_area: 100000
@@ -29,142 +50,181 @@ objects:
       min_area: 1000
       max_area: 10000
       threshold: 0.7
-ffmpeg:
-  hwaccel_args:
-    - -hwaccel
-    - vaapi
-    - -hwaccel_device
-    - /dev/dri/renderD128
-    - -hwaccel_output_format
-    - yuv420p
-  # Enable audio on recordings...
-  # might cause issues on recording playback
-  output_args:
-    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
+
+go2rtc:
+  streams:
+    frigate_doorbell_hq: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=0
+    frigate_doorbell_lq: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=1
+    frigate_front_door_hq: rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101
+    frigate_front_door_lq: rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102
+    frigate_garage_hq: rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101
+    frigate_garage_lq: rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102
+
+# ffmpeg:
+#   hwaccel_args:
+#     - -hwaccel
+#     - vaapi
+#     - -hwaccel_device
+#     - /dev/dri/renderD128
+#     - -hwaccel_output_format
+#     - yuv420p
+#   # Enable audio on recordings...
+#   # might cause issues on recording playback
+#   output_args:
+#     record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -c:a aac
+
 cameras:
   # --
   doorbell:
     ffmpeg:
       inputs:
-        # Sub Stream
-        # - path: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
-        #   roles:
-        #   - detect
-        # Main Stream
-        - path: "rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=0"
-          roles:
-            - rtmp
-            - record
-        - path: "rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=1"
+        - path: rtsp://localhost:8554/frigate_doorbell_lq
           roles:
             - detect
+        - path: rtsp://localhost:8554/frigate_doorbell_hq
+          roles:
+            - record
+
+          # Sub Stream
+          # - path: rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/Streaming/Channels/102
+          #   roles:
+          #   - detect
+          # Main Stream
+          # - path: "rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=0"
+          #   roles:
+          #     - rtmp
+          #     - record
+          # - path: "rtsp://{FRIGATE_DOORBELL_CAMERA_USER}:{FRIGATE_DOORBELL_VIEWER_PASSWORD}@{FRIGATE_DOORBELL_IP_ADDRESS}:554/cam/realmonitor?channel=1&subtype=1"
+          #   roles:
+          #     - detect
     detect:
       width: 960
       height: 720
       fps: 10
-    record:
-      enabled: True
-      retain:
-        days: 0
-        mode: active_objects
-      events:
-        retain:
-          default: 14
-        objects:
-          - person
-          - dog
-          - cat
-    snapshots:
-      enabled: True
-      timestamp: False
-      bounding_box: true
-      retain:
-        default: 14
-    rtmp:
-      enabled: True
+
+    objects:
+      filters:
+        car:
+          mask:
+            - 633,437,732,423,695,366,439,373,442,449
+
+    # record:
+    #   enabled: True
+    #   retain:
+    #     days: 0
+    #     mode: active_objects
+    #   events:
+    #     retain:
+    #       default: 14
+    #     objects:
+    #       - person
+    #       - dog
+    #       - cat
+    # snapshots:
+    #   enabled: True
+    #   timestamp: False
+    #   bounding_box: true
+    #   retain:
+    #     default: 14
+    # rtmp:
+    #   enabled: True
 
   front_door:
     # rtmp:
     #   enabled: false
     ffmpeg:
       inputs:
-        # Main Stream
-        - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101"
+        - path: rtsp://localhost:8554/frigate_front_door_lq
           roles:
-            # - rtmp
-            # - detect
-            - record
-        - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102"
-          roles:
-            - rtmp
             - detect
-          # - record
-          # - clips
+        - path: rtsp://localhost:8554/frigate_front_door_hq
+          roles:
+            - record
+
+        # # Main Stream
+        # - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/101"
+        #   roles:
+        #     # - rtmp
+        #     # - detect
+        #     - record
+        # - path: "rtsp://{FRIGATE_FRONT_DOOR_USER}:{FRIGATE_FRONT_DOOR_VIEWER_PASSWORD}@{FRIGATE_FRONT_DOOR_IP_ADDRESS}:554/Streaming/Channels/102"
+        #   roles:
+        #     - rtmp
+        #     - detect
+        #   # - record
+        #   # - clips
     detect:
       width: 640
       height: 480
       fps: 15
-    record:
-      enabled: True
-      retain:
-        days: 0
-        mode: active_objects
-      events:
-        retain:
-          default: 14
-        objects:
-          - person
-          - dog
-          - cat
-          - car
-    snapshots:
-      enabled: True
-      timestamp: False
-      bounding_box: true
-      retain:
-        default: 14
-    # rtmp:
+    # record:
     #   enabled: True
+    #   retain:
+    #     days: 0
+    #     mode: active_objects
+    #   events:
+    #     retain:
+    #       default: 14
+    #     objects:
+    #       - person
+    #       - dog
+    #       - cat
+    #       - car
+    # snapshots:
+    #   enabled: True
+    #   timestamp: False
+    #   bounding_box: true
+    #   retain:
+    #     default: 14
+    # # rtmp:
+    # #   enabled: True
 
   garage:
-    rtmp:
-      enabled: false
+    # rtmp:
+    #   enabled: false
     ffmpeg:
       inputs:
-        # Main Stream
-        - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101"
+        - path: rtsp://localhost:8554/frigate_garage_lq
           roles:
-            # - rtmp
-            # - detect
-            - record
-        - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102"
-          roles:
-            - rtmp
             - detect
-          # - record
-          # - clips
+        - path: rtsp://localhost:8554/frigate_garage_hq
+          roles:
+            - record
+
+        # # Main Stream
+        # - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/101"
+        #   roles:
+        #     # - rtmp
+        #     # - detect
+        #     - record
+        # - path: "rtsp://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_VIEWER_PASSWORD}@{FRIGATE_GARAGE_IP_ADDRESS}:554/Streaming/Channels/102"
+        #   roles:
+        #     - rtmp
+        #     - detect
+        #   # - record
+        #   # - clips
     detect:
       width: 640
       height: 480
       fps: 30
-    record:
-      enabled: True
-      retain:
-        days: 0
-        mode: active_objects
-      events:
-        retain:
-          default: 14
-        objects:
-          - person
-          - dog
-          - cat
-          - car
-    snapshots:
-      enabled: True
-      timestamp: False
-      bounding_box: true
-      retain:
-        default: 14
+    # record:
+    #   enabled: True
+    #   retain:
+    #     days: 0
+    #     mode: active_objects
+    #   events:
+    #     retain:
+    #       default: 14
+    #     objects:
+    #       - person
+    #       - dog
+    #       - cat
+    #       - car
+    # snapshots:
+    #   enabled: True
+    #   timestamp: False
+    #   bounding_box: true
+    #   retain:
+    #     default: 14
     # rtmp:
     #   enabled: True
