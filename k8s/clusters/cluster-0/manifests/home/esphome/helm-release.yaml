@@ -9,22 +9,27 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: esphome
-      version: 8.4.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+      interval: 30m
   values:
     image:
-      repository: esphome/esphome
-      tag: 2023.8.2
+      repository: ghcr.io/esphome/esphome
+      tag: 2023.8.2@sha256:b0da16a8b58bb1a2fd94cc2377c0a2ab6625fb034af8981b721743205a3307f0
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: esphome-secrets,esphome-deploykey
+
     env:
       TZ: "${TIMEZONE}"
       ESPHOME_DASHBOARD_USE_PING: true
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
+
+    # hostNetwork: true
+    # dnsPolicy: ClusterFirstWithHostNet
     ingress:
       main:
         enabled: true
@@ -32,18 +37,28 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-        - host: &host "esp.${SECRET_DOMAIN}"
-          paths:
-          - path: /
+          - host: &host "esp.${SECRET_DOMAIN}"
+            paths:
+              - path: /
         tls:
-        - hosts:
-          - *host
-          secretName: tls.esphome
+          - hosts:
+              - *host
+            secretName: tls.esphome
     persistence:
       config:
         enabled: true
         existingClaim: esphome-config
-    
+      secrets:
+        enabled: true
+        type: secret
+        name: esphome-secret
+        mountPath: /config/secrets.yaml
+        subPath: secrets.yaml
+      esphome-cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /config/.esphome
+
     resources:
       requests:
         cpu: 15m
