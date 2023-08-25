@@ -6,6 +6,7 @@ namespace: home
 resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
+  - ./externalsecret.yaml
   - ./helm-release.yaml
 configMapGenerator:
   - name: frigate-config
