@@ -28,6 +28,12 @@ spec:
       TZ: "${TIMEZONE}"
       ESPHOME_DASHBOARD_USE_PING: true
 
+    service:
+      main:
+        ports:
+          http:
+            port: 6052
+
     # hostNetwork: true
     # dnsPolicy: ClusterFirstWithHostNet
     ingress:
