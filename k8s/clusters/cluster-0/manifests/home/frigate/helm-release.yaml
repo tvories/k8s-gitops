@@ -28,6 +28,7 @@ spec:
       type: statefulset
       annotations:
         reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/blakeblackshear/frigate
       tag: 0.12.1
@@ -36,7 +37,7 @@ spec:
       TZ: ${TIMEZONE}
     envFrom:
       - secretRef:
-          name: frigate
+          name: frigate-secret
 
     service:
       main:
@@ -133,74 +134,74 @@ spec:
       limits:
         memory: 4000Mi
 
-  valuesFrom:
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_password
-      targetPath: env.FRIGATE_MQTT_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_ip
-      targetPath: env.FRIGATE_DOORBELL_IP_ADDRESS
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_user
-      targetPath: env.FRIGATE_DOORBELL_CAMERA_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: doorbell_password
-      targetPath: env.FRIGATE_DOORBELL_VIEWER_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: mqtt_user
-      targetPath: env.FRIGATE_MQTT_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_password
-      targetPath: env.FRIGATE_FRONT_DOOR_VIEWER_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_ip
-      targetPath: env.FRIGATE_FRONT_DOOR_IP_ADDRESS
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: front_door_user
-      targetPath: env.FRIGATE_FRONT_DOOR_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_password
-      targetPath: env.FRIGATE_GARAGE_VIEWER_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_user
-      targetPath: env.FRIGATE_GARAGE_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: garage_ip
-      targetPath: env.FRIGATE_GARAGE_IP_ADDRESS
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: cdale_doorbell_user
-      targetPath: env.FRIGATE_CDALE_DOORBELL_USER
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: cdale_doorbell_password
-      targetPath: env.FRIGATE_CDALE_DOORBELL_PASSWORD
-      optional: false
-    - kind: Secret
-      name: frigate
-      valuesKey: cdale_doorbell_ip
-      targetPath: env.FRIGATE_CDALE_DOORBELL_IP
-      optional: false
+  # valuesFrom:
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_password
+  #     targetPath: env.FRIGATE_MQTT_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_ip
+  #     targetPath: env.FRIGATE_DOORBELL_IP_ADDRESS
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_user
+  #     targetPath: env.FRIGATE_DOORBELL_CAMERA_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: doorbell_password
+  #     targetPath: env.FRIGATE_DOORBELL_VIEWER_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: mqtt_user
+  #     targetPath: env.FRIGATE_MQTT_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_password
+  #     targetPath: env.FRIGATE_FRONT_DOOR_VIEWER_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_ip
+  #     targetPath: env.FRIGATE_FRONT_DOOR_IP_ADDRESS
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: front_door_user
+  #     targetPath: env.FRIGATE_FRONT_DOOR_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_password
+  #     targetPath: env.FRIGATE_GARAGE_VIEWER_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_user
+  #     targetPath: env.FRIGATE_GARAGE_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: garage_ip
+  #     targetPath: env.FRIGATE_GARAGE_IP_ADDRESS
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: cdale_doorbell_user
+  #     targetPath: env.FRIGATE_CDALE_DOORBELL_USER
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: cdale_doorbell_password
+  #     targetPath: env.FRIGATE_CDALE_DOORBELL_PASSWORD
+  #     optional: false
+  #   - kind: Secret
+  #     name: frigate
+  #     valuesKey: cdale_doorbell_ip
+  #     targetPath: env.FRIGATE_CDALE_DOORBELL_IP
+  #     optional: false
