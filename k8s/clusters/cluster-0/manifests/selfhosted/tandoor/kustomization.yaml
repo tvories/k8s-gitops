@@ -6,3 +6,4 @@ resources:
   # - ./cnpg.yaml
   # - ./pg-secret.sops.yaml
   - ./helm-release.yaml
+  - ./volsync.yaml
