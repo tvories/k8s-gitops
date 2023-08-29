@@ -6,7 +6,6 @@ metadata:
   namespace: system-monitoring
 spec:
   interval: 6h
-  maxHistory: 2
   timeout: 20m
   chart:
     spec:
@@ -16,8 +15,40 @@ spec:
         kind: HelmRepository
         name: prometheus-community-charts
         namespace: flux-system
-
+  maxHistory: 3
+  install:
+    remediation:
+      retries: 1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 1
+  uninstall:
+    keepHistory: false
   values:
+    cleanPrometheusOperatorObjectNames: true
+
+    alertmanager:
+      ingress:
+        enabled: true
+        ingressClassName: nginx-internal
+        hosts:
+          - &host-alert-manager alert-manager.${CLUSTER_NAME}.${SECRET_DOMAIN}
+        paths:
+          - /
+        pathType: Prefix
+        tls:
+          - hosts:
+              - *host-alert-manager
+      alertManagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              resources:
+                requests:
+                  storage: 10Gi
+
     ###
     ### Component values
     ###
@@ -30,9 +61,11 @@ spec:
     kubeEtcd:
       enabled: true
       endpoints:
-        - 192.168.80.91
-        - 192.168.80.92
-        - 192.168.80.93
+        - 192.168.80.99
+        - 192.168.80.100
+        - 192.168.80.98
+        - 192.168.80.90
+        - 192.168.80.97
       service:
         enabled: true
         port: 2381
@@ -42,10 +75,13 @@ spec:
       enabled: true
       serviceMonitor:
         metricRelabelings:
-          - action: replace
-            sourceLabels:
-              - node
+          # Remove duplicate metrics
+          - sourceLabels: ["__name__"]
+            regex: "(apiserver_audit|apiserver_client|apiserver_delegated|apiserver_envelope|apiserver_storage|apiserver_webhooks|authentication_token|cadvisor_version|container_blkio|container_cpu|container_fs|container_last|container_memory|container_network|container_oom|container_processes|container|csi_operations|disabled_metric|get_token|go|hidden_metric|kubelet_certificate|kubelet_cgroup|kubelet_container|kubelet_containers|kubelet_cpu|kubelet_device|kubelet_graceful|kubelet_http|kubelet_lifecycle|kubelet_managed|kubelet_node|kubelet_pleg|kubelet_pod|kubelet_run|kubelet_running|kubelet_runtime|kubelet_server|kubelet_started|kubelet_volume|kubernetes_build|kubernetes_feature|machine_cpu|machine_memory|machine_nvm|machine_scrape|node_namespace|plugin_manager|prober_probe|process_cpu|process_max|process_open|process_resident|process_start|process_virtual|registered_metric|rest_client|scrape_duration|scrape_samples|scrape_series|storage_operation|volume_manager|volume_operation|workqueue)_(.+)"
+            action: keep
+          - sourceLabels: ["node"]
             targetLabel: instance
+            action: replace
 
     kubeProxy:
       enabled: false
@@ -144,6 +180,8 @@ spec:
 
       thanosService:
         enabled: true
+      thanosServiceMonitor:
+        enabled: true
 
       prometheusSpec:
         replicas: 1
@@ -155,6 +193,8 @@ spec:
         retentionSize: "6GB"
         retention: 2d
         enableAdminAPI: true
+        externalLabels:
+          cluster: ${CLUSTER_NAME}
         walCompression: true
         storageSpec:
           volumeClaimTemplate:
