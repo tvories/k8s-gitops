@@ -5,3 +5,4 @@ resources:
   - ./objectbucketclaim.yaml
   - ./helm-release.yaml
   - ./dashboard
+  - ./externalsecret.yaml
