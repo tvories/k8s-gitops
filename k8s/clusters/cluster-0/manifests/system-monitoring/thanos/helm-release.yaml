@@ -33,8 +33,8 @@ spec:
 
     objstoreConfig:
       type: s3
-      config:
-        insecure: false
+      # config:
+      #   insecure: false
 
     query:
       enabled: true
