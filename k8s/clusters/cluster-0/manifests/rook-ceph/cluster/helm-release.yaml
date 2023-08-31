@@ -114,12 +114,12 @@ spec:
           # - name: "talos-worker-3"
           #   devices:
           #     - name: "sdb"
-          - name: "physical1"
-            devices:
-              - name: "sdb"
-          - name: "physical2"
-            devices:
-              - name: "sdb"
+          # - name: "physical1"
+          #   devices:
+          #     - name: "sdb"
+          # - name: "physical2"
+          #   devices:
+          #     - name: "sdb"
           # - name: "sff1"
           #   devices:
           #     - name: "sdb"
