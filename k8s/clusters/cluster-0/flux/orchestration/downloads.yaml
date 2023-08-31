@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-namespace
@@ -45,7 +45,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-pvc
@@ -61,7 +61,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-prowlarr
@@ -81,7 +81,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-qbittorrent
@@ -101,7 +101,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-radarr
@@ -120,7 +120,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-readarr
@@ -139,7 +139,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-sonarr
@@ -176,7 +176,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: downloads-unpackerr
