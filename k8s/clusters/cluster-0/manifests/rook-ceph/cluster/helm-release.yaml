@@ -120,15 +120,18 @@ spec:
           - name: "physical2"
             devices:
               - name: "sdb"
-          - name: "sff1"
-            devices:
-              - name: "sdb"
+          # - name: "sff1"
+          #   devices:
+          #     - name: "sdb"
           - name: "m720q-1"
             devices:
               - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2304210050300351"
           - name: "m720q-2"
             devices:
               - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2305150020700998"
+          - name: "m720q-3"
+            devices:
+              - name: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2307170050100778"
 
     ingress:
       dashboard:
