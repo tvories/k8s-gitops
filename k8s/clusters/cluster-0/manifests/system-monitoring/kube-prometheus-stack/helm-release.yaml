@@ -63,6 +63,7 @@ spec:
       endpoints:
         - 192.168.80.99
         - 192.168.80.100
+        - 192.168.80.101
         - 192.168.80.98
         - 192.168.80.90
         - 192.168.80.97
@@ -232,6 +233,7 @@ spec:
                   - "sff1.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "m720q-1.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "m720q-2.${SECRET_INTERNAL_DOMAIN}:9100"
+                  - "m720q-3.${SECRET_INTERNAL_DOMAIN}:9100"
           - job_name: "home-assistant"
             scrape_interval: 60s
             metrics_path: "/api/prometheus"
