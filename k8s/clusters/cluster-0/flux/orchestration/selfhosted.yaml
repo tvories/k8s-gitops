@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-namespace
@@ -13,7 +13,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-kms
@@ -27,7 +27,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-tandoor
@@ -59,7 +59,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-boobereats
@@ -73,7 +73,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-gitlab
@@ -87,7 +87,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-taylorvories
@@ -101,7 +101,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-tmtech
@@ -143,7 +143,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-vaultwarden
@@ -159,7 +159,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-nextcloud
@@ -189,7 +189,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-minio
@@ -217,7 +217,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-obico
@@ -231,7 +231,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-hashi-vault
@@ -247,7 +247,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-paperless
@@ -277,7 +277,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-theme-park
@@ -291,7 +291,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-valheim
@@ -305,7 +305,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-valheim-family
@@ -319,7 +319,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-immich
