@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-namespace
@@ -13,7 +13,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-emqx
@@ -29,7 +29,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-node-red
@@ -46,7 +46,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-frigate
@@ -64,7 +64,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-esphome
@@ -81,7 +81,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-home-assistant
@@ -100,7 +100,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-zwavejs2mqtt
@@ -118,7 +118,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-zigbee2mqtt
@@ -136,7 +136,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: home-amcrest2mqtt

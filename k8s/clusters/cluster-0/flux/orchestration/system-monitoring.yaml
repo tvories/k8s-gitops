@@ -1,5 +1,5 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-namespace
@@ -13,7 +13,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-kube-prom-stack
@@ -30,7 +30,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-thanos
@@ -65,7 +65,7 @@ spec:
 #     kind: GitRepository
 #     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-grafana
@@ -83,7 +83,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-vector-aggregator
@@ -100,7 +100,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-vector-agent
@@ -118,7 +118,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-loki
@@ -136,7 +136,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-speedtest-exporter
@@ -153,7 +153,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-prometheus-smartctl
@@ -170,7 +170,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-vpa
@@ -186,7 +186,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-goldilocks
@@ -203,7 +203,7 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: system-monitoring-snmp-exporter-cisco-switch
