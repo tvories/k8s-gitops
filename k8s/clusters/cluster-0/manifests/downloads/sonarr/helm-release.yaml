@@ -38,7 +38,7 @@ spec:
 
     image:
       repository: ghcr.io/onedr0p/sonarr-develop
-      tag: 4.0.0.650@sha256:f81eeebf3859b10049b71f1953558b804f28d48c945885c14d09320b83be586e
+      tag: 4.0.0.657@sha256:7cad79cd0c852ac74c0f8088235bcd8ed50623db10090d38be680db31c4183d0
 
     env:
       TZ: "${TIMEZONE}"
