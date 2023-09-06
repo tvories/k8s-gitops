@@ -1,4 +1,3 @@
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -7,10 +6,10 @@ metadata:
 spec:
   interval: 10m0s
   dependsOn:
-    - name: cluster-config
-    - name: cluster-repositories
-    - name: manage-flux
-    - name: cluster-crds
+  - name: cluster-config
+  - name: cluster-repositories
+  - name: manage-flux
+  - name: cluster-crds
   path: ./k8s/clusters/cluster-test/flux/orchestration
   prune: true
   wait: true
@@ -20,38 +19,38 @@ spec:
   decryption:
     provider: sops
   postBuild:
-    substitute: {}
+    # substitute: {}
     substituteFrom:
-      - kind: ConfigMap
-        name: global-config
-      - kind: Secret
-        name: global-secrets
-      - kind: ConfigMap
-        name: cluster-config
-      - kind: Secret
-        name: cluster-secrets
+    - kind: ConfigMap
+      name: global-config
+    - kind: Secret
+      name: global-secrets
+    - kind: ConfigMap
+      name: cluster-config
+    - kind: Secret
+      name: cluster-secrets
   patches:
-    - patch: |-
-        apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-        kind: Kustomization
-        metadata:
-          name: not-used
-          namespace: not-used
-        spec:
-          decryption:
-            provider: sops
-          postBuild:
-            substitute: {}
-            substituteFrom:
-              - kind: ConfigMap
-                name: global-config
-              - kind: Secret
-                name: global-secrets
-              - kind: ConfigMap
-                name: cluster-config
-              - kind: Secret
-                name: cluster-secrets
-      target:
-        kind: Kustomization
-        group: kustomize.toolkit.fluxcd.io
-        version: v1beta2
+  - patch: |-
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: not-used
+        namespace: not-used
+      spec:
+        decryption:
+          provider: sops
+        postBuild:
+          # substitute: {}
+          substituteFrom:
+            - kind: ConfigMap
+              name: global-config
+            - kind: Secret
+              name: global-secrets
+            - kind: ConfigMap
+              name: cluster-config
+            - kind: Secret
+              name: cluster-secrets
+    target:
+      kind: Kustomization
+      group: kustomize.toolkit.fluxcd.io
+      version: v1beta2
