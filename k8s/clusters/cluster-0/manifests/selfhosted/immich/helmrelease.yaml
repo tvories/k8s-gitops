@@ -49,8 +49,8 @@ spec:
       # OAUTH_AUTO_REGISTER: "true"
       # OAUTH_BUTTON_TEXT: "Login with Authelia"
     envFrom:
-      - secretRef:
-          name: immich-secret
+    - secretRef:
+        name: immich-secret
 
     postgres:
       enabled: false
@@ -88,7 +88,7 @@ spec:
 
     image:
       # renovate: datasource=github-releases depName=immich-app/immich
-      tag: "v1.76.1"
+      tag: "v1.77.0"
 
     server:
       resources:
@@ -96,10 +96,10 @@ spec:
           cpu: 15m
           memory: 512M
       envFrom:
-        - secretRef:
-            name: immich-secret
-        - configMapRef:
-            name: immich
+      - secretRef:
+          name: immich-secret
+      - configMapRef:
+          name: immich
 
     microservices:
       controller:
@@ -127,12 +127,12 @@ spec:
           enabled: false
           spec:
             initialDelaySeconds: 90
-      # persistence:
-      #   cache:
-      #     size: 10Gi
-      #     type: pvc
-      #     accessMode: ReadWriteOnce
-      #     storageClass: ceph-block
+            # persistence:
+            #   cache:
+            #     size: 10Gi
+            #     type: pvc
+            #     accessMode: ReadWriteOnce
+            #     storageClass: ceph-block
 
     web:
       resources:
@@ -151,13 +151,14 @@ spec:
           ingressClassName: nginx-internal
           annotations:
             # kubernetes.io/ingress.class: nginx-internal
+            cert-manager.io/cluster-issuer: letsencrypt-production
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
           hosts:
-            - host: &host "photos.${SECRET_DOMAIN}"
-              paths:
-                - path: /
-                  pathType: Prefix
+          - host: &host "photos.${SECRET_DOMAIN}"
+            paths:
+            - path: /
+              pathType: Prefix
           tls:
-            - hosts:
-                - *host
-              secretName: *host
+          - hosts:
+            - *host
+            secretName: *host
