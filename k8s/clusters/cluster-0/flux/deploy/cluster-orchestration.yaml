@@ -19,7 +19,7 @@ spec:
   decryption:
     provider: sops
   postBuild:
-    substitute: {}
+    # substitute: {}
     substituteFrom:
     - kind: ConfigMap
       name: global-config
@@ -40,7 +40,7 @@ spec:
         decryption:
           provider: sops
         postBuild:
-          substitute: {}
+          # substitute: {}
           substituteFrom:
             - kind: ConfigMap
               name: global-config
