@@ -1,4 +1,3 @@
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -34,7 +33,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/tandoor"
   prune: true
@@ -150,7 +149,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
   prune: true
@@ -166,7 +165,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
   prune: true
@@ -238,7 +237,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/hashi-vault"
   prune: true
@@ -254,7 +253,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
+  - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless"
   prune: true
@@ -329,6 +328,22 @@ spec:
   # - name: database-zalando-postgres-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/immich"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: selfhosted-obsidian-couchdb
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: rook-ceph-cluster
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/selfhosted/obsidian-couchdb"
   prune: true
   wait: true
   sourceRef:
