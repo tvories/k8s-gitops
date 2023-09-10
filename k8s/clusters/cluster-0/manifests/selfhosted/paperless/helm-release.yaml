@@ -25,6 +25,14 @@ spec:
       remediateLastFailure: true # remediate the last failure, when no retries remain
     cleanupOnFail: true
   values:
+    initContainers:
+      01-init-db:
+        image: ghcr.io/onedr0p/postgres-init:14.9
+        imagePullPolicy: IfNotPresent
+        envFrom: &envFrom
+          - secretRef:
+              name: paperless-secret
+
     image:
       repository: ghcr.io/paperless-ngx/paperless-ngx
       tag: 1.17.4
@@ -38,7 +46,7 @@ spec:
       PAPERLESS_DBHOST: postgres.database
       PAPERLESS_DBNAME: paperless
       PAPERLESS_DBUSER: paperless
-      PAPERLESS_DBPASS: ${PAPERLESS_PG_PASSWORD}
+      # PAPERLESS_DBPASS: ${PAPERLESS_PG_PASSWORD}
       PAPERLESS_CONSUMER_POLLING: "60"
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
@@ -48,6 +56,9 @@ spec:
       PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
       PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN}"
       PAPERLESS_WORKER_TIMEOUT: 3600
+    envFrom:
+      - secretRef:
+          name: paperless-secret
 
     persistence:
       data:
