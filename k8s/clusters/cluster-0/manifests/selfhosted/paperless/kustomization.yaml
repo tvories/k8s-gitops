@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - ./pvc.yaml
   - ./helm-release.yaml
-patchesStrategicMerge:
-  - patches/postgres.yaml
+  - ./externalsecret.yaml
+# patchesStrategicMerge:
+#   - patches/postgres.yaml
