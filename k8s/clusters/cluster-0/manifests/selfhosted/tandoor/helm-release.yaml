@@ -155,9 +155,9 @@ spec:
           - name: DB_ENGINE
             value: django.db.backends.postgresql_psycopg2
           - name: POSTGRES_HOST
-            value: ${POSTGRES_HOST}
+            value: postgres.database.svc.cluster.local
           - name: POSTGRES_PORT
-            value: ${POSTGRES_PORT}
+            value: "5432"
           - name: POSTGRES_DB
             value: tandoor
         envFrom: *envFrom
