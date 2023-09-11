@@ -28,7 +28,7 @@ metadata:
   name: tandoor
   namespace: selfhosted
 spec:
-  sourcePVC: tandoor-config
+  sourcePVC: tandoor-files
   trigger:
     schedule: "0 7 * * *"
   restic:
