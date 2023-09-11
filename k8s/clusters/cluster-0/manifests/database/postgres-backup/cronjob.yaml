@@ -40,7 +40,7 @@ spec:
                       name: postgres.postgres.credentials.postgresql.acid.zalan.do
                       key: password
                 - name: POSTGRES_DB
-                  value: "hass,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,prowlarr_log,sonarr_main,sonarr_log,radarr_main,radarr_log"
+                  value: "hass,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,prowlarr_log,sonarr_main,sonarr_log,radarr_main,radarr_log,vaultwarden"
               volumeMounts:
                 - name: nas-backups
                   mountPath: /backups
