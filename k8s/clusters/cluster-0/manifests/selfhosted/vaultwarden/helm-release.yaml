@@ -34,6 +34,7 @@ spec:
           - secretRef:
               name: &secret vaultwarden-secret
     controller:
+      type: statefulset
       annotations:
         reloader.stakater.com/auto: "true"
     image:
