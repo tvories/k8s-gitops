@@ -1,40 +1,56 @@
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: tandoor-config
+#   namespace: selfhosted
+#   labels:
+#     triliovault.trilio.io/backup: "true"
+#     kasten.io/backup-volume: "enabled"
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 2Gi
+#   storageClassName: ceph-block
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: tandoor-static
+#   namespace: selfhosted
+#   labels:
+#     triliovault.trilio.io/backup: "true"
+#     kasten.io/backup-volume: "enabled"
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 2Gi
+#   storageClassName: ceph-block
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: tandoor-media
+#   namespace: selfhosted
+#   labels:
+#     triliovault.trilio.io/backup: "true"
+#     kasten.io/backup-volume: "enabled"
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 2Gi
+#   storageClassName: ceph-block
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tandoor-config
-  namespace: selfhosted
-  labels:
-    triliovault.trilio.io/backup: "true"
-    kasten.io/backup-volume: "enabled"
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: tandoor-static
-  namespace: selfhosted
-  labels:
-    triliovault.trilio.io/backup: "true"
-    kasten.io/backup-volume: "enabled"
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: tandoor-media
+  name: tandoor-files
   namespace: selfhosted
   labels:
     triliovault.trilio.io/backup: "true"
