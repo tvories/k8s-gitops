@@ -339,7 +339,7 @@ spec:
         cpu: 49m
         memory: 79M
       limits:
-        memory: 152M
+        memory: 400M
 
     podAnnotations:
       configmap.reloader.stakater.com/reload: "grafana"
