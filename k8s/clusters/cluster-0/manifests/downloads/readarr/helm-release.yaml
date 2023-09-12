@@ -49,7 +49,6 @@ spec:
         existingClaim: readarr-nfs-backup
         mountPath: /config/Backups
 
-
     ingress:
       main:
         enabled: true
@@ -87,24 +86,24 @@ spec:
       limits:
         memory: 1500Mi
 
-    prometheus:
-      podMonitor:
-        enabled: true
-        interval: 10m
-        scrapeTimeout: 2s
+    # prometheus:
+    #   podMonitor:
+    #     enabled: true
+    #     interval: 10m
+    #     scrapeTimeout: 2s
 
-    metrics:
-      enabled: true
-      serviceMonitor:
-        interval: 3m
-        scrapeTimeout: 1m
-      prometheusRule:
-        enabled: true
-      exporter:
-        image:
-          repository: ghcr.io/onedr0p/exportarr
-          tag: v1.5.3
-        env:
-          port: 9794
-          additionalMetrics: true
-          unknownQueueItems: true
+    # metrics:
+    #   enabled: true
+    #   serviceMonitor:
+    #     interval: 3m
+    #     scrapeTimeout: 1m
+    #   prometheusRule:
+    #     enabled: true
+    #   exporter:
+    #     image:
+    #       repository: ghcr.io/onedr0p/exportarr
+    #       tag: v1.5.3
+    #     env:
+    #       port: 9794
+    #       additionalMetrics: true
+    #       unknownQueueItems: true
