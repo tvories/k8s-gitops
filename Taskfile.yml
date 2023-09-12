@@ -1,13 +1,13 @@
 ---
 version: "3"
 
-vars:
-  PROJECT_DIR:
-    sh: "git rev-parse --show-toplevel"
-  CLUSTER_DIR: "{{.PROJECT_DIR}}/cluster"
+# vars:
+#   PROJECT_DIR:
+#     sh: "git rev-parse --show-toplevel"
+#   CLUSTER_DIR: "{{.PROJECT_DIR}}/cluster"
 
-env:
-  KUBECONFIG: "{{.PROJECT_DIR}}/kubeconfig"
+# env:
+#   KUBECONFIG: "{{.PROJECT_DIR}}/kubeconfig"
 
 includes:
   flux: .taskfiles/flux.yml
@@ -15,3 +15,9 @@ includes:
   lint: .taskfiles/lint.yml
   pre-commit: .taskfiles/pre-commit.yml
   cluster: .taskfiles/cluster.yml
+  volsync:
+    taskfile: ".taskfiles/volsync"
+    dir: .taskfiles/volsync
+  rook:
+    taskfile: ".taskfiles/rook"
+    dir: .taskfiles/rook
