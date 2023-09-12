@@ -29,7 +29,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 20Gi
   storageClassName: ceph-block
 
 ---
@@ -63,7 +63,7 @@ metadata:
   namespace: media
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   storageClassName: audiobookshelf-nfs-backup
   resources:
     requests:
@@ -100,7 +100,7 @@ metadata:
   namespace: media
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   storageClassName: audiobookshelf-nfs-audiobooks
   resources:
     requests:
