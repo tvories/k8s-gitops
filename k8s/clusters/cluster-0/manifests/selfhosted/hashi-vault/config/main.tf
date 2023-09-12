@@ -10,7 +10,7 @@ terraform {
 # Use the approle once first use has been created
 # provider "vault" {
 #   address = "https://vault.${data.sops_file.secrets.data["external_domain"]}"
-#   token = data.sops_file.secrets.data["vault_token"]
+#   token   = data.sops_file.secrets.data["vault_token"]
 # }
 
 # This is block to be used after bootstrap.  Leverage the terraform approle
