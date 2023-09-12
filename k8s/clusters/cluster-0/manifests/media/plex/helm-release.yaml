@@ -6,26 +6,43 @@ metadata:
   namespace: media
 spec:
   releaseName: plex
-  interval: 5m
+  interval: 30m
   chart:
     spec:
       # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: plex
-      version: 6.4.3
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+      interval: 30m
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
       repository: ghcr.io/onedr0p/plex
       tag: 1.32.5.7349-8f4248874
+
+    service:
+      main:
+        enabled: true
+        ports:
+          http:
+            port: 32400
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: ${LB_PLEX}
+        externalTrafficPolicy: Cluster
 
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 568
       fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
       supplementalGroups:
         - 44
         - 109
@@ -37,11 +54,11 @@ spec:
       TZ: "${TIMEZONE}"
       ADVERTISE_IP: "https://plex.${SECRET_DOMAIN}:443/,http://${LB_PLEX}:32400/"
 
-    service:
-      main:
-        type: LoadBalancer
-        loadBalancerIP: ${LB_PLEX}
-        externalTrafficPolicy: Local
+    # service:
+    #   main:
+    #     type: LoadBalancer
+    #     loadBalancerIP: ${LB_PLEX}
+    #     externalTrafficPolicy: Local
 
     ingress:
       main:
