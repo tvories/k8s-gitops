@@ -1,8 +1,8 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.5.0
-kubernetesVersion: v1.27.4
+talosVersion: v1.5.2
+kubernetesVersion: v1.28.1
 endpoint: https://${cluster_name}.${domain_name}:6443
 domain: cluster.local
 allowSchedulingOnMasters: true
@@ -40,64 +40,64 @@ nodes:
   #   ipAddress: 192.168.80.93
   #   installDisk: /dev/sda
 
-  - hostname: physical1.${domain_name}
-    controlPlane: true
-    installDiskSelector:
-      busPath: /pci0000:00/0000:00:1f.2/ata5/host4/target4:0:0/4:0:0:0/
-    ipAddress: 192.168.80.98
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-    installDisk: /dev/sda
-    # patches:
-    #   - |-
-    #     machine:
-    #       install:
-    #         extensions:
-    #           - image: ${gasket_image}
-    #       kernel:
-    #         modules:
-    #           - name: gasket
-    #           - name: apex
+  # - hostname: physical1.${domain_name}
+  #   controlPlane: true
+  #   installDiskSelector:
+  #     busPath: /pci0000:00/0000:00:1f.2/ata5/host4/target4:0:0/4:0:0:0/
+  #   ipAddress: 192.168.80.98
+  #   networkInterfaces:
+  #     - interface: eth0
+  #       dhcp: true
+  #       mtu: 9000
+  #   installDisk: /dev/sda
+  #   # patches:
+  #   #   - |-
+  #   #     machine:
+  #   #       install:
+  #   #         extensions:
+  #   #           - image: ${gasket_image}
+  #   #       kernel:
+  #   #         modules:
+  #   #           - name: gasket
+  #   #           - name: apex
 
-  - hostname: physical2.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.90
-    installDisk: /dev/sda
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-    # patches:
-    #   - |-
-    #     machine:
-    #       install:
-    #         extensions:
-    #           - image: ${gasket_image}
-    #       kernel:
-    #         modules:
-    #           - name: gasket
-    #           - name: apex
+  # - hostname: physical2.${domain_name}
+  #   controlPlane: true
+  #   ipAddress: 192.168.80.90
+  #   installDisk: /dev/sda
+  #   networkInterfaces:
+  #     - interface: eth0
+  #       dhcp: true
+  #       mtu: 9000
+  #   # patches:
+  #   #   - |-
+  #   #     machine:
+  #   #       install:
+  #   #         extensions:
+  #   #           - image: ${gasket_image}
+  #   #       kernel:
+  #   #         modules:
+  #   #           - name: gasket
+  #   #           - name: apex
 
-  - hostname: sff1.${domain_name}
-    controlPlane: true
-    ipAddress: 192.168.80.97
-    networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        mtu: 9000
-    installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+  # - hostname: sff1.${domain_name}
+  #   controlPlane: true
+  #   ipAddress: 192.168.80.97
+  #   networkInterfaces:
+  #     - interface: eth0
+  #       dhcp: true
+  #       mtu: 9000
+  #   installDisk: /dev/sda
+  #   # patches:
+  #   #   - |-
+  #   #     machine:
+  #   #       install:
+  #   #         extensions:
+  #   #           - image: ${gasket_image}
+  #   #       kernel:
+  #   #         modules:
+  #   #           - name: gasket
+  #   #           - name: apex
 
   - hostname: m720q-1.${domain_name}
     controlPlane: true
@@ -123,6 +123,27 @@ nodes:
     installDiskSelector:
       busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
     ipAddress: 192.168.80.100
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        mtu: 9000
+    installDisk: /dev/sda
+    patches:
+      - |-
+        machine:
+          install:
+            extensions:
+              - image: ${gasket_image}
+          kernel:
+            modules:
+              - name: gasket
+              - name: apex
+
+  - hostname: m720q-3.${domain_name}
+    controlPlane: true
+    installDiskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+    ipAddress: 192.168.80.101
     networkInterfaces:
       - interface: eth0
         dhcp: true
