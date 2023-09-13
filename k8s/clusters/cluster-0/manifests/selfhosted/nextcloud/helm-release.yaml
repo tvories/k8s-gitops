@@ -94,6 +94,12 @@ spec:
           secretName: tls.nextcloud
 
     nextcloud:
+      extraEnv:
+        - name: REDIS_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: *secret
+              key: REDIS_PASSWORD
       extraInitContainers:
         extraInitContainers:
           - name: init-db
