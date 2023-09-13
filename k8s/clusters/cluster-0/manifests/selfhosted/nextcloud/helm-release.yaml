@@ -231,9 +231,9 @@ spec:
       enabled: true
       architecture: standalone
       auth:
-        enabled: false
-        # existingSecret: *secret
-        # existingSecretPasswordKey: REDIS_PASSWORD
+        enabled: true
+        existingSecret: *secret
+        existingSecretPasswordKey: REDIS_PASSWORD
       master:
         persistence:
           enabled: false
