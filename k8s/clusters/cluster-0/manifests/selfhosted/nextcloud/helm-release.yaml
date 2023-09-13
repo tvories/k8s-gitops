@@ -11,7 +11,7 @@ spec:
     spec:
       # renovate: registryUrl=https://nextcloud.github.io/helm/
       chart: nextcloud
-      version: 4.3.0
+      version: 4.3.1
       sourceRef:
         kind: HelmRepository
         name: nextcloud-charts
@@ -27,8 +27,10 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    deploymentAnnotations:
+      secret.reloader.stakater.com/reload: &secret nextcloud-secret
     image:
-      tag: 26.0.3-fpm
+      tag: 27.0.2-fpm
 
     ingress:
       enabled: true
@@ -93,36 +95,22 @@ spec:
 
     nextcloud:
       extraInitContainers:
-        - name: wait-database
-          image: alpine:3.18.3
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-          args:
-            - -c
-            - >-
-              until nc -w 1 -v $MYSQL_HOST:3306 || nc -w 1 -v $POSTGRES_HOST:5432;
-              do echo "Waiting for database";
-              done
-          env:
-            - name: POSTGRES_HOST
-              value: postgres.database.svc
-        - name: wait-redis
-          image: alpine:3.18.3
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-          args:
-            - -c
-            - >-
-              until nc -w 1 -v $REDIS_HOST:$REDIS_HOST_PORT;
-              do echo "Waiting for Redis";
-              done
-          env:
-            - name: REDIS_HOST
-              value: nextcloud-redis-master
-            - name: REDIS_HOST_PORT
-              value: "6379"
+        extraInitContainers:
+          - name: init-db
+            image: ghcr.io/onedr0p/postgres-init:14.9
+            envFrom:
+              - secretRef:
+                  name: *secret
+
+      existingSecret:
+        enabled: true
+        secretName: *secret
+        usernameKey: ADMIN_USER
+        passwordKey: ADMIN_PASS
+        # tokenKey: METRICS_TOKEN
+        smtpHostKey: SMTP_HOST
+        smtpUsernameKey: SMTP_USERNAME
+        smtpPasswordKey: SMTP_PASSWORD
 
       host: *host
       username: admin
@@ -132,12 +120,49 @@ spec:
         fromAddress: nc
         domain: ${SECRET_DOMAIN}
         smtp:
-          host: ${SECRET_SMTP_HOST}
+          # host: ${SECRET_SMTP_HOST}
           secure: ssl
           port: 465
           authtype: LOGIN
-          name: ${SECRET_NEXTCLOUD_MAIL_USER}
-          password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
+          # name: ${SECRET_NEXTCLOUD_MAIL_USER}
+          # password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
+
+      configs:
+        local.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' =>
+            array (
+              0 => '127.0.0.1',
+              1 => '172.16.0.0/16',
+            ),
+            'forwarded_for_headers' =>
+            array (
+              0 => 'HTTP_X_FORWARDED_FOR',
+            ),
+            'default_phone_region' => 'US',
+            'trashbin_retention_obligation' => 'auto, 30',
+            'auth.bruteforce.protection.enabled' => true,
+          );
+      phpConfigs:
+        uploadLimit.ini: |
+          upload_max_filesize = 16G
+          post_max_size = 16G
+          max_input_time = 3600
+          max_execution_time = 3600
+        www.conf: |
+          [www]
+          user = www-data
+          group = www-data
+          listen = 127.0.0.1:9000
+          pm = dynamic
+          pm.max_children = 57
+          pm.start_servers = 14
+          pm.min_spare_servers = 14
+          pm.max_spare_servers = 42
+          pm.max_requests = 500
+          pm.process_idle_timeout = 10s
+
       extraVolumes:
         - name: media
           nfs:
@@ -166,6 +191,17 @@ spec:
     nginx:
       ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
       enabled: true
+      image:
+        repository: public.ecr.aws/nginx/nginx
+        tag: "1.25.2"
+      config:
+        default: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 20Mi
+        limits:
+          memory: 100Mi
 
     internalDatabase:
       enabled: false
@@ -173,39 +209,59 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: postgres.database
+      # host: postgres.database
       database: nextcloud
-      password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
-      user: ncuser
+      existingSecret:
+        enabled: true
+        secretName: *secret
+        hostKey: POSTGRES_HOST
+        databaseKey: POSTGRES_DB
+        usernameKey: POSTGRES_USER
+        passwordKey: POSTGRES_PASSWORD
+      # password: ${SECRET_NEXTCLOUD_DB_PASSWORD}
+      # user: ncuser
 
     redis:
       enabled: true
+      architecture: standalone
       auth:
         enabled: true
-        password: ${SECRET_NEXTCLOUD_REDIS_PASSWORD}
+        existingSecret: *secret
+        existingSecretPasswordKey: REDIS_PASSWORD
       master:
         persistence:
           enabled: false
-      replica:
-        persistence:
-          enabled: false
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            memory: 100Mi
+      commonConfiguration: |-
+        # Enable AOF https://redis.io/topics/persistence#append-only-file
+        appendonly yes
+        # Disable RDB persistence, AOF persistence already enabled.
+        save ""
+        maxmemory 94371840
+        maxmemory-policy allkeys-lru
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+          limits:
+            memory: 20Mi
 
     postgresql:
       enabled: false
-      persistence:
-        enabled: true
-        existingClaim: pvc-nextcloud-db
-        size: 1Mi
-      global:
-        postgresql:
-          postgresqlUsername: ncuser
-          postgresqlPassword: ${SECRET_NEXTCLOUD_DB_PASSWORD}
-          postgresqlDatabase: nextcloud
 
     cronjob:
       enabled: true
-      failedJobsHistoryLimit: 1
-      successfulJobsHistoryLimit: 1
+      # failedJobsHistoryLimit: 1
+      # successfulJobsHistoryLimit: 1
 
     persistence:
       enabled: true
@@ -213,24 +269,31 @@ spec:
       size: 1Mi
       existingClaim: nextcloud-nfs-config
 
-    # this seems to be required for nextcloud initialization which takes a long time
     startupProbe:
       enabled: true
-      initialDelaySeconds: 30
+      initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 5
-      failureThreshold: 30
+      failureThreshold: 60
       successThreshold: 1
-
-    # livenessProbe:
-    #   enabled: false
-
-    # readinessProbe:
-    #   enabled: false
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
 
     resources:
       requests:
-        cpu: 35m
-        memory: 164M
+        cpu: 200m
+        memory: 250M
       # limits:
       #   memory: 508M
