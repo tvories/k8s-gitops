@@ -274,6 +274,9 @@ spec:
       accessMode: ReadWriteMany
       size: 1Mi
       existingClaim: nextcloud-nfs-config
+      nextcloudData:
+        enabled: true
+        existingClaim: nextcloud-nfs-data
 
     startupProbe:
       enabled: true
