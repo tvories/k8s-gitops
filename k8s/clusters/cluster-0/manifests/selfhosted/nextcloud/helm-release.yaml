@@ -105,8 +105,8 @@ spec:
       existingSecret:
         enabled: true
         secretName: *secret
-        usernameKey: ADMIN_USER
-        passwordKey: ADMIN_PASS
+        # usernameKey: ADMIN_USER
+        # passwordKey: ADMIN_PASS
         # tokenKey: METRICS_TOKEN
         smtpHostKey: SMTP_HOST
         smtpUsernameKey: SMTP_USER
@@ -127,23 +127,23 @@ spec:
           # name: ${SECRET_NEXTCLOUD_MAIL_USER}
           # password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
 
-      configs:
-        local.config.php: |-
-          <?php
-          $CONFIG = array (
-            'trusted_proxies' =>
-            array (
-              0 => '127.0.0.1',
-              1 => '172.16.0.0/16',
-            ),
-            'forwarded_for_headers' =>
-            array (
-              0 => 'HTTP_X_FORWARDED_FOR',
-            ),
-            'default_phone_region' => 'US',
-            'trashbin_retention_obligation' => 'auto, 30',
-            'auth.bruteforce.protection.enabled' => true,
-          );
+      # configs:
+      #   local.config.php: |-
+      #     <?php
+      #     $CONFIG = array (
+      #       'trusted_proxies' =>
+      #       array (
+      #         0 => '127.0.0.1',
+      #         1 => '172.16.0.0/16',
+      #       ),
+      #       'forwarded_for_headers' =>
+      #       array (
+      #         0 => 'HTTP_X_FORWARDED_FOR',
+      #       ),
+      #       'default_phone_region' => 'US',
+      #       'trashbin_retention_obligation' => 'auto, 30',
+      #       'auth.bruteforce.protection.enabled' => true,
+      #     );
       phpConfigs:
         uploadLimit.ini: |
           upload_max_filesize = 16G
