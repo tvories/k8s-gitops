@@ -109,7 +109,7 @@ spec:
         passwordKey: ADMIN_PASS
         # tokenKey: METRICS_TOKEN
         smtpHostKey: SMTP_HOST
-        smtpUsernameKey: SMTP_USERNAME
+        smtpUsernameKey: SMTP_USER
         smtpPasswordKey: SMTP_PASS
 
       host: *host
