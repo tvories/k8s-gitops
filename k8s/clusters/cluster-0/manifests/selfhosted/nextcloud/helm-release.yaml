@@ -105,16 +105,16 @@ spec:
       existingSecret:
         enabled: true
         secretName: *secret
-        # usernameKey: ADMIN_USER
-        # passwordKey: ADMIN_PASS
+        usernameKey: ADMIN_USER
+        passwordKey: ADMIN_PASS
         # tokenKey: METRICS_TOKEN
         smtpHostKey: SMTP_HOST
         smtpUsernameKey: SMTP_USER
         smtpPasswordKey: SMTP_PASS
 
       host: *host
-      username: admin
-      password: ${SECRET_NEXTCLOUD_ADMIN_PASSWORD}
+      # username: admin
+      # password: ${SECRET_NEXTCLOUD_ADMIN_PASSWORD}
       mail:
         enabled: true
         fromAddress: nc
