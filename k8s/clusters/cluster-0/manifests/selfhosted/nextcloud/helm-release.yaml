@@ -94,12 +94,6 @@ spec:
           secretName: tls.nextcloud
 
     nextcloud:
-      # extraEnv:
-      #   - name: REDIS_HOST_PASSWORD
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: *secret
-      #         key: REDIS_PASSWORD
       extraInitContainers:
         extraInitContainers:
           - name: init-db
@@ -132,7 +126,6 @@ spec:
           authtype: LOGIN
           # name: ${SECRET_NEXTCLOUD_MAIL_USER}
           # password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
-
       configs:
         local.config.php: |-
           <?php
@@ -146,6 +139,7 @@ spec:
               array (
                 0 => 'nc.${SECRET_DOMAIN}',
             ),
+            'overwrite.cli.url' => 'http://nc.${SECRET_DOMAIN}}',
             'forwarded_for_headers' =>
             array (
               0 => 'HTTP_X_FORWARDED_FOR',
@@ -154,6 +148,7 @@ spec:
             'default_phone_region' => 'US',
             'trashbin_retention_obligation' => 'auto, 30',
             'auth.bruteforce.protection.enabled' => true,
+            'trashbin_retention_obligation' => 'auto, 30',
           );
 
       phpConfigs:
@@ -280,9 +275,9 @@ spec:
       accessMode: ReadWriteMany
       size: 1Mi
       existingClaim: nextcloud-nfs-config
-      nextcloudData:
-        enabled: true
-        existingClaim: nextcloud-nfs-data
+      # nextcloudData:
+      #   enabled: true
+      #   existingClaim: nextcloud-nfs-data
 
     startupProbe:
       enabled: true
