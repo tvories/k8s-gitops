@@ -105,19 +105,19 @@ spec:
   resources:
     requests:
       storage: 1Mi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-nfs-data
-  namespace: selfhosted
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: nextcloud-nfs-data
-  resources:
-    requests:
-      storage: 1Mi
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: nextcloud-nfs-data
+#   namespace: selfhosted
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: nextcloud-nfs-data
+#   resources:
+#     requests:
+#       storage: 1Mi
 # ---
 # apiVersion: v1
 # kind: PersistentVolumeClaim
