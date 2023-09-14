@@ -150,12 +150,10 @@ spec:
             array (
               0 => 'HTTP_X_FORWARDED_FOR',
             ),
-            'dbtype' => 'pgsql',
             'overwriteprotocol' => 'https',
             'default_phone_region' => 'US',
             'trashbin_retention_obligation' => 'auto, 30',
             'auth.bruteforce.protection.enabled' => true,
-            'installed' => true,
           );
 
       phpConfigs:
