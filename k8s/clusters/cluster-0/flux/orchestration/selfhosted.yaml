@@ -33,7 +33,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/tandoor"
   prune: true
@@ -149,7 +149,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
   prune: true
@@ -165,7 +165,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
   prune: true
@@ -187,20 +187,20 @@ spec:
 #   sourceRef:
 #     kind: GitRepository
 #     name: k8s-gitops
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: selfhosted-minio
-  namespace: flux-system
-spec:
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/selfhosted/minio"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: selfhosted-minio
+#   namespace: flux-system
+# spec:
+#   interval: 5m
+#   path: "./k8s/clusters/cluster-0/manifests/selfhosted/minio"
+#   prune: true
+#   wait: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: k8s-gitops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 # kind: Kustomization
@@ -237,7 +237,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/hashi-vault"
   prune: true
@@ -253,7 +253,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless"
   prune: true
@@ -341,7 +341,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-  - name: rook-ceph-cluster
+    - name: rook-ceph-cluster
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/obsidian-couchdb"
   prune: true
