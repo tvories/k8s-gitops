@@ -5,4 +5,4 @@
 - op: replace
   path: /machine/install/extensions
   value:
-    - image: ghcr.io/siderolabs/gasket-driver:97aeba58-v1.4.6 # System extension image.
+    - image: ghcr.io/siderolabs/gasket-driver:97aeba58-v1.5.0 # System extension image.
