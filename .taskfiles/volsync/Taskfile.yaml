@@ -119,7 +119,7 @@ tasks:
     cmds:
       - flux -n flux-system suspend kustomization {{.kustomization}}
       - flux -n {{.namespace}} suspend helmrelease {{.rsrc}}
-      - kubectl -n {{.namespace}} scale {{.controller}} --replicas 0
+      # - kubectl -n {{.namespace}} scale {{.controller}} --replicas 0
       - kubectl -n {{.namespace}} wait pod --for delete --selector="app.kubernetes.io/name={{.rsrc}}" --timeout=2m
     env: *task-vars
 

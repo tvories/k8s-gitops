@@ -12,44 +12,44 @@ vars:
   ts: '{{now | date "150405"}}'
 
 tasks:
-  wipe-node-delta:
-    desc: Trigger a wipe of Rook-Ceph data on node "delta"
+  wipe-node-m720q-1:
+    desc: Trigger a wipe of Rook-Ceph data on node "m720q-1"
     cmds:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57009Y"
+          ceph_disk: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2304210050300351"
       - task: wipe-data
         vars:
           node: "{{.node}}"
     vars:
-      node: delta
+      node: m720q-1
 
-  wipe-node-enigma:
-    desc: Trigger a wipe of Rook-Ceph data on node "enigma"
+  wipe-node-m720q-2:
+    desc: Trigger a wipe of Rook-Ceph data on node "m720q-2"
     cmds:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-Samsung_SSD_980_1TB_S649NX0RB57050E"
+          ceph_disk: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2305150020700998"
       - task: wipe-data
         vars:
           node: "{{.node}}"
     vars:
-      node: enigma
+      node: m720q-2
 
-  wipe-node-felix:
-    desc: Trigger a wipe of Rook-Ceph data on node "felix"
+  wipe-node-m720q-3:
+    desc: Trigger a wipe of Rook-Ceph data on node "m720q-3"
     cmds:
       - task: wipe-disk
         vars:
           node: "{{.node}}"
-          ceph_disk: "/dev/disk/by-id/nvme-CT1000P1SSD8_202228759489"
+          ceph_disk: "/dev/disk/by-id/nvme-TEAM_TM8FP6001T_TPBF2307170050100778"
       - task: wipe-data
         vars:
           node: "{{.node}}"
     vars:
-      node: felix
+      node: m720q-3
 
   wipe-disk:
     desc: Wipe all remnants of rook-ceph from a given disk (ex. task rook:wipe-disk node=delta ceph_disk="/dev/nvme0n1")
@@ -64,7 +64,7 @@ tasks:
     vars:
       node: '{{ or .node (fail "`node` is required") }}'
       ceph_disk: '{{ or .ceph_disk (fail "`ceph_disk` is required") }}'
-      jobName: 'wipe-disk-{{- .node -}}-{{- .ceph_disk | replace "/" "-" -}}-{{- .ts -}}'
+      jobName: "wipe-disk-{{- .node -}}"
       wipeRookDiskJobTemplate: "WipeDiskJob.tmpl.yaml"
     env: *task-vars
     preconditions:
