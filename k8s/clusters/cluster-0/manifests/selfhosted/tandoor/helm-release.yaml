@@ -61,7 +61,7 @@ spec:
       GUNICORN_MEDIA: "0"
     envFrom: &envFrom
       - secretRef:
-          name: tandoor-secret
+          name: tandoor-config
 
     command:
       - /opt/recipes/venv/bin/gunicorn
