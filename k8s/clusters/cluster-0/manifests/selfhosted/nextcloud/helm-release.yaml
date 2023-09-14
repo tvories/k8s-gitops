@@ -149,7 +149,7 @@ spec:
             'default_phone_region' => 'US',
             'trashbin_retention_obligation' => 'auto, 30',
             'auth.bruteforce.protection.enabled' => true,
-      #     );
+          );
       phpConfigs:
         uploadLimit.ini: |
           upload_max_filesize = 16G
