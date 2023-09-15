@@ -149,6 +149,8 @@ spec:
             'trashbin_retention_obligation' => 'auto, 30',
             'auth.bruteforce.protection.enabled' => true,
             'trashbin_retention_obligation' => 'auto, 30',
+            'loglevel' => 2,
+            "logfile" => "/dev/stdout",
           );
 
       phpConfigs:
