@@ -139,7 +139,7 @@ spec:
               array (
                 0 => 'nc.${SECRET_DOMAIN}',
             ),
-            'overwrite.cli.url' => 'http://nc.${SECRET_DOMAIN}}',
+            'overwrite.cli.url' => 'http://nc.${SECRET_DOMAIN}',
             'forwarded_for_headers' =>
             array (
               0 => 'HTTP_X_FORWARDED_FOR',
