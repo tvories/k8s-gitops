@@ -15,10 +15,6 @@ spec:
     size: 50Gi
     storageClass: ceph-block
 
-  bootstrap:
-    recovery:
-      source: &previous-cluster postgres-v1
-
   postgresql:
     parameters:
       max_connections: "300"
@@ -58,6 +54,10 @@ spec:
         secretAccessKey:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
+
+  # bootstrap:
+  #   recovery:
+  #     source: &previous-cluster postgres-v1
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
