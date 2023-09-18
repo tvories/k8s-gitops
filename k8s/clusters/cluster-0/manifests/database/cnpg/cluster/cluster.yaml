@@ -60,18 +60,19 @@ spec:
           key: aws-secret-access-key
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
-  externalClusters:
-    - name: *previous-cluster
-      barmanObjectStore:
-        destinationPath: s3://cnpg/
-        endpointURL: https://nas1.${SECRET_DOMAIN}:9000
-        s3Credentials:
-          accessKeyId:
-            name: cloudnative-pg-secret
-            key: aws-access-key-id
-          secretAccessKey:
-            name: cloudnative-pg-secret
-            key: aws-secret-access-key
-        wal:
-          compression: gzip
-          maxParallel: 12
+  # Disabled until first cluster goes up
+  # externalClusters:
+  #   - name: *previous-cluster
+  #     barmanObjectStore:
+  #       destinationPath: s3://cnpg/
+  #       endpointURL: https://nas1.${SECRET_DOMAIN}:9000
+  #       s3Credentials:
+  #         accessKeyId:
+  #           name: cloudnative-pg-secret
+  #           key: aws-access-key-id
+  #         secretAccessKey:
+  #           name: cloudnative-pg-secret
+  #           key: aws-secret-access-key
+  #       wal:
+  #         compression: gzip
+  #         maxParallel: 12
