@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-lb
+  namespace: database
+spec:
+  type: LoadBalancer
+  annotations:
+    io.cilium/lb-ipam-ips: ${LB_CNPG}
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    postgresql: postgres
+    role: primary
