@@ -6,8 +6,9 @@ metadata:
   namespace: database
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Local
-  loadBalancerIP: "${LB_CNPG}"
+  annotations:
+    io.cilium/lb-ipam-ips: ${LB_CNPG}
+  externalTrafficPolicy: Cluster
   ports:
     - name: postgres
       port: 5432
