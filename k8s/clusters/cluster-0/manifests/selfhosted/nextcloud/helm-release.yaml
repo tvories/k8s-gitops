@@ -95,12 +95,11 @@ spec:
 
     nextcloud:
       extraInitContainers:
-        extraInitContainers:
-          - name: init-db
-            image: ghcr.io/onedr0p/postgres-init:14.9
-            envFrom:
-              - secretRef:
-                  name: *secret
+        - name: init-db
+          image: ghcr.io/onedr0p/postgres-init:14.9
+          envFrom:
+            - secretRef:
+                name: *secret
 
       existingSecret:
         enabled: true
