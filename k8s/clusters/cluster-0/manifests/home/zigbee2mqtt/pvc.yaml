@@ -15,7 +15,6 @@ spec:
   mountOptions:
     - nfsvers=4.1
     - tcp
-    - intr
     - hard
     - noatime
     - nodiratime
@@ -30,7 +29,7 @@ metadata:
   namespace: home
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   storageClassName: zigbee2mqtt-nfs-config
   resources:
     requests:
