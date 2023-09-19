@@ -17,7 +17,7 @@ spec:
   values:
     env:
       # DB_DATABASE_NAME: immich
-      DB_HOSTNAME: postgres.database.svc.cluster.local
+      DB_HOSTNAME: postgres-rw.database.svc.cluster.local
       DB_USERNAME:
         valueFrom:
           secretKeyRef:
@@ -49,8 +49,8 @@ spec:
       # OAUTH_AUTO_REGISTER: "true"
       # OAUTH_BUTTON_TEXT: "Login with Authelia"
     envFrom:
-    - secretRef:
-        name: immich-secret
+      - secretRef:
+          name: immich-secret
 
     postgres:
       enabled: false
@@ -96,10 +96,10 @@ spec:
           cpu: 15m
           memory: 512M
       envFrom:
-      - secretRef:
-          name: immich-secret
-      - configMapRef:
-          name: immich
+        - secretRef:
+            name: immich-secret
+        - configMapRef:
+            name: immich
 
     microservices:
       controller:
@@ -154,11 +154,11 @@ spec:
             cert-manager.io/cluster-issuer: letsencrypt-production
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
           hosts:
-          - host: &host "photos.${SECRET_DOMAIN}"
-            paths:
-            - path: /
-              pathType: Prefix
+            - host: &host "photos.${SECRET_DOMAIN}"
+              paths:
+                - path: /
+                  pathType: Prefix
           tls:
-          - hosts:
-            - *host
-            secretName: *host
+            - hosts:
+                - *host
+              secretName: *host
