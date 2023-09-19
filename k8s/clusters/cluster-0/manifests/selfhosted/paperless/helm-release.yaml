@@ -68,8 +68,12 @@ spec:
       USERMAP_UID: 568
       USERMAP_GID: 20513
     envFrom:
-      - secretRef:
-          name: paperless-secret
+      - secretRef: *envFrom
+    service:
+      main:
+        ports:
+          http:
+            port: *port
 
     persistence:
       library:
