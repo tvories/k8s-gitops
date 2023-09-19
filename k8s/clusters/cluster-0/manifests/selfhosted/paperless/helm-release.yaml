@@ -5,25 +5,25 @@ metadata:
   name: paperless
   namespace: selfhosted
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      chart: paperless
-      version: 9.1.3
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+  maxHistory: 2
   install:
-    createNamespace: true
-    remediation: # perform remediation when helm install fails
+    remediation:
       retries: 3
   upgrade:
-    remediation: # perform remediation when helm upgrade fails
-      retries: 3
-      remediateLastFailure: true # remediate the last failure, when no retries remain
     cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     controller:
       type: statefulset
@@ -48,29 +48,34 @@ spec:
       PAPERLESS_CONSUMER_POLLING: "60"
       PAPERLESS_CONSUMER_RECURSIVE: "true"
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
-      # PAPERLESS_TASK_WORKERS: 2
+      PAPERLESS_CONSUMPTION_DIR: /library/consume
+      PAPERLESS_DATA_DIR: /library/data
+      PAPERLESS_EXPORT_DIR: /library/export
+      PAPERLESS_MEDIA_ROOT: /library/media
+      PAPERLESS_TASK_WORKERS: 2
       PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
-      USERMAP_GID: 20513
       PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
       PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN}"
       PAPERLESS_WORKER_TIMEOUT: 3600
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://localhost:3000
+      PAPERLESS_TIKA_ENDPOINT: http://localhost:9998
+      # PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
+      # PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_REMOTE_USER
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_PORT: &port "8000"
+      PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16,192.168.42.0/24,192.168.69.0/24
+      USERMAP_UID: 568
+      USERMAP_GID: 20513
     envFrom:
       - secretRef:
           name: paperless-secret
 
     persistence:
-      data:
+      library:
         enabled: true
-        existingClaim: paperless-nfs-data
-      media:
-        enabled: true
-        existingClaim: paperless-nfs-media
-      consume:
-        enabled: true
-        existingClaim: paperless-nfs-incoming
-      export:
-        enabled: true
-        existingClaim: paperless-nfs-export
+        existingClaim: paperless-nfs
+        mountPath: /library
 
     ingress:
       main:
@@ -87,23 +92,23 @@ spec:
             hosts:
               - *host
 
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-
     resources:
       requests:
-        cpu: 11m
-        memory: 298M
+        cpu: 100m
+        memory: 1000M
       # limits:
       #   cpu: 1311m
       #   memory: 324M
 
-    additionalContainers:
-      - name: broker
-        image: redis:7.2
+    sidecars:
+      gotenburg:
+        image: thecodingmachine/gotenberg:7.8.3
+        imagePullPolicy: IfNotPresent
+        env:
+          - { name: DISABLE_GOOGLE_CHROME, value: "1" }
+      redis:
+        image: public.ecr.aws/docker/library/redis:7.0.11
+        imagePullPolicy: IfNotPresent
+      tika:
+        image: ghcr.io/paperless-ngx/tika:2.7.0-full
         imagePullPolicy: IfNotPresent
