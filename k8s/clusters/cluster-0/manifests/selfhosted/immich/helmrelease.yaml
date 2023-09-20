@@ -17,7 +17,7 @@ spec:
   values:
     env:
       # DB_DATABASE_NAME: immich
-      DB_HOSTNAME: postgres-rw.database.svc.cluster.local
+      DB_HOSTNAME: postgres.mcbadass.local
       DB_USERNAME:
         valueFrom:
           secretKeyRef:
