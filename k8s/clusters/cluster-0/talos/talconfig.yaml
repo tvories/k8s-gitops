@@ -213,4 +213,4 @@ controlPlane:
         time:
           disabled: false
           servers:
-            - us.pool.ntp.org
+            - 192.168.80.1
