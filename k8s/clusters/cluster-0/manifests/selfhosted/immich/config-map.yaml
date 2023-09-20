@@ -6,7 +6,7 @@ metadata:
   namespace: selfhosted
 data:
   DB_DATABASE_NAME: immich
-  DB_HOSTNAME: postgres-rw.database.svc.cluster.local
+  DB_HOSTNAME: postgres.mcbadass.local
   DB_PORT: "5432"
   DISABLE_REVERSE_GEOCODING: "false"
   REVERSE_GEOCODING_PRECISION: "2"
