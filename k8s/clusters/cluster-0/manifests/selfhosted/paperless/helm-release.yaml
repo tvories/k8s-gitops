@@ -67,8 +67,7 @@ spec:
       PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16,192.168.42.0/24,192.168.69.0/24
       USERMAP_UID: 568
       USERMAP_GID: 20513
-    envFrom:
-      - secretRef: *envFrom
+    envFrom: *envFrom
     service:
       main:
         ports:
