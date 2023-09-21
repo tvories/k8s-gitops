@@ -5,49 +5,73 @@ metadata:
   name: readarr
   namespace: downloads
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      chart: readarr
-      version: 6.4.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
+    initContainers:
+      01-init-db:
+        image: ghcr.io/onedr0p/postgres-init:14.9
+        imagePullPolicy: IfNotPresent
+        envFrom: &envFrom
+          - secretRef:
+              name: readarr-secret
+
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
-      # renovate: docker-image
       repository: ghcr.io/onedr0p/readarr-nightly
       tag: "0.3.6.2232"
 
     env:
       TZ: "${TIMEZONE}"
+      READARR__INSTANCE_NAME: Readarr
+      READARR__PORT: &port 8787
+      READARR__LOG_LEVEL: info
+      READARR__THEME: dark
 
-    podSecurityContext:
-      fsGroup: 568
-      runAsUser: 568
-      supplementalGroups:
-        - 65539
+    envFrom: *envFrom
 
-    persistence:
-      config:
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    probes:
+      liveness: &probes
         enabled: true
-        existingClaim: readarr-config
-      media:
-        enabled: true
-        type: nfs
-        server: ${SECRET_NAS1}
-        path: /mnt/fatguys/Media
-        mountPath: /media
-      ebooks:
-        enabled: true
-        existingClaim: downloads-nfs-ebooks
-        mountPath: /ebooks
-      backup:
-        enabled: true
-        existingClaim: readarr-nfs-backup
-        mountPath: /config/Backups
+        custom: true
+        spec:
+          httpGet:
+            path: /ping
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
 
     ingress:
       main:
@@ -55,6 +79,8 @@ spec:
         ingressClassName: "nginx-internal"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
         hosts:
           - host: &host "readarr.${SECRET_DOMAIN}"
             paths:
@@ -79,31 +105,34 @@ spec:
               - *host
             secretName: *tls
 
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65539
+        - 10000
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: readarr-config
+      media:
+        enabled: true
+        existingClaim: downloads-nfs-media
+        mountPath: /media
+      ebooks:
+        enabled: true
+        existingClaim: downloads-nfs-ebooks
+        mountPath: /ebooks
+      backup:
+        enabled: true
+        existingClaim: readarr-nfs-backup
+        mountPath: /config/Backups
     resources:
       requests:
         cpu: 15m
         memory: 184M
       limits:
         memory: 1500Mi
-
-    # prometheus:
-    #   podMonitor:
-    #     enabled: true
-    #     interval: 10m
-    #     scrapeTimeout: 2s
-
-    # metrics:
-    #   enabled: true
-    #   serviceMonitor:
-    #     interval: 3m
-    #     scrapeTimeout: 1m
-    #   prometheusRule:
-    #     enabled: true
-    #   exporter:
-    #     image:
-    #       repository: ghcr.io/onedr0p/exportarr
-    #       tag: v1.5.3
-    #     env:
-    #       port: 9794
-    #       additionalMetrics: true
-    #       unknownQueueItems: true
