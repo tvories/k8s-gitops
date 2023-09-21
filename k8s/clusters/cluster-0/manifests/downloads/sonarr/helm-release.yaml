@@ -33,6 +33,7 @@ spec:
           - secretRef:
               name: sonarr-secret
     controller:
+      type: statefulset
       annotations:
         reloader.stakater.com/auto: "true"
 
