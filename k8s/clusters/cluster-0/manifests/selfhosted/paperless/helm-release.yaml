@@ -106,7 +106,7 @@ spec:
 
     sidecars:
       gotenburg:
-        image: thecodingmachine/gotenberg:7.8.3
+        image: thecodingmachine/gotenberg:7.9.2
         imagePullPolicy: IfNotPresent
         env:
           - { name: DISABLE_GOOGLE_CHROME, value: "1" }
