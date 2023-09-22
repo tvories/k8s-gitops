@@ -39,3 +39,4 @@ resources:
   - ./piraeus.yaml
   - ./backube.yaml
   - ./immich.yaml
+  - ./democratic-csi.yaml
