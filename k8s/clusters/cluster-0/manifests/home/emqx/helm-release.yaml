@@ -61,7 +61,7 @@ spec:
       enabled: true
     persistence:
       enabled: true
-      storageClassName: ceph-block
+      storageClassName: local-hostpath
       size: 250Mi
 
     affinity:
