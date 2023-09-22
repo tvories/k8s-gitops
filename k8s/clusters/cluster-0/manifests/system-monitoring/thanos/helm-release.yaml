@@ -9,12 +9,11 @@ spec:
   chart:
     spec:
       chart: thanos
-      version: 12.13.4
+      version: 12.13.5
       sourceRef:
         kind: HelmRepository
         name: bitnami-charts
         namespace: flux-system
-      interval: 15m
   maxHistory: 2
   install:
     remediation:
@@ -29,7 +28,7 @@ spec:
     image:
       registry: quay.io
       repository: thanos/thanos
-      tag: v0.32.2
+      tag: v0.32.3
 
     objstoreConfig:
       type: s3
@@ -89,7 +88,7 @@ spec:
       persistence:
         enabled: true
         storageClass: "ceph-block"
-        size: 5Gi
+        size: 20Gi
 
     storegateway:
       enabled: true
@@ -101,6 +100,7 @@ spec:
         #   memory: 64M
       persistence:
         enabled: true
+        storageClass: "ceph-block"
         size: 512Mi
 
     ruler:
