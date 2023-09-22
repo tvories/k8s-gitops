@@ -152,3 +152,19 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: system-democratic-csi-local-path
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/system/democratic-csi/local-path"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
