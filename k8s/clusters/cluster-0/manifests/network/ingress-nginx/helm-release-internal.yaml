@@ -19,6 +19,7 @@ spec:
     fullNameOverride: nginx-internal
 
     controller:
+      allowSnippetAnnotations: true
       ingressClassResource:
         name: nginx-internal
         default: true
