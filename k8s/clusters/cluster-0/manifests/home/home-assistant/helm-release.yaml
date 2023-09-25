@@ -43,7 +43,7 @@ spec:
 
     image:
       repository: homeassistant/home-assistant
-      tag: 2023.9.2
+      tag: 2023.9.3
 
     env:
       TZ: "${TIMEZONE}"
