@@ -5,7 +5,7 @@ metadata:
   name: calibre
   namespace: media
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
       chart: app-template
@@ -14,18 +14,17 @@ spec:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    # initContainers:
-    #   update-volume-permission:
-    #     image: busybox@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
-    #     command: ["sh", "-c", "chown -R 1000:1000 /config"]
-    #     volumeMounts:
-    #       - name: config
-    #         mountPath: /config
-    #     securityContext:
-    #       runAsUser: 0
-
     image:
       repository: ghcr.io/linuxserver/calibre
       tag: version-v6.27.0
@@ -69,15 +68,9 @@ spec:
             protocol: TCP
             targetPort: 8081
         type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: ${LB_CALIBRE}
         externalTrafficPolicy: Cluster
-        loadBalancerIP: ${LB_CALIBRE}
-    probes:
-      startup:
-        enabled: false
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
 
     ingress:
       main:
