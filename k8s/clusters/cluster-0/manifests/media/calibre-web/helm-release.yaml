@@ -5,25 +5,46 @@ metadata:
   name: calibre-web
   namespace: media
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      chart: calibre-web
-      version: 8.4.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     image:
-      repository: ghcr.io/linuxserver/calibre-web
-      tag: version-0.6.20
+      repository: ghcr.io/bjw-s/calibre-web
+      tag: 0.6.20@sha256:a5a40ae5bc78afee94515cc20dca470ce775c2e7456962fac3e09e63cc00ddf2
+
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 65539
+      fsGroupChangePolicy: "OnRootMismatch"
 
     env:
       TZ: "${TIMEZONE}"
       PGID: 65539
-      DOCKER_MODS: "linuxserver/calibre-web:calibre"
+      # DOCKER_MODS: "linuxserver/calibre-web:calibre"
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8083
 
     persistence:
       config:
