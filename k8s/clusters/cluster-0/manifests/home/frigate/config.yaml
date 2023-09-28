@@ -156,7 +156,7 @@ cameras:
     detect:
       width: 640
       height: 480
-      fps: 15
+      fps: 10
     # record:
     #   enabled: True
     #   retain:
@@ -206,7 +206,7 @@ cameras:
     detect:
       width: 640
       height: 480
-      fps: 30
+      fps: 10
     # record:
     #   enabled: True
     #   retain:
