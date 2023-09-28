@@ -73,7 +73,7 @@ spec:
           http:
             port: 8080
 
-    podSecurityContext:
+    securityContext:
       privileged: true
 
     persistence:
