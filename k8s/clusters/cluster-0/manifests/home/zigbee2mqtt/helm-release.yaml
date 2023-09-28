@@ -85,6 +85,7 @@ spec:
         enabled: true
         type: hostPath
         hostPath: *serial
+        mountPath: *serial
         hostPathType: CharDevice
 
     ingress:
