@@ -1,7 +1,7 @@
 ---
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.5.0
+talosVersion: v1.5.3
 kubernetesVersion: v1.28.1
 endpoint: https://${cluster_name}.${domain_name}:6443
 domain: cluster.local
@@ -106,6 +106,9 @@ nodes:
       - interface: eth0
         dhcp: true
         # mtu: 9000
+      - interface: enp1s0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
     patches:
       - |-
@@ -127,6 +130,9 @@ nodes:
       - interface: eth0
         dhcp: true
         # mtu: 9000
+      - interface: enp1s0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
     patches:
       - |-
@@ -148,6 +154,9 @@ nodes:
       - interface: eth0
         dhcp: true
         # mtu: 9000
+      - interface: enp1s0
+        dhcp: true
+        mtu: 9000
     installDisk: /dev/sda
     patches:
       - |-

@@ -21,9 +21,6 @@ spec:
     deploymentStrategy:
       type: Recreate
 
-    # image:
-    #   repository: ghcr.io/k8s-at-home/grafana
-
     env:
       GF_EXPLORE_ENABLED: true
       GF_PANELS_DISABLE_SANITIZE_HTML: true
@@ -192,14 +189,6 @@ spec:
         netdata:
           gnetId: 7107
           revision: 1
-          datasource: Prometheus
-
-      media:
-        radarr:
-          url: https://raw.githubusercontent.com/k8s-at-home/grafana-dashboards/main/radarr.json
-          datasource: Prometheus
-        sonarr:
-          url: https://raw.githubusercontent.com/k8s-at-home/grafana-dashboards/main/sonarr.json
           datasource: Prometheus
 
       networking:
