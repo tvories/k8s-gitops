@@ -66,6 +66,12 @@ spec:
       - secretRef:
           name: zigbee2mqtt-secret
 
+    service:
+      main:
+        ports:
+          http:
+            port: 8080
+
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 568
