@@ -77,6 +77,7 @@ cameras:
   # --
   doorbell:
     ffmpeg:
+      hwaccel_args: preset-intel-qsv-h264
       inputs:
         - path: rtsp://localhost:8554/frigate_doorbell_lq
           roles:
@@ -133,6 +134,7 @@ cameras:
     # rtmp:
     #   enabled: false
     ffmpeg:
+      hwaccel_args: preset-intel-qsv-h264
       inputs:
         - path: rtsp://localhost:8554/frigate_front_door_lq
           roles:
@@ -183,6 +185,7 @@ cameras:
     # rtmp:
     #   enabled: false
     ffmpeg:
+      hwaccel_args: preset-intel-qsv-h264
       inputs:
         - path: rtsp://localhost:8554/frigate_garage_lq
           roles:
