@@ -5,34 +5,52 @@ metadata:
   name: zwavejs2mqtt
   namespace: home
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: zwavejs2mqtt
-      version: 5.4.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
   values:
     image:
       repository: zwavejs/zwave-js-ui
       tag: 8.26.0
     env:
       TZ: "${TIMEZONE}"
-      NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
+      # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
+    envFrom:
+      - secretRef:
+          name: zwavejs2mqtt-secret
     securityContext:
       privileged: true
     service:
-      ws:
-        enabled: true
-        primary: false
+      main:
         ports:
-          ws:
+          http:
+            port: &port 8091
+          websocket:
             enabled: true
             port: 3000
+
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /health
+            port: *port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
+
     ingress:
       main:
         enabled: true
@@ -40,13 +58,13 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-        - host: &host "zw.${SECRET_DOMAIN}"
-          paths:
-          - path: /
+          - host: &host "zw.${SECRET_DOMAIN}"
+            paths:
+              - path: /
         tls:
-        - hosts:
-          - *host
-          secretName: tls.zwave
+          - hosts:
+              - *host
+            secretName: tls.zwave
     persistence:
       config:
         enabled: true
@@ -60,8 +78,12 @@ spec:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
-          - matchExpressions:
-            - {key: "feature.node.kubernetes.io/custom-zwave", operator: In, values: ["true"]}
+            - matchExpressions:
+                - {
+                    key: "feature.node.kubernetes.io/custom-zwave",
+                    operator: In,
+                    values: ["true"],
+                  }
     resources:
       requests:
         cpu: 23m
