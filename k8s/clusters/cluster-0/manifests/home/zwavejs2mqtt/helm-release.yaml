@@ -15,6 +15,10 @@ spec:
         name: bjw-s-charts
         namespace: flux-system
   values:
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
     image:
       repository: zwavejs/zwave-js-ui
       tag: 8.26.0
