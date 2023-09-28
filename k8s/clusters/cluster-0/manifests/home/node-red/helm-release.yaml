@@ -6,31 +6,42 @@ metadata:
   namespace: home
 spec:
   releaseName: node-red
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      # renovate: registryUrl=https://k8s-at-home.com/charts/
-      chart: node-red
-      version: 10.3.2
+      chart: app-template
+      version: 1.5.1
       sourceRef:
         kind: HelmRepository
-        name: k8s-at-home-charts
+        name: bjw-s-charts
         namespace: flux-system
-      interval: 5m
   values:
-    imagePullSecret: regcred
+    controller:
+      type: statefulset
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     image:
-      repository: nodered/node-red
-      tag: 2.2.3-12-minimal
+      repository: docker.io/nodered/node-red
+      tag: 3.1.0@sha256:81bc011a753112fa0abbaeb4d6e8e3f80e102ec7ff0ee816dc411515b7804c17
+
     env:
       TZ: "${TIMEZONE}"
-      NODE_RED_ENABLE_PROJECTS: "true"
-      NODE_RED_ENABLE_SAFE_MODE: "false"
+      # NODE_RED_ENABLE_PROJECTS: "true"
+      # NODE_RED_ENABLE_SAFE_MODE: "false"
+
+    service:
+      main:
+        ports:
+          http:
+            port: 1880
+
     persistence:
       data:
         enabled: true
         existingClaim: node-red-config
         mountPath: /data
+
     ingress:
       main:
         enabled: true
@@ -38,13 +49,20 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-        - host: &host "node-red.${SECRET_DOMAIN}"
-          paths:
-          - path: /
+          - host: &host "node-red.${SECRET_DOMAIN}"
+            paths:
+              - path: /
         tls:
-        - hosts:
-          - *host
-          secretName: tls.node-red
+          - hosts:
+              - *host
+            secretName: tls.node-red
+
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+
     resources:
       requests:
         cpu: 15m
