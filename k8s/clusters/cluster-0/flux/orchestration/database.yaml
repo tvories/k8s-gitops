@@ -52,7 +52,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: database-zalando-postgres-operator
+    # - name: database-zalando-postgres-operator
     - name: rook-ceph-cluster
     # - name: system-kyverno
   interval: 5m
