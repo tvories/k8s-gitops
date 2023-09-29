@@ -31,8 +31,8 @@ spec:
         requests:
           cpu: 15m
           memory: 64M
-        limits:
-          memory: 64M
+        # limits:
+        #   memory: 64M
 
       ingress:
         enabled: true
