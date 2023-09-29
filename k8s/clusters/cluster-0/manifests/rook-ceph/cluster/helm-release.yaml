@@ -29,6 +29,11 @@ spec:
       enabled: true
       createPrometheusRules: true
 
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128M
+
     configOverride: |
       [global]
       bdev_enable_discard = true
