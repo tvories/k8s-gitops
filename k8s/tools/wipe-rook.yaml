@@ -5,7 +5,7 @@ metadata:
   name: disk-wipe-physical1
 spec:
   restartPolicy: Never
-  nodeName: physical1
+  nodeName: m720q-1
   containers:
     - name: disk-wipe
       image: ubuntu:jammy
@@ -16,9 +16,8 @@ spec:
           "/bin/sh",
           "-c",
           "apt update && apt install -y gdisk",
-          "blkdiscard -f /dev/sdb",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/sdb",
-          "sgdisk -z /dev/sdb",
+          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "sgdisk -z /dev/nvme0n1",
         ]
 ---
 apiVersion: v1
@@ -27,7 +26,7 @@ metadata:
   name: disk-wipe-physical2
 spec:
   restartPolicy: Never
-  nodeName: physical2
+  nodeName: m720q-2
   containers:
     - name: disk-wipe
       image: ubuntu:jammy
@@ -38,9 +37,8 @@ spec:
           "/bin/sh",
           "-c",
           "apt update && apt install -y gdisk",
-          "blkdiscard -f /dev/sdb",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/sdb",
-          "&& sgdisk -z /dev/sdb",
+          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "sgdisk -z /dev/nvme0n1",
         ]
 ---
 apiVersion: v1
@@ -49,7 +47,7 @@ metadata:
   name: disk-wipe-sff1
 spec:
   restartPolicy: Never
-  nodeName: sff1
+  nodeName: m720q-3
   containers:
     - name: disk-wipe
       image: ubuntu:jammy
@@ -60,6 +58,6 @@ spec:
           "/bin/sh",
           "-c",
           "apt update && apt install -y gdisk",
-          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/sdb",
-          "sgdisk -z /dev/sdb",
+          "dd if=/dev/zero bs=1M count=10000 oflag=direct of=/dev/nvme0n1",
+          "sgdisk -z /dev/nvme0n1",
         ]
