@@ -5,7 +5,7 @@ metadata:
   name: cluster-apps-metallb
   namespace: flux-system
 spec:
-  path: ./k8s/clusters/nas/apps/metallb/app
+  path: ./k8s/clusters/nas/apps/network/metallb/app
   prune: true
   sourceRef:
     kind: GitRepository
