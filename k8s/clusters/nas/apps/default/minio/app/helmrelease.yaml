@@ -135,9 +135,9 @@ spec:
       data:
         enabled: true
         type: hostPath
+        hostPath: /mnt/ook/minio/
         globalMounts:
           - path: /data
-            hostPath: /mnt/ook/minio/
             hostPathType: Directory
             mountPath: /data
             readOnly: false
