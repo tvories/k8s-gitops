@@ -7,6 +7,7 @@ resources:
   - ingress-nginx.yaml
   - jetstack.yaml
   - kubernetes-sigs-descheduler.yaml
+  - metallb.yaml
   # - kubernetes-sigs-external-dns.yaml
   - kubernetes-sigs-metrics-server.yaml
   # - kubernetes-sigs-nfd.yaml
