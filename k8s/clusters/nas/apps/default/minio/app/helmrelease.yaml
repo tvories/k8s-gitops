@@ -64,7 +64,7 @@ spec:
             spec:
               httpGet:
                 path: /minio/health/live
-                port: *api-port
+                port: 9000
               initialDelaySeconds: 0
               periodSeconds: 10
               timeoutSeconds: 1
@@ -94,7 +94,7 @@ spec:
         #     bearerTokenSecret:
         #       name: minio-secret
         #       key: MINIO_PROMETHEUS_TOKEN
-    
+
     ingress:
       main:
         enabled: true
