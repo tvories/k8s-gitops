@@ -28,3 +28,5 @@ spec:
           protocol: layer2
           addresses:
             - 192.168.184.180-192.168.184.200
+    psp:
+      create: false
