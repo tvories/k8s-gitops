@@ -8,3 +8,4 @@ resources:
   # Flux-Kustomizations
   - ./metallb/ks.yaml
   - ./ingress-nginx/ks.yaml
+  - ./wildcard-certificate/ks.yaml

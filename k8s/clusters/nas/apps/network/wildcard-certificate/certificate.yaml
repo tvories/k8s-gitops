@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "${SECRET_DOMAIN/./-}"
+  namespace: network
+spec:
+  secretName: "wildcard-nas-${SECRET_DOMAIN/./-}-tls"
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "nas.${SECRET_DOMAIN}"
+  dnsNames:
+    - "nas.${SECRET_DOMAIN}"
+    - "*.nas.${SECRET_DOMAIN}"
