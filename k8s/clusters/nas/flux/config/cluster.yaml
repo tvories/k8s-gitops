@@ -38,3 +38,9 @@ spec:
       - kind: ConfigMap
         name: cluster-settings
         optional: false
+      - kind: ConfigMap
+        name: global-config
+        optional: false
+      - kind: Secret
+        name: global-secrets
+        optional: false

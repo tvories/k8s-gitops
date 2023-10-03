@@ -16,7 +16,11 @@ spec:
   postBuild:
     substituteFrom:
       - kind: ConfigMap
+        name: global-config
+      - kind: ConfigMap
         name: cluster-settings
+      - kind: Secret
+        name: global-secrets
   patches:
     - patch: |-
         apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -29,6 +33,8 @@ spec:
             provider: sops
           postBuild:
             substituteFrom:
+              - kind: ConfigMap
+                name: global-config
               - kind: ConfigMap
                 name: cluster-settings
               - kind: Secret
