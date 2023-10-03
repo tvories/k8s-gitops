@@ -108,6 +108,7 @@ spec:
                 pathType: Prefix
                 service:
                   port: *console-port
+                  name: main
         tls:
           - hosts:
               - *console-host
@@ -124,6 +125,7 @@ spec:
                 pathType: Prefix
                 service:
                   port: 9000
+                  name: main
         tls:
           - hosts:
               - *api-host
