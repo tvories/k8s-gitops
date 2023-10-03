@@ -78,8 +78,8 @@ spec:
           namespaceSelector:
             any: true
 
-      # extraArgs:
-      #   default-ssl-certificate: "network/${SECRET_DOMAIN/./-}-tls"
+      extraArgs:
+        default-ssl-certificate: "network/wildcard-nas-${SECRET_DOMAIN/./-}-tls"
 
       # resources:
       #   requests:
