@@ -123,7 +123,7 @@ spec:
               - path: /
                 pathType: Prefix
                 service:
-                  port: *api-port
+                  port: 9000
         tls:
           - hosts:
               - *api-host
