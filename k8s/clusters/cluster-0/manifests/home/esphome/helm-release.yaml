@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: ghcr.io/esphome/esphome
-      tag: 2023.8.3@sha256:242fb2221f338bb443bcc853f681dcc48d00cd099e15cdba90ecb905c500b8f5
+      tag: 2023.9.3@sha256:07cbbe0cc9d82d505dedbd40238fd9b800be6f1683d71e1a637456c474f2857e
 
     podAnnotations:
       secret.reloader.stakater.com/reload: esphome-secrets
