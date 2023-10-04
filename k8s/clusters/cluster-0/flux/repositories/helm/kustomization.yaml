@@ -40,3 +40,4 @@ resources:
   - ./backube.yaml
   - ./immich.yaml
   - ./democratic-csi.yaml
+  - ./crunchydata.yaml
