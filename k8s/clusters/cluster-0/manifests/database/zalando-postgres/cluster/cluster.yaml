@@ -5,13 +5,25 @@ metadata:
   name: postgres
   namespace: database
 spec:
+  initContainers:
+    - name: chmod
+      image: busybox
+      command: ["/bin/sh"]
+      args:
+        [
+          "-c",
+          "chown -R postgres: /home/postgres/pgdata /run/certs && chmod 711 /home/postgres/pgdata",
+        ]
+      volumeMounts:
+        - name: pgdata
+          mountPath: /home/postgres/pgdata
   env:
     - name: ALLOW_NOSSL
       value: "true"
   teamId: "acid"
   volume:
     size: 75Gi
-    storageClass: ceph-block
+    storageClass: local-hostpath
   numberOfInstances: 3
   users:
     postgres: # database owner
