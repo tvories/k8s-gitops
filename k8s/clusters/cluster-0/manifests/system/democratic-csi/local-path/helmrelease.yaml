@@ -24,7 +24,7 @@ spec:
     storageClasses:
       - name: local-hostpath
         defaultClass: false
-        reclaimPolicy: Delete
+        reclaimPolicy: Retain
         volumeBindingMode: WaitForFirstConsumer
         # distributed support is not yet ready for expansion
         allowVolumeExpansion: false
@@ -62,22 +62,22 @@ spec:
       driver:
         extraVolumeMounts:
           - name: local-hostpath
-            mountPath: /var/k8s/demo-csi-local-path
+            mountPath: &path /var/lib/democratic-csi-local-hostpath
             mountPropagation: Bidirectional
 
       extraVolumes:
         - name: local-hostpath
           hostPath:
-            path: /var/k8s/demo-csi-local-path
+            path: *path
             type: DirectoryOrCreate
 
     driver:
       config:
         driver: local-hostpath
-        instance_id:
+        instance_id: k8s-local-hostpath
         local-hostpath:
-          shareBasePath: "/var/k8s/demo-csi-local-path"
-          controllerBasePath: "/var/k8s/demo-csi-local-path"
+          shareBasePath: *path
+          controllerBasePath: *path
           dirPermissionsMode: "0770"
           dirPermissionsUser: 0
           dirPermissionsGroup: 0
