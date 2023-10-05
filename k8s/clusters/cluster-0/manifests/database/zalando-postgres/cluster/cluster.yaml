@@ -11,7 +11,7 @@ spec:
   teamId: "acid"
   volume:
     size: 75Gi
-    storageClass: ceph-block
+    storageClass: local-hostpath
   numberOfInstances: 3
   users:
     postgres: # database owner
