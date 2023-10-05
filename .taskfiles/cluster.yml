@@ -144,66 +144,49 @@ tasks:
     cmds:
       - kubectl delete pods --field-selector status.phase=Succeeded -A --ignore-not-found=true
 
-  debug-volume:
-    desc: Attach a volume to a container for debugging, ex. VOLUME=zigbee2mqtt-config-v1 NAMESPACE=home task debug-volume
+  mount:
+    desc: Mount a PersistentVolumeClaim to a pod temporarily
     interactive: true
-    silent: true
+    vars:
+      claim: '{{ or .claim (fail "PersistentVolumeClaim `claim` is required") }}'
+      namespace: '{{.namespace | default "default"}}'
     cmds:
       - |
-        kubectl run debug-{{.VOLUME}} -n {{.NAMESPACE}} -i --tty --rm --image=null --overrides='
+        kubectl run -n {{.namespace}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
           {
+            "apiVersion": "v1",
             "spec": {
               "containers": [
                 {
                   "name": "debug",
-                  "image": "docker.io/library/alpine:3.15",
+                  "image": "ghcr.io/onedr0p/alpine:rolling",
                   "command": [
-                    "/bin/sh"
+                    "/bin/bash"
                   ],
                   "stdin": true,
                   "stdinOnce": true,
                   "tty": true,
-                  "lifecycle": {
-                    "postStart": {
-                      "exec": {
-                        "command": [
-                          "/bin/sh",
-                          "-c",
-                          "apk add --no-cache curl vim"
-                        ]
-                      }
-                    }
-                  },
                   "volumeMounts": [
                     {
-                      "name": "backups",
-                      "mountPath": "/mnt/backups/"
-                    },
-                    {
-                      "name": "debug-volume",
-                      "mountPath": "/mnt/volume/"
+                      "name": "config",
+                      "mountPath": "/data/config"
                     }
                   ]
                 }
               ],
               "volumes": [
                 {
-                  "name": "backups",
-                  "nfs": {
-                    "server": '{{.NAS_ADDRESS | default "hyperion"}}',
-                    "path": '{{.NAS_PATH | default "/volume1/backups/"}}'
-                  }
-                },
-                {
-                  "name": "debug-volume",
+                  "name": "config",
                   "persistentVolumeClaim": {
-                    "claimName": "{{.VOLUME}}"
+                    "claimName": "{{.claim}}"
                   }
                 }
               ],
               "restartPolicy": "Never"
             }
           }'
+    preconditions:
+      - kubectl -n {{.namespace}} get pvc {{.claim}}
   debug-node:
     desc: Create a privileged container on a node for debugging, ex. NODE=anvil task debug-node
     interactive: true
