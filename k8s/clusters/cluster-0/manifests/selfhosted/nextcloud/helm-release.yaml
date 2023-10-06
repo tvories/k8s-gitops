@@ -30,7 +30,8 @@ spec:
     deploymentAnnotations:
       secret.reloader.stakater.com/reload: &secret nextcloud-secret
     image:
-      tag: 27.0.2-fpm
+      tag: 27.1.1-fpm
+      repository: nextcloud
 
     ingress:
       enabled: true
