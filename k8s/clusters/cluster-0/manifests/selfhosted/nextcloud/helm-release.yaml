@@ -281,7 +281,7 @@ spec:
       #   existingClaim: nextcloud-nfs-data
 
     startupProbe:
-      enabled: true
+      enabled: false
       initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 5
