@@ -57,12 +57,11 @@ spec:
           nginx.ingress.kubernetes.io/proxy-body-size: "10G"
           nginx.ingress.kubernetes.io/proxy-buffering: "off"
           nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
-          nginx.ingress.kubernetes.io/server-snippet: |-
-            proxy_set_header Host               $host;
-            proxy_set_header Upgrade            $http_upgrade;
-            proxy_set_header Connection         "upgrade";
-            client_max_body_size               10G;
+          # nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          # nginx.ingress.kubernetes.io/server-snippet: |-
+          #   proxy_set_header Host               $host;
+          #   proxy_set_header Upgrade            $http_upgrade;
+          #   proxy_set_header Connection         "upgrade";
         hosts:
           - host: &host "ab.${SECRET_DOMAIN}"
             paths:
