@@ -30,7 +30,7 @@ spec:
     deploymentAnnotations:
       secret.reloader.stakater.com/reload: &secret nextcloud-secret
     image:
-      tag: 27.1.1-fpm
+      tag: 27.1.2-fpm
       repository: nextcloud
 
     ingress:
@@ -281,21 +281,21 @@ spec:
       #   existingClaim: nextcloud-nfs-data
 
     startupProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 5
-      failureThreshold: 60
+      failureThreshold: 80
       successThreshold: 1
     livenessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 3
       successThreshold: 1
     readinessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 5
       periodSeconds: 10
       timeoutSeconds: 5
