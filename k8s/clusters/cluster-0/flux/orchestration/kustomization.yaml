@@ -16,7 +16,7 @@ resources:
   - ./system-monitoring.yaml
   - ./system.yaml
   - ./vpn.yaml
-  - ./kasten-io.yaml
+  # - ./kasten-io.yaml
   - ./database.yaml
   - ./security.yaml
   - ./gitlab.yaml
