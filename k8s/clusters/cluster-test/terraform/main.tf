@@ -6,7 +6,7 @@ terraform {
   }
   required_providers {
     vsphere = {
-      version = "2.4.3"
+      version = "2.5.1"
     }
     dns = {
       source  = "hashicorp/dns"
