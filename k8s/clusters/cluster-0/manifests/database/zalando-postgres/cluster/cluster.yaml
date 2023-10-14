@@ -37,6 +37,6 @@ spec:
   # - Uncomment the "clone" section below to restore a point in time backup
   # - Apply the config and let the cluster restore
   # - Uncomment the "clone" section below
-  # clone:
-  #   cluster: "postgres"  # The source cluster name
-  #   timestamp: "2023-03-21T19:50:00+00:00"  # timezone required (offset relative to UTC, see RFC 3339 section 5.6)
+  clone:
+    cluster: "postgres" # The source cluster name
+    timestamp: "2023-10-12T00:00:00+00:00" # timezone required (offset relative to UTC, see RFC 3339 section 5.6)
