@@ -33,11 +33,21 @@ spec:
       tag: 0.9.0
     env:
       TZ: "${TIMEZONE}"
-    envFrom:
-      - secretRef:
-          name: omada-exporter-secret
+    # envFrom:
+    #   - secretRef:
+    #       name: omada-exporter-secret
     omada:
       host: https://omada-controller.network.svc.cluster.local:8043
       request_timeout: 60
       site: Default
       insecure: true
+      username:
+        valueFrom:
+          secretKeyRef:
+            name: omada-exporter-secret
+            key: OMADA_USER
+      password:
+        valueFrom:
+          secretKeyRef:
+            name: omada-exporter-secret
+            key: OMADA_PASS
