@@ -41,13 +41,5 @@ spec:
       request_timeout: 60
       site: Default
       insecure: true
-      username:
-        valueFrom:
-          secretKeyRef:
-            name: omada-exporter-secret
-            key: OMADA_USER
-      password:
-        valueFrom:
-          secretKeyRef:
-            name: omada-exporter-secret
-            key: OMADA_PASS
+      username: ${SECRET_OMADA_EXPORTER_USERNAME}
+      password: ${SECRET_OMADA_EXPORTER_PASSWORD}
