@@ -41,3 +41,4 @@ resources:
   - ./immich.yaml
   - ./democratic-csi.yaml
   - ./crunchydata.yaml
+  - ./charlie-haley.yaml
