@@ -42,6 +42,11 @@ path "ad/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
+// # Configure the ldap secrets engine and create roles
+// path "ldap/*" {
+//   capabilities = [ "create", "read", "update", "delete", "list" ]
+// }
+
 # List existing secrets engines.
 path "sys/mounts" {
   capabilities = ["read"]
