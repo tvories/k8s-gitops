@@ -35,10 +35,18 @@ spec:
         enabled: false
       metrics:
         enabled: true
-        ipFamilyPolicy: PreferDualStack
+        # ipFamilyPolicy: PreferDualStack
         ports:
           metrics:
             port: 9798
+    serviceMonitor:
+      main:
+        enabled: true
+        endpoints:
+          - port: metrics
+            path: /metrics
+            interval: 60m
+            scrapeTimeout: 1m
     resources:
       requests:
         cpu: 15m
