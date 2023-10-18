@@ -151,7 +151,9 @@ spec:
     dashboards:
       default:
         node-exporter-full:
-          url: https://grafana.com/api/dashboards/1860/revisions/22/download
+          # renovate: depName="Node Exporter Full"
+          gnetId: 1860
+          revision: 32
           datasource: Prometheus
       flux:
         flux-cluster:
@@ -163,23 +165,59 @@ spec:
         flux-logs:
           url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/logs.json
           datasource: Loki
-
-      storage:
-        # Ref: https://grafana.com/grafana/dashboards/2842
-        ceph-cluster:
-          gnetId: 2842
+      kubernetes:
+        kubernetes-api-server:
+          # renovate: depName="Kubernetes / System / API Server"
+          gnetId: 15761
           revision: 14
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/5336
+        kubernetes-coredns:
+          # renovate: depName="Kubernetes / System / CoreDNS"
+          gnetId: 15762
+          revision: 13
+          datasource: Prometheus
+        kubernetes-global:
+          # renovate: depName="Kubernetes / Views / Global"
+          gnetId: 15757
+          revision: 31
+          datasource: Prometheus
+        kubernetes-namespaces:
+          # renovate: depName="Kubernetes / Views / Namespaces"
+          gnetId: 15758
+          revision: 27
+          datasource: Prometheus
+        kubernetes-nodes:
+          # renovate: depName="Kubernetes / Views / Nodes"
+          gnetId: 15759
+          revision: 19
+          datasource: Prometheus
+        kubernetes-pods:
+          # renovate: depName="Kubernetes / Views / Pods"
+          gnetId: 15760
+          revision: 22
+          datasource: Prometheus
+        kubernetes-volumes:
+          # renovate: depName="K8s / Storage / Volumes / Cluster"
+          gnetId: 11454
+          revision: 14
+          datasource: Prometheus
+      ceph:
+        ceph-cluster:
+          # renovate: depName="Ceph Cluster"
+          gnetId: 2842
+          revision: 17
+          datasource: Prometheus
         ceph-osd:
+          # renovate: depName="Ceph - OSD (Single)"
           gnetId: 5336
-          revision: 5
+          revision: 9
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/5342
         ceph-pools:
+          # renovate: depName="Ceph - Pools"
           gnetId: 5342
-          revision: 5
+          revision: 9
           datasource: Prometheus
+      storage:
         # Ref: https://grafana.com/grafana/dashboards/7845
         zfs:
           gnetId: 7845
@@ -237,11 +275,13 @@ spec:
           gnetId: 11312
           revision: 8
           datasource: Prometheus
-        # Ref: https://grafana.com/grafana/dashboards/13665
-        speedtest:
+        speedtest-exporter:
+          # renovate: depName="Speedtest-Exporter Dashboard"
           gnetId: 13665
           revision: 4
-          datasource: Prometheus
+          datasource:
+            - name: DS_PROMETHEUS
+              value: Prometheus
         nginx-dashboard:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus
