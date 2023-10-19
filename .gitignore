@@ -21,3 +21,9 @@ backend.conf
 *sa.json
 *credential.json
 compare.yaml
+
+# Ansible
+secrets.yaml
+secret.yaml
+secret.yml
+secrets.yml
