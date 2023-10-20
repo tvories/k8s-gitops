@@ -239,6 +239,9 @@ spec:
           gnetId: 7845
           revision: 4
           datasource: Prometheus
+        zrepl:
+          url: https://raw.githubusercontent.com/zrepl/zrepl/master/dist/grafana/grafana-prometheus-zrepl.json
+          datasource: Prometheus
         # Ref: https://grafana.com/grafana/dashboards/7845
         netdata:
           gnetId: 7107
