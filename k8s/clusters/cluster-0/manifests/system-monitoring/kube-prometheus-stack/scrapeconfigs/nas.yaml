@@ -4,7 +4,7 @@
 # kind: ScrapeConfig
 # metadata:
 #   name: nas3-kopia
-#   namespace: monitoring
+#   namespace: system-monitoring
 # spec:
 #   staticConfigs:
 #     - targets: ["nas3.${SECRET_DOMAIN}:51516"]
@@ -15,7 +15,7 @@
 # kind: ScrapeConfig
 # metadata:
 #   name: nas3-minio
-#   namespace: monitoring
+#   namespace: system-monitoring
 # spec:
 #   staticConfigs:
 #     - targets: ["nas3.${SECRET_DOMAIN}:9000"]
@@ -26,7 +26,7 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
   name: nas3-smartctl-exporter
-  namespace: monitoring
+  namespace: system-monitoring
 spec:
   staticConfigs:
     - targets: ["nas3.${SECRET_DOMAIN}:9633"]
@@ -37,8 +37,19 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
   name: nas3-zrepl
-  namespace: monitoring
+  namespace: system-monitoring
 spec:
   staticConfigs:
     - targets: ["nas3.${SECRET_DOMAIN}:9811"]
+  metricsPath: /metrics
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: nas3-zfs
+  namespace: system-monitoring
+spec:
+  staticConfigs:
+    - targets: ["nas3.${SECRET_DOMAIN}:9134"]
   metricsPath: /metrics
