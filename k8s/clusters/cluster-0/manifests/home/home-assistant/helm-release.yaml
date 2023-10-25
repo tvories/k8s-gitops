@@ -139,8 +139,8 @@ spec:
             protocol: TCP
             targetPort: 12321
       matterserver:
-        type: ClusterIP
-        # externalTrafficPolicy: Cluster
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
         controller: main
         ports:
           http:
@@ -148,6 +148,16 @@ spec:
             port: *matter_port
             protocol: TCP
             targetPort: *matter_port
+          mdns-tcp:
+            enabled: true
+            port: 5353
+            protocol: TCP
+            targetPort: 5353
+          mdns-udp:
+            enabled: true
+            port: 5353
+            protocol: UDP
+            targetPort: 5353
 
     ingress:
       main:
