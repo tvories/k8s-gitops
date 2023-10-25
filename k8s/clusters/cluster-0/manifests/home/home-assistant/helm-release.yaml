@@ -95,6 +95,10 @@ spec:
             workingDir: "/matter_data"
             env:
               TZ: "${TIMEZONE}"
+              MATTER_SERVER__INSTANCE_NAME: Matter-Server
+              MATTER_SERVER__PORT: &matter_port 5580
+              MATTER_SERVER__APPLICATION_URL: &matter_host "matter.${SECRET_DOMAIN}"
+              MATTER_SERVER__LOG_LEVEL: info
             volumeMounts:
               - name: data
                 mountPath: /matter_data
@@ -138,11 +142,11 @@ spec:
         type: ClusterIP
         controller: main
         ports:
-          ws:
+          http:
             enabled: true
-            port: 5580
+            port: *matter_port
             protocol: TCP
-            targetPort: 5580
+            targetPort: *matter_port
 
     ingress:
       main:
@@ -183,6 +187,22 @@ spec:
           - secretName: tls.ha-vscode
             hosts:
               - *vscodehost
+
+      matterserver:
+        enabled: true
+        className: nginx-internal
+        hosts:
+          - host: *matter_host
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: matterserver
+                  port: http
+        tls:
+          - secretName: tls.matterserver
+            hosts:
+              - *matter_host
 
     persistence:
       config:
