@@ -108,6 +108,7 @@ spec:
                 memory: 100M
             securityContext:
               appArmor: "unconfirmed"
+              privileged: true
 
     service:
       main:
@@ -219,3 +220,8 @@ spec:
       config:
         enabled: true
         existingClaim: homeassistant-config
+      dbus:
+        enabled: true
+        type: hostPath
+        hostPath: /run/dbus
+        mountPath: /run/dbus
