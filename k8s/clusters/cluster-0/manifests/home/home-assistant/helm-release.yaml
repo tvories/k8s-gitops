@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.0.3
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -27,42 +27,117 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    initContainers:
-      01-init-db:
-        image: ghcr.io/onedr0p/postgres-init:14.9
-        imagePullPolicy: IfNotPresent
-        envFrom: &envFrom
-          - secretRef:
-              name: home-assistant-secret
+    controllers:
+      main:
+        strategy: Recreate
+        pod:
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          01-init-db:
+            image: ghcr.io/onedr0p/postgres-init:14.9
+            imagePullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: home-assistant-secret
+        containers:
+          main:
+            image:
+              repository: homeassistant/home-assistant
+              tag: 2023.10.3
 
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
+            env:
+              TZ: "${TIMEZONE}"
+              POSTGRES_HOST: postgres-rw.database.svc.cluster.local
+              POSTGRES_DB: hass
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
 
-    image:
-      repository: homeassistant/home-assistant
-      tag: 2023.10.5
+          codeserver:
+            enabled: true
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: ghcr.io/coder/code-server
+            workingDir: "/config"
+            env:
+              password: ${SECRET_CODESERVER_PASSWORD}
+              TZ: "${TIMEZONE}"
+              HASS_SERVER: http://localhost:8123
+            args:
+              - --auth
+              - "none"
+              - --user-data-dir
+              - "/config/.vscode"
+              - --extensions-dir
+              - "/config/.vscode"
+            volumeMounts:
+              - name: config
+                mountPath: /config
+            resources:
+              requests:
+                cpu: 11m
+                memory: 94M
 
-    env:
-      TZ: "${TIMEZONE}"
-      POSTGRES_HOST: postgres-rw.database.svc.cluster.local
-      POSTGRES_DB: hass
-    envFrom:
-      - secretRef:
-          name: home-assistant-secret
+          matterserver:
+            enabled: true
+            image:
+              repository: ghcr.io/home-assistant-libs/python-matter-server
+              tag: 4.0.0b0
+            workingDir: "/matter_data"
+            env:
+              TZ: "${TIMEZONE}"
+            volumeMounts:
+              - name: data
+                mountPath: /matter_data
+            resources:
+              requests:
+                cpu: 20m
+                memory: 100M
+            securityContext:
+              appArmor: "unconfirmed"
 
     service:
       main:
-        externalTrafficPolicy: Local
         type: LoadBalancer
-        loadBalancerIP: "${LB_HOMEASSISTANT}"
+        annotations:
+          io.cilium/lb-ipam-ips: "${LB_HOMEASSISTANT}"
+        externalTrafficPolicy: Cluster
+        # loadBalancerIP: "${LB_HOMEASSISTANT}"
         ports:
           http:
             port: 8123
-
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
+          mdns-tcp:
+            enabled: true
+            port: 5353
+            protocol: TCP
+            targetPort: 5353
+          mdns-udp:
+            enabled: true
+            port: 5353
+            protocol: UDP
+            targetPort: 5353
+      codeserver:
+        type: ClusterIP
+        controller: main
+        ports:
+          http:
+            enabled: true
+            port: 12321
+            protocol: TCP
+            targetPort: 12321
+      matterserver:
+        type: ClusterIP
+        controller: main
+        ports:
+          ws:
+            enabled: true
+            port: 5580
+            protocol: TCP
+            targetPort: 5580
 
     ingress:
       main:
@@ -76,10 +151,33 @@ spec:
           - host: &host "ha.${SECRET_DOMAIN}"
             paths:
               - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.homeassistant
             hosts:
               - *host
+
+      codeserver:
+        enabled: true
+        ingressClassName: "nginx-internal"
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: codeserver
+                  port: http
+        tls:
+          - secretName: tls.ha-vscode
+            hosts:
+              - *vscodehost
 
     persistence:
       config:
@@ -92,42 +190,3 @@ spec:
         memory: 588M
 
     addons:
-      codeserver:
-        enabled: true
-        image:
-          repository: codercom/code-server
-          tag: 4.18.0
-        workingDir: "/config"
-        env:
-          password: ${SECRET_CODESERVER_PASSWORD}
-          TZ: "${TIMEZONE}"
-          HASS_SERVER: http://localhost:8123
-        args:
-          - --auth
-          - "none"
-          - --user-data-dir
-          - "/config/.vscode"
-          - --extensions-dir
-          - "/config/.vscode"
-        ingress:
-          enabled: true
-          ingressClassName: "nginx-internal"
-          annotations:
-            nginx.ingress.kubernetes.io/proxy-body-size: "0"
-            cert-manager.io/cluster-issuer: letsencrypt-production
-          hosts:
-            - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
-              paths:
-                - path: /
-          tls:
-            - secretName: tls.ha-vscode
-              hosts:
-                - *vscodehost
-        volumeMounts:
-          - name: config
-            mountPath: /config
-
-        resources:
-          requests:
-            cpu: 11m
-            memory: 94M
