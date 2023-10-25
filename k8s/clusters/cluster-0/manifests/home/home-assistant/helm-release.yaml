@@ -139,7 +139,8 @@ spec:
             protocol: TCP
             targetPort: 12321
       matterserver:
-        type: ClusterIP
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
         controller: main
         ports:
           http:
