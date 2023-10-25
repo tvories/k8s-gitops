@@ -147,9 +147,9 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: nginx-external
+        # ingressClassName: nginx-external
+        className: nginx-external
         annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         hosts:
