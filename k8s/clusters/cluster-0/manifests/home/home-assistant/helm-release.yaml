@@ -167,7 +167,7 @@ spec:
 
       codeserver:
         enabled: true
-        ingressClassName: "nginx-internal"
+        className: nginx-internal
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
           cert-manager.io/cluster-issuer: letsencrypt-production
