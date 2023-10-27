@@ -16,18 +16,18 @@ spec:
       interval: 15m
   values:
     env:
-      # DB_DATABASE_NAME: immich
-      # DB_HOSTNAME: postgres.mcbadass.local
-      # DB_USERNAME:
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: immich-secret
-      #       key: DB_USERNAME
-      # DB_PASSWORD:
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: immich-secret
-      #       key: DB_PASSWORD
+      DB_DATABASE_NAME: immich
+      DB_HOSTNAME: postgres.database.svc.cluster.local
+      DB_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: immich-secret
+            key: DB_USERNAME
+      DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: immich-secret
+            key: DB_PASSWORD
       DB_PORT: "5432"
       DISABLE_REVERSE_GEOCODING: "false"
       REVERSE_GEOCODING_PRECISION: "2"
