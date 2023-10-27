@@ -66,11 +66,6 @@ spec:
         enabled: true
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
-      # postgresql:
-      #   host: nordrassil-storage-rw.storage.svc.cluster.local
-      #   user: authentik-admin
-      #   name: authentik
-      #   password: ${AUTHENTIK_PG_PASSWORD}
     redis:
       enabled: true
       persistence:
