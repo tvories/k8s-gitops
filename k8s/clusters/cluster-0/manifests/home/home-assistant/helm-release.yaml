@@ -35,15 +35,16 @@ spec:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          01-init-db:
-            image:
-              repository: ghcr.io/onedr0p/postgres-init
-              tag: 14.9
-            imagePullPolicy: IfNotPresent
-            envFrom: &envFrom
-              - secretRef:
-                  name: home-assistant-secret
+        # I don't want home assistant to be blocked if postgres is down
+        # initContainers:
+        #   01-init-db:
+        #     image:
+        #       repository: ghcr.io/onedr0p/postgres-init
+        #       tag: 14.9
+        #     imagePullPolicy: IfNotPresent
+        #     envFrom: &envFrom
+        #       - secretRef:
+        #           name: home-assistant-secret
         containers:
           main:
             image:
