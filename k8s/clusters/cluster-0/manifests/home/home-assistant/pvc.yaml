@@ -11,7 +11,7 @@ spec:
     - ReadWriteMany
   nfs:
     path: /mnt/fatguys/k8s/homeassistant
-    server: ${SECRET_NAS1}
+    server: 192.168.80.21
   mountOptions:
     - nfsvers=4.1
     - tcp
