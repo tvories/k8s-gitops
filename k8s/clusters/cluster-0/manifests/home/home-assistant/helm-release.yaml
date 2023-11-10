@@ -221,6 +221,7 @@ spec:
       config:
         enabled: true
         existingClaim: homeassistant-config
+        mountPath: /config
       # dbus:
       #   enabled: true
       #   type: hostPath
