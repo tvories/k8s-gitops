@@ -60,7 +60,7 @@ spec:
     metrics:
       enabled: true
     persistence:
-      enabled: true
+      enabled: false
       storageClassName: local-hostpath
       size: 250Mi
 
