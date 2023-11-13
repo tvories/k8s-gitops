@@ -12,14 +12,14 @@ spec:
   nfs:
     path: /mnt/fatguys/k8s/nextcloud
     server: ${SECRET_NAS1}
-  mountOptions:
-    - nfsvers=4.1
-    - tcp
-    - hard
-    - noatime
-    - nodiratime
-    - rsize=1048576
-    - wsize=1048576
+  # mountOptions:
+  #   - nfsvers=4.1
+  #   - tcp
+  #   - hard
+  #   - noatime
+  #   - nodiratime
+  #   - rsize=1048576
+  #   - wsize=1048576
 
 # ---
 # apiVersion: v1
