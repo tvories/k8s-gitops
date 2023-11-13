@@ -56,12 +56,12 @@ spec:
               POSTGRES_HOST:
                 valueFrom:
                   secretKeyRef:
-                    name: home-assistant
+                    name: home-assistant-secret
                     key: INIT_POSTGRES_HOST
               POSTGRES_DB:
                 valueFrom:
                   secretKeyRef:
-                    name: home-assistant
+                    name: home-assistant-secret
                     key: INIT_POSTGRES_DBNAME
             envFrom:
               - secretRef:
