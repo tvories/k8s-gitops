@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.0.3
+      version: 2.2.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -48,13 +48,21 @@ spec:
         containers:
           main:
             image:
-              repository: homeassistant/home-assistant
-              tag: 2023.11.1
+              repository: ghcr.io/home-assistant/home-assistant
+              tag: 2023.11.2
 
             env:
               TZ: "${TIMEZONE}"
-              POSTGRES_HOST: postgres.database.svc.cluster.local
-              POSTGRES_DB: hass
+              POSTGRES_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant
+                    key: INIT_POSTGRES_HOST
+              POSTGRES_DB:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant
+                    key: INIT_POSTGRES_DBNAME
             envFrom:
               - secretRef:
                   name: home-assistant-secret
@@ -68,9 +76,8 @@ spec:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.18.0@sha256:29267847d68332a28d249bd5235715402b144a3903b921da0a1962173aef10b1
-            workingDir: "/config"
             env:
-              password: ${SECRET_CODESERVER_PASSWORD}
+              # password: ${SECRET_CODESERVER_PASSWORD}
               TZ: "${TIMEZONE}"
               HASS_SERVER: http://localhost:8123
             args:
@@ -80,9 +87,9 @@ spec:
               - "/config/.vscode"
               - --extensions-dir
               - "/config/.vscode"
-            volumeMounts:
-              - name: config
-                mountPath: /config
+              - --port
+              - "12321"
+              - "/config"
             resources:
               requests:
                 cpu: 11m
@@ -132,14 +139,14 @@ spec:
             protocol: UDP
             targetPort: 5353
       codeserver:
-        type: ClusterIP
+        # type: ClusterIP
         controller: main
         ports:
           http:
             enabled: true
             port: 12321
-            protocol: TCP
-            targetPort: 12321
+            # protocol: TCP
+            # targetPort: 12321
       matterserver:
         type: LoadBalancer
         externalTrafficPolicy: Cluster
