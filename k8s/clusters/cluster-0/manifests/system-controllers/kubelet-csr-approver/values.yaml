@@ -1,5 +1,5 @@
 ---
 providerRegex: |
-  ^(physical1|physical2|m720q-1|m720q-2|sff1)$
+  ^(physical1|physical2|m720q-1|m720q-2)$
 
 bypassDnsResolution: true
