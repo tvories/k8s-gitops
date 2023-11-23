@@ -3,7 +3,7 @@ apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: bgp-pool
-  namespace: networking
+  namespace: network
 spec:
   addresses:
     - 192.168.80.180-192.168.80.189
