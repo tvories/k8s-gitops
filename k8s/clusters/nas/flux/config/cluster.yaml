@@ -31,6 +31,8 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
+  dependsOn:
+    - name: flux
   postBuild:
     substituteFrom:
       - kind: ConfigMap

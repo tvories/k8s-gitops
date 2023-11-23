@@ -21,6 +21,8 @@ spec:
         name: cluster-settings
       - kind: Secret
         name: global-secrets
+      - kind: Secret
+        name: cluster-secrets
   patches:
     - patch: |-
         apiVersion: kustomize.toolkit.fluxcd.io/v1
