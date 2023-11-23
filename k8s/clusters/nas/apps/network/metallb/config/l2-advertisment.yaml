@@ -6,4 +6,4 @@ metadata:
   namespace: network
 spec:
   interfaces:
-    - vlan80@enp1s0
+    - vlan80
