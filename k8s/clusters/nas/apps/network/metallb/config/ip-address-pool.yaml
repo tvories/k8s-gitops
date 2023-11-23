@@ -2,7 +2,7 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: bgp-pool
+  name: nas-pool
   namespace: network
 spec:
   addresses:

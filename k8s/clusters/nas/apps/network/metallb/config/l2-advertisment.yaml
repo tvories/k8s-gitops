@@ -5,5 +5,7 @@ metadata:
   name: l2
   namespace: network
 spec:
+  ipAddressPools:
+    - nas-pool
   interfaces:
     - vlan80
