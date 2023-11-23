@@ -1,6 +1,6 @@
 # NAS Kubernetes
 
-I am running TrueNAS Scale and I am using Flux to manage the manifests on the built-in K3s.
+I am running Nixos and using K3s.
 
 ## How to bootstrap
 
@@ -20,4 +20,10 @@ I use a GCP service account to decrypt flux secrets using SOPS.
 
 ```command
 kubectl -n flux-system create secret generic fluxcd-google-sa-secret --from-file=$SADIRECTORY/gcp-flux-sa-credential.json --type=Opaque
+```
+
+#### Apply config
+
+```command
+kubectl apply --server-side --kustomize ./flux/config
 ```
