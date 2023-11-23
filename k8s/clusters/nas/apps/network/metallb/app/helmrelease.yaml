@@ -22,11 +22,5 @@ spec:
     remediation:
       retries: 3
   values:
-    configInline:
-      address-pools:
-        - name: default
-          protocol: layer2
-          addresses:
-            - 192.168.80.180-192.168.80.189
-    psp:
-      create: false
+    crds:
+      enabled: true
