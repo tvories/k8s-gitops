@@ -31,8 +31,6 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
-    secretRef:
-      name: fluxcd-google-sa-secret
   dependsOn:
     - name: flux
   postBuild:
