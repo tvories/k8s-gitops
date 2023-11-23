@@ -31,8 +31,6 @@ spec:
     name: k8s-gitops
   decryption:
     provider: sops
-  dependsOn:
-    - name: flux
   postBuild:
     substituteFrom:
       - kind: ConfigMap
@@ -47,20 +45,3 @@ spec:
       - kind: Secret
         name: cluster-secrets
         optional: false
-
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: cluster-config
-  namespace: flux-system
-spec:
-  interval: 10m0s
-  path: ./k8s/clusters/nas/flux/vars
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
-  decryption:
-    provider: sops
