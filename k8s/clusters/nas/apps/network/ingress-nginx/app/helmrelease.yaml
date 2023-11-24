@@ -32,6 +32,8 @@ spec:
         # annotations:
         #   io.cilium/lb-ipam-ips: ${INTERNAL_NGINX_LB}
         externalTrafficPolicy: Local
+        annotations:
+          metallb.universe.tf/address-pool: nas-pool
 
       publishService:
         enabled: true
