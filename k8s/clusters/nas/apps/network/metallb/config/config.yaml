@@ -1,0 +1,40 @@
+---
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: router
+  namespace: network
+spec:
+  myASN: 64512
+  peerASN: 64512
+  peerAddress: 192.168.1.1
+
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: bgp-84
+  namespace: network
+spec:
+  addresses:
+    - 192.168.84.180-192.168.84.190
+  autoAssign: true
+
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: bgp-84
+  namespace: network
+spec:
+  ipAddressPools:
+    - bgp-84
+# ---
+# apiVersion: metallb.io/v1beta1
+# kind: L2Advertisement
+# metadata:
+#   name: vlan3route
+#   namespace: network
+# spec:
+#   ipAddressPools:
+#     - vlan3
