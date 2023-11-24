@@ -28,7 +28,7 @@ spec:
         # type: LoadBalancer
         # externalIPs:
         # - "${INTERNAL_NGINX_LB}"
-        loadBalancerIP: "192.168.80.180"
+        loadBalancerIP: "192.168.84.180"
         # annotations:
         #   io.cilium/lb-ipam-ips: ${INTERNAL_NGINX_LB}
         externalTrafficPolicy: Local
