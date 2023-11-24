@@ -2,6 +2,15 @@
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
+  name: l2-default
+  namespace: network
+spec:
+  interfaces:
+    - vlan80
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
   name: l2
   namespace: network
 spec:
