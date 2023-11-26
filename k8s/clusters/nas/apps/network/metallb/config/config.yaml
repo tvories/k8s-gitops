@@ -28,6 +28,10 @@ metadata:
 spec:
   ipAddressPools:
     - pool-84
+  interfaces:
+    - vlan20
+    - vlan80
+    - enp1s0
 # ---
 # apiVersion: metallb.io/v1beta1
 # kind: BGPAdvertisement
