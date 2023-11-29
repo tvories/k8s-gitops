@@ -38,7 +38,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/Backup/k8s/applications/audiobookshelf
+    path: /ook/Backup/k8s/applications/audiobookshelf
     server: ${SECRET_NAS3}
   mountOptions:
     - nfsvers=4.1
@@ -74,7 +74,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/Media/books
+    path: /ook/Media/books
     server: ${SECRET_NAS3}
   mountOptions:
     - nfsvers=4.1
