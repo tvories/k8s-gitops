@@ -28,10 +28,10 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/Media/nvr
-    server: ${SECRET_NAS1}
+    path: /ook/Media/nvr
+    server: ${SECRET_NAS3}
   mountOptions:
-    - nfsvers=4.1
+    - nfsvers=4.2
     - tcp
     - hard
     - noatime
