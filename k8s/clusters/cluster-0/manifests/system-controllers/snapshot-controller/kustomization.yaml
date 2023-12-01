@@ -4,3 +4,4 @@ kind: Kustomization
 namespace: system-controllers
 resources:
   - ./helm-release.yaml
+  - ./pki.yaml
