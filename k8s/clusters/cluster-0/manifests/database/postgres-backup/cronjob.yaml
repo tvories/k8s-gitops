@@ -51,4 +51,4 @@ spec:
             - name: nas-backups
               nfs:
                 server: "${SECRET_NAS3}"
-                path: /mnt/fatguys/Backup/k8s/pgbackups
+                path: /ook/Backup/k8s/pgbackups

@@ -62,8 +62,8 @@ spec:
         enabled: true
         type: nfs
         nfs:
-        server: ${SECRET_NAS1}
-        path: /mnt/fatguys/Books
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks
         mountPath: /books
 
     ingress:
