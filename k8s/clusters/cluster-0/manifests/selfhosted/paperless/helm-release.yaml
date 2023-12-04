@@ -85,16 +85,22 @@ spec:
                 memory: 1812M
 
           gotenburg:
-            image: thecodingmachine/gotenberg:7.10.1
-            imagePullPolicy: IfNotPresent
+            image:
+              repository: thecodingmachine/gotenberg
+              tag: 7.10.1
+              pullPolicy: IfNotPresent
             env:
               - { name: DISABLE_GOOGLE_CHROME, value: "1" }
           redis:
-            image: public.ecr.aws/docker/library/redis:7.2.3
-            imagePullPolicy: IfNotPresent
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 7.2.3
+              pullPolicy: IfNotPresent
           tika:
-            image: ghcr.io/paperless-ngx/tika:2.9.0-full
-            imagePullPolicy: IfNotPresent
+            image:
+              repository: ghcr.io/paperless-ngx/tika
+              tag: 2.9.0-full
+              pullPolicy: IfNotPresent
 
     service:
       main:
