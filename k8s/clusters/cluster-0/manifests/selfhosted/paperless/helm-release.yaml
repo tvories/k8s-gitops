@@ -36,9 +36,10 @@ spec:
               - 65543 # docs-rw
         initContainers:
           init-db:
-            repisotry: ghcr.io/onedr0p/postgres-init
-            tag: 15.5@sha256:a337602f0dc11ee0e7f819ede78fa1a13e40a52adad737353efe10ce265a4b36
-            imagePullPolicy: IfNotPresent
+            image:
+              repisotry: ghcr.io/onedr0p/postgres-init
+              tag: 15.5@sha256:a337602f0dc11ee0e7f819ede78fa1a13e40a52adad737353efe10ce265a4b36
+              pullPolicy: IfNotPresent
             envFrom: &envFrom
               - secretRef:
                   name: paperless-secret
