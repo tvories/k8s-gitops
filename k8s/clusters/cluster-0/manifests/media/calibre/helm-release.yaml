@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.3.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -25,39 +25,25 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/linuxserver/calibre
-      tag: version-v7.1.0
-
-    env:
-      TZ: "${TIMEZONE}"
-      PUID: "1000"
-      PGID: "65539"
-      UMASK_SET: "022"
-
-    persistence:
-      config:
-        enabled: true
-        existingClaim: calibre-config
-        mountPath: /config
-
-      media:
-        enabled: true
-        existingClaim: media-nfs-media
-        mountPath: /media
-
-      ebooks:
-        enabled: true
-        type: nfs
-        nfs:
-        server: ${SECRET_NAS3}
-        path: /ook/Media/ebooks
-        mountPath: /books
-
+    controllers:
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        image:
+          repository: ghcr.io/linuxserver/calibre
+          tag: version-v7.1.0
+        env:
+          TZ: "${TIMEZONE}"
+          PUID: "568"
+          PGID: "65539"
+          UMASK_SET: "022"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200M
+          limits:
+            memory: 604M
     service:
       main:
         ports:
@@ -79,19 +65,36 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx-internal"
+        className: "nginx-internal"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
           - host: &host calibre.${SECRET_DOMAIN}
             paths:
               - path: /
-
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.calibre
             hosts:
               - *host
-    resources:
-      requests:
-        cpu: 224m
-        memory: 64M
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-config
+        mountPath: /config
+
+      media:
+        enabled: true
+        existingClaim: media-nfs-media
+        mountPath: /media
+
+      ebooks:
+        enabled: true
+        type: nfs
+        nfs:
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks
+        mountPath: /books
