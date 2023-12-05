@@ -94,10 +94,9 @@ spec:
         existingClaim: media-nfs-media
         mountPath: /media
 
-      ebooks:
+      books:
         enabled: true
         type: nfs
-        nfs:
         server: ${SECRET_NAS3}
         path: /ook/Media/ebooks
         mountPath: /books
