@@ -30,20 +30,22 @@ spec:
         type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
-        image:
-          repository: ghcr.io/linuxserver/calibre
-          tag: version-v7.1.0
-        env:
-          TZ: "${TIMEZONE}"
-          PUID: "568"
-          PGID: "65539"
-          UMASK_SET: "022"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200M
-          limits:
-            memory: 604M
+        containers:
+          main:
+            image:
+              repository: ghcr.io/linuxserver/calibre
+              tag: version-v7.1.0
+            env:
+              TZ: "${TIMEZONE}"
+              PUID: "568"
+              PGID: "65539"
+              UMASK_SET: "022"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 200M
+              limits:
+                memory: 604M
     service:
       main:
         ports:
