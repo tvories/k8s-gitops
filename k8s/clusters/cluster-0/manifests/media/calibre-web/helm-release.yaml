@@ -58,7 +58,7 @@ spec:
         enabled: true
         existingClaim: media-nfs-media
         mountPath: /media
-      ebooks:
+      books:
         enabled: true
         type: nfs
         nfs:
