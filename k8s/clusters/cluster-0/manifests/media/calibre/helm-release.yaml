@@ -53,6 +53,7 @@ spec:
             port: 8080
       webserver:
         enabled: true
+        controller: main
         ports:
           webserver:
             enabled: true
