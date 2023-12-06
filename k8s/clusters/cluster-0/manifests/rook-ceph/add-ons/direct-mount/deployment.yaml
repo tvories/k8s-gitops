@@ -77,8 +77,8 @@ spec:
                 path: mon-endpoints
         - name: nas-backup
           nfs:
-            server: "${SECRET_NAS1}"
-            path: /mnt/fatguys/Backup/k8s/rook-ceph
+            server: "${SECRET_NAS3}"
+            path: /ook/Backup/k8s/rook-ceph
         - name: direct-mount-scripts
           projected:
             defaultMode: 0775
