@@ -10,22 +10,21 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/esphome
+    path: /ook/k8s/esphome
     server: ${SECRET_NAS1}
   mountOptions:
-    - nfsvers=4.1
-    - tcp
+    - nfsvers=4.2
+    - nconnect=8
     - hard
     - noatime
-    - nodiratime
-    - rsize=1048576
-    - wsize=1048576
+    - rsize=131072
+    - wsize=131072
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: esphome-config
+  name: esphome-nfs-config
   namespace: home
 spec:
   accessModes:
