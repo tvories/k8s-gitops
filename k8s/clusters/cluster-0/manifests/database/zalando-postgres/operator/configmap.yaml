@@ -17,7 +17,7 @@ data:
   BACKUP_NUM_TO_RETAIN: "14"
   CLONE_USE_WALG_RESTORE: "true"
   AWS_S3_FORCE_PATH_STYLE: "true"
-  AWS_ENDPOINT: https://nas1.${SECRET_DOMAIN}:9000
+  AWS_ENDPOINT: https://s3.nas.${SECRET_DOMAIN}
   AWS_REGION: us-east-1
   WAL_S3_BUCKET: zalando-postgres
   # AWS_ACCESS_KEY_ID: <configured in externalSecret>
