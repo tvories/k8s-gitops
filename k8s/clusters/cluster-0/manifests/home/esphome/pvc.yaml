@@ -11,7 +11,7 @@ spec:
     - ReadWriteMany
   nfs:
     path: /ook/k8s/esphome
-    server: ${SECRET_NAS1}
+    server: ${SECRET_NAS3}
   mountOptions:
     - nfsvers=4.2
     - nconnect=8
