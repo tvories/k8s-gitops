@@ -74,7 +74,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx-internal"
+        className: "nginx-internal"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           nginx.ingress.kubernetes.io/configuration-snippet: |
