@@ -10,16 +10,15 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /mnt/fatguys/k8s/nextcloud
-    server: ${SECRET_NAS1}
+    path: /ook/k8s/nextcloud
+    server: ${SECRET_NAS3}
   mountOptions:
-    - nfsvers=4.1
-    - tcp
+    - nfsvers=4.2
+    - nconnect=8
     - hard
     - noatime
-    - nodiratime
-    - rsize=1048576
-    - wsize=1048576
+    - rsize=131072
+    - wsize=131072
 
 # ---
 # apiVersion: v1
