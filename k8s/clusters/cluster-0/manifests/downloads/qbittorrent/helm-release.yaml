@@ -34,7 +34,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 65539 # media-rw
-      hostname: qb
+      hostname: qbittorrent
     controllers:
       main:
         type: statefulset
