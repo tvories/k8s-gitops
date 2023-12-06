@@ -5,11 +5,11 @@ metadata:
   name: qbittorrent
   namespace: downloads
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 2.3.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -26,37 +26,33 @@ spec:
     keepHistory: false
 
   values:
-    image:
-      repository: ghcr.io/onedr0p/qbittorrent
-      tag: 4.6.2@sha256:252b90e64ae43113f1fdb5dd941728a752eed13fc5fbc4ac5b63e2acccad8f7f
-
-    hostname: qb
-
-    podAnnotations:
-      setGateway: "true"
-
-    podSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
-      fsGroupChangePolicy: OnRootMismatch
-      supplementalGroups:
-        - 65539
-        - 100
-
-    settings:
-      automaticPortSetup: false
-
-    env:
-      TZ: "${TIMEZONE}"
-      # UMASK: "022"
-      # USE_PROFILE: "true"
-      QBITTORRENT__PORT: &port 8080
-      QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
-    envFrom:
-      - secretRef:
-          name: qbittorrent-config
-
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 65539 # media-rw
+      hostname: qb
+    controllers:
+      main:
+        type: statefulset
+        pod:
+          annotations:
+            setDownloadGateway: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.6.2@sha256:252b90e64ae43113f1fdb5dd941728a752eed13fc5fbc4ac5b63e2acccad8f7f
+            env:
+              TZ: "${TIMEZONE}"
+              QBITTORRENT__PORT: &port 8080
+              QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-config
     service:
       main:
         ports:
@@ -73,37 +69,6 @@ spec:
             port: *port-bt
             protocol: TCP
             targetPort: *port-bt
-
-    persistence:
-      cache:
-        enabled: true
-        type: emptyDir
-        mountPath: /config/qBittorrent/cache
-
-      config:
-        enabled: true
-        existingClaim: qbittorrent-config
-        mountPath: /config
-
-      # configfiles:
-      #   enabled: true
-      #   type: configMap
-      #   name: qbittorrent-config
-      #   mountPath: "-"
-
-      # data:
-      #   enabled: true
-      #   existingClaim: qbittorrent-config
-      #   mountPath: /config/qBittorrent/data
-
-      media:
-        enabled: true
-        existingClaim: downloads-nfs-media
-        mountPath: /media
-      ebooks:
-        enabled: true
-        existingClaim: downloads-nfs-ebooks
-        mountPath: /ebooks
 
     ingress:
       main:
@@ -122,10 +87,27 @@ spec:
           - host: &host qb.${SECRET_DOMAIN}
             paths:
               - path: /
+                service:
+                  name: main
+                  port: http
         tls:
           - secretName: tls.qbittorrent
             hosts:
               - *host
+    persistence:
+      cache:
+        enabled: true
+        type: emptyDir
+        mountPath: /config/qBittorrent/cache
+
+      config:
+        enabled: true
+        existingClaim: qbittorrent-config
+        mountPath: /config
+      media:
+        enabled: true
+        existingClaim: downloads-nfs-media
+        mountPath: /media
 
     lifecyle:
       postStart:

@@ -122,10 +122,6 @@ spec:
         enabled: true
         existingClaim: downloads-nfs-media
         mountPath: /media
-      ebooks:
-        enabled: true
-        existingClaim: downloads-nfs-ebooks
-        mountPath: /ebooks
       backup:
         enabled: true
         existingClaim: readarr-nfs-backup
