@@ -36,7 +36,7 @@ spec:
     pruneIntervalDays: 14
     repository: zigbee2mqtt-restic-secret
     cacheCapacity: 2Gi
-    volumeSnapshotClassName: csi-ceph-blockpool
+    volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block
     moverSecurityContext:
       runAsUser: 568

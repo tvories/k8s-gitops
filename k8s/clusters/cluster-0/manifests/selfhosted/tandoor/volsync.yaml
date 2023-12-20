@@ -36,7 +36,7 @@ spec:
     pruneIntervalDays: 14
     repository: tandoor-restic-secret
     cacheCapacity: 8Gi
-    volumeSnapshotClassName: csi-ceph-blockpool
+    volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block
     moverSecurityContext:
       runAsUser: 568
