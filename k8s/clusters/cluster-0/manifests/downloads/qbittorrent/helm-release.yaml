@@ -96,6 +96,8 @@ spec:
                 value: "127.0.0.2"
               - name: TZ
                 value: "${TIMEZONE}"
+              - name: WIREGUARD_PRESHARED_KEY
+                value: ""
             envFrom:
               - secretRef:
                   name: qbittorrent-config
