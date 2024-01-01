@@ -1,5 +1,6 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: qbittorrent
@@ -9,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.3.0
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -26,30 +27,94 @@ spec:
     keepHistory: false
 
   values:
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups:
-          - 65539 # media-rw
-      hostname: qbittorrent
     controllers:
       main:
+        annotations:
+          configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
+          secret.reloader.stakater.com/reload: qbittorrent-secret
         type: statefulset
         pod:
-          annotations:
-            setDownloadGateway: "true"
+          securityContext:
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+          # annotations:
+          #   setDownloadGateway: "true"
         containers:
           main:
+            nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 4.6.2@sha256:252b90e64ae43113f1fdb5dd941728a752eed13fc5fbc4ac5b63e2acccad8f7f
             env:
+              UMASK: "022"
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: &port 8080
               QBITTORRENT__BT_PORT: &port-bt ${VPN_FORWARDED_PORT_1}
+            resources:
+              requests:
+                cpu: 49m
+                memory: 1024Mi
+              limits:
+                memory: 8192Mi
+            securityContext:
+              runAsUser: 568
+              runAsGroup: 568
+              # runAsNonRoot: true
+              # allowPrivilegeEscalation: false
+              # readOnlyRootFilesystem: true
+              # capabilities:
+              #   drop:
+              #     - ALL
+          dnsdist:
+            image:
+              repository: docker.io/powerdns/dnsdist-18
+              tag: 1.8.3
+
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: latest@sha256:fc3ea92a6bbf3c037316e2326e0185da2d661e9f06b68408e4a24ee2aa2d2b8d
+            env:
+              - name: VPN_INTERFACE
+                value: wg0
+              - name: VPN_PORT_FORWARDING
+                value: "on"
+              - name: VPN_PORT_FORWARDING_PROVIDER
+                value: "protonvpn"
+              - name: FIREWALL_INPUT_PORTS
+                value: "8080"
+              - name: FIREWALL_OUTBOUND_SUBNETS
+                # Allow access to k8s subnets
+                value: "10.96.0.0/12,10.244.0.0/16"
+              - name: SHADOWSOCKS
+                value: "on"
+              - name: DOT
+                value: "off"
+              - name: DNS_PLAINTEXT_ADDRESS
+                value: "127.0.0.2"
+              - name: TZ
+                value: "${TIMEZONE}"
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+
+          port-forward:
+            image:
+              repository: docker.io/snoringdragon/gluetun-qbittorrent-port-manager
+              tag: "1.3"
+            env:
+              - name: QBITTORRENT_SERVER
+                value: localhost
+              - name: QBITTORRENT_PORT
+                value: "8080"
+              - name: PORT_FORWARDED
+                value: "/tmp/gluetun/forwarded_port"
             envFrom:
               - secretRef:
                   name: qbittorrent-config
@@ -110,16 +175,16 @@ spec:
         existingClaim: downloads-nfs-media
         mountPath: /media
 
-    lifecyle:
-      postStart:
-        exec:
-          command:
-            [
-              "curl",
-              "-c /config/qBittorrent/mam.cookie",
-              "-b 'mam_id=${MAM_ID}'",
-              "{$MAM_URL}",
-            ]
+    # lifecyle:
+    #   postStart:
+    #     exec:
+    #       command:
+    #         [
+    #           "curl",
+    #           "-c /config/qBittorrent/mam.cookie",
+    #           "-b 'mam_id=${MAM_ID}'",
+    #           "{$MAM_URL}",
+    #         ]
 
     resources:
       requests:
