@@ -98,7 +98,7 @@ spec:
                 value: "${TIMEZONE}"
             envFrom:
               - secretRef:
-                  name: qbittorrent-secret
+                  name: qbittorrent-config
             securityContext:
               capabilities:
                 add:
