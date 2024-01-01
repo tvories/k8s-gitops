@@ -92,8 +92,8 @@ spec:
                 value: "on"
               - name: DOT
                 value: "off"
-              - name: DNS_PLAINTEXT_ADDRESS
-                value: "127.0.0.2"
+              # - name: DNS_PLAINTEXT_ADDRESS
+              #   value: "127.0.0.2"
               - name: TZ
                 value: "${TIMEZONE}"
               - name: WIREGUARD_PRESHARED_KEY
