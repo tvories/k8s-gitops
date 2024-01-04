@@ -1,0 +1,40 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cnpg
+  namespace: database
+spec:
+  releaseName: cnpg
+  interval: 30m
+  chart:
+    spec:
+      chart: cloudnative-pg
+      version: 0.20.0
+      sourceRef:
+        kind: HelmRepository
+        name: cnpg-charts
+        namespace: flux-system
+  # maxHistory: 2
+  # install:
+  #   remediation:
+  #     retries: 2
+  # upgrade:
+  #   cleanupOnFail: true
+  #   remediation:
+  #     retries: 2
+  uninstall:
+    keepHistory: false
+  values:
+    # replicaCount: 1
+    # podAnnotations:
+    #   configmap.reloader.stakater.com/reload: cnpg-controller-manager-config
+    # image:
+    #   repository: ghcr.io/cloudnative-pg/cloudnative-pg
+    #   tag: "1.20.2"
+    # resources:
+    #   requests:
+    #     cpu: 15m
+    #     memory: 128Mi
+    crds:
+      create: true
