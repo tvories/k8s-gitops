@@ -1,11 +1,12 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
 talosVersion: v1.6.1
-kubernetesVersion: v1.28.3
+kubernetesVersion: v1.29.0
 endpoint: https://${cluster_name}.${domain_name}:6443
-domain: cluster.local
-allowSchedulingOnMasters: true
+# domain: cluster.local
+# allowSchedulingOnMasters: true
 clusterPodNets:
   - 10.244.0.0/16
 clusterSvcNets:
@@ -16,12 +17,12 @@ cniConfig:
   # urls:
   #   - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
 
-additionalApiServerCertSans:
-  - ${cluster_endpoint_ip}
-
-additionalMachineCertSans:
+additionalApiServerCertSans: &san
   - ${cluster_endpoint_ip}
   - ${cluster_name}.${domain_name}
+  - "127.0.0.1" # KubePrism
+
+additionalMachineCertSans: *san
 
 nodes:
   # Two virtual cpnodes and 3 physical cpnodes
@@ -69,6 +70,13 @@ nodes:
       - interface: eth0
         dhcp: true
         mtu: 9000
+        # vlans:
+        #   - &vlan80
+        #     vlanId: 80
+        #     mtu: 9000
+        #     dhcp: true
+        #     dhcpOptions:
+        #       routeMetric: 4096
     # patches:
     #   - |-
     #     machine:
@@ -98,7 +106,6 @@ nodes:
   #   #         modules:
   #   #           - name: gasket
   #   #           - name: apex
-
   - hostname: m720q-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.99
@@ -110,16 +117,21 @@ nodes:
         dhcp: true
         mtu: 9000
     installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gasket-driver
+    # patches:
+    #   - |-
+    #     machine:
+    #     #   install:
+    #     #     extensions:
+    #     #       - image: ${gasket_image}
+    #       kernel:
+    #         modules:
+    #           - name: gasket
+    #           - name: apex
 
   - hostname: m720q-2.${domain_name}
     controlPlane: true
@@ -134,16 +146,11 @@ nodes:
         dhcp: true
         mtu: 9000
     installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gasket-driver
 
   - hostname: m720q-3.${domain_name}
     controlPlane: true
@@ -158,16 +165,11 @@ nodes:
         dhcp: true
         mtu: 9000
     installDisk: /dev/sda
-    patches:
-      - |-
-        machine:
-          install:
-            extensions:
-              - image: ${gasket_image}
-          kernel:
-            modules:
-              - name: gasket
-              - name: apex
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gasket-driver
 
   # - hostname: talos-worker-1.${domain_name}
   #   ipAddress: 192.168.80.94
@@ -182,44 +184,130 @@ nodes:
   #   installDisk: /dev/sda
 
 controlPlane:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - net.ifnames=0
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/gasket-driver
   patches:
+    # Disable search domain everywhere
     - |-
-      cluster:
-        allowSchedulingOnMasters: true
-        # This must be disabled or else cilium kube-proxy will conflict
-        proxy:
-          disabled: true
-        etcd:
-          advertisedSubnets:
-            - 192.168.80.0/24
-        apiServer:
-          extraArgs:
-            anonymous-auth: true
+      machine:
+        network:
+          disableSearchDomain: true
 
+    # Force nameserver
     - |-
-      - op: remove
-        path: /cluster/apiServer/admissionControl
+      machine:
+        network:
+          nameservers:
+            - 192.168.1.240
+            - 192.168.1.241
 
+    # Configure NTP
+    - |-
+      machine:
+        time:
+          disabled: false
+          servers:
+            - 192.168.80.1
+
+    # Enable KubePrism
     - |-
       machine:
         features:
           kubePrism:
             enabled: true
             port: 7445
+
+    # Configure cluster loopback
+    - |-
+      machine:
+        network:
+          extraHostEntries:
+            - ip: ${cluster_endpoint_ip}
+              aliases:
+                - ${cluster_name}.${domain_name}
+
+    # Configure containerd
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+
+    # Configure nfs mount options
+    - |-
+      machine:
+        files:
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
+
+    # Cluster configuration
+    - |-
+      cluster:
+        allowSchedulingOnMasters: true
+        # This must be disabled or else cilium kube-proxy will conflict
+        proxy:
+          disabled: true
+
+    # ETCD configuration
+    - |-
+      cluster:
+        etcd:
+          advertisedSubnets:
+            - 192.168.80.0/24
+
+    # Enable Anonymous Auth for HAProxy health check
+    - |-
+      cluster:
+        apiServer:
+          extraArgs:
+            anonymous-auth: true
+
+    # Disable default API server admission plugins.
+    - |-
+      - op: remove
+        path: /cluster/apiServer/admissionControl
+
+    # Kubelet configuration
+    - |-
+      machine:
         kubelet:
           extraArgs:
-            feature-gates: CronJobTimeZone=true,GracefulNodeShutdown=true
+            feature-gates: GracefulNodeShutdown=true,NewVolumeManagerReconstruction=false
             rotate-server-certificates: "true"
           extraConfig:
             maxPods: 150
           nodeIP:
             validSubnets:
                 - 192.168.80.0/24
-        sysctls:
-          fs.inotify.max_user_watches: "1048576"
-          fs.inotify.max_user_instances: "8192"
-          net.ipv4.ip_unprivileged_port_start: 0
-        time:
-          disabled: false
-          servers:
-            - 192.168.80.1
+
+worker:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - net.ifnames=0
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/gasket-driver
+          # - siderolabs/i915-ucode
