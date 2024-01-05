@@ -70,16 +70,16 @@ spec:
         existingSecret: immich-secret
         existingSecretPasswordKey: REDIS_PASSWORD
 
-    typesense:
-      enabled: true
-      persistence:
-        tsdata:
-          enabled: true
-          storageClass: ceph-block
-      resources:
-        requests:
-          cpu: 15m
-          memory: 145M
+    # typesense:
+    #   enabled: true
+    #   persistence:
+    #     tsdata:
+    #       enabled: true
+    #       storageClass: ceph-block
+    #   resources:
+    #     requests:
+    #       cpu: 15m
+    #       memory: 145M
 
     immich:
       persistence:
