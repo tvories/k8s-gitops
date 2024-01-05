@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: postgres
+  name: postgres2
   namespace: database
 spec:
   instances: 3
@@ -50,6 +50,7 @@ spec:
         maxParallel: 12
       destinationPath: s3://cnpg/
       endpointURL: https://s3.nas.t-vo.us:443
+      serverName: &currentCluster postgres2
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -58,24 +59,24 @@ spec:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
 
-  # bootstrap:
-  #   recovery:
-  #     source: &previous-cluster postgres-v1
+  bootstrap:
+    recovery:
+      source: &previous-cluster postgres
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
-  # externalClusters:
-  #   - name: *previous-cluster
-  #     barmanObjectStore:
-  #       destinationPath: s3://cnpg/
-  #       endpointURL: https://nas1.${SECRET_DOMAIN}:9000
-  #       s3Credentials:
-  #         accessKeyId:
-  #           name: cloudnative-pg-secret
-  #           key: aws-access-key-id
-  #         secretAccessKey:
-  #           name: cloudnative-pg-secret
-  #           key: aws-secret-access-key
-  #       wal:
-  #         compression: gzip
-  #         maxParallel: 12
+  externalClusters:
+    - name: *previous-cluster
+      barmanObjectStore:
+        destinationPath: s3://cnpg/
+        endpointURL: https://s3.nas.t-vo.us:443
+        s3Credentials:
+          accessKeyId:
+            name: cloudnative-pg-secret
+            key: aws-access-key-id
+          secretAccessKey:
+            name: cloudnative-pg-secret
+            key: aws-secret-access-key
+        wal:
+          compression: gzip
+          maxParallel: 12
