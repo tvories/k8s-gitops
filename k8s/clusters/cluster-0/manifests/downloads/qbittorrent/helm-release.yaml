@@ -76,7 +76,7 @@ spec:
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
-              tag: latest@sha256:450a487b23cd460da99b025b32b22fbccd41e7f3a0b083d34326d5a4c88519b0
+              tag: latest@sha256:fc3ea92a6bbf3c037316e2326e0185da2d661e9f06b68408e4a24ee2aa2d2b8d
             env:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
