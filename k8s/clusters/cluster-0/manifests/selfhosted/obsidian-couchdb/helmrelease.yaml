@@ -23,7 +23,7 @@ spec:
 
     image:
       repository: public.ecr.aws/docker/library/couchdb
-      tag: 3.3.2
+      tag: 3.3.3
 
     initContainers:
       init-config:
