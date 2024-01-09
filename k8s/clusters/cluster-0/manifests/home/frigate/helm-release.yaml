@@ -33,38 +33,39 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          image:
-            repository: ghcr.io/blakeblackshear/frigate
-            tag: 0.12.1
+          main:
+            image:
+              repository: ghcr.io/blakeblackshear/frigate
+              tag: 0.12.1
 
-          env:
-            TZ: ${TIMEZONE}
-          envFrom:
-            - secretRef:
-                name: frigate-secret
-          probes:
-            liveness: &probes
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/version
-                  port: &port 5000
-                initialDelaySeconds: 0
-                periodSeconds: 10
-                timeoutSeconds: 1
-                failureThreshold: 3
-            readiness: *probes
-            startup:
-              enabled: false
-          resources:
-            requests:
-              cpu: 1000m
-              memory: 1313M
-            limits:
-              memory: 6000Mi
-          securityContext:
-            privileged: true
+            env:
+              TZ: ${TIMEZONE}
+            envFrom:
+              - secretRef:
+                  name: frigate-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: &port 5000
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 1000m
+                memory: 1313M
+              limits:
+                memory: 6000Mi
+            securityContext:
+              privileged: true
 
     service:
       main:
