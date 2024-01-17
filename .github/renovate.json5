@@ -1,4 +1,5 @@
 {
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
     ":enableRenovate",
     "config:recommended",
@@ -17,11 +18,11 @@
     "github>tvories/k8s-gitops//.github/renovate/customManagers.json5",
     "github>tvories/k8s-gitops//.github/renovate/customDatasources.json5",
   ],
-  platform: "github",
-  username: "tvories-tbot[bot]",
-  repositories: ["tvories/k8s-gitops"],
-  onboarding: false,
-  requireConfig: "optional",
+  // platform: "github",
+  // username: "tvories-tbot[bot]",
+  // repositories: ["tvories/k8s-gitops"],
+  // onboarding: false,
+  // requireConfig: "optional",
   gitAuthor: "tvories-tbot <tvories-tbot@users.noreply.github.com>",
   timezone: "America/Denver",
   dependencyDashboardTitle: "Renovate Dashboard",
