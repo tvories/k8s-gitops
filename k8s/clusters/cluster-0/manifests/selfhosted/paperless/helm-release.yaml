@@ -45,6 +45,9 @@ spec:
                   name: paperless-secret
         containers:
           main:
+            probes:
+              startup:
+                enabled: false
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
               tag: 2.3.3
