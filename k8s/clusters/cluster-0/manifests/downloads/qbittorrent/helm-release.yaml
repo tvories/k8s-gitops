@@ -52,7 +52,7 @@ spec:
               UMASK: "022"
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &port-bt "54395"
+              QBITTORRENT__BT_PORT: &port-bt 57563
             resources:
               requests:
                 cpu: 49m
