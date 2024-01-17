@@ -82,7 +82,7 @@ spec:
                 memory: 1000M
               limits:
                 # cpu: 1311m
-                memory: 2500M
+                memory: 3000M
 
           gotenburg:
             image:
