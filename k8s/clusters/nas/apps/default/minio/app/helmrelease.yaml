@@ -78,34 +78,17 @@ spec:
               runAsUser: 0
     service:
       main:
-        controller: main
-        enabled: true
         ports:
           http:
-            port: &console-port 9001
+            port: 9001
           s3:
-            enabled: true
-            port: &api-port 9000
-    serviceMonitor:
-      main:
-        enabled: false
-        # endpoints:
-        #   - port: api
-        #     scheme: http
-        #     path: /minio/v2/metrics/cluster
-        #     interval: 1m
-        #     scrapeTimeout: 10s
-        #     bearerTokenSecret:
-        #       name: minio-secret
-        #       key: MINIO_PROMETHEUS_TOKEN
+            port: 9000
 
     ingress:
       main:
         enabled: true
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-          - host: &console-host "{{ .Release.Name }}.nas.${SECRET_DOMAIN}"
+          - host: "{{ .Release.Name }}.nas.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
