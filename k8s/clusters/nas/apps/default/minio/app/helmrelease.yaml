@@ -27,13 +27,6 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    defaultPodOptions:
-      podSecurityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [100]
     controllers:
       main:
         enabled: true
@@ -71,6 +64,15 @@ spec:
               readiness: *probes
               startup:
                 enabled: false
+            resources:
+              requests:
+                memory: 100Mi
+                cpu: 100m
+              limits:
+                memory: 750Mi
+            securityContext:
+              privileged: true
+              runAsUser: 0
     service:
       main:
         controller: main
@@ -124,9 +126,3 @@ spec:
             hostPathType: Directory
             mountPath: /data
             readOnly: false
-    resources:
-      requests:
-        memory: 100Mi
-        cpu: 100m
-      limits:
-        memory: 750Mi
