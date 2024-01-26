@@ -44,12 +44,10 @@ spec:
           main:
             image:
               repository: quay.io/minio/minio
-              tag: RELEASE.2023-01-25T00-19-54Z
+              tag: RELEASE.2024-01-18T22-51-28Z
             env:
               TZ: ${TIMEZONE}
               MINIO_UPDATE: "off"
-              # MINIO_PROMETHEUS_URL: https://prometheus.holthome.net
-              # MINIO_PROMETHEUS_JOB_ID: minio
               MINIO_BROWSER_REDIRECT_URL: https://minio.nas.${SECRET_DOMAIN}
               MINIO_SERVER_URL: https://s3.nas.${SECRET_DOMAIN}
               MINIO_API_CORS_ALLOW_ORIGIN: https://minio.nas.${SECRET_DOMAIN},https://s3.nas.${SECRET_DOMAIN}
@@ -109,6 +107,7 @@ spec:
                 service:
                   port: *console-port
                   name: main
+          - host:
         tls:
           - hosts:
               - *console-host
