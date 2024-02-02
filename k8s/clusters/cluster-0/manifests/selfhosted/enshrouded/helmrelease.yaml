@@ -40,10 +40,13 @@ spec:
     probes:
       liveness:
         enabled: false
+        type: UDP
       readiness:
         enabled: false
+        type: UDP
       startup:
         enabled: false
+        type: UDP
 
     service:
       main:
