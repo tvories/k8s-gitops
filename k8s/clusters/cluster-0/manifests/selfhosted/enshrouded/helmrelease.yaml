@@ -52,6 +52,8 @@ spec:
             enabled: true
             port: *query_port
             protocol: UDP
+          http:
+            enabled: false
 
     persistence:
       data:
