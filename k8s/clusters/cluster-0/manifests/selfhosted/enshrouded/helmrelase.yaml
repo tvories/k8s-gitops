@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: enshrouded
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        type: statefulset
+        containers:
+          main:
+            nameOverride: enshrouded
+            image:
+              repository: sknnr/enshrouded-dedicated-server
+              tag: v2.0.5
+            env:
+              SERVER_NAME: "Peenshrouded"
+              GAME_PORT: &game_port 15636
+              QUERY_PORT: &query_port 16737
+              SERVER_SLOTS: 16
+            envFrom:
+              - secretRef:
+                  name: enshrouded-secret
+
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          io.cilium/lb-ipam-ips: 192.168.83.53
+        ports:
+          game_port:
+            enabled: true
+            port: *game_port
+            protocol: UDP
+          query_port:
+            enabled: true
+            port: *query_port
+            protocol: UDP
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: enshrouded-data
+        mountPath: /home/steam/enshrouded/savegame
