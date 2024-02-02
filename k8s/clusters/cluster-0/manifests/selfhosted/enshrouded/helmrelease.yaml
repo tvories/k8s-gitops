@@ -32,7 +32,7 @@ spec:
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
-              QUERY_PORT: &query_port 16737
+              QUERY_PORT: &query_port 15637
               SERVER_SLOTS: 16
             envFrom:
               - secretRef:
