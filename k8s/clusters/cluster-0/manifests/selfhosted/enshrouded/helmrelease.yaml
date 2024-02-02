@@ -21,7 +21,7 @@ spec:
       main:
         annotations:
           reloader.stakater.com/auto: "true"
-        type: statefulset
+        # type: statefulset
         containers:
           main:
             nameOverride: enshrouded
@@ -38,16 +38,16 @@ spec:
               - secretRef:
                   name: enshrouded-secret
 
-    probes:
-      liveness:
-        enabled: false
-        type: UDP
-      readiness:
-        enabled: false
-        type: UDP
-      startup:
-        enabled: false
-        type: UDP
+            probes:
+              liveness:
+                enabled: false
+                type: UDP
+              readiness:
+                enabled: false
+                type: UDP
+              startup:
+                enabled: false
+                type: UDP
 
     service:
       main:
