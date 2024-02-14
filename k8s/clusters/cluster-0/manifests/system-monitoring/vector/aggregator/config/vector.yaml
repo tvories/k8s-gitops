@@ -54,8 +54,8 @@ transforms:
       .__host, err= replace(.__host, "192.168.80.91", "talos-cp-1")
       .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
       .__host = replace(.__host, "192.168.80.90", "physical2")
-      .__host = replace(.__host, "192.168.80.98", "physical1")
-      .__host = replace(.__host, "192.168.80.97", "sff1")
+      # .__host = replace(.__host, "192.168.80.98", "physical1")
+      # .__host = replace(.__host, "192.168.80.97", "sff1")
       .__host = replace(.__host, "192.168.80.99", "m720q-1")
   talos_service_logs_xform:
     type: remap
@@ -64,9 +64,9 @@ transforms:
     source: |-
       .__host, err = replace(.__host, "192.168.80.91", "talos-cp-1")
       .__host = replace(.__host, "192.168.80.92", "talos-cp-2")
-      .__host = replace(.__host, "192.168.80.98", "physical1")
+      # .__host = replace(.__host, "192.168.80.98", "physical1")
       .__host = replace(.__host, "192.168.80.90", "physical2")
-      .__host = replace(.__host, "192.168.80.97", "sff1")
+      # .__host = replace(.__host, "192.168.80.97", "sff1")
       .__host = replace(.__host, "192.168.80.99", "m720q-1")
 
 # Sinks
