@@ -70,7 +70,7 @@ spec:
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx-external"
+        className: "nginx-external"
         hosts:
           - host: &host "obsidian-db.${SECRET_DOMAIN}"
             paths:
