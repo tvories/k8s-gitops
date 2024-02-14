@@ -245,6 +245,22 @@ spec:
               - targets:
                   - "nas3-80.${SECRET_DOMAIN}:9633"
 
+          - job_name: zrepl-exporter
+            scrape_interval: 5m
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "nas3-80.${SECRET_DOMAIN}:9811"
+
+          - job_name: zfs-exporter
+            scrape_interval: 5m
+            scrape_timeout: 10s
+            honor_timestamps: true
+            static_configs:
+              - targets:
+                  - "nas3-80.${SECRET_DOMAIN}:9134"
+
           - job_name: "home-assistant"
             scrape_interval: 60s
             metrics_path: "/api/prometheus"
