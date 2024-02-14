@@ -1,3 +1,4 @@
+---
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
@@ -34,6 +35,9 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: obsidian-couchdb-restic-secret
+    cacheCapacity: 5Gi
+    volumeSnapshotClassName: csi-rbdplugin-snapclass
+    storageClassName: ceph-block
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
