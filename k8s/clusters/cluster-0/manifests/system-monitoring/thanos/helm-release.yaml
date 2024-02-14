@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: thanos
-      version: 12.23.0
+      version: 12.23.2
       sourceRef:
         kind: HelmRepository
         name: bitnami-charts
@@ -32,50 +32,48 @@ spec:
 
     objstoreConfig:
       type: s3
-      # config:
-      #   insecure: false
+      config:
+        bucket: thanos
+        endpoint: "s3.nas.${SECRET_DOMAIN}"
+        region: ""
 
     query:
       enabled: true
       replicaCount: 1
-      replicaLabel: ["__replica__"]
+      replicaLabel:
+        - replica
       dnsDiscovery:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: system-monitoring
+        stores:
+          - "dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery"
+          - "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}:443"
 
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
         # limits:
         #   memory: 99M
 
       ingress:
         enabled: true
-        hostname: "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+        hostname: &host "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}"
         ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
         tls: true
+        extraTls:
+          - hosts:
+              - *host
 
-    queryFrontend:
-      enabled: true
-      replicaCount: 1
-      resources:
-        limits:
-          memory: 1Gi
-
-    bucketweb:
-      enabled: true
       resources:
         requests:
           cpu: 15m
           memory: 64M
-        # limits:
-        #   memory: 64M
-
+    queryFrontend:
+      enabled: true
+    bucketweb:
+      enabled: true
     compactor:
       enabled: true
+      extraFlags:
+        - "--compact.concurrency"
+        - "4"
       retentionResolutionRaw: 14d
       retentionResolution5m: 30d
       retentionResolution1h: 180d
@@ -85,6 +83,14 @@ spec:
           memory: 204M
         # limits:
         #   memory: 270M
+      ingress:
+        enabled: true
+        hostname: &hostc "thanos-compactor.${SECRET_DOMAIN}"
+        ingressClassName: "nginx-internal"
+        tls: true
+        extraTls:
+          - hosts:
+              - *hostc
       persistence:
         enabled: true
         storageClass: "ceph-block"
@@ -94,17 +100,17 @@ spec:
       enabled: true
       resources:
         requests:
-          cpu: 15m
-          memory: 64M
+          cpu: 23m
+          memory: 204M
         # limits:
         #   memory: 64M
       persistence:
         enabled: true
         storageClass: "ceph-block"
-        size: 512Mi
+        size: 4Gi
 
     ruler:
-      enabled: true
+      enabled: false
       dnsDiscovery:
         enabled: true
       alertmanagers:
