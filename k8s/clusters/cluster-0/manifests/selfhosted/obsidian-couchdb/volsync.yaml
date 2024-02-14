@@ -18,8 +18,8 @@ spec:
         AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
   dataFrom:
-  - extract:
-      key: volsync-restic-template
+    - extract:
+        key: volsync-restic-template
 ---
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
@@ -27,7 +27,7 @@ metadata:
   name: obsidian-couchdb
   namespace: selfhosted
 spec:
-  sourcePVC: data-obsidian-couchdb-0
+  sourcePVC: obsidian-couchdb-data
   trigger:
     schedule: "0 */12 * * *"
   restic:
