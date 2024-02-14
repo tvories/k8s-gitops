@@ -71,4 +71,6 @@ spec:
       data:
         enabled: true
         existingClaim: enshrouded-data
-        mountPath: /home/steam/enshrouded/savegame
+        globalMounts:
+          - path: /home/steam/enshrouded/savegame
+            readOnly: false
