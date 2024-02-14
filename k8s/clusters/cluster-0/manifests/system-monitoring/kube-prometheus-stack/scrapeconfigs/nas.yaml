@@ -7,7 +7,7 @@
 #   namespace: system-monitoring
 # spec:
 #   staticConfigs:
-#     - targets: ["nas3-80.${SECRET_DOMAIN}:51516"]
+#     - targets: ["192.168.80.24:51516"]
 #   metricsPath: /metrics
 # ---
 # # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -18,7 +18,7 @@
 #   namespace: system-monitoring
 # spec:
 #   staticConfigs:
-#     - targets: ["nas3-80.${SECRET_DOMAIN}:9000"]
+#     - targets: ["192.168.80.24:9000"]
 #   metricsPath: /minio/v2/metrics/cluster
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -29,7 +29,7 @@ metadata:
   namespace: system-monitoring
 spec:
   staticConfigs:
-    - targets: ["nas3-80.${SECRET_DOMAIN}:9633"]
+    - targets: ["192.168.80.24:9633"]
   metricsPath: /metrics
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -40,7 +40,7 @@ metadata:
   namespace: system-monitoring
 spec:
   staticConfigs:
-    - targets: ["nas3-80.${SECRET_DOMAIN}:9811"]
+    - targets: ["192.168.80.24:9811"]
   metricsPath: /metrics
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -51,5 +51,5 @@ metadata:
   namespace: system-monitoring
 spec:
   staticConfigs:
-    - targets: ["nas3-80.${SECRET_DOMAIN}:9134"]
+    - targets: ["192.168.80.24:9134"]
   metricsPath: /metrics
