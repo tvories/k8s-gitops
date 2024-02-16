@@ -112,6 +112,7 @@ spec:
           - path: /dev/shm
       coral:
         type: hostPath
+        hostPath: /dev
         hostPathType: Directory
         advancedMounts:
           main:
