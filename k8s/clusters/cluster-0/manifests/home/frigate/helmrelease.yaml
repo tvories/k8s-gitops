@@ -89,11 +89,11 @@ spec:
               - *host
 
     persistence:
-      config:
-        enabled: true
-        existingClaim: frigate-data
-        globalMounts:
-          - path: /data
+      # data:
+      #   enabled: true
+      #   existingClaim: frigate-data
+      #   globalMounts:
+      #     - path: /data
 
       config-file:
         type: configMap
