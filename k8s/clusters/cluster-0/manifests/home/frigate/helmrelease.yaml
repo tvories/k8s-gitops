@@ -105,7 +105,7 @@ spec:
       media:
         existingClaim: frigate-nfs-media
         globalMounts:
-          - path: /media
+          - path: /media/frigate
       cache:
         type: emptyDir
         medium: Memory
