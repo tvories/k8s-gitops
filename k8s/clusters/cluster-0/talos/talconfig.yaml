@@ -275,6 +275,8 @@ controlPlane:
         etcd:
           advertisedSubnets:
             - 192.168.80.0/24
+          extraArgs:
+            listen-metrics-urls: http://{{.NodeIP}}:2381
 
     # Enable Anonymous Auth for HAProxy health check
     - |-
