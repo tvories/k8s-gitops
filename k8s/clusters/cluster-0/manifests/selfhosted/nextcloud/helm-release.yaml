@@ -6,7 +6,6 @@ metadata:
   namespace: selfhosted
 spec:
   releaseName: nextcloud
-  interval: 15m
   chart:
     spec:
       # renovate: registryUrl=https://nextcloud.github.io/helm/
@@ -16,16 +15,11 @@ spec:
         kind: HelmRepository
         name: nextcloud-charts
         namespace: flux-system
-      interval: 15m
+      interval: 30m
   install:
-    remediation:
-      retries: 3
+    timeout: 60m
   upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
-  uninstall:
-    keepHistory: false
+    timeout: 60m
   values:
     deploymentAnnotations:
       secret.reloader.stakater.com/reload: &secret nextcloud-secret
@@ -190,8 +184,8 @@ spec:
       ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
       enabled: true
       image:
-        repository: public.ecr.aws/nginx/nginx
-        tag: "1.25.3"
+        repository: nginx
+        tag: "1.25.4"
       config:
         default: true
       resources:
@@ -202,10 +196,10 @@ spec:
         #   memory: 100Mi
 
     internalDatabase:
-      enabled: false
+      enabled: true
 
     externalDatabase:
-      enabled: true
+      enabled: false
       type: postgresql
       # host: postgres.database
       database: nextcloud
