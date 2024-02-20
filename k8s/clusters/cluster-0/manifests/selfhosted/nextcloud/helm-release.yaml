@@ -6,6 +6,7 @@ metadata:
   namespace: selfhosted
 spec:
   releaseName: nextcloud
+  interval: 30m
   chart:
     spec:
       # renovate: registryUrl=https://nextcloud.github.io/helm/
@@ -15,7 +16,6 @@ spec:
         kind: HelmRepository
         name: nextcloud-charts
         namespace: flux-system
-      interval: 30m
   install:
     timeout: 60m
   upgrade:
@@ -199,7 +199,7 @@ spec:
       enabled: true
 
     externalDatabase:
-      enabled: false
+      enabled: true
       type: postgresql
       # host: postgres.database
       database: nextcloud
