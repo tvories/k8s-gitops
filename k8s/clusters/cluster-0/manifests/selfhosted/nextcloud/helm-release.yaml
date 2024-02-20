@@ -196,7 +196,7 @@ spec:
         #   memory: 100Mi
 
     internalDatabase:
-      enabled: true
+      enabled: false
 
     externalDatabase:
       enabled: true
