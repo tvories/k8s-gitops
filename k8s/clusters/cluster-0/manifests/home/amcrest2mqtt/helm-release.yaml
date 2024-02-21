@@ -23,7 +23,7 @@ spec:
 
     podAnnotations:
       secret.reloader.stakater.com/reload: "amcrest2mqtt-secrets"
-    
+
     env:
       TZ: "${TIMEZONE}"
       MQTT_HOST: emqx.home
@@ -39,7 +39,7 @@ spec:
     service:
       main:
         enabled: false
-    
+
     ingress:
       main:
         enabled: false
@@ -48,7 +48,7 @@ spec:
       requests:
         cpu: 15m
         memory: 64M
-    
+
     probes:
       liveness:
         enabled: false
