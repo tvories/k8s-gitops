@@ -39,7 +39,7 @@ spec:
         reloader.stakater.com/auto: "true"
     image:
       repository: vaultwarden/server
-      tag: 1.30.4
+      tag: 1.30.5
 
     env:
       DATA_FOLDER: "config"
