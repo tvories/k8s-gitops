@@ -31,7 +31,7 @@ spec:
         reloader.stakater.com/auto: "true"
     image:
       repository: ghcr.io/bjw-s/calibre-web
-      tag: 0.6.21@sha256:8c269753065a866818dc3fd52fe6bbbe2f019cef60cf796432935cc5c11f9419
+      tag: 0.6.21@sha256:a69f561e575102c029ad7a5580210b03a533bc4747a02bc488e9c35e68a86f93
 
     podSecurityContext:
       runAsUser: 568
