@@ -35,7 +35,7 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: homeassistant-restic-secret
-    cacheCapacity: 2Gi
+    cacheCapacity: 10Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block
     moverSecurityContext:
