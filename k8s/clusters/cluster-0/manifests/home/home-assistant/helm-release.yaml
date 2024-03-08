@@ -155,6 +155,7 @@ spec:
             # protocol: TCP
             # targetPort: 12321
       matterserver:
+        controller: main
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
