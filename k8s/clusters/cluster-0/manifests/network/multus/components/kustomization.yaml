@@ -4,3 +4,4 @@ resources:
   # - dhcp-daemonset.yaml
   # - dhcp-networkattachment.yaml
   - net-attach-iot.yaml
+  - net-attach-legacy.yaml
