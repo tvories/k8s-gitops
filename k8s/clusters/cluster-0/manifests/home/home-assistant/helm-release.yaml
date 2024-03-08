@@ -37,7 +37,7 @@ spec:
                 "ips": ["192.168.50.10/24"]
               }]
             # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-          # hostNetwork: true
+          hostNetwork: true
           # dnsPolicy: ClusterFirstWithHostNet
         type: statefulset
         annotations:
