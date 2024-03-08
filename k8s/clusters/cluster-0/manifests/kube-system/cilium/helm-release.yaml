@@ -61,6 +61,9 @@ spec:
     # containerRuntime:
     #   integration: containerd
 
+    cni:
+      exclusive: false # Needed to allow Cillium to work with Multus
+
     hubble:
       enabled: true
       serviceMonitor:
