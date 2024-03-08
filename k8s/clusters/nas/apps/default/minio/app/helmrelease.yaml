@@ -72,7 +72,7 @@ spec:
                 memory: 128M
                 cpu: 5m
               limits:
-                memory: 750Mi
+                memory: 1500Mi
             securityContext:
               privileged: true
               runAsUser: 0
