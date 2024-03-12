@@ -6,11 +6,11 @@ metadata:
   namespace: home
 spec:
   releaseName: esphome
-  interval: 5m
+  interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.3.0
+      version: 3.0.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -18,12 +18,20 @@ spec:
       interval: 30m
   values:
     controllers:
-      main:
+      esphome:
         type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: esphome-secret
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |
+              [{
+                "name":"multus-iot",
+                "namespace": "network",
+                "ips": ["192.168.50.11/24"]
+              }]
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/esphome/esphome
               tag: 2024.2.2
@@ -38,22 +46,20 @@ spec:
               ESPHOME_DASHBOARD_USE_PING: true
 
     service:
-      main:
+      app:
+        controller: esphome
         ports:
           http:
             port: 6052
     ingress:
-      main:
-        enabled: true
+      app:
         className: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
           - host: &host "esp.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -63,6 +69,10 @@ spec:
       config:
         enabled: true
         existingClaim: esphome-nfs-config
+        advancedMounts:
+          esphome:
+            app:
+              - path: /config
       # secrets:
       #   enabled: true
       #   type: secret
