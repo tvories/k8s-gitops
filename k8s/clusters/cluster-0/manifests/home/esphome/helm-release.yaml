@@ -19,7 +19,7 @@ spec:
   values:
     controllers:
       esphome:
-        type: statefulset
+        # type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: esphome-secret
         pod:
