@@ -22,14 +22,14 @@ spec:
         # type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: esphome-secret
-        pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "network",
-                "ips": ["192.168.50.30/24"]
-              }]
+        # pod:
+        #   annotations:
+        #     k8s.v1.cni.cncf.io/networks: |
+        #       [{
+        #         "name":"multus-iot",
+        #         "namespace": "network",
+        #         "ips": ["192.168.50.30/24"]
+        #       }]
         containers:
           app:
             image:
