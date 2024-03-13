@@ -37,7 +37,7 @@ spec:
     repository: homeassistant-restic-secret
     cacheCapacity: 15Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
-    storageClassName: local-hostpath
+    storageClassName: ceph-block
     moverSecurityContext:
       runAsUser: 568
       runAsGroup: 568
