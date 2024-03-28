@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -10,30 +10,20 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.0.4
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-  # install:
-  #   createNamespace: true
-  #   remediation:
-  #     retries: 1
-  # upgrade:
-  #   remediation:
-  #     retries: 1
-  #   cleanupOnFail: true
-  # uninstall:
-  #   keepHistory: false
 
   values:
     controllers:
-      main:
+      qbittorrent:
         annotations:
           # configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
           secret.reloader.stakater.com/reload: qbittorrent-config
-        type: statefulset
+        # type: statefulset
         pod:
           securityContext:
             fsGroup: &gid 568
@@ -43,7 +33,7 @@ spec:
           # annotations:
           #   setDownloadGateway: "true"
         containers:
-          main:
+          app:
             nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
@@ -53,6 +43,16 @@ spec:
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: &port 8080
               QBITTORRENT__BT_PORT: &port-bt 56191
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 49m
@@ -76,7 +76,7 @@ spec:
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
-              tag: latest@sha256:be03a514f4e064421e25988e59b8edb38b05316bb8c7995e123393e28123fbdb
+              tag: v3.38.0
             env:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
@@ -114,13 +114,14 @@ spec:
           #     runAsGroup: *gid
 
     service:
-      main:
+      app:
+        controller: qbittorrent
         ports:
           http:
             port: *port
       bittorrent:
         enabled: true
-        controller: main
+        controller: qbittorrent
         type: LoadBalancer
         loadBalancerIP: ${LB_QBITTORRENT}
         externalTrafficPolicy: Local
@@ -132,8 +133,7 @@ spec:
             targetPort: *port-bt
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "nginx-internal"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
@@ -149,7 +149,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.qbittorrent
