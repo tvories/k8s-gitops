@@ -40,7 +40,7 @@ spec:
 
     image:
       repository: ghcr.io/onedr0p/readarr-nightly
-      tag: "0.3.22.2487"
+      tag: "0.3.22.2488"
 
     env:
       TZ: "${TIMEZONE}"
