@@ -26,6 +26,7 @@ spec:
     - kind: ConfigMap
       name: cilium-values
   values:
+    routingMode: native
     # securityContext:
     #   privileged: true
     # cluster:
