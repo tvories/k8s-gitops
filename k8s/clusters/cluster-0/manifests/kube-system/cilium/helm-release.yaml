@@ -27,6 +27,7 @@ spec:
       name: cilium-values
   values:
     routingMode: native
+    tunnel: disabled
     # securityContext:
     #   privileged: true
     # cluster:
