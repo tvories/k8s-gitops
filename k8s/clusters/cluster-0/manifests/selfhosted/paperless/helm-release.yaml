@@ -47,7 +47,7 @@ spec:
           main:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
-              tag: 2.6.3
+              tag: 2.7.0
             env:
               TZ: "${TIMEZONE}"
               PAPERLESS_REDIS: redis://localhost:6379
