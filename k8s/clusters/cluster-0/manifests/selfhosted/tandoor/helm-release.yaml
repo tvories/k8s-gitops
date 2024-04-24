@@ -179,7 +179,7 @@ spec:
             mountPath: /opt/recipes/staticfiles
     sidecars:
       nginx:
-        image: nginxinc/nginx-unprivileged:1.25.5-alpine
+        image: nginxinc/nginx-unprivileged:1.26.0-alpine
         imagePullPolicy: IfNotPresent
         ports:
           - name: nginx
