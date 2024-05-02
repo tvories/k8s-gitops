@@ -100,7 +100,7 @@ spec:
       image:
         registry: ghcr.io
         repository: nginxinc/nginx-unprivileged
-        tag: 1.25-alpine
+        tag: 1.26-alpine
       ingress:
         enabled: true
         ingressClassName: nginx-internal
