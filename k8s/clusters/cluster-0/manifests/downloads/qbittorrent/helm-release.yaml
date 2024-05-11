@@ -37,7 +37,7 @@ spec:
             nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
-              tag: 4.6.4@sha256:055f3bc32d0337de67671c33a67e71c96a1f409e9fa9d168941c00f0839737cc
+              tag: 4.6.4@sha256:b9af0f2173572a69d2c02eab8f701ef7b04f61689efe1c5338b96445d528dec4
             env:
               UMASK: "022"
               TZ: "${TIMEZONE}"
