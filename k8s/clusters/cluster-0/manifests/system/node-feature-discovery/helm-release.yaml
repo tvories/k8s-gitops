@@ -1,24 +1,32 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: node-feature-discovery
   namespace: system
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
       chart: node-feature-discovery
-      version: 0.14.3
+      version: 0.15.0
       sourceRef:
         kind: HelmRepository
-        name: kubernetes-sigs-nfd-charts
+        name: node-feature-discovery
         namespace: flux-system
-      interval: 5m
+  maxHistory: 2
   install:
+    createNamespace: true
     crds: CreateReplace
+    remediation:
+      retries: 3
   upgrade:
+    cleanupOnFail: true
     crds: CreateReplace
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     nodeFeatureRule:
       createCRD: true
