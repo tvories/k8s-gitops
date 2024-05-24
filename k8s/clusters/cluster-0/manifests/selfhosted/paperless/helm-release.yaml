@@ -87,7 +87,7 @@ spec:
           gotenburg:
             image:
               repository: thecodingmachine/gotenberg
-              tag: 8.4.0
+              tag: 8.5.1
               pullPolicy: IfNotPresent
             env:
               - { name: DISABLE_GOOGLE_CHROME, value: "1" }
