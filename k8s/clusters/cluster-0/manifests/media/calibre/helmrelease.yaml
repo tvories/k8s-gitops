@@ -102,3 +102,10 @@ spec:
         path: /ook/Media/ebooks
         globalMounts:
           - path: /books
+      uploads:
+        enabled: true
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks/uploads
+        globalMounts:
+          - path: /uploads
