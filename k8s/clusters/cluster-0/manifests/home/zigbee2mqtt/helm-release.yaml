@@ -137,7 +137,7 @@ spec:
           nodeSelectorTerms:
             - matchExpressions:
                 - {
-                    key: "feature.node.kubernetes.io/custom-zigbee",
+                    key: "feature.node.kubernetes.io/usb-02_0658_0200.present",
                     operator: In,
                     values: ["true"],
                   }
