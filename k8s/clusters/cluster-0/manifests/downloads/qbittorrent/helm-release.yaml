@@ -18,17 +18,17 @@ spec:
         namespace: flux-system
 
   values:
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups:
-          - 65539 # media-rw
-          - 10000
     controllers:
       qbittorrent:
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups:
+              - 65539 # media-rw
+              - 10000
         containers:
           app:
             image:
