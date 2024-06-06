@@ -79,6 +79,7 @@ spec:
               capabilities:
                 add:
                   - NET_ADMIN
+              allowPrivilegeEscalation: false
 
           # port-forward:
           #   image:
