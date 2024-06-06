@@ -22,8 +22,8 @@ spec:
       qbittorrent:
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
+            # runAsUser: 568
+            # runAsGroup: 568
             fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
             supplementalGroups:
@@ -55,6 +55,10 @@ spec:
                 memory: 1024Mi
               limits:
                 memory: 8192Mi
+            securityContext:
+              runAsUser: 568
+              runAsGroup: 568
+              runAsNonRoot: true
 
           gluetun:
             image:
@@ -166,10 +170,3 @@ spec:
     #           "-b 'mam_id=${MAM_ID}'",
     #           "{$MAM_URL}",
     #         ]
-
-    resources:
-      requests:
-        cpu: 11m
-        memory: 381M
-      # limits:
-      #   memory: 1426M
