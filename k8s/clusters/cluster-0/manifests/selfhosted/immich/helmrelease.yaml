@@ -88,13 +88,13 @@ spec:
 
     image:
       # renovate: datasource=github-releases depName=immich-app/immich
-      tag: "v1.105.1"
+      tag: "v1.106.1"
 
     server:
       resources:
         requests:
-          cpu: 15m
-          memory: 512M
+          cpu: 1500m
+          memory: 2048M
       envFrom:
         - secretRef:
             name: immich-secret
@@ -116,14 +116,6 @@ spec:
             - hosts:
                 - *host
               secretName: *host
-
-    microservices:
-      controller:
-        replicas: 2
-      resources:
-        requests:
-          cpu: 100m
-          memory: 250M
 
     machine-learning:
       resources:
