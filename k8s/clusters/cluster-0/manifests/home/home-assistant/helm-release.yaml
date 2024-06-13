@@ -106,7 +106,7 @@ spec:
             enabled: true
             image:
               repository: ghcr.io/home-assistant-libs/python-matter-server
-              tag: 6.1.1
+              tag: 6.1.2
             workingDir: "/matter_data"
             env:
               TZ: "${TIMEZONE}"
