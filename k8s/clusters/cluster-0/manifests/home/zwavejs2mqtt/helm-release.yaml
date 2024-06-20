@@ -21,7 +21,7 @@ spec:
         reloader.stakater.com/auto: "true"
     image:
       repository: zwavejs/zwave-js-ui
-      tag: 9.13.0
+      tag: 9.13.4
     env:
       TZ: "${TIMEZONE}"
       # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
