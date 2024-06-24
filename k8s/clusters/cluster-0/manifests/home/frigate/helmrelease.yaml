@@ -25,7 +25,7 @@ spec:
   values:
     defaultPodOptions:
       nodeSelector:
-        feature.node.kubernetes.io/custom-coral-tpu: "true"
+        feature.node.kubernetes.io/pci-0880_1ac1_089a.present: "true"
     controllers:
       frigate:
         annotations:
