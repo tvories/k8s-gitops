@@ -244,21 +244,21 @@ spec:
 
     startupProbe:
       enabled: false
-      initialDelaySeconds: 5
+      initialDelaySeconds: 7200
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 60
       successThreshold: 1
     livenessProbe:
       enabled: false
-      initialDelaySeconds: 5
+      initialDelaySeconds: 7200
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 3
       successThreshold: 1
     readinessProbe:
       enabled: false
-      initialDelaySeconds: 5
+      initialDelaySeconds: 7200
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 3
