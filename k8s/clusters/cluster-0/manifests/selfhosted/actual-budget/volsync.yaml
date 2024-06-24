@@ -28,7 +28,7 @@ metadata:
   name: actual
   namespace: home
 spec:
-  sourcePVC: actual-config
+  sourcePVC: actual-data
   trigger:
     schedule: "0 7 * * *"
   restic:
