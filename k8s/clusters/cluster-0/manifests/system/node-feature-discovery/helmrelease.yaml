@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: node-feature-discovery
-      version: 0.15.0
+      version: 0.16.0
       sourceRef:
         kind: HelmRepository
         name: kubernetes-sigs
@@ -28,55 +28,16 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    nodeFeatureRule:
-      createCRD: true
-    master:
-      tolerations:
-        - effect: "NoExecute"
-          operator: "Exists"
-        - effect: "NoSchedule"
-          operator: "Exists"
-
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
-                  - key: "node-role.kubernetes.io/master"
-                    operator: In
-                    values: [""]
-
-      resources:
-        requests:
-          cpu: 23m
-          memory: 64M
-        limits:
-          # memory: 64M
-
     worker:
       annotations:
         configmap.reloader.stakater.com/reload: "node-feature-discovery-worker-conf"
-
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
-        limits:
-          # memory: 64M
-
-      tolerations:
-        - effect: "NoExecute"
-          operator: "Exists"
-        - effect: "NoSchedule"
-          operator: "Exists"
-
       config:
         core:
           labelSources:
             - custom
             - pci
             - usb
+            - cpu
 
         sources:
           usb:
@@ -102,18 +63,18 @@ spec:
               - "vendor"
               - "device"
           custom:
-            - name: "zigbee"
-              matchOn:
-                - usbId:
-                    class: ["ff"]
-                    vendor: ["1a86"]
-                    device: ["7523"]
-            - name: "zwave"
-              matchOn:
-                - usbId:
-                    class: ["02"]
-                    vendor: ["0658"]
-                    device: ["0200"]
+            # - name: "zigbee"
+            #   matchOn:
+            #     - usbId:
+            #         class: ["ff"]
+            #         vendor: ["1a86"]
+            #         device: ["7523"]
+            # - name: "zwave"
+            #   matchOn:
+            #     - usbId:
+            #         class: ["02"]
+            #         vendor: ["0658"]
+            #         device: ["0200"]
             - name: "cyberpower-ups"
               matchOn:
                 - usbId:
@@ -150,18 +111,18 @@ spec:
             #     class: ["224"]
             #     vendor: ["2357"]
             #     device: ["0604"]
-            - name: "coral-tpu"
-              matchOn:
-                - pciId:
-                    vendor: ["1ac1"]
-                    device: ["089a"]
-            - name: "intel-gpu"
-              matchOn:
-                - pciId:
-                    vendor: ["8086"]
-                    device: ["0162"]
-            - name: "intel-gpu"
-              matchOn:
-                - pciId:
-                    vendor: ["8086"]
-                    class: ["0600"]
+            # - name: "coral-tpu"
+            #   matchOn:
+            #     - pciId:
+            #         vendor: ["1ac1"]
+            #         device: ["089a"]
+            # - name: "intel-gpu"
+            #   matchOn:
+            #     - pciId:
+            #         vendor: ["8086"]
+            #         device: ["0162"]
+            # - name: "intel-gpu"
+            #   matchOn:
+            #     - pciId:
+            #         vendor: ["8086"]
+            #         class: ["0600"]
