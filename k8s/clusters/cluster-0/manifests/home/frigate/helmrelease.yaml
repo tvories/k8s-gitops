@@ -114,9 +114,5 @@ spec:
           - path: /dev/shm
       coral:
         type: hostPath
-        hostPath: /dev
-        hostPathType: Directory
-        advancedMounts:
-          main:
-            main:
-              - path: /dev
+        hostPath: /dev/apex_0
+        hostPathType: CharDevice
