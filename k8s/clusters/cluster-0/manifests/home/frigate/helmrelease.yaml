@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -27,12 +27,11 @@ spec:
       nodeSelector:
         feature.node.kubernetes.io/custom-coral-tpu: "true"
     controllers:
-      main:
-        type: statefulset
+      frigate:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
               tag: 0.13.2@sha256:2906991ccad85035b176941f9dedfd35088ff710c39d45ef1baa9a49f2b16734
@@ -65,7 +64,7 @@ spec:
             securityContext:
               privileged: true
     service:
-      main:
+      app:
         ports:
           http:
             port: *port
@@ -81,7 +80,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.frigate
