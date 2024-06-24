@@ -41,6 +41,8 @@ spec:
           }]
     controllers:
       home-assistant:
+        pod:
+          hostNetwork: true
         containers:
           app:
             image:
