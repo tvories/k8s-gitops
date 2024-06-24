@@ -6,16 +6,15 @@ metadata:
   namespace: home
 spec:
   releaseName: home-assistant
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-      interval: 15m
   install:
     remediation:
       retries: 1
@@ -26,38 +25,26 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name":"multus-iot",
+            "namespace": "network",
+            "ips": ["192.168.50.10/24"]
+          }]
     controllers:
-      main:
-        pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "network",
-                "ips": ["192.168.50.10/24"]
-              }]
-            # k8s.v1.cni.cncf.io/networks: home-automation-iot-dhcp
-          hostNetwork: true
-          # dnsPolicy: ClusterFirstWithHostNet
-        type: statefulset
-        annotations:
-          reloader.stakater.com/auto: "true"
-        # I don't want home assistant to be blocked if postgres is down
-        # initContainers:
-        #   01-init-db:
-        #     image:
-        #       repository: ghcr.io/onedr0p/postgres-init
-        #       tag: 14.9
-        #     imagePullPolicy: IfNotPresent
-        #     envFrom: &envFrom
-        #       - secretRef:
-        #           name: home-assistant-secret
+      home-assistant:
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/home-assistant/home-assistant
-              tag: 2024.5.5
-
+              tag: 2024.6.4
             env:
               TZ: "${TIMEZONE}"
               POSTGRES_HOST:
@@ -79,7 +66,6 @@ spec:
                 memory: 588M
 
           codeserver:
-            enabled: true
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.90.2@sha256:0f21d336db045b2f5f7fd8e118b85709beab8202bd2ff0c86db51650fb3ae82e
@@ -101,9 +87,25 @@ spec:
               requests:
                 cpu: 11m
                 memory: 94M
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      (
+                        set -ex
+                        apt update
+                        apt install --yes dnsutils
+                        apt install --yes iproute2
+                        apt install --yes inetutils-ping
+                        apt install --yes inetutils-telnet
+                        apt install --yes inetutils-traceroute
+                        apt install --yes net-tools
+                      ) > /tmp/postStart.log 2>&1 || true
 
           matterserver:
-            enabled: true
             image:
               repository: ghcr.io/home-assistant-libs/python-matter-server
               tag: 6.1.2
@@ -125,8 +127,18 @@ spec:
               appArmor: "unconfirmed"
               privileged: true
 
+        initContainers:
+          recorder-initdb:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
+
     service:
-      main:
+      app:
+        controller: home-assistant
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: "${LB_HOMEASSISTANT}"
@@ -147,7 +159,7 @@ spec:
             targetPort: 5353
       codeserver:
         # type: ClusterIP
-        controller: main
+        controller: home-assistant
         ports:
           http:
             enabled: true
@@ -155,7 +167,7 @@ spec:
             # protocol: TCP
             # targetPort: 12321
       matterserver:
-        controller: main
+        controller: home-assistant
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
@@ -178,9 +190,7 @@ spec:
             targetPort: 5353
 
     ingress:
-      main:
-        enabled: true
-        # ingressClassName: nginx-external
+      app:
         className: nginx-external
         annotations:
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
@@ -189,9 +199,8 @@ spec:
           - host: &host "ha.${SECRET_DOMAIN}"
             paths:
               - path: /
-                pathType: Prefix
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.homeassistant
@@ -199,7 +208,6 @@ spec:
               - *host
 
       codeserver:
-        enabled: true
         className: nginx-internal
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
@@ -208,9 +216,8 @@ spec:
           - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
             paths:
               - path: /
-                pathType: Prefix
                 service:
-                  name: codeserver
+                  identifier: codeserver
                   port: http
         tls:
           - secretName: tls.ha-vscode
@@ -218,15 +225,13 @@ spec:
               - *vscodehost
 
       matterserver:
-        enabled: true
         className: nginx-internal
         hosts:
           - host: *matter_host
             paths:
               - path: /
-                pathType: Prefix
                 service:
-                  name: matterserver
+                  identifier: matterserver
                   port: http
         tls:
           - secretName: tls.matterserver
@@ -237,6 +242,8 @@ spec:
       config:
         enabled: true
         existingClaim: homeassistant-config
+        globalMounts:
+          - path: /config
         # mountPath: /config
       # dbus:
       #   enabled: true
