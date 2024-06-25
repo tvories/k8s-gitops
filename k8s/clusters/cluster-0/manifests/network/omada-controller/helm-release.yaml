@@ -39,7 +39,7 @@ spec:
     # hostNetwork: true
     image:
       repository: mbentley/omada-controller
-      tag: 5.13@sha256:ba95968f9bd6cb59b5a6fb183871fd6403f7d118875dbe7b98088b1a2277db2b
+      tag: 5.13@sha256:374b7d9cbab55549537a6cbe2d69dcf72a1d3f3fefcd91caefa4c08339fdd940
 
     env:
       TZ: "${TIMEZONE}"
