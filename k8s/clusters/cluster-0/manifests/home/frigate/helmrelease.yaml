@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app frigate
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -25,14 +25,13 @@ spec:
   values:
     defaultPodOptions:
       nodeSelector:
-        feature.node.kubernetes.io/custom-coral-tpu: "true"
+        feature.node.kubernetes.io/pci-0880_1ac1_089a.present: "true"
     controllers:
-      main:
-        type: statefulset
+      frigate:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
               tag: 0.13.2@sha256:2906991ccad85035b176941f9dedfd35088ff710c39d45ef1baa9a49f2b16734
@@ -65,7 +64,8 @@ spec:
             securityContext:
               privileged: true
     service:
-      main:
+      app:
+        controller: frigate
         ports:
           http:
             port: *port
@@ -81,7 +81,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.frigate
@@ -114,9 +114,5 @@ spec:
           - path: /dev/shm
       coral:
         type: hostPath
-        hostPath: /dev
-        hostPathType: Directory
-        advancedMounts:
-          main:
-            main:
-              - path: /dev
+        hostPath: /dev/apex_0
+        hostPathType: CharDevice

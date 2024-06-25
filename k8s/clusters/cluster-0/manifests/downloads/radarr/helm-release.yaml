@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: radarr
@@ -27,7 +27,7 @@ spec:
   values:
     initContainers:
       01-init-db:
-        image: ghcr.io/onedr0p/postgres-init:16.2
+        image: ghcr.io/onedr0p/postgres-init:16.3
         imagePullPolicy: IfNotPresent
         envFrom: &envFrom
           - secretRef:
@@ -40,7 +40,7 @@ spec:
 
     image:
       repository: ghcr.io/onedr0p/radarr
-      tag: "5.3.6.8612"
+      tag: "5.7.0.8882"
     env:
       TZ: "${TIMEZONE}"
       RADARR__INSTANCE_NAME: Radarr

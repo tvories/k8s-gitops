@@ -2,8 +2,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.6.7
-kubernetesVersion: v1.29.0
+talosVersion: v1.7.5
+kubernetesVersion: v1.30.1
 endpoint: https://${cluster_name}.${domain_name}:6443
 # domain: cluster.local
 # allowSchedulingOnMasters: true
@@ -66,17 +66,26 @@ nodes:
     controlPlane: false
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
+    nameservers:
+      - 192.168.1.240
+      - 192.168.1.241
     networkInterfaces:
-      - interface: eth0
-        dhcp: true
+      - interface: en02
+        dhcp: false
         mtu: 9000
-        # vlans:
-        #   - &vlan80
-        #     vlanId: 80
-        #     mtu: 9000
-        #     dhcp: true
-        #     dhcpOptions:
-        #       routeMetric: 4096
+        vlans:
+          - &vlan80
+            vlanId: 80
+            mtu: 9000
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 2048
+          - &vlan50
+            vlanId: 50
+            mtu: 1500
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 4096
     # patches:
     #   - |-
     #     machine:
@@ -110,12 +119,12 @@ nodes:
     controlPlane: true
     ipAddress: 192.168.80.99
     networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        # mtu: 9000
       - interface: enp1s0
-        dhcp: true
+        dhcp: false
         mtu: 9000
+        vlans:
+          - *vlan80
+          - *vlan50
     installDisk: /dev/sda
     schematic:
       customization:
@@ -313,3 +322,55 @@ worker:
           - siderolabs/intel-ucode
           - siderolabs/gasket-driver
           # - siderolabs/i915-ucode
+  patches:
+    # Disable search domain everywhere
+    - |-
+      machine:
+        network:
+          disableSearchDomain: true
+
+    # Force nameserver
+    - |-
+      machine:
+        network:
+          nameservers:
+            - 192.168.1.240
+            - 192.168.1.241
+    # Configure NTP
+    - |-
+      machine:
+        time:
+          disabled: false
+          servers:
+            - 192.168.80.1
+    # Configure containerd
+    - |-
+      machine:
+        files:
+          - op: create
+            path: /etc/cri/conf.d/20-customization.part
+            content: |
+              [plugins]
+                [plugins."io.containerd.grpc.v1.cri"]
+                  enable_unprivileged_ports = true
+                  enable_unprivileged_icmp = true
+    # Configure nfs mount options
+    - |-
+      machine:
+        files:
+          - op: overwrite
+            path: /etc/nfsmount.conf
+            permissions: 0o644
+            content: |
+              [ NFSMount_Global_Options ]
+              nfsvers=4.2
+              hard=True
+              noatime=True
+              nodiratime=True
+              rsize=131072
+              wsize=131072
+              nconnect=8
+    # Disable default API server admission plugins.
+    - |-
+      - op: remove
+        path: /cluster/apiServer/admissionControl

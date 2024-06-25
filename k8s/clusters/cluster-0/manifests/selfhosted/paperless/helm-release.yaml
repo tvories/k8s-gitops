@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: paperless
@@ -38,7 +38,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/onedr0p/postgres-init
-              tag: 16.2@sha256:930a20e3ea8c82504d8e80f413d042d9936930d625fb098dd306b5aad427a151
+              tag: 16.3@sha256:8ba3204f6b293dd168766009aae2ce4fa986a29b931c2d30ac1b30238ac750b8
               pullPolicy: IfNotPresent
             envFrom: &envFrom
               - secretRef:
@@ -47,7 +47,7 @@ spec:
           main:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
-              tag: 2.6.3
+              tag: 2.10.2
             env:
               TZ: "${TIMEZONE}"
               PAPERLESS_REDIS: redis://localhost:6379
@@ -87,14 +87,14 @@ spec:
           gotenburg:
             image:
               repository: thecodingmachine/gotenberg
-              tag: 8.3.0
+              tag: 8.7.0
               pullPolicy: IfNotPresent
             env:
               - { name: DISABLE_GOOGLE_CHROME, value: "1" }
           redis:
             image:
               repository: public.ecr.aws/docker/library/redis
-              tag: 7.2.4
+              tag: 7.2.5
               pullPolicy: IfNotPresent
           tika:
             image:

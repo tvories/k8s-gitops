@@ -1,16 +1,16 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: qbittorrent
+  name: &app qbittorrent
   namespace: downloads
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 3.0.4
+      version: 3.1.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -20,29 +20,25 @@ spec:
   values:
     controllers:
       qbittorrent:
-        annotations:
-          # configmap.reloader.stakater.com/reload: qbittorrent-scripts,qbittorrent-dnsdist
-          secret.reloader.stakater.com/reload: qbittorrent-config
-        # type: statefulset
         pod:
           securityContext:
-            fsGroup: &gid 568
-            fsGroupChangePolicy: "OnRootMismatch"
+            # runAsUser: 568
+            # runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
             supplementalGroups:
               - 65539 # media-rw
-          # annotations:
-          #   setDownloadGateway: "true"
+              - 10000
         containers:
           app:
-            nameOverride: qbittorrent
             image:
               repository: ghcr.io/onedr0p/qbittorrent
-              tag: 4.6.4@sha256:85f185207a81ec03e84b8302db06f1694c533c99e0efdb2acf0316d554d332e3
+              tag: 4.6.5@sha256:c019af23966ebafcaf1713d4553bc043246858b711a7d57d8bee358a89990a3e
             env:
               UMASK: "022"
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &port-bt 54315
+              QBITTORRENT__BT_PORT: &port-bt 54802
             probes:
               liveness:
                 enabled: true
@@ -60,18 +56,9 @@ spec:
               limits:
                 memory: 8192Mi
             securityContext:
-              runAsUser: *gid
-              runAsGroup: *gid
+              runAsUser: 568
+              runAsGroup: 568
               # runAsNonRoot: true
-              # allowPrivilegeEscalation: false
-              # readOnlyRootFilesystem: true
-              # capabilities:
-              #   drop:
-              #     - ALL
-          # dnsdist:
-          #   image:
-          #     repository: docker.io/powerdns/dnsdist-18
-          #     tag: 1.8.3
 
           gluetun:
             image:
@@ -96,6 +83,7 @@ spec:
               capabilities:
                 add:
                   - NET_ADMIN
+              # allowPrivilegeEscalation: false
 
           # port-forward:
           #   image:
@@ -115,13 +103,13 @@ spec:
 
     service:
       app:
-        controller: qbittorrent
+        controller: *app
         ports:
           http:
             port: *port
       bittorrent:
         enabled: true
-        controller: qbittorrent
+        controller: *app
         type: LoadBalancer
         loadBalancerIP: ${LB_QBITTORRENT}
         externalTrafficPolicy: Local
@@ -182,10 +170,3 @@ spec:
     #           "-b 'mam_id=${MAM_ID}'",
     #           "{$MAM_URL}",
     #         ]
-
-    resources:
-      requests:
-        cpu: 11m
-        memory: 381M
-      # limits:
-      #   memory: 1426M

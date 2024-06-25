@@ -8,7 +8,7 @@ spec:
   nodeName: m720q-1
   containers:
     - name: disk-wipe
-      image: ubuntu:jammy
+      image: ubuntu:noble
       securityContext:
         privileged: true
       command:
@@ -29,7 +29,7 @@ spec:
   nodeName: m720q-2
   containers:
     - name: disk-wipe
-      image: ubuntu:jammy
+      image: ubuntu:noble
       securityContext:
         privileged: true
       command:
@@ -50,7 +50,7 @@ spec:
   nodeName: m720q-3
   containers:
     - name: disk-wipe
-      image: ubuntu:jammy
+      image: ubuntu:noble
       securityContext:
         privileged: true
       command:

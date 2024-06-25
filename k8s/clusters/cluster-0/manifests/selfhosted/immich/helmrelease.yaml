@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: immich
@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: immich
-      version: 0.4.0
+      version: 0.7.0
       sourceRef:
         kind: HelmRepository
         name: immich-charts
@@ -88,13 +88,13 @@ spec:
 
     image:
       # renovate: datasource=github-releases depName=immich-app/immich
-      tag: "v1.100.0"
+      tag: "v1.106.4"
 
     server:
       resources:
         requests:
-          cpu: 15m
-          memory: 512M
+          cpu: 1500m
+          memory: 2048M
       envFrom:
         - secretRef:
             name: immich-secret
@@ -116,14 +116,6 @@ spec:
             - hosts:
                 - *host
               secretName: *host
-
-    microservices:
-      controller:
-        replicas: 2
-      resources:
-        requests:
-          cpu: 100m
-          memory: 250M
 
     machine-learning:
       resources:

@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: atuin
@@ -27,7 +27,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/onedr0p/postgres-init
-              tag: 16.2
+              tag: 16.3
             envFrom: &envFrom
               - secretRef:
                   name: atuin-secret
@@ -44,7 +44,7 @@ spec:
           main:
             image:
               repository: ghcr.io/atuinsh/atuin
-              tag: v18.1.0
+              tag: 18.3.0
             args:
               - server
               - start

@@ -6,7 +6,7 @@ terraform {
   }
   required_providers {
     vsphere = {
-      version = "2.7.0"
+      version = "2.8.1"
     }
     dns = {
       source  = "hashicorp/dns"
@@ -14,7 +14,7 @@ terraform {
     }
     google = {
       source  = "hashicorp/google"
-      version = "5.23.0"
+      version = "5.35.0"
     }
   }
 }

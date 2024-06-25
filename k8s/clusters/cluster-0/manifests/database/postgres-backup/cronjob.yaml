@@ -22,7 +22,7 @@ spec:
 
           containers:
             - name: postgres-backup
-              image: docker.io/prodrigestivill/postgres-backup-local:16@sha256:c577b0d62673d4dce0471c75d21e3e08e4e9789903f5a3fd6613c410442e9670
+              image: docker.io/prodrigestivill/postgres-backup-local:16@sha256:f873bbfb406db633ab879628b11ef8092279639c467a2ea5f5bfa08b776252fb
               imagePullPolicy: IfNotPresent
               command:
                 - "/backup.sh"
@@ -40,7 +40,7 @@ spec:
                       name: postgres.postgres.credentials.postgresql.acid.zalan.do
                       key: password
                 - name: POSTGRES_DB
-                  value: "hass,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,prowlarr_log,sonarr_main,sonarr_log,radarr_main,radarr_log,readarr_log,readarr_main,readarr_cache,vaultwarden"
+                  value: "hass,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,prowlarr_log,sonarr_main,sonarr_log,radarr_main,radarr_log,readarr_log,readarr_main,readarr_cache,vaultwarden,speakarr_main,speakarr_log,speakarr_cache"
               volumeMounts:
                 - name: nas-backups
                   mountPath: /backups

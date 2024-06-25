@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app theme-park
@@ -31,7 +31,7 @@ spec:
   values:
     image:
       repository: ghcr.io/onedr0p/theme-park
-      tag: 1.16.1@sha256:26746f632b3a0f15cd5b234a2828d77d6078920b94fea34d9d443aa4a84dcab9
+      tag: 1.17.0@sha256:df753be9371fd663795cd9784d79ba0af1ea86f69ef42774b02a9dabb67afa8c
     service:
       main:
         ports:

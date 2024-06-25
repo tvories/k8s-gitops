@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: node-red
@@ -23,7 +23,7 @@ spec:
 
     image:
       repository: docker.io/nodered/node-red
-      tag: 3.1.8@sha256:4f2bdf69cc3fb62ec60a746ca8db10245cc0ee353b10aa3e66ec0bfbf920c407
+      tag: 4.0.0@sha256:dc2134cb3566eafb4c2f68b4d9e99b4ef909533e27a6337f32dc2b2278972ed2
 
     env:
       TZ: "${TIMEZONE}"

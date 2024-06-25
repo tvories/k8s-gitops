@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: multus
@@ -23,7 +23,7 @@ spec:
     cni:
       image:
         repository: ghcr.io/angelnu/cni-plugins
-        tag: 1.4.1@sha256:d27f97ae7d9dd1ca9bb2883273ac2477b336da37b4450e1509716124550853d9
+        tag: 1.5.1@sha256:caac0fccffb23811386919e3f8cc216de7e1a907648f19bc671d9e495fb77069
 
       paths:
         config: /etc/cni/net.d

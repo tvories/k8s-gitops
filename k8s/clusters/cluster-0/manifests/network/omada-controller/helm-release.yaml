@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app omada-controller
@@ -39,7 +39,7 @@ spec:
     # hostNetwork: true
     image:
       repository: mbentley/omada-controller
-      tag: 5.13@sha256:6239edc061a396404b7d91a8c3f0bfe0fcb8145b266f5aa69991c18ab2296bb4
+      tag: 5.13@sha256:ba95968f9bd6cb59b5a6fb183871fd6403f7d118875dbe7b98088b1a2277db2b
 
     env:
       TZ: "${TIMEZONE}"

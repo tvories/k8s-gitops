@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: zalando-postgres
@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: postgres-operator
-      version: 1.11.0
+      version: 1.12.0
       sourceRef:
         kind: HelmRepository
         name: zalando-postgres-operator
@@ -61,7 +61,7 @@ spec:
 
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: zalando-postgres-operator-ui
@@ -71,7 +71,7 @@ spec:
   chart:
     spec:
       chart: postgres-operator-ui
-      version: 1.11.0
+      version: 1.12.2
       sourceRef:
         kind: HelmRepository
         name: zalando-postgres-operator-ui
