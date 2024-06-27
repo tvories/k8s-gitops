@@ -29,9 +29,9 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        # fsGroup: 568
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 65539
@@ -54,13 +54,33 @@ spec:
               tag: 1.19.0.4568@sha256:59a1b3f3f5df0f0d112a338d8b155737736ae506aaf2f227fa8bdf54b1bd634d
             env:
               TZ: "${TIMEZONE}"
-              PROWLARR__INSTANCE_NAME: Prowlarr
+              PROWLARR__APP__INSTANCENAME: Prowlarr
               # PROWLARR__PORT: &port 80
-              PROWLARR__LOG_LEVEL: info
-              PROWLARR__AUTHENTICATION_METHOD: External
-              PROWLARR__THEME: dark
+              PROWLARR__AUTH__METHOD: External
+              PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              PROWLARR__LOG__DBENABLED: "False"
+              PROWLARR__LOG__LEVEL: info
+              PROWLARR__APP_THEME: dark
+              PROWLARR__UPDATE__BRANCH: develop
 
             envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 11m
@@ -97,34 +117,19 @@ spec:
             hosts:
               - *host
 
-    # probes:
-    #   liveness: &probes
-    #     enabled: true
-    #     custom: true
-    #     spec:
-    #       httpGet:
-    #         path: /ping
-    #         port: *port
-    #       initialDelaySeconds: 0
-    #       periodSeconds: 10
-    #       timeoutSeconds: 1
-    #       failureThreshold: 3
-    #   readiness: *probes
-    #   startup:
-    #     enabled: false
-
     persistence:
       config:
-        enabled: true
         # existingClaim: prowlarr-config
         type: emptyDir
         # mountPath: /config
+      tmp:
+        type: emptyDir
     # shared:
     #   enabled: true
     #   type: emptyDir
     #   mountPath: /shared
-    backup:
-      enabled: true
-      existingClaim: prowlarr-nfs-backup
-      globalMounts:
-        - path: /config/Backups
+    # backup:
+    #   enabled: true
+    #   existingClaim: prowlarr-nfs-backup
+    #   globalMounts:
+    #     - path: /config/Backups
