@@ -31,7 +31,7 @@ spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 568
+        # fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 65539
