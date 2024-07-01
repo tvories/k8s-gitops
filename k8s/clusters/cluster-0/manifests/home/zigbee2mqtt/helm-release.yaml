@@ -31,7 +31,7 @@ spec:
         reloader.stakater.com/auto: "true"
     image:
       repository: ghcr.io/koenkk/zigbee2mqtt
-      tag: 1.38.0
+      tag: 1.39.0
 
     env:
       TZ: "${TIMEZONE}"
