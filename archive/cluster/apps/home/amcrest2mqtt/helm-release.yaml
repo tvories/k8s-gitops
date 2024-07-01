@@ -18,8 +18,8 @@ spec:
       interval: 5m
   values:
     image:
-      repository: dchesterton/amcrest2mqtt
-      tag: 1.0.16
+      repository: layertwo/amcrest2mqtt
+      tag: latest
 
     podAnnotations:
       secret.reloader.stakater.com/reload: "amcrest2mqtt-secrets"
