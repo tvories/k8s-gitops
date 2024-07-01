@@ -74,12 +74,10 @@ spec:
           nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
           nginx.org/websocket-services: authentik
           nginx.ingress.kubernetes.io/enable-global-auth: "false"
-          cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
           - host: authentik.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                pathType: Prefix
+        paths:
+          - /
         tls:
           - hosts:
               - authentik.${SECRET_DOMAIN}
