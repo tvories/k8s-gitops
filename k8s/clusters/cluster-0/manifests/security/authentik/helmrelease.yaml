@@ -68,19 +68,17 @@ spec:
       ingress:
         enabled: true
         ingressClassName: nginx-external
-        annotations:
-          nginx.ingress.kubernetes.io/router.entrypoints: websecure
-          nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-          nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-          nginx.org/websocket-services: authentik
-          nginx.ingress.kubernetes.io/enable-global-auth: "false"
+        # annotations:
+        #   nginx.ingress.kubernetes.io/router.entrypoints: websecure
+        #   nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        #   nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+        #   nginx.org/websocket-services: authentik
+        #   nginx.ingress.kubernetes.io/enable-global-auth: "false"
         hosts:
-          - host: authentik.${SECRET_DOMAIN}
-        paths:
-          - /
+          - host: &host authentik.${SECRET_DOMAIN}
         tls:
           - hosts:
-              - authentik.${SECRET_DOMAIN}
+              - *host
     worker:
       replicas: 1
       resources:
