@@ -106,9 +106,5 @@ spec:
         enabled: false
 
     prometheus:
-      serviceMonitor:
-        create: true
-        interval: 30s
-        scrapeTimeout: 3s
       rules:
-        create: true
+        enabled: true
