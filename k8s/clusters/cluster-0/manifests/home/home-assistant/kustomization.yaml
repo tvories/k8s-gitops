@@ -5,5 +5,5 @@ namespace: home
 resources:
   - ./pvc.yaml
   - ./externalsecret.yaml
-  - ./helm-release.yaml
+  - ./helmrelease.yaml
   - ./volsync.yaml
