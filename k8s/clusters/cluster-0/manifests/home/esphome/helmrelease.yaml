@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -10,16 +11,22 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.0.2
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-      interval: 30m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
   values:
     controllers:
       esphome:
-        # type: statefulset
         annotations:
           secret.reloader.stakater.com/reload: esphome-secret
         # pod:
@@ -44,6 +51,16 @@ spec:
             env:
               TZ: "${TIMEZONE}"
               ESPHOME_DASHBOARD_USE_PING: true
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
 
     service:
       app:
@@ -67,19 +84,17 @@ spec:
             secretName: tls.esphome
     persistence:
       config:
-        enabled: true
         existingClaim: esphome-nfs-config
-        advancedMounts:
-          esphome:
-            app:
-              - path: /config
+        globalMounts:
+          - path: /config
       # secrets:
       #   enabled: true
       #   type: secret
       #   name: esphome-secret
       #   mountPath: /config/secrets.yaml
       #   subPath: secrets.yaml
-      # esphome-cache:
-      #   enabled: true
-      #   type: emptyDir
-      #   mountPath: /config/.esphome
+      esphome-cache:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /config/.esphome
