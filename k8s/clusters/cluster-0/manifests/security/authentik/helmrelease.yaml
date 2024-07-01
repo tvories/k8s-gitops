@@ -75,7 +75,7 @@ spec:
         #   nginx.org/websocket-services: authentik
         #   nginx.ingress.kubernetes.io/enable-global-auth: "false"
         hosts:
-          - host: &host "authentik.t-vo.us"
+          - &host "authentik.t-vo.us"
         tls:
           - hosts:
               - *host
