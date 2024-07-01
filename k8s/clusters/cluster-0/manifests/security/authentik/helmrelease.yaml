@@ -37,7 +37,7 @@ spec:
         - name: AUTHENTIK_EMAIL__HOST
           value: "${SECRET_SMTP_HOST}"
         - name: AUTHENTIK_EMAIL__PORT
-          value: 587
+          value: "587"
         - name: AUTHENTIK_EMAIL__USE_TLS
           value: "true"
     # controller:
