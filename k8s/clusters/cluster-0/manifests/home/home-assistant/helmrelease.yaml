@@ -195,6 +195,7 @@ spec:
         annotations:
           service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
           nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          nginx.org/websocket-services: home-assistant
         hosts:
           - host: &host "ha.${SECRET_DOMAIN}"
             paths:
