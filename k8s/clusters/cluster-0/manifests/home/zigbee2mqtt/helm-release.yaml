@@ -28,7 +28,7 @@ spec:
   values:
     defaultPodOptions:
       nodeSelector:
-        feature.node.kubernetes.io/usb-02_0658_0200.present: "true"
+        feature.node.kubernetes.io/usb-ff_1a86_7523.present: "true"
     controllers:
       zigbee2mqtt:
         annotations:

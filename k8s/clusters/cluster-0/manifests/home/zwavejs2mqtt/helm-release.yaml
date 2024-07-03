@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,31 +10,57 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: zwavejs/zwave-js-ui
-      tag: 9.14.4
-    env:
-      TZ: "${TIMEZONE}"
-      # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
-    envFrom:
-      - secretRef:
-          name: zwavejs2mqtt-secret
+    defaultPodOptions:
+      nodeSelector:
+        feature.node.kubernetes.io/usb-02_0658_0200.present: "true"
+    controllers:
+      zwavejs2mqtt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: zwavejs/zwave-js-ui
+              tag: 9.14.4
+            env:
+              TZ: "${TIMEZONE}"
+              # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
+            envFrom:
+              - secretRef:
+                  name: zwavejs2mqtt-secret
+            
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
 
-    securityContext:
-      privileged: true
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 23m
+                memory: 110M
 
     service:
-      main:
+      app:
+        controller: zwavejs2mqtt
         ports:
           http:
             port: &port 8091
@@ -41,57 +68,34 @@ spec:
             enabled: true
             port: 3000
 
-    probes:
-      liveness: &probes
-        enabled: true
-        custom: true
-        spec:
-          httpGet:
-            path: /health
-            port: *port
-          initialDelaySeconds: 0
-          periodSeconds: 10
-          timeoutSeconds: 1
-          failureThreshold: 3
-      readiness: *probes
-      startup:
-        enabled: false
+    
 
     ingress:
-      main:
+      app:
         enabled: true
-        ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
+        className: "nginx-internal"
         hosts:
           - host: &host "zw.${SECRET_DOMAIN}"
             paths:
               - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - hosts:
               - *host
             secretName: tls.zwave
+
     persistence:
       config:
         enabled: true
         existingClaim: zwavejs2mqtt-config
-        mountPath: /usr/src/app/store
+        globalMounts:
+          - path: /usr/src/app/store
       usb:
         enabled: true
         type: hostPath
-        hostPath: /dev/serial/by-id/usb-0658_0200-if00
-        mountPath: /dev/serial/by-id/usb-0658_0200-if00
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - {
-                    key: "feature.node.kubernetes.io/usb-02_0658_0200.present",
-                    operator: In,
-                    values: ["true"],
-                  }
-    resources:
-      requests:
-        cpu: 23m
-        memory: 110M
+        hostPath: &serial /dev/serial/by-id/usb-0658_0200-if00
+        hostPathType: CharDevice
+        globalMounts:
+          - path: *serial
