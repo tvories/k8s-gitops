@@ -193,8 +193,9 @@ spec:
       app:
         className: nginx-external
         annotations:
-          # service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
-          # nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          nginx.org/websocket-services: home-assistant-app
         hosts:
           - host: &host "ha.${SECRET_DOMAIN}"
             paths:
