@@ -107,7 +107,7 @@ spec:
         enabled: true
         existingClaim: media-nfs-media
         advancedMounts:
-          calbire-web:
+          calibre-web:
             app:
               - path: /media
       books:
