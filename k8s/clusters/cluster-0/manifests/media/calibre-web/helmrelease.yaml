@@ -1,0 +1,120 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: calibre-web
+  namespace: media
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      calibre-web:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 65539
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bjw-s/calibre-web
+              tag: 0.6.21
+
+            env:
+              TZ: "${TIMEZONE}"
+              # PGID: 65539
+              CACHE_DIR: /cache
+              # DOCKER_MODS: "linuxserver/calibre-web:calibre"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                cpu: 5m
+                memory: 470M
+              limits:
+                memory: 470M
+
+    service:
+      app:
+        controller: calibre-web
+        ports:
+          http:
+            port: 8083
+
+    ingress:
+      app:
+        enabled: true
+        className: "nginx-external"
+        annotations:
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/calibreweb/plex.css"></head>';
+            sub_filter_once on;
+
+        hosts:
+          - host: &host books.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - secretName: tls.calibre-web
+            hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-web-config
+        advancedMounts:
+          calibre-web:
+            app:
+              - path: /config
+      media:
+        enabled: true
+        existingClaim: media-nfs-media
+        advancedMounts:
+          calbire-web:
+            app:
+              - path: /media
+      books:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks
+        advancedMounts:
+          calibre-web:
+            app:
+              - path: /books
