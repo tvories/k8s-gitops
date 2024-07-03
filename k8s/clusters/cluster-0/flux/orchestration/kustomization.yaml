@@ -20,6 +20,5 @@ resources:
   - ./database.yaml
   - ./security.yaml
   - ./gitlab.yaml
-  # - ./kyverno.yaml
   - ./system-controllers.yaml
   - ./csi-addons-system.yaml
