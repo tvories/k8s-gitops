@@ -34,9 +34,9 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 568
-            runAsGroup: 568
+            # runAsNonRoot: true
+            # runAsUser: 568
+            # runAsGroup: 568
             fsGroup: 65539
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
@@ -50,8 +50,8 @@ spec:
               TZ: "${TIMEZONE}"
               CONFIG_PATH: /config
               METADATA_PATH: /metadata
-              AUDIOBOOKSHELF_UID: 568
-              AUDIOBOOKSHELF_GID: 568
+              # AUDIOBOOKSHELF_UID: 568
+              # AUDIOBOOKSHELF_GID: 568
             probes:
               liveness: &probes
                 enabled: true
@@ -65,10 +65,10 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+            # securityContext:
+            #   allowPrivilegeEscalation: false
+            #   readOnlyRootFilesystem: true
+            #   capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
