@@ -95,7 +95,7 @@ spec:
       enabled: false
       image:
         repository: ghcr.io/tarampampam/error-pages
-        tag: 2.27.0
+        tag: 3.0.0
       extraEnvs:
         - name: TEMPLATE_NAME
           value: ghost
