@@ -87,20 +87,3 @@ spec:
       #   requests:
       #     memory: 400Mi
       #     cpu: 99m
-
-    # defaultBackend:
-    #   enabled: false
-    #   image:
-    #     repository: ghcr.io/tarampampam/error-pages
-    #     tag: 2.25.0
-    #   extraEnvs:
-    #     - name: TEMPLATE_NAME
-    #       value: ghost
-    #     - name: SHOW_DETAILS
-    #       value: "false"
-    #   resources:
-    #     requests:
-    #       cpu: 15m
-    #       memory: 64M
-    #     limits:
-    #       memory: 64M
