@@ -7,7 +7,7 @@ resources:
   - ./externalsecret.yaml
   # - ./cnpg.yaml
   # - ./pg-secret.sops.yaml
-  - ./helm-release.yaml
+  - ./helmrelease.yaml
   - ./volsync.yaml
 configMapGenerator:
   - name: tandoor-configmap
