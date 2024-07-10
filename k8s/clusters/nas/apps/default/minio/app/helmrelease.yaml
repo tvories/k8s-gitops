@@ -1,16 +1,16 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: minio
+  name: &app minio
   namespace: default
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -28,13 +28,11 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
-        type: statefulset
+      minio:
         annotations:
           reloader.stakater.com/auto: "true"
-
         containers:
-          main:
+          app:
             image:
               repository: quay.io/minio/minio
               tag: RELEASE.2024-07-04T14-25-45Z
@@ -77,7 +75,8 @@ spec:
               privileged: true
               runAsUser: 0
     service:
-      main:
+      app:
+        controller: minio
         ports:
           http:
             port: 9001
@@ -85,23 +84,20 @@ spec:
             port: 9000
 
     ingress:
-      main:
-        enabled: true
+      app:
         hosts:
           - host: "{{ .Release.Name }}.nas.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
                   port: http
-                  name: main
+                  identifier: app
           - host: &api-host s3.nas.${SECRET_DOMAIN}
             paths:
               - path: /
-                pathType: Prefix
                 service:
                   port: s3
-                  name: main
-
+                  identifier: app
     persistence:
       data:
         type: hostPath
