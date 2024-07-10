@@ -39,40 +39,40 @@ spec:
             envFrom: &envFrom
               - secretRef:
                   name: &secret vaultwarden-secret
-    containers:
-      app:
-        image:
-          repository: vaultwarden/server
-          tag: 1.31.0@sha256:4e28425bad4bd13568e1779f682ff7e441eca2ecd079bd77cfcba6e4eaf1b999
+        containers:
+          app:
+            image:
+              repository: vaultwarden/server
+              tag: 1.31.0@sha256:4e28425bad4bd13568e1779f682ff7e441eca2ecd079bd77cfcba6e4eaf1b999
 
-        env:
-          DATA_FOLDER: "config"
-          ICON_CACHE_FOLDER: "data/icon_cache"
-          ATTACHMENTS_FOLDER: "data/attachments"
-          DOMAIN: https://vaultwarden.${SECRET_DOMAIN}
-          SIGNUPS_ALLOWED: "false"
-          SMTP_FROM_NAME: Vaultwarden
-          # SMTP_FROM: ${SECRET_VAULTWARDEN_MAIL_USER}
-          # SMTP_HOST: ${SECRET_SMTP_HOST}
-          SMTP_PORT: 465
-          SMTP_SSL: "true"
-          # SMTP_USERNAME: ${SECRET_TVO_EMAIL}
-          # SMTP_PASSWORD: ${SECRET_VAULTWARDEN_MAIL_PASSWORD}
-          SMTP_EXPLICIT_TLS: "true"
-          # SMTP_DEBUG: "true"
-          # LOG_LEVEL: debug
-          TZ: ${TIMEZONE}
-          WEBSOCKET_ADDRESS: 0.0.0.0
-          WEBSOCKET_ENABLED: true
-          WEBSOCKET_PORT: 3012
+            env:
+              DATA_FOLDER: "config"
+              ICON_CACHE_FOLDER: "data/icon_cache"
+              ATTACHMENTS_FOLDER: "data/attachments"
+              DOMAIN: https://vaultwarden.${SECRET_DOMAIN}
+              SIGNUPS_ALLOWED: "false"
+              SMTP_FROM_NAME: Vaultwarden
+              # SMTP_FROM: ${SECRET_VAULTWARDEN_MAIL_USER}
+              # SMTP_HOST: ${SECRET_SMTP_HOST}
+              SMTP_PORT: 465
+              SMTP_SSL: "true"
+              # SMTP_USERNAME: ${SECRET_TVO_EMAIL}
+              # SMTP_PASSWORD: ${SECRET_VAULTWARDEN_MAIL_PASSWORD}
+              SMTP_EXPLICIT_TLS: "true"
+              # SMTP_DEBUG: "true"
+              # LOG_LEVEL: debug
+              TZ: ${TIMEZONE}
+              WEBSOCKET_ADDRESS: 0.0.0.0
+              WEBSOCKET_ENABLED: true
+              WEBSOCKET_PORT: 3012
 
-        envFrom: *envFrom
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-          limits:
-            memory: 2Gi
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                memory: 2Gi
 
     service:
       app:
