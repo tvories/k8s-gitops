@@ -83,7 +83,7 @@ spec:
 
     service:
       app:
-        controller: app
+        controller: atuin
         ports:
           http:
             port: *port
@@ -92,7 +92,6 @@ spec:
     serviceMonitor:
       app:
         serviceName: *app
-        enabled: true
         endpoints:
           - port: metrics
             scheme: http
