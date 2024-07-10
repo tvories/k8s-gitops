@@ -1,15 +1,16 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: paperless
+  name: &app paperless
   namespace: selfhosted
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.3.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -26,8 +27,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
-        type: statefulset
+      paperless:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
@@ -44,13 +44,13 @@ spec:
               - secretRef:
                   name: paperless-secret
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
               tag: 2.10.2
             env:
               TZ: "${TIMEZONE}"
-              PAPERLESS_REDIS: redis://localhost:6379
+              PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
               PAPERLESS_TIME_ZONE: "${TIMEZONE}"
               PAPERLESS_CONSUMER_POLLING: "60"
               PAPERLESS_CONSUMER_RECURSIVE: "true"
@@ -96,6 +96,12 @@ spec:
               repository: public.ecr.aws/docker/library/redis
               tag: 7.2.5
               pullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
           tika:
             image:
               repository: ghcr.io/paperless-ngx/tika
@@ -103,23 +109,26 @@ spec:
               pullPolicy: IfNotPresent
 
     service:
-      main:
+      app:
+        controller: paperless
         ports:
           http:
             port: *port
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379
 
     ingress:
       main:
-        enabled: true
-        ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: "letsencrypt-production"
+        className: "nginx-internal"
         hosts:
           - host: &host "paperless.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - secretName: tls.paperless
@@ -139,5 +148,3 @@ spec:
         path: /ook/k8s/paperless
         globalMounts:
           - path: /library
-
-    sidecars:
