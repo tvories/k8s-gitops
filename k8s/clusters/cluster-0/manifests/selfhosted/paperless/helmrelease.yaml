@@ -84,29 +84,29 @@ spec:
                 # cpu: 1311m
                 memory: 8000M # Something is eating memory
 
-          gotenburg:
-            image:
-              repository: thecodingmachine/gotenberg
-              tag: 8.8.0
-              pullPolicy: IfNotPresent
-            env:
-              - { name: DISABLE_GOOGLE_CHROME, value: "1" }
-          redis:
-            image:
-              repository: public.ecr.aws/docker/library/redis
-              tag: 7.2.5
-              pullPolicy: IfNotPresent
-            resources:
-              requests:
-                cpu: 5m
-                memory: 32Mi
-              limits:
-                memory: 128Mi
-          tika:
-            image:
-              repository: ghcr.io/paperless-ngx/tika
-              tag: 2.9.1-full
-              pullPolicy: IfNotPresent
+          # gotenburg:
+          #   image:
+          #     repository: thecodingmachine/gotenberg
+          #     tag: 8.8.0
+          #     pullPolicy: IfNotPresent
+          #   env:
+          #     - { name: DISABLE_GOOGLE_CHROME, value: "1" }
+          # redis:
+          #   image:
+          #     repository: public.ecr.aws/docker/library/redis
+          #     tag: 7.2.5
+          #     pullPolicy: IfNotPresent
+          #   resources:
+          #     requests:
+          #       cpu: 5m
+          #       memory: 32Mi
+          #     limits:
+          #       memory: 128Mi
+          # tika:
+          #   image:
+          #     repository: ghcr.io/paperless-ngx/tika
+          #     tag: 2.9.1-full
+          #     pullPolicy: IfNotPresent
 
     service:
       app:
