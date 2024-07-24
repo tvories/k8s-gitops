@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -26,7 +26,6 @@ spec:
             image:
               repository: sknnr/enshrouded-dedicated-server
               tag: proton-latest
-              imagePullPolicy: Always
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
@@ -39,16 +38,14 @@ spec:
             probes:
               liveness:
                 enabled: false
-                type: UDP
               readiness:
                 enabled: false
-                type: UDP
               startup:
                 enabled: false
-                type: UDP
 
     service:
       app:
+        controller: enshrouded
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
@@ -62,8 +59,6 @@ spec:
             enabled: true
             port: *query_port
             protocol: UDP
-          http:
-            enabled: false
 
     persistence:
       data:
