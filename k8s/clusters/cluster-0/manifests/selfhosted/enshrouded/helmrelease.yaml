@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.2.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -18,13 +18,11 @@ spec:
         namespace: flux-system
   values:
     controllers:
-      main:
+      enshrouded:
         annotations:
           reloader.stakater.com/auto: "true"
-        # type: statefulset
         containers:
-          main:
-            nameOverride: enshrouded
+          app:
             image:
               repository: sknnr/enshrouded-dedicated-server
               tag: proton-latest
@@ -50,7 +48,7 @@ spec:
                 type: UDP
 
     service:
-      main:
+      app:
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
