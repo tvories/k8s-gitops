@@ -37,7 +37,7 @@ spec:
     #   - secretRef:
     #       name: omada-exporter-secret
     omada:
-      host: https://omada-controller-controller.network.svc.cluster.local:8043
+      host: https://omada-controller-app.network.svc.cluster.local:8043
       request_timeout: 60
       site: Default
       insecure: true
