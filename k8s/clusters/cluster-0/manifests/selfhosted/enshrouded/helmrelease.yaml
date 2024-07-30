@@ -17,6 +17,11 @@ spec:
         name: bjw-s-charts
         namespace: flux-system
   values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 10000
+        runAsGroup: 10000
+        fsGroup: 10000
     controllers:
       enshrouded:
         annotations:
@@ -25,7 +30,7 @@ spec:
           app:
             image:
               repository: sknnr/enshrouded-dedicated-server
-              tag: proton-latest
+              tag: proton-latest@sha256:79f871d139af69567dba7ff04777b8616c0b9d7b82c79ad6f91187a0d1335071
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
