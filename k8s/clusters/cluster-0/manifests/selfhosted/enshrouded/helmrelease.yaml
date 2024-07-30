@@ -75,7 +75,6 @@ spec:
       config:
         type: secret
         name: enshrouded-secret
-        identifier: enshrouded_server.json
         globalMounts:
           - path: /home/steam/enshrouded/enshrouded_server.json
             subPath: enshrouded_server.json
