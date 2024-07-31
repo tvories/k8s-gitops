@@ -27,6 +27,6 @@ data:
   STATUS_HTTP: "true" # Only useful on public server
   SUPERVISOR_HTTP: "true"
   ### other
-  PUID: "1000"
-  PGID: "1000"
+  # PUID: "1000"
+  # PGID: "1000"
   TZ: ${TIMEZONE}
