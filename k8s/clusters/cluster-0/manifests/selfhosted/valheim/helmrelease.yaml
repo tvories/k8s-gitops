@@ -31,6 +31,9 @@ spec:
       valheim:
         annotations:
           reloader.stakater.com/search: "true"
+        pod:
+          nodeSelector:
+            feature.node.kubernetes.io/cpu-model.id: "158"
         containers:
           app:
             image:
