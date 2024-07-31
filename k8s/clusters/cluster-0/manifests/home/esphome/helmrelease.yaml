@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: esphome
+  namespace: home
+spec:
+  releaseName: esphome
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      esphome:
+        annotations:
+          secret.reloader.stakater.com/reload: esphome-secret
+        # pod:
+        #   annotations:
+        #     k8s.v1.cni.cncf.io/networks: |
+        #       [{
+        #         "name":"multus-iot",
+        #         "namespace": "network",
+        #         "ips": ["192.168.50.30/24"]
+        #       }]
+        containers:
+          app:
+            image:
+              repository: ghcr.io/esphome/esphome
+              tag: 2024.7.2
+            resources:
+              requests:
+                cpu: 10m
+                memory: 100M
+              # limits:
+              #   memory: 2048M
+            env:
+              TZ: "${TIMEZONE}"
+              ESPHOME_DASHBOARD_USE_PING: true
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+    service:
+      app:
+        controller: esphome
+        ports:
+          http:
+            port: 6052
+    ingress:
+      app:
+        className: "nginx-internal"
+        hosts:
+          - host: &host "esp.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.esphome
+    persistence:
+      config:
+        existingClaim: esphome-nfs-config
+        globalMounts:
+          - path: /config
+      # secrets:
+      #   enabled: true
+      #   type: secret
+      #   name: esphome-secret
+      #   mountPath: /config/secrets.yaml
+      #   subPath: secrets.yaml
+      esphome-cache:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /config/.esphome

@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 57.2.0
+      version: 61.3.3
       sourceRef:
         kind: HelmRepository
         name: prometheus-community-charts
@@ -212,9 +212,9 @@ spec:
             memory: 5977M
 
         thanos:
-          image: quay.io/thanos/thanos:v0.35.0
+          image: quay.io/thanos/thanos:v0.35.1
           # renovate: datasource=docker depName=quay.io/thanos/thanos
-          version: v0.35.0
+          version: v0.35.1
           objectStorageConfig:
             name: thanos-objstore-secret
             key: objstore.yml

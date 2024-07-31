@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app omada-exporter
@@ -37,7 +37,7 @@ spec:
     #   - secretRef:
     #       name: omada-exporter-secret
     omada:
-      host: https://omada-controller.network.svc.cluster.local:8043
+      host: https://omada-controller-app.network.svc.cluster.local:8043
       request_timeout: 60
       site: Default
       insecure: true

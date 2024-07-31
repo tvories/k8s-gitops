@@ -1,35 +1,13 @@
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: valheim-nfs-config
-spec:
-  storageClassName: valheim-nfs-config
-  capacity:
-    storage: 1Mi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    path: /ook/k8s/valheim
-    server: ${SECRET_NAS3}
-  mountOptions:
-    - nfsvers=4.2
-    - nconnect=8
-    - hard
-    - noatime
-    - rsize=131072
-    - wsize=131072
-
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: valheim-nfs-config
+  name: valheim-config
   namespace: selfhosted
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: valheim-nfs-config
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 1Mi
+      storage: 10Gi
+  storageClassName: ceph-block

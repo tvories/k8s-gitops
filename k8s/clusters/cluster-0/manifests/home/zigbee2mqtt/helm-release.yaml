@@ -1,5 +1,6 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: zigbee2mqtt
@@ -9,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
+      version: 3.3.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -25,123 +26,91 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controller:
-      type: statefulset
-      annotations:
-        reloader.stakater.com/auto: "true"
-    image:
-      repository: ghcr.io/koenkk/zigbee2mqtt
-      tag: 1.37.1
-
-    env:
-      TZ: "${TIMEZONE}"
-      ZIGBEE2MQTT_DATA: /config
-      # DEBUG: "zigbee-herdsman*"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_DISCOVERY_TOPIC: homeassistant
-      ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_LEGACY_ENTITY_ATTRIBUTES: "false"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_LEGACY_TRIGGERS: "false"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_STATUS_TOPIC: homeassistant/status
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LAST_SEEN: ISO_8601
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: "false"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: "false"
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: info # debug
-      ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT: '["console"]'
-      ZIGBEE2MQTT_CONFIG_AVAILABILITY_ACTIVE_TIMEOUT: 60
-      ZIGBEE2MQTT_CONFIG_AVAILABILITY_PASSIVE_TIMEOUT: 2000
-      ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_LEGACY: "false"
-      ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: "true"
-      ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: "true"
-      ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port 8080
-      ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zig.${SECRET_DOMAIN}
-      ZIGBEE2MQTT_CONFIG_HOMEASSISTANT: "true"
-      ZIGBEE2MQTT_CONFIG_MQTT_INCLUDE_DEVICE_INFORMATION: "true"
-      ZIGBEE2MQTT_CONFIG_MQTT_KEEPALIVE: 60
-      ZIGBEE2MQTT_CONFIG_MQTT_REJECT_UNAUTHORIZED: "true"
-      ZIGBEE2MQTT_CONFIG_MQTT_SERVER: mqtt://emqx.home.svc.cluster.local
-      ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
-      ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: "false"
-      ZIGBEE2MQTT_CONFIG_SERIAL_PORT: &serial /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
-      # ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
-      # ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: "false"
-    envFrom:
-      - secretRef:
-          name: zigbee2mqtt-secret
+    defaultPodOptions:
+      nodeSelector:
+        feature.node.kubernetes.io/usb-ff_1a86_7523.present: "true"
+    controllers:
+      zigbee2mqtt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/koenkk/zigbee2mqtt
+              tag: 1.39.0
+            env:
+              TZ: "${TIMEZONE}"
+              ZIGBEE2MQTT_DATA: /config
+              # DEBUG: "zigbee-herdsman*"
+              ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_DISCOVERY_TOPIC: homeassistant
+              ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_LEGACY_ENTITY_ATTRIBUTES: "false"
+              ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_LEGACY_TRIGGERS: "false"
+              ZIGBEE2MQTT_CONFIG_ADVANCED_HOMEASSISTANT_STATUS_TOPIC: homeassistant/status
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LAST_SEEN: ISO_8601
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_API: "false"
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LEGACY_AVAILABILITY_PAYLOAD: "false"
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: info # debug
+              ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_OUTPUT: '["console"]'
+              ZIGBEE2MQTT_CONFIG_AVAILABILITY_ACTIVE_TIMEOUT: 60
+              ZIGBEE2MQTT_CONFIG_AVAILABILITY_PASSIVE_TIMEOUT: 2000
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_LEGACY: "false"
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: "true"
+              ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: "true"
+              ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port 8080
+              ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zig.${SECRET_DOMAIN}
+              ZIGBEE2MQTT_CONFIG_HOMEASSISTANT: "true"
+              ZIGBEE2MQTT_CONFIG_MQTT_INCLUDE_DEVICE_INFORMATION: "true"
+              ZIGBEE2MQTT_CONFIG_MQTT_KEEPALIVE: 60
+              ZIGBEE2MQTT_CONFIG_MQTT_REJECT_UNAUTHORIZED: "true"
+              ZIGBEE2MQTT_CONFIG_MQTT_SERVER: mqtt://emqx.home.svc.cluster.local
+              ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
+              ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: "false"
+              ZIGBEE2MQTT_CONFIG_SERIAL_PORT: &serial /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+              # ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
+              # ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: "false"
+            envFrom:
+              - secretRef:
+                  name: zigbee2mqtt-secret
+            resources:
+              requests:
+                cpu: 15m
+                memory: 94M
+            securityContext:
+              privileged: true
 
     service:
-      main:
+      app:
+        controller: zigbee2mqtt
         ports:
           http:
-            port: 8080
-
-    securityContext:
-      privileged: true
-
-    persistence:
-      config:
-        enabled: true
-        existingClaim: zigbee2mqtt-config
-        mountPath: /config
-      usb:
-        enabled: true
-        type: hostPath
-        hostPath: *serial
-        mountPath: *serial
-        hostPathType: CharDevice
+            port: &port 8080
 
     ingress:
-      main:
+      app:
         enabled: true
-        ingressClassName: "nginx-internal"
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-
+        className: "nginx-internal"
         hosts:
           - host: &host zig.${SECRET_DOMAIN}
             paths:
               - path: /
-
+                service:
+                  identifier: app
+                  port: http
         tls:
           - secretName: tls.zigbee2mqtt
             hosts:
               - *host
 
-    config:
-      mqtt:
-        base_topic: zigbee2mqtt
-        # server: "mqtt://emqx:1883"
-        # user: ${ZIGBEE2MQTT_MQTT_USER}
-        # password: ${ZIGBEE2MQTT_MQTT_PASSWORD}
-
-      homeassistant: true
-
-      device_options:
-        retain: true
-
-      permit_join: false
-
-      serial:
-        port: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
-
-      advanced:
-        log_output:
-          - console
-        network_key: [9, 3, 2, 7, 9, 3, 13, 15, 0, 2, 13, 6, 8, 11, 12, 13]
-        # pan_id: 6752
-
-      # Both of these need to be enabled for the webui
-      # frontend:
-      #   port: *port
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - {
-                    key: "feature.node.kubernetes.io/custom-zigbee",
-                    operator: In,
-                    values: ["true"],
-                  }
-    resources:
-      requests:
-        cpu: 15m
-        memory: 94M
+    persistence:
+      config:
+        enabled: true
+        existingClaim: zigbee2mqtt-config
+        globalMounts:
+          - path: /config
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: *serial
+        hostPathType: CharDevice
+        globalMounts:
+          - path: *serial

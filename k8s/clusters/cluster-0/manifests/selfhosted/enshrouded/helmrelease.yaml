@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: enshrouded
@@ -10,25 +10,31 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
+      version: 3.3.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
   values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 10000
+        runAsGroup: 10000
+        fsGroup: 10000
     controllers:
-      main:
+      enshrouded:
         annotations:
           reloader.stakater.com/auto: "true"
-        # type: statefulset
+        pod:
+          nodeSelector:
+            feature.node.kubernetes.io/cpu-model.id: "158"
+
         containers:
-          main:
-            nameOverride: enshrouded
+          app:
             image:
               repository: sknnr/enshrouded-dedicated-server
-              tag: proton-latest
-              imagePullPolicy: Always
+              tag: proton-latest@sha256:79f871d139af69567dba7ff04777b8616c0b9d7b82c79ad6f91187a0d1335071
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
@@ -41,16 +47,14 @@ spec:
             probes:
               liveness:
                 enabled: false
-                type: UDP
               readiness:
                 enabled: false
-                type: UDP
               startup:
                 enabled: false
-                type: UDP
 
     service:
-      main:
+      app:
+        controller: enshrouded
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
@@ -64,8 +68,6 @@ spec:
             enabled: true
             port: *query_port
             protocol: UDP
-          http:
-            enabled: false
 
     persistence:
       data:
@@ -74,3 +76,9 @@ spec:
         globalMounts:
           - path: /home/steam/enshrouded/savegame
             readOnly: false
+      config:
+        type: secret
+        name: enshrouded-secret
+        globalMounts:
+          - path: /home/steam/enshrouded/enshrouded_server.json
+            subPath: enshrouded_server.json

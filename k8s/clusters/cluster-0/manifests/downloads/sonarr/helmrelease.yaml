@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app sonarr
+  namespace: downloads
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 2
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 2
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 65539
+          - 10000
+    controllers:
+      sonarr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.3
+            envFrom: &envFrom
+              - secretRef:
+                  name: sonarr-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/sonarr-develop
+              tag: 4.0.8.1988@sha256:d8404510500ffe8ed804ac37bc5a56040228eb632458d6771d9c7dab40f6f61a
+
+            env:
+              TZ: "${TIMEZONE}"
+              SONARR__INSTANCE_NAME: Sonarr
+              SONARR__LOG_LEVEL: info
+              SONARR__THEME: dark
+              SONARR__APPLICATION_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
+              SONARR__PORT: &port 8989
+
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 23m
+                memory: 273M
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      app:
+        enabled: true
+        className: "nginx-internal"
+        annotations:
+          # cert-manager.io/cluster-issuer: letsencrypt-production
+          # nginx.ingress.kubernetes.io/configuration-snippet: |
+          #   proxy_set_header Accept-Encoding "";
+          #   sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/sonarr/plex.css"></head>';
+          #   sub_filter_once on;
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+        hosts:
+          - host: &host sonarr.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: &tls tls.sonarr
+
+      api:
+        enabled: true
+        className: "nginx-internal"
+        hosts:
+          - host: *host
+            paths:
+              - path: /api
+                service:
+                  identifier: app
+                  port: http
+                pathType: Prefix
+        tls:
+          - hosts:
+              - *host
+            secretName: *tls
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: sonarr-config
+        globalMounts:
+          - path: /config
+      media:
+        enabled: true
+        existingClaim: downloads-nfs-media
+        globalMounts:
+          - path: /media
+      backup:
+        enabled: true
+        existingClaim: sonarr-nfs-backup
+        globalMounts:
+          - path: /config/Backups

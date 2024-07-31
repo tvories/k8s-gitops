@@ -1,0 +1,113 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app vaultwarden
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      vaultwarden:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.3
+            envFrom: &envFrom
+              - secretRef:
+                  name: &secret vaultwarden-secret
+        containers:
+          app:
+            image:
+              repository: vaultwarden/server
+              tag: 1.31.0@sha256:4e28425bad4bd13568e1779f682ff7e441eca2ecd079bd77cfcba6e4eaf1b999
+
+            env:
+              DATA_FOLDER: "config"
+              ICON_CACHE_FOLDER: "data/icon_cache"
+              ATTACHMENTS_FOLDER: "data/attachments"
+              DOMAIN: https://vaultwarden.${SECRET_DOMAIN}
+              SIGNUPS_ALLOWED: "false"
+              SMTP_FROM_NAME: Vaultwarden
+              # SMTP_FROM: ${SECRET_VAULTWARDEN_MAIL_USER}
+              # SMTP_HOST: ${SECRET_SMTP_HOST}
+              SMTP_PORT: 465
+              SMTP_SSL: "true"
+              # SMTP_USERNAME: ${SECRET_TVO_EMAIL}
+              # SMTP_PASSWORD: ${SECRET_VAULTWARDEN_MAIL_PASSWORD}
+              SMTP_EXPLICIT_TLS: "true"
+              # SMTP_DEBUG: "true"
+              # LOG_LEVEL: debug
+              TZ: ${TIMEZONE}
+              WEBSOCKET_ADDRESS: 0.0.0.0
+              WEBSOCKET_ENABLED: true
+              WEBSOCKET_PORT: 3012
+
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                memory: 2Gi
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: &port 80
+          websocket:
+            enabled: true
+            port: &websocket-port 3012
+
+    ingress:
+      app:
+        className: "nginx-external"
+        hosts:
+          - host: &host vaultwarden.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: *port
+              - path: /notifications/hub/negotiate
+                service:
+                  identifier: app
+                  port: *port
+              - path: /notifications/hub
+                service:
+                  identifier: app
+                  port: *websocket-port
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.vaultwarden
+    persistence:
+      config:
+        existingClaim: vaultwarden-config
+        globalMounts:
+          - path: /config

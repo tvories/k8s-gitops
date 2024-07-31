@@ -1,0 +1,132 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: audiobookshelf
+  namespace: media
+spec:
+  releaseName: audiobookshelf
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 1
+  upgrade:
+    remediation:
+      retries: 1
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      audiobookshelf:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            # runAsNonRoot: true
+            # runAsUser: 568
+            # runAsGroup: 568
+            fsGroup: 65539
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+        containers:
+          app:
+            image:
+              repository: ghcr.io/advplyr/audiobookshelf
+              tag: 2.11.0@sha256:725c287ac1b56f8115dfc7fca75d8490976af59466f893fbf344711bd117f8cb
+            env:
+              TZ: "${TIMEZONE}"
+              CONFIG_PATH: /config
+              METADATA_PATH: /metadata
+              # AUDIOBOOKSHELF_UID: 568
+              # AUDIOBOOKSHELF_GID: 568
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthcheck
+                    port: &port 80
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            # securityContext:
+            #   allowPrivilegeEscalation: false
+            #   readOnlyRootFilesystem: true
+            #   capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 150Mi
+              limits:
+                memory: 300Mi
+
+    service:
+      app:
+        controller: audiobookshelf
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        className: "nginx-external"
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+          nginx.ingress.kubernetes.io/proxy-buffering: "off"
+          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          nginx.ingress.kubernetes.io/server-snippet: |-
+            proxy_set_header Host               $host;
+            proxy_set_header Upgrade            $http_upgrade;
+            proxy_set_header Connection         "upgrade";
+        hosts:
+          - host: &host "ab.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.audiobookshelf
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: audiobookshelf-config
+        globalMounts:
+          - path: /config
+      metadata:
+        existingClaim: audiobookshelf-metadata
+        globalMounts:
+          - path: /metadata
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /.npm
+      backup:
+        existingClaim: audiobookshelf-nfs-backup
+        globalMounts:
+          - path: /metadata/backups
+      audiobooks:
+        existingClaim: audiobookshelf-nfs-audiobooks
+        globalMounts:
+          - path: /audiobooks
+            readOnly: true

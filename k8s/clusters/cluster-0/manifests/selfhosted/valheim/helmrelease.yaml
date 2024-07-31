@@ -1,0 +1,97 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valheim
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    defaultPodOptions:
+      securityContext:
+        supplementalGroups:
+          - 100 # Users
+          - 65537 # NAS Permission group
+    controllers:
+      valheim:
+        annotations:
+          reloader.stakater.com/search: "true"
+        pod:
+          nodeSelector:
+            feature.node.kubernetes.io/cpu-model.id: "158"
+        containers:
+          app:
+            image:
+              repository: lloesche/valheim-server
+              tag: latest@sha256:b97da1038714e5156cf28d042422a1c5af41e03189572025e615bde61395c678
+            envFrom:
+              - secretRef:
+                  name: valheim-secret
+              - configMapRef:
+                  name: valheim-config
+              - configMapRef:
+                  name: valheimplus-config
+            resources:
+              requests:
+                cpu: 511m
+                memory: 5528Mi
+
+    service:
+      app:
+        controller: valheim
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          io.cilium/lb-ipam-ips: "${LB_VALHEIM}"
+        ports:
+          http:
+            port: 80
+            protocol: TCP
+          steam1:
+            port: 2456
+            protocol: UDP
+          steam2:
+            port: 2457
+            protocol: UDP
+          steam3:
+            port: 2458
+            protocol: UDP
+          supervisor:
+            port: 9001
+            protocol: TCP
+
+    ingress:
+      app:
+        className: "nginx-external"
+        hosts:
+          - host: &host "valheim.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.valheim
+
+    persistence:
+      config:
+        existingClaim: valheim-config
+        globalMounts:
+          - path: /config

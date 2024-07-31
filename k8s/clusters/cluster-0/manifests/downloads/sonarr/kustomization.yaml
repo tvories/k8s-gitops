@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - pvc.yaml
-  - helm-release.yaml
+  - helmrelease.yaml

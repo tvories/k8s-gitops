@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app prowlarr
+  namespace: downloads
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 65539
+    controllers:
+      prowlarr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.3
+            envFrom: &envFrom
+              - secretRef:
+                  name: prowlarr-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/prowlarr-develop
+              tag: 1.21.2.4649@sha256:d82c09f83e1f7ec200eb99832d3eb05cbb6b59da9c5d819abe648b4199d102c5
+            env:
+              TZ: "${TIMEZONE}"
+              PROWLARR__APP__INSTANCENAME: Prowlarr
+              PROWLARR__SERVER__PORT: &port 9696
+              PROWLARR__AUTH__METHOD: External
+              PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              PROWLARR__LOG__DBENABLED: "False"
+              PROWLARR__LOG__LEVEL: info
+              PROWLARR__APP_THEME: dark
+              PROWLARR__UPDATE__BRANCH: develop
+
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 11m
+                memory: 127M
+              limits:
+                memory: 508M
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: &port 9696
+
+    ingress:
+      app:
+        enabled: true
+        className: "nginx-internal"
+        # annotations:
+        #   cert-manager.io/cluster-issuer: letsencrypt-production
+        #   nginx.ingress.kubernetes.io/configuration-snippet: |
+        #     proxy_set_header Accept-Encoding "";
+        #     sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/prowlarr/nord.css"></head>';
+        #     sub_filter_once on;
+        hosts:
+          - host: &host "prowlarr.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - secretName: tls.prowlarr
+            hosts:
+              - *host
+
+    persistence:
+      config:
+        # existingClaim: prowlarr-config
+        type: emptyDir
+        # mountPath: /config
+      tmp:
+        type: emptyDir
+    # shared:
+    #   enabled: true
+    #   type: emptyDir
+    #   mountPath: /shared
+    # backup:
+    #   enabled: true
+    #   existingClaim: prowlarr-nfs-backup
+    #   globalMounts:
+    #     - path: /config/Backups

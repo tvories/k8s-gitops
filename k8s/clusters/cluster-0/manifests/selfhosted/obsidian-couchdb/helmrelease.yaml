@@ -1,4 +1,6 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: obsidian-couchdb
@@ -8,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.3.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -17,7 +19,7 @@ spec:
 
   values:
     controllers:
-      main:
+      obsidian-couchdb:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
@@ -31,7 +33,7 @@ spec:
           init-config:
             image:
               repository: public.ecr.aws/docker/library/busybox
-              tag: latest@sha256:bb02074c822cfe6180486e4c3a50f2654c0447175b4a58ad8fa1a5d6ecdc1028
+              tag: latest@sha256:9ae97d36d26566ff84e8893c64a6dc4fe8ca6d1144bf5b87b2b85a32def253c7
               pullPolicy: IfNotPresent
             command:
               - "/bin/sh"
@@ -39,7 +41,7 @@ spec:
               - "cp /tmp/config/*.ini /opt/couchdb/etc/default.d/; ls -lrt /opt/couchdb/etc/default.d;"
 
         containers:
-          main:
+          app:
             image:
               repository: public.ecr.aws/docker/library/couchdb
               tag: 3.3.3
@@ -62,21 +64,21 @@ spec:
                 memory: 146M
 
     service:
-      main:
+      app:
+        controller: obsidian-couchdb
         ports:
           http:
             port: 5984
 
     ingress:
-      main:
-        enabled: true
+      app:
         className: "nginx-external"
         hosts:
           - host: &host "obsidian-db.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -84,22 +86,19 @@ spec:
 
     persistence:
       config:
-        enabled: true
         type: configMap
         name: obsidian-couchdb-configmap
         advancedMounts:
-          main:
+          obsidian-couchdb:
             init-config:
               - path: /tmp/config
       data:
-        enabled: true
         existingClaim: obsidian-couchdb-data
         advancedMounts:
-          main:
+          obsidian-couchdb:
             main:
               - path: /opt/couchdb/data
       config-storage:
-        enabled: true
         type: emptyDir
         globalMounts:
           - path: /opt/couchdb/etc/default.d

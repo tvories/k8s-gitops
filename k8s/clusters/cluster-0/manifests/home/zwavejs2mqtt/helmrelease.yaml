@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zwavejs2mqtt
+  namespace: home
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      nodeSelector:
+        feature.node.kubernetes.io/usb-02_0658_0200.present: "true"
+    controllers:
+      zwavejs2mqtt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: zwavejs/zwave-js-ui
+              tag: 9.16.4
+            env:
+              TZ: "${TIMEZONE}"
+              # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
+            envFrom:
+              - secretRef:
+                  name: zwavejs2mqtt-secret
+
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8091
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 23m
+                memory: 110M
+
+    service:
+      app:
+        controller: zwavejs2mqtt
+        ports:
+          http:
+            port: *port
+          websocket:
+            enabled: true
+            port: 3000
+
+    ingress:
+      app:
+        enabled: true
+        className: "nginx-internal"
+        hosts:
+          - host: &host "zw.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.zwave
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: zwavejs2mqtt-config
+        globalMounts:
+          - path: /usr/src/app/store
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: &serial /dev/serial/by-id/usb-0658_0200-if00
+        hostPathType: CharDevice
+        globalMounts:
+          - path: *serial

@@ -1,0 +1,253 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home
+spec:
+  releaseName: home-assistant
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 1
+  upgrade:
+    remediation:
+      retries: 1
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name":"multus-iot",
+            "namespace": "network",
+            "ips": ["192.168.50.10/24"]
+          }]
+    controllers:
+      home-assistant:
+        pod:
+          hostNetwork: true
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-assistant/home-assistant
+              tag: 2024.7.4
+            env:
+              TZ: "${TIMEZONE}"
+              POSTGRES_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-secret
+                    key: INIT_POSTGRES_HOST
+              POSTGRES_DB:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-secret
+                    key: INIT_POSTGRES_DBNAME
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
+            resources:
+              requests:
+                cpu: 109m
+                memory: 588M
+
+          codeserver:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.91.1@sha256:8403442d3472e411f72b6a5267b5ee0e62db27e258d81efebef40c3b41219970
+            env:
+              # password: ${SECRET_CODESERVER_PASSWORD}
+              TZ: "${TIMEZONE}"
+              HASS_SERVER: http://localhost:8123
+            args:
+              - --auth
+              - "none"
+              - --user-data-dir
+              - "/config/.vscode"
+              - --extensions-dir
+              - "/config/.vscode"
+              - --port
+              - "12321"
+              - "/config"
+            resources:
+              requests:
+                cpu: 11m
+                memory: 94M
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      (
+                        set -ex
+                        apt update
+                        apt install --yes dnsutils
+                        apt install --yes iproute2
+                        apt install --yes inetutils-ping
+                        apt install --yes inetutils-telnet
+                        apt install --yes inetutils-traceroute
+                        apt install --yes net-tools
+                      ) > /tmp/postStart.log 2>&1 || true
+
+          matterserver:
+            image:
+              repository: ghcr.io/home-assistant-libs/python-matter-server
+              tag: 6.4.0
+            workingDir: "/matter_data"
+            env:
+              TZ: "${TIMEZONE}"
+              MATTER_SERVER__INSTANCE_NAME: Matter-Server
+              MATTER_SERVER__PORT: &matter_port 5580
+              MATTER_SERVER__APPLICATION_URL: &matter_host "matter.${SECRET_DOMAIN}"
+              MATTER_SERVER__LOG_LEVEL: info
+            resources:
+              requests:
+                cpu: 20m
+                memory: 100M
+            securityContext:
+              appArmor: "unconfirmed"
+              privileged: true
+
+        initContainers:
+          recorder-initdb:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
+
+    service:
+      app:
+        controller: home-assistant
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: "${LB_HOMEASSISTANT}"
+        externalTrafficPolicy: Cluster
+        # loadBalancerIP: "${LB_HOMEASSISTANT}"
+        ports:
+          http:
+            port: 8123
+          mdns-tcp:
+            enabled: true
+            port: 5353
+            protocol: TCP
+            targetPort: 5353
+          mdns-udp:
+            enabled: true
+            port: 5353
+            protocol: UDP
+            targetPort: 5353
+      codeserver:
+        # type: ClusterIP
+        controller: home-assistant
+        ports:
+          http:
+            enabled: true
+            port: 12321
+            # protocol: TCP
+            # targetPort: 12321
+      matterserver:
+        controller: home-assistant
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          io.cilium/lb-ipam-ips: "192.168.83.54"
+        ports:
+          http:
+            enabled: true
+            port: *matter_port
+            protocol: TCP
+            targetPort: *matter_port
+          mdns-tcp:
+            enabled: true
+            port: 5353
+            protocol: TCP
+            targetPort: 5353
+          mdns-udp:
+            enabled: true
+            port: 5353
+            protocol: UDP
+            targetPort: 5353
+
+    ingress:
+      app:
+        className: nginx-external
+        annotations:
+          service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          nginx.org/websocket-services: home-assistant-app
+        hosts:
+          - host: &host "ha.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - secretName: tls.homeassistant
+            hosts:
+              - *host
+
+      codeserver:
+        className: nginx-internal
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: &vscodehost "ha-vscode.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: codeserver
+                  port: http
+        tls:
+          - secretName: tls.ha-vscode
+            hosts:
+              - *vscodehost
+
+      matterserver:
+        className: nginx-internal
+        hosts:
+          - host: *matter_host
+            paths:
+              - path: /
+                service:
+                  identifier: matterserver
+                  port: http
+        tls:
+          - secretName: tls.matterserver
+            hosts:
+              - *matter_host
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: homeassistant-config
+        globalMounts:
+          - path: /config
+        # mountPath: /config
+      # dbus:
+      #   enabled: true
+      #   type: hostPath
+      #   hostPath: /run/dbus
+      #   mountPath: /run/dbus

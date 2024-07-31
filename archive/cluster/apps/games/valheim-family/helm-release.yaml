@@ -1,0 +1,115 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valheim-family
+  namespace: selfhosted
+spec:
+  interval: 15m
+  chart:
+    spec:
+      # renovate: registryUrl=https://bjw-s.github.io/helm-charts
+      chart: app-template
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    global:
+      # nameOverride: valheim
+      annotations:
+        reloader.stakater.com/search: "true"
+
+    image:
+      repository: lloesche/valheim-server
+      tag: latest
+      pullPolicy: Always
+
+    # env:
+    #   ...
+    envFrom:
+      - secretRef:
+          name: valheim-family-secret
+      - configMapRef:
+          name: valheim-family-config
+      # - configMapRef:
+      #     name: valheimplus-config
+
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: "${LB_VALHEIM_FAMILY}"
+        ports:
+          http:
+            port: 80
+          steam1:
+            port: 2456
+            protocol: UDP
+          steam2:
+            port: 2457
+            protocol: UDP
+          steam3:
+            port: 2458
+            protocol: UDP
+          supervisor:
+            port: 9001
+            protocol: TCP
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx-external"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - host: &host "valheim-family.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.valheim-family
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: valheim-family-config
+        subPath:
+          - path: config
+            mountPath: /config
+          - path: data
+            mountPath: /opt/valheim
+      backup:
+        enabled: true
+        existingClaim: valheim-family-nfs-backup
+        subPath:
+          - path: backup
+            mountPath: /config/backup
+
+    podSecurityContext:
+      supplementalGroups:
+        - 100 # Users
+        - 65537 # NAS Permission group
+
+    resources:
+      requests:
+        cpu: 511m
+        memory: 5528M
+
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #         - matchExpressions:
+    #             - key: kubernetes.io/hostname
+    #               operator: In
+    #               values:
+    #                 - "hp1"

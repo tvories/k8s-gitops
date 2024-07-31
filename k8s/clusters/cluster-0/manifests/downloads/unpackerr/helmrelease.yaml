@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: unpackerr
+  namespace: downloads
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  values:
+    controllers:
+      unpackerr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            seccompProfile: { type: RuntimeDefault }
+        containers:
+          app:
+            image:
+              repository: ghcr.io/unpackerr/unpackerr
+              tag: 0.14.2@sha256:2b2105159bb7bbf20291ffd2023d96578dad236ed6cbbb6d0a5bc5d44f32d492
+
+            env:
+              TZ: ${TIMEZONE}
+              UN_SONARR_0_URL: http://sonarr.downloads.svc.cluster.local:8989
+              UN_SONARR_0_PATHS_0: /media/tv
+              UN_RADARR_0_URL: http://radarr.downloads.svc.cluster.local:7878
+              UN_RADARR_0_PATHS_0: /media/movies
+              # UN_READARR_0_URL: http://readarr.media.svc.cluster.local:8787
+              # UN_READARR_0_PATHS_0: /media/books
+              # UN_READARR_1_URL: http://speakarr.media.svc.cluster.local:8787
+              # UN_READARR_1_PATHS_1: /media/books
+            envFrom:
+              - secretRef:
+                  name: unpackerr-config
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            probes:
+              startup:
+                enabled: false
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+            resources:
+              requests:
+                cpu: 500m
+                memory: 250Mi
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        controller: unpackerr
+        ports:
+          http:
+            port: 5656
+
+    persistence:
+      media:
+        enabled: true
+        existingClaim: downloads-nfs-media
+        globalMounts:
+          - path: /media
