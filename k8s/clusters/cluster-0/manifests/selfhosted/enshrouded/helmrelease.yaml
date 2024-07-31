@@ -10,22 +10,31 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.3.0
+      version: 3.3.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
   values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 10000
+        runAsGroup: 10000
+        fsGroup: 10000
     controllers:
       enshrouded:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          nodeSelector:
+            feature.node.kubernetes.io/cpu-model.id: "158"
+
         containers:
           app:
             image:
               repository: sknnr/enshrouded-dedicated-server
-              tag: proton-latest
+              tag: proton-latest@sha256:79f871d139af69567dba7ff04777b8616c0b9d7b82c79ad6f91187a0d1335071
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
@@ -67,3 +76,9 @@ spec:
         globalMounts:
           - path: /home/steam/enshrouded/savegame
             readOnly: false
+      config:
+        type: secret
+        name: enshrouded-secret
+        globalMounts:
+          - path: /home/steam/enshrouded/enshrouded_server.json
+            subPath: enshrouded_server.json
