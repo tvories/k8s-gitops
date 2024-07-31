@@ -30,3 +30,4 @@ data:
   # PUID: "1000"
   # PGID: "1000"
   TZ: ${TIMEZONE}
+  UPDATE_CRON: "0 6 * * *"
