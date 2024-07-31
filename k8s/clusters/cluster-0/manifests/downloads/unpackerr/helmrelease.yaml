@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/unpackerr/unpackerr
-              tag: 0.14.2@sha256:2b2105159bb7bbf20291ffd2023d96578dad236ed6cbbb6d0a5bc5d44f32d492
+              tag: 0.14.5@sha256:dc72256942ce50d1c8a1aeb5aa85b6ae2680a36eefd2182129d8d210fce78044
 
             env:
               TZ: ${TIMEZONE}
