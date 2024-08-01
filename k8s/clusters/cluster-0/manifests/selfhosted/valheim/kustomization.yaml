@@ -7,3 +7,4 @@ resources:
   - ./configmap-valheimplus.yaml
   - ./pvc.yaml
   - ./externalsecret.yaml
+  - ./volsync.yaml
