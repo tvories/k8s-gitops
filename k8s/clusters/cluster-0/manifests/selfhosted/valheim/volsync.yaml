@@ -28,7 +28,7 @@ metadata:
   name: valheim
   namespace: selfhosted
 spec:
-  sourcePVC: valheim-files
+  sourcePVC: valheim-config
   trigger:
     schedule: "0 7 * * *"
   restic:
