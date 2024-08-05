@@ -30,7 +30,7 @@ spec:
     image:
       repository: ghcr.io/charlie-haley/omada_exporter
       pullPolicy: IfNotPresent
-      tag: 0.13.0
+      tag: 0.13.1
     env:
       TZ: "${TIMEZONE}"
     # envFrom:
