@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: sknnr/enshrouded-dedicated-server
-              tag: proton-latest@sha256:1465da7259713dcdfa73c4d5fa363bb9f22201cefe34086b3c9bf95f44c21854
+              tag: proton-latest@sha256:6ed45d8fad2e08734058d18b5aed0766acc014fc344bd7e6a13e587cd60dc43e
             env:
               SERVER_NAME: "Peenshrouded"
               GAME_PORT: &game_port 15636
