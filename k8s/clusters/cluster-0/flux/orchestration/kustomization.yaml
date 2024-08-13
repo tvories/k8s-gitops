@@ -21,4 +21,4 @@ resources:
   - ./security.yaml
   - ./gitlab.yaml
   - ./system-controllers.yaml
-  - ./csi-addons-system.yaml
+  # - ./csi-addons-system.yaml
