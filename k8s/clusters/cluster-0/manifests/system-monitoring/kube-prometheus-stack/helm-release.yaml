@@ -212,9 +212,9 @@ spec:
             memory: 5977M
 
         thanos:
-          image: quay.io/thanos/thanos:v0.36.0
+          image: quay.io/thanos/thanos:v0.36.1
           # renovate: datasource=docker depName=quay.io/thanos/thanos
-          version: v0.36.0
+          version: v0.36.1
           objectStorageConfig:
             name: thanos-objstore-secret
             key: objstore.yml
