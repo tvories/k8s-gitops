@@ -96,7 +96,7 @@ spec:
           nginx:
             image:
               repository: ghcr.io/nginxinc/nginx-unprivileged
-              tag: 1.27-alpine-perl@sha256:f9138b08881b3a59feec7a6950374b8e198961b960e51d66764e56129b08ae9b
+              tag: 1.27-alpine-perl@sha256:e14b808615c1cb29358b429f6891c2a36a67be9e41f942659b6defd5a4285d5c
 
     service:
       app:
