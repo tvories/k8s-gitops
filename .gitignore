@@ -27,3 +27,5 @@ secrets.yaml
 secret.yaml
 secret.yml
 secrets.yml
+
+.mise.toml
