@@ -21,7 +21,7 @@ spec:
   values:
     image:
       repository: timberio/vector
-      tag: 0.41.0-debian
+      tag: 0.41.1-debian
 
     role: "Agent"
 
