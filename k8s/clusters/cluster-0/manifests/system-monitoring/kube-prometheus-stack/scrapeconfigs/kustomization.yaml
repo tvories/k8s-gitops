@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: system-monitoring
 resources:
   - ./nas.yaml
+  - ./pi-backup.yaml
   # - ./node-exporter.yaml
   # - ./pikvm.yaml
   # - ./zigbee-controller.yaml

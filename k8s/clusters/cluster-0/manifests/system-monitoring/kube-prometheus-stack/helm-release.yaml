@@ -235,6 +235,7 @@ spec:
                   - "m720q-2.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "m720q-3.${SECRET_INTERNAL_DOMAIN}:9100"
                   - "nas3-80.${SECRET_DOMAIN}:9100"
+                  - "tback.${SECRET_INTERNAL_DOMAIN}:9100" # tback
                   - "opnsense.${SECRET_INTERNAL_DOMAIN}:9100"
 
           - job_name: smartctl-exporter
@@ -244,6 +245,7 @@ spec:
             static_configs:
               - targets:
                   - "nas3-80.${SECRET_DOMAIN}:9633"
+                  - "tback.${SECRET_INTERNAL_DOMAIN}:9633"
 
           - job_name: zrepl-exporter
             scrape_interval: 5m

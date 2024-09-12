@@ -1,0 +1,33 @@
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+# apiVersion: monitoring.coreos.com/v1alpha1
+# kind: ScrapeConfig
+# metadata:
+#   name: nas3-kopia
+#   namespace: system-monitoring
+# spec:
+#   staticConfigs:
+#     - targets: ["192.168.80.24:51516"]
+#   metricsPath: /metrics
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+# apiVersion: monitoring.coreos.com/v1alpha1
+# kind: ScrapeConfig
+# metadata:
+#   name: nas3-minio
+#   namespace: system-monitoring
+# spec:
+#   staticConfigs:
+#     - targets: ["192.168.80.24:9000"]
+#   metricsPath: /minio/v2/metrics/cluster
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: tback-smartctl-exporter
+  namespace: system-monitoring
+spec:
+  staticConfigs:
+    - targets: ["tback.${SECRET_INTERNAL_DOMAIN}:9633"]
+  metricsPath: /metrics
