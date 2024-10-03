@@ -163,7 +163,7 @@ spec:
       enabled: true
       image:
         repository: nginx
-        tag: "1.27.1"
+        tag: "1.27.2"
       config:
         default: true
       resources:
