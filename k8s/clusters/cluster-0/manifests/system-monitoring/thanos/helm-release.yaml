@@ -25,29 +25,26 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    image:
-      registry: quay.io
-      repository: thanos/thanos
-      tag: v0.36.1
-
     objstoreConfig:
       type: s3
       config:
         bucket: thanos
         endpoint: "s3.nas.${SECRET_DOMAIN}"
         region: ""
-
+    queryFrontend:
+      enabled: false
     query:
       enabled: true
-      replicaCount: 1
+      replicaCount: 3
+      podAntiAffinityPreset: hard
       replicaLabel:
         - replica
       dnsDiscovery:
         sidecarsService: kube-prometheus-stack-thanos-discovery
         sidecarsNamespace: system-monitoring
-        stores:
-          - "dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery"
-          - "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}:443"
+        # stores:
+        #   - "dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery"
+        #   - "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}:443"
 
         # limits:
         #   memory: 99M
@@ -60,13 +57,6 @@ spec:
         extraTls:
           - hosts:
               - *host
-
-      resources:
-        requests:
-          cpu: 15m
-          memory: 64M
-    queryFrontend:
-      enabled: true
     bucketweb:
       enabled: true
     compactor:
@@ -77,12 +67,6 @@ spec:
       retentionResolutionRaw: 14d
       retentionResolution5m: 30d
       retentionResolution1h: 180d
-      resources:
-        requests:
-          cpu: 15m
-          memory: 204M
-        # limits:
-        #   memory: 270M
       ingress:
         enabled: true
         hostname: &hostc "thanos-compactor.${SECRET_DOMAIN}"
@@ -94,23 +78,15 @@ spec:
       persistence:
         enabled: true
         storageClass: "ceph-block"
-        size: 20Gi
-
+        size: 100Gi
     storegateway:
       enabled: true
-      resources:
-        requests:
-          cpu: 23m
-          memory: 204M
-        # limits:
-        #   memory: 64M
       persistence:
         enabled: true
         storageClass: "ceph-block"
-        size: 4Gi
-
+        size: 10Gi
     ruler:
-      enabled: false
+      enabled: true
       dnsDiscovery:
         enabled: true
       alertmanagers:
@@ -132,13 +108,7 @@ spec:
       persistence:
         enabled: true
         storageClass: "ceph-block"
-        size: 512Mi
-      resources:
-        requests:
-          cpu: 15m
-          memory: 94M
-        # limits:
-        #   memory: 113M
+        size: 2Gi
 
     metrics:
       enabled: true
