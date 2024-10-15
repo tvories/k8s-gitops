@@ -40,8 +40,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/readarr-nightly
-              tag: "0.4.0.2593"
+              repository: ghcr.io/joryirving/readarr-nightly
+              tag: "0.4.1.2648"
 
             env:
               TZ: "${TIMEZONE}"
