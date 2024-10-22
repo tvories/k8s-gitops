@@ -65,9 +65,9 @@ spec:
               ZIGBEE2MQTT_CONFIG_MQTT_SERVER: mqtt://emqx.home.svc.cluster.local
               ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
               ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: "false"
-              # ZIGBEE2MQTT_CONFIG_SERIAL_PORT: &serial /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
-              ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://192.168.20.70:6638
-              ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ezsp
+              ZIGBEE2MQTT_CONFIG_SERIAL_PORT: &serial /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+              # ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://192.168.20.70:6638
+              # ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ezsp
               # ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
               # ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: "false"
             envFrom:
@@ -109,10 +109,10 @@ spec:
         existingClaim: zigbee2mqtt-config
         globalMounts:
           - path: /config
-      # usb:
-      #   enabled: true
-      #   type: hostPath
-      #   hostPath: *serial
-      #   hostPathType: CharDevice
-      #   globalMounts:
-      #     - path: *serial
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: *serial
+        hostPathType: CharDevice
+        globalMounts:
+          - path: *serial
