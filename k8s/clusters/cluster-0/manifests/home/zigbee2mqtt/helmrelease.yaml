@@ -70,6 +70,7 @@ spec:
               ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ezsp
               ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
               ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: "false"
+              ZIGBEE2MQTT_CONFIG_FRONTEND: false
             envFrom:
               - secretRef:
                   name: zigbee2mqtt-secret
