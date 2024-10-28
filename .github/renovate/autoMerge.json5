@@ -18,8 +18,12 @@
         "ghcr.io/onedr0p/readarr-nightly",
         "ghcr.io/onedr0p/readarr-develop",
         "ghcr.io/onedr0p/radarr-develop",
+        "ghcr.io/onedr0p/radarr",
         "ghcr.io/onedr0p/sonarr-develop",
         "ghcr.io/onedr0p/prowlarr-develop",
+        "ghcr.io/joryirving/readarr-nightly",
+        "ghcr.io/nginxinc/nginx-unprivileged",
+        "alpine/k8s",
       ],
     },
     // {
