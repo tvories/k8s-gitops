@@ -11,11 +11,12 @@ spec:
     spec:
       chart: app-template
       version: 3.5.1
+      interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
         namespace: flux-system
-      interval: 30m
+
   values:
     configMaps:
       daemon-config:
@@ -89,7 +90,7 @@ spec:
                 cpu: "5m"
                 memory: "96Mi"
               limits:
-                memory: "96Mi"
+                memory: "512Mi"
             securityContext:
               privileged: true
 
@@ -116,7 +117,7 @@ spec:
               - -c
             args: |
               set -x
-              cp /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
+              cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
             resources:
               requests:
                 cpu: "10m"
