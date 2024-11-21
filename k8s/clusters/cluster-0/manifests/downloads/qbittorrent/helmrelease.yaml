@@ -84,6 +84,9 @@ spec:
                 add:
                   - NET_ADMIN
               # allowPrivilegeEscalation: false
+            resources:
+              limits:
+                kernel.org/tun: 1
 
           # port-forward:
           #   image:
@@ -159,11 +162,11 @@ spec:
         existingClaim: downloads-nfs-media
         globalMounts:
           - path: /media
-      tun:
-        enabled: true
-        type: hostPath
-        hostPath: /dev/net/tun
-        hostPathType: CharDevice
+      # tun:
+      #   enabled: true
+      #   type: hostPath
+      #   hostPath: /dev/net/tun
+      #   hostPathType: CharDevice
 
     # lifecyle:
     #   postStart:
