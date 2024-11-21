@@ -159,6 +159,10 @@ spec:
         existingClaim: downloads-nfs-media
         globalMounts:
           - path: /media
+      tun:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/net/tun
 
     # lifecyle:
     #   postStart:
