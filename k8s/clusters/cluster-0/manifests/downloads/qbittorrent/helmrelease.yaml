@@ -163,6 +163,7 @@ spec:
         enabled: true
         type: hostPath
         hostPath: /dev/net/tun
+        hostPathType: CharDevice
 
     # lifecyle:
     #   postStart:
