@@ -33,7 +33,7 @@ controllers:
       uninstall:
         image:
           repository: alpine
-          tag: 3.20.3
+          tag: 3.21.0
 
         command:
           - /bin/sh
