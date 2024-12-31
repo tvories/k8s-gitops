@@ -98,31 +98,23 @@ spec:
           authtype: LOGIN
           # name: ${SECRET_NEXTCLOUD_MAIL_USER}
           # password: ${SECRET_NEXTCLOUD_MAIL_PASSWORD}
-      # configs:
-      #   local.config.php: |-
-      #     <?php
-      #     $CONFIG = array (
-      #       'trusted_proxies' =>
-      #       array (
-      #         0 => '127.0.0.1',
-      #         1 => '172.16.0.0/16',
-      #       ),
-      #       'trusted_domains' =>
-      #         array (
-      #           0 => 'nc.${SECRET_DOMAIN}',
-      #       ),
-      #       'overwrite.cli.url' => 'http://nc.${SECRET_DOMAIN}',
-      #       'forwarded_for_headers' =>
-      #       array (
-      #         0 => 'HTTP_X_FORWARDED_FOR',
-      #       ),
-      #       'overwriteprotocol' => 'https',
-      #       'default_phone_region' => 'US',
-      #       'trashbin_retention_obligation' => 'auto, 30',
-      #       'auth.bruteforce.protection.enabled' => true,
-      #       'trashbin_retention_obligation' => 'auto, 30',
-      #       'loglevel' => 2,
-      #     );
+      configs:
+        local.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' =>
+            array (
+              0 => '127.0.0.1',
+              1 => '172.16.0.0/16',
+            ),
+            'forwarded_for_headers' =>
+            array (
+              0 => 'HTTP_X_FORWARDED_FOR',
+            ),
+            'default_phone_region' => 'US',
+            'trashbin_retention_obligation' => 'auto, 30',
+            'auth.bruteforce.protection.enabled' => true,
+          );
 
       phpConfigs:
         uploadLimit.ini: |
