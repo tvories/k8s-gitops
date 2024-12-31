@@ -33,14 +33,15 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: "letsencrypt-production"
         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+        # nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         nginx.ingress.kubernetes.io/proxy-body-size: "10G"
         nginx.ingress.kubernetes.io/proxy-buffering: "off"
         nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         nginx.ingress.kubernetes.io/server-snippet: |-
           server_tokens off;
           proxy_hide_header X-Powered-By;
-          rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+          rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+          rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
           rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
           rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
           location = /.well-known/carddav {
