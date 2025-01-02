@@ -50,6 +50,9 @@ spec:
           location = /.well-known/caldav {
             return 301 $scheme://$host/remote.php/dav;
           }
+          location = /.well-known/webfinger {
+            return 301 $scheme://$host/index.php/.well-known/webfinger;
+          }
           location = /robots.txt {
             allow all;
             log_not_found off;
