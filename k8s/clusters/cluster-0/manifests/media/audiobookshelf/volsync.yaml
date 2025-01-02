@@ -81,7 +81,7 @@ spec:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: audiobookshelf-metadata-restic-secret
-    cacheCapacity: 2Gi
+    cacheCapacity: 20Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block
     moverSecurityContext:
