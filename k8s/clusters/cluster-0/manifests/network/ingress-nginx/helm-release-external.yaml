@@ -20,6 +20,7 @@ spec:
 
     controller:
       allowSnippetAnnotations: true
+      annotations-risk-level: Critical
       ingressClassResource:
         name: nginx-external
         default: false
