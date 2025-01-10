@@ -9,7 +9,7 @@ spec:
   ref:
     branch: main
     # renovate: datasource=github-releases depName=reactive-tech/kubegres versioning=loose
-    tag: v1.18
+    tag: v1.19
   url: https://github.com/reactive-tech/kubegres
   ignore: |
     # exclude all
