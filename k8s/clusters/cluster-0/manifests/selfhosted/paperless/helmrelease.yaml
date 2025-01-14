@@ -181,4 +181,10 @@ spec:
         path: /ook/k8s/paperless
         globalMounts:
           - path: /library
-      # Todo: add prompts as a configmap
+      prompts:
+        enabled: true
+        existingClaim: paperless-gpt-prompts
+        advancedMounts:
+          paperless:
+            paperless-gpt:
+              - path: /app/prompts
