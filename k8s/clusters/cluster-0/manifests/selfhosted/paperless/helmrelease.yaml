@@ -91,6 +91,21 @@ spec:
           #     pullPolicy: IfNotPresent
           #   env:
           #     - { name: DISABLE_GOOGLE_CHROME, value: "1" }
+          paperless-gpt:
+            image:
+              repository: icereed/paperless-gpt
+              tag: v0.9.0@sha256:a6807e7687e7d767bda9950624ff350bb4cc33e2c612848194b09a95fb456a47
+            env:
+              PAPERLESS_BASE_URL: http://paperless-app
+              LLM_PROVIDER: ollama
+              PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
+              LLM_MODEL: solar # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
+              OLLAMA_HOST: 192.168.1.50
+              VISION_LLM_PROVIDER: ollama
+              VISION_LLM_MODEL: solar
+              LOG_LEVEL: "info"
+            envFrom: *envFrom
+
           redis:
             image:
               repository: public.ecr.aws/docker/library/redis
@@ -119,6 +134,11 @@ spec:
         ports:
           http:
             port: 6379
+      paperless-gpt:
+        controller: paperless
+        ports:
+          http:
+            port: 8080
 
     ingress:
       app:
@@ -134,6 +154,19 @@ spec:
           - secretName: tls.paperless
             hosts:
               - *host
+      paperless-gpt:
+        className: "nginx-internal"
+        hosts:
+          - host: "paperless-gpt.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: paperless-gpt
+                  port: http
+        tls:
+          - secretName: tls.paperless-gpt
+            hosts:
+              - "paperless-gpt.${SECRET_DOMAIN}"
 
     persistence:
       # library:
@@ -148,3 +181,4 @@ spec:
         path: /ook/k8s/paperless
         globalMounts:
           - path: /library
+      # Todo: add prompts as a configmap
