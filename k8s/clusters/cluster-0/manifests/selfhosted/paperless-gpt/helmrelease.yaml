@@ -38,9 +38,9 @@ spec:
             env:
               PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
               LLM_PROVIDER: ollama
-              # PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LLM_MODEL: solar # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
-              OLLAMA_HOST: 192.168.1.50
+              OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
               VISION_LLM_MODEL: solar
               LOG_LEVEL: "debug"
