@@ -12,3 +12,4 @@ resources:
   # - ./vmware-tanzu-charts.yaml
   # - ./kyverno-charts.yaml
   - ./gabe565-charts.yaml
+  - ./stevehipwell.yaml
