@@ -84,13 +84,6 @@ spec:
                 # cpu: 1311m
                 memory: 8000M # Something is eating memory
 
-          # gotenburg:
-          #   image:
-          #     repository: thecodingmachine/gotenberg
-          #     tag: 8.8.0
-          #     pullPolicy: IfNotPresent
-          #   env:
-          #     - { name: DISABLE_GOOGLE_CHROME, value: "1" }
           paperless-gpt:
             image:
               repository: icereed/paperless-gpt
@@ -103,7 +96,7 @@ spec:
               OLLAMA_HOST: 192.168.1.50
               VISION_LLM_PROVIDER: ollama
               VISION_LLM_MODEL: solar
-              LOG_LEVEL: "info"
+              LOG_LEVEL: "debug"
             envFrom: *envFrom
 
           redis:
