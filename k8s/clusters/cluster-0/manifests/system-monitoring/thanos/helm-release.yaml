@@ -61,9 +61,9 @@ spec:
       enabled: true
     compactor:
       enabled: true
-      extraFlags:
-        - "--compact.concurrency"
-        - "4"
+      # extraFlags:
+      #   - "--compact.concurrency"
+      #   - "4"
       retentionResolutionRaw: 14d
       retentionResolution5m: 30d
       retentionResolution1h: 180d
