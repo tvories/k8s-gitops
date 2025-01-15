@@ -181,10 +181,10 @@ spec:
         path: /ook/k8s/paperless
         globalMounts:
           - path: /library
-      prompts:
+      paperless-gpt-app:
         enabled: true
-        existingClaim: paperless-gpt-prompts
+        existingClaim: paperless-gpt-app
         advancedMounts:
           paperless:
             paperless-gpt:
-              - path: /app/prompts
+              - path: /app
