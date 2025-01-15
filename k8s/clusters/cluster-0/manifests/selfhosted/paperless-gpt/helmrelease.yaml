@@ -43,7 +43,7 @@ spec:
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
               VISION_LLM_MODEL: dolphin-mixtral
-              LOG_LEVEL: "debug"
+              LOG_LEVEL: "info"
             envFrom:
               - secretRef:
                   name: paperless-secret
