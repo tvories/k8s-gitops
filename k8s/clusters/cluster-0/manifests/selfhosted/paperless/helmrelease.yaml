@@ -62,7 +62,7 @@ spec:
               PAPERLESS_TASK_WORKERS: 2
               PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
-              PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN}"
+              # PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN},paperless-app." $ Defaults to "*"
               PAPERLESS_WORKER_TIMEOUT: 3600
               PAPERLESS_TIKA_ENABLED: 1
               PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://localhost:3000
@@ -111,11 +111,6 @@ spec:
         ports:
           http:
             port: 6379
-      paperless-gpt:
-        controller: paperless
-        ports:
-          http:
-            port: 8080
 
     ingress:
       app:
