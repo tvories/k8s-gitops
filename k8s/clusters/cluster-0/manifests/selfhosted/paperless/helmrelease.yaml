@@ -187,4 +187,4 @@ spec:
         advancedMounts:
           paperless:
             paperless-gpt:
-              - path: /app
+              - path: /app/prompt
