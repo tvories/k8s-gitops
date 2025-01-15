@@ -36,7 +36,7 @@ spec:
               repository: icereed/paperless-gpt
               tag: v0.9.0@sha256:a6807e7687e7d767bda9950624ff350bb4cc33e2c612848194b09a95fb456a47
             env:
-              PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_BASE_URL: http://paperless-app:8000
               LLM_PROVIDER: ollama
               # PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LLM_MODEL: llama3.3 # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
