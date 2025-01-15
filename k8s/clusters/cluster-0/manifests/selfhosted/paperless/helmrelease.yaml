@@ -75,7 +75,6 @@ spec:
               USERMAP_UID: 568
               USERMAP_GID: 65543
             envFrom: *envFrom
-
             resources:
               requests:
                 cpu: 100m
@@ -83,21 +82,6 @@ spec:
               limits:
                 # cpu: 1311m
                 memory: 8000M # Something is eating memory
-
-          paperless-gpt:
-            image:
-              repository: icereed/paperless-gpt
-              tag: v0.9.0@sha256:a6807e7687e7d767bda9950624ff350bb4cc33e2c612848194b09a95fb456a47
-            env:
-              PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
-              LLM_PROVIDER: ollama
-              # PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
-              LLM_MODEL: solar # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
-              OLLAMA_HOST: 192.168.1.50
-              VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: solar
-              LOG_LEVEL: "debug"
-            envFrom: *envFrom
 
           redis:
             image:
@@ -147,26 +131,8 @@ spec:
           - secretName: tls.paperless
             hosts:
               - *host
-      paperless-gpt:
-        className: "nginx-internal"
-        hosts:
-          - host: "paperless-gpt.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: paperless-gpt
-                  port: http
-        tls:
-          - secretName: tls.paperless-gpt
-            hosts:
-              - "paperless-gpt.${SECRET_DOMAIN}"
 
     persistence:
-      # library:
-      #   enabled: true
-      #   existingClaim: paperless-nfs
-      #   mountPath: /library
-
       library:
         enabled: true
         type: nfs
@@ -174,10 +140,3 @@ spec:
         path: /ook/k8s/paperless
         globalMounts:
           - path: /library
-      paperless-gpt-app:
-        enabled: true
-        existingClaim: paperless-gpt-app
-        advancedMounts:
-          paperless:
-            paperless-gpt:
-              - path: /app/prompt
