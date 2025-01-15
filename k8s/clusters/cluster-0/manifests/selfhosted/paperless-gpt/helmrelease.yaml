@@ -1,0 +1,76 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app paperless-gpt
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      paperless-gpt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: icereed/paperless-gpt
+              tag: v0.9.0@sha256:a6807e7687e7d767bda9950624ff350bb4cc33e2c612848194b09a95fb456a47
+            env:
+              PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
+              LLM_PROVIDER: ollama
+              # PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
+              LLM_MODEL: solar # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
+              OLLAMA_HOST: 192.168.1.50
+              VISION_LLM_PROVIDER: ollama
+              VISION_LLM_MODEL: solar
+              LOG_LEVEL: "debug"
+            envFrom:
+              - secretRef:
+                  name: paperless-secret
+    service:
+      app:
+        controller: paperless-gpt
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      app:
+        className: "nginx-internal"
+        hosts:
+          - host: &host "paperless-gpt.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - secretName: tls.paperless-gpt
+            hosts:
+              - *host
+    persistence:
+      paperless-gpt-app:
+        enabled: true
+        existingClaim: paperless-gpt-app
+        globalMounts:
+          - path: /app/prompt
