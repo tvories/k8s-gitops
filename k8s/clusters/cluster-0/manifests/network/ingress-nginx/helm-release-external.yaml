@@ -20,7 +20,6 @@ spec:
 
     controller:
       allowSnippetAnnotations: true
-      annotations-risk-level: Critical
       ingressClassResource:
         name: nginx-external
         default: false
@@ -75,6 +74,7 @@ spec:
           "duration": $request_time,"method": "$request_method", "http_referrer": "$http_referer",
           "http_user_agent": "$http_user_agent"}
         proxy-buffer-size: "16k"
+        annotations-risk-level: Critical
 
       metrics:
         enabled: true
