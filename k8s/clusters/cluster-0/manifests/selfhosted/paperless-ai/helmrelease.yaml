@@ -36,7 +36,7 @@ spec:
               repository: clusterzx/paperless-ai
               tag: 2.2.0@sha256:1abbec7762cdd4afae3a9c3d52ee7bf4bafbee90e518539b047aa0f314a13f39
             env:
-              PAPERLESS_API_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_API_URL: https://paperless.${SECRET_DOMAIN}/api
               AI_PROVIDER: ollama
               SCAN_INTERVAL: "*/30 * * * *"
               SYSTEM_PROMPT: |
