@@ -52,7 +52,7 @@ spec:
                   "language": "en/de/es/..."
                 }
               PROCESS_PREDEFINED_DOCUMENTS: true
-              TAGS: paperless-gpt
+              TAGS: ai-assisted
               ADD_AI_PROCESSED_TAG: true
               AI_PROCESSED_TAG_NAME: ai-processed
               USE_PROMPT_TAGS: true
