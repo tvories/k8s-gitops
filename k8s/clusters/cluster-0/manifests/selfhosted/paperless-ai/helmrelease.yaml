@@ -56,9 +56,9 @@ spec:
             #   ADD_AI_PROCESSED_TAG: yes
             #   AI_PROCESSED_TAG_NAME: ai-processed
             #   USE_PROMPT_TAGS: no
-            envFrom:
-              - secretRef:
-                  name: paperless-secret
+            # envFrom:
+            #   - secretRef:
+            #       name: paperless-secret
     service:
       app:
         controller: paperless-ai
