@@ -39,11 +39,11 @@ spec:
               PAPERLESS_BASE_URL: http://paperless-app.selfhosted.svc.cluster.local:8000
               LLM_PROVIDER: ollama
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
-              LLM_MODEL: mistral # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
+              LLM_MODEL: phi4 # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: mistral
-              LOG_LEVEL: "info"
+              VISION_LLM_MODEL: phi4
+              LOG_LEVEL: "debug"
             envFrom:
               - secretRef:
                   name: paperless-secret
