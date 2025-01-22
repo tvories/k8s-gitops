@@ -26,9 +26,9 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    defaultPodOptions:
-      nodeSelector:
-        feature.node.kubernetes.io/usb-ff_1a86_7523.present: "true"
+    # defaultPodOptions:
+    #   nodeSelector:
+    #     feature.node.kubernetes.io/usb-ff_1a86_7523.present: "true"
     controllers:
       zigbee2mqtt:
         annotations:
