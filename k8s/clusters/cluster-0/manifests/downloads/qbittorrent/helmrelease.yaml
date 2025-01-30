@@ -38,7 +38,7 @@ spec:
               UMASK: "022"
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &port-bt 52286
+              QBITTORRENT__BT_PORT: &port-bt 59752
             probes:
               liveness:
                 enabled: false
