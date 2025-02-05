@@ -18,6 +18,7 @@ cniConfig:
   #   - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
 
 additionalApiServerCertSans: &san
+  - &talosControlplaneVip 192.168.80.200
   - ${cluster_endpoint_ip}
   - ${cluster_name}.${domain_name}
   - "127.0.0.1" # KubePrism
@@ -121,6 +122,8 @@ nodes:
     networkInterfaces:
       - interface: enp1s0
         dhcp: false
+        vip:
+          ip: *talosControlplaneVip
         mtu: 9000
         vlans:
           - *vlan80
@@ -153,6 +156,8 @@ nodes:
         # mtu: 9000
       - interface: enp1s0
         dhcp: true
+        vip:
+          ip: *talosControlplaneVip
         mtu: 9000
     installDisk: /dev/sda
     schematic:
@@ -172,6 +177,8 @@ nodes:
         # mtu: 9000
       - interface: enp1s0
         dhcp: true
+        vip:
+          ip: *talosControlplaneVip
         mtu: 9000
     installDisk: /dev/sda
     schematic:
