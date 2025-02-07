@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: icereed/paperless-gpt
-              tag: v0.10.3@sha256:f0d54cc3d148775bcabf23de7f820a225e35b57a0290440b94a6d53d879d45a9
+              tag: v0.11.0@sha256:2f5bc26bcdea88f8426a614637a8954d57bee64f2251d116b697e560be012573
             env:
               PAPERLESS_BASE_URL: http://paperless-app.selfhosted.svc.cluster.local:8000
               LLM_PROVIDER: ollama
