@@ -2,8 +2,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.9.3
-kubernetesVersion: v1.30.7
+talosVersion: v1.8.4
+kubernetesVersion: v1.30.5
 endpoint: https://${cluster_name}.${domain_name}:6443
 # domain: cluster.local
 # allowSchedulingOnMasters: true
@@ -19,7 +19,7 @@ cniConfig:
 
 additionalApiServerCertSans: &san
   - &talosControlplaneVip 192.168.80.200
-  - ${cluster_endpoint_ip}
+  # - ${cluster_endpoint_ip}
   - ${cluster_name}.${domain_name}
   - "127.0.0.1" # KubePrism
 
@@ -81,12 +81,12 @@ nodes:
             dhcp: true
             dhcpOptions:
               routeMetric: 2048
-          - &vlan50
-            vlanId: 50
-            mtu: 1500
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 4096
+          # - &vlan50
+          #   vlanId: 50
+          #   mtu: 1500
+          #   dhcp: true
+          #   dhcpOptions:
+          #     routeMetric: 4096
     # patches:
     #   - |-
     #     machine:
@@ -127,7 +127,7 @@ nodes:
         mtu: 9000
         vlans:
           - *vlan80
-          - *vlan50
+          # - *vlan50
     installDisk: /dev/sda
     schematic:
       customization:
@@ -291,8 +291,6 @@ controlPlane:
         etcd:
           advertisedSubnets:
             - 192.168.80.0/24
-          extraArgs:
-            listen-metrics-urls: http://{{.NodeIP}}:2381
 
     # Enable Anonymous Auth for HAProxy health check
     - |-
@@ -386,7 +384,3 @@ worker:
               rsize=131072
               wsize=131072
               nconnect=8
-    # Disable default API server admission plugins.
-    - |-
-      - op: remove
-        path: /cluster/apiServer/admissionControl
