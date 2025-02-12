@@ -13,3 +13,4 @@ resources:
   # - ./kyverno-charts.yaml
   - ./gabe565-charts.yaml
   - ./stevehipwell.yaml
+  - ./intel.yaml
