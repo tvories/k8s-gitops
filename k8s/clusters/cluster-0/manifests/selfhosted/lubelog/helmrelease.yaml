@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app lubelog
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      lubelog:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.6@sha256:a37bbb04a0ea3f15b505c6f97637e7ae89bc66541ae23b8d3848024087980e76
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: lubelog-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/hargata/lubelogger
+              tag: v1.4.4
+            env:
+              TZ: "${TIMEZONE}"
+            envFrom:
+              - secretRef:
+                  name: lubelog-secret
+            resources:
+              requests:
+                cpu: 15m
+                memory: 80M
+              limits:
+                memory: 256M
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 8080
+    ingress:
+      app:
+        className: "nginx-internal"
+        hosts:
+          - host: &host "lubelog.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - secretName: tls.lubelog
+            hosts:
+              - *host
+    persistence:
+      app:
+        existingClaim: lubelog-data
+        globalMounts:
+          - path: /App/config
+            subPath: config
+          - path: /App/data
+            subPath: data
+          - path: /App/wwwroot/translations
+            subPath: translations
+          - path: /App/wwwroot/documents
+            subPath: documents
+          - path: /App/wwwroot/images
+            subPath: images
+          - path: /App/log
+            subPath: log
+          - path: /root/.aspnet/DataProtection-Keys
+            subPath: keys
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /App/wwwroot/temp
