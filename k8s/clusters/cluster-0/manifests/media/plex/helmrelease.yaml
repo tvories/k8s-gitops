@@ -74,10 +74,12 @@ spec:
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
+                gpu.intel.com/i915: "1"
                 cpu: 25m
                 memory: 4282M
               limits:
                 memory: 16Gi
+                gpu.intel.com/i915: "1"
     service:
       app:
         controller: plex
