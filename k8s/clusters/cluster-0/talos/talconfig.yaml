@@ -132,8 +132,12 @@ nodes:
     schematic:
       customization:
         systemExtensions:
-          officialExtensions:
+          officialExtensions: &m720q
             - siderolabs/gasket-driver
+            - siderolabs/i915-ucode
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/mei
     # patches:
     #   - |-
     #     machine:
@@ -163,8 +167,7 @@ nodes:
     schematic:
       customization:
         systemExtensions:
-          officialExtensions:
-            - siderolabs/gasket-driver
+          officialExtensions: *m720q
 
   - hostname: m720q-3.${domain_name}
     controlPlane: true
@@ -184,8 +187,7 @@ nodes:
     schematic:
       customization:
         systemExtensions:
-          officialExtensions:
-            - siderolabs/gasket-driver
+          officialExtensions: *m720q
 
   # - hostname: talos-worker-1.${domain_name}
   #   ipAddress: 192.168.80.94
@@ -204,10 +206,10 @@ controlPlane:
     customization:
       extraKernelArgs:
         - net.ifnames=0
-      systemExtensions:
-        officialExtensions:
-          - siderolabs/intel-ucode
-          - siderolabs/gasket-driver
+      # systemExtensions:
+      #   officialExtensions:
+      #     - siderolabs/intel-ucode
+      #     - siderolabs/gasket-driver
   patches:
     # Disable search domain everywhere
     - |-
