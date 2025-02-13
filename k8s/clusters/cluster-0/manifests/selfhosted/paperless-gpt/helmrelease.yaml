@@ -43,7 +43,7 @@ spec:
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
               VISION_LLM_MODEL: deepseek-r1
-              # LOG_LEVEL: "debug"
+              LOG_LEVEL: "debug"
             envFrom:
               - secretRef:
                   name: paperless-secret
