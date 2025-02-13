@@ -42,7 +42,7 @@ spec:
               LLM_MODEL: deepseek-r1 # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: deepseek-r1
+              VISION_LLM_MODEL: deepseek-r1:8b
               LOG_LEVEL: "debug"
             envFrom:
               - secretRef:
