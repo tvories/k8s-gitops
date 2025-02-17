@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://bjw-s.github.io/helm-charts
       chart: obico
-      version: 0.5.0
+      version: 0.6.0
       sourceRef:
         kind: HelmRepository
         name: gabe565-charts
