@@ -59,7 +59,7 @@ spec:
       enabled: false
 
     kubeEtcd:
-      enabled: true
+      enabled: false
       endpoints:
         - 192.168.80.99
         - 192.168.80.100
