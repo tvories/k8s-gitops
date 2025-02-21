@@ -69,13 +69,14 @@ spec:
         enabled: true
         existingSecret: immich-secret
         existingSecretPasswordKey: REDIS_PASSWORD
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128M
-        limits:
-          cpu: 200m
-          memory: 198M
+      master:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128M
+          limits:
+            cpu: 200m
+            memory: 198M
 
     # typesense:
     #   enabled: true
