@@ -270,7 +270,7 @@ spec:
             scheme: http
             static_configs:
               - targets:
-                  - home-assistant.home.svc:8123
+                  - home-assistant-app.home.svc.cluster.local:8123
           - job_name: "opnsense"
             scrape_interval: 30s
             # metrics_path: "/metrics"
