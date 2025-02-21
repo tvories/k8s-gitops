@@ -261,7 +261,7 @@ spec:
             honor_timestamps: true
             static_configs:
               - targets:
-                  - "nas3-80.${SECRET_DOMAIN}:9134"
+                  - "nas3-80.${SECRET_DOMAIN}:9901"
 
           - job_name: "home-assistant"
             scrape_interval: 60s
