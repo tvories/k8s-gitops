@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.6.1
+      version: 3.7.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/readarr-nightly
-              tag: "0.4.11.2737"
+              tag: "0.4.11.2738"
 
             env:
               TZ: "${TIMEZONE}"

@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 68.4.5
+      version: 69.4.1
       sourceRef:
         kind: HelmRepository
         name: prometheus-community-charts
@@ -59,7 +59,7 @@ spec:
       enabled: false
 
     kubeEtcd:
-      enabled: true
+      enabled: false
       endpoints:
         - 192.168.80.99
         - 192.168.80.100
@@ -261,7 +261,7 @@ spec:
             honor_timestamps: true
             static_configs:
               - targets:
-                  - "nas3-80.${SECRET_DOMAIN}:9134"
+                  - "nas3-80.${SECRET_DOMAIN}:9901"
 
           - job_name: "home-assistant"
             scrape_interval: 60s
@@ -270,7 +270,7 @@ spec:
             scheme: http
             static_configs:
               - targets:
-                  - home-assistant.home.svc:8123
+                  - home-assistant-app.home.svc.cluster.local:8123
           - job_name: "opnsense"
             scrape_interval: 30s
             # metrics_path: "/metrics"

@@ -5,7 +5,7 @@ kind: Kustomization
 helmCharts:
   - name: app-template
     repo: https://bjw-s.github.io/helm-charts/
-    version: 3.6.1
+    version: 3.7.1
     releaseName: multus
     includeCRDs: false
     namespace: network

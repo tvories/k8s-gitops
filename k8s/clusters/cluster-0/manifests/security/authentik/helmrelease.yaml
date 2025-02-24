@@ -12,7 +12,7 @@ spec:
     spec:
       # renovate: registryUrl=https://charts.goauthentik.io
       chart: authentik
-      version: 2024.12.3
+      version: 2025.2.0
       sourceRef:
         kind: HelmRepository
         name: authentik-charts
@@ -50,7 +50,7 @@ spec:
       replicas: 1
       initContainers:
         - name: init-db
-          image: ghcr.io/onedr0p/postgres-init:16.6
+          image: ghcr.io/onedr0p/postgres-init:16.8
           envFrom:
             - secretRef:
                 name: *secret

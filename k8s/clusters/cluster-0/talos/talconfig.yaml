@@ -2,8 +2,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.8.4
-kubernetesVersion: v1.30.5
+talosVersion: v1.9.4
+kubernetesVersion: v1.31.6
 endpoint: https://${cluster_name}.${domain_name}:6443
 # domain: cluster.local
 # allowSchedulingOnMasters: true
@@ -134,7 +134,7 @@ nodes:
         systemExtensions:
           officialExtensions: &m720q
             - siderolabs/gasket-driver
-            - siderolabs/i915-ucode
+            - siderolabs/i915
             - siderolabs/intel-ucode
             - siderolabs/iscsi-tools
             - siderolabs/mei

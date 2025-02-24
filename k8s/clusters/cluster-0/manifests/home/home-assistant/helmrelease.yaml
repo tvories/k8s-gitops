@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.6.1
+      version: 3.7.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -72,7 +72,7 @@ spec:
           codeserver:
             image:
               repository: ghcr.io/coder/code-server
-              tag: 4.96.4@sha256:f93810f7f6636b3af3b1a750faf612349cddb89fbb6d28d69123a214fc75ee9e
+              tag: 4.97.2@sha256:6ff0e9cf5a553b3961ece200be75e21e8c887ed0ae28a7c28213722dccf74b0c
             env:
               # password: ${SECRET_CODESERVER_PASSWORD}
               TZ: "${TIMEZONE}"

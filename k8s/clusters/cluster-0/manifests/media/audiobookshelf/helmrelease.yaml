@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.6.1
+      version: 3.7.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -45,7 +45,7 @@ spec:
           app:
             image:
               repository: ghcr.io/advplyr/audiobookshelf
-              tag: 2.19.2@sha256:b7f7da1d46d3350798fdee0c1bcef298dfbdb2ed19b28a975630e51ddf54f6d3
+              tag: 2.19.5@sha256:4d383bfd61135492ab3c52fe98550b9640e7d0791ed2a5e81c98e4087f5086d0
             env:
               TZ: "${TIMEZONE}"
               CONFIG_PATH: /config

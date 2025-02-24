@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.6.1
+      version: 3.7.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -53,7 +53,7 @@ spec:
           uninstall:
             image:
               repository: alpine
-              tag: 3.21.2
+              tag: 3.21.3
 
             command:
               - /bin/sh

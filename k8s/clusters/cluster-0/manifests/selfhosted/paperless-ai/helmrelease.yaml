@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.6.1
+      version: 3.7.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s-charts
@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: clusterzx/paperless-ai
-              tag: 2.6.1@sha256:7867da0824d274d1719331f9221dfe35754f8e725bc10a7a9c706d0e9437f9b5
+              tag: 2.6.7@sha256:4e5245808299ff9d837e45b692b4e2edca0ba2e393d92a3cb96bb2e17995dd5f
             # env:
             #   PAPERLESS_API_URL: https://paperless.${SECRET_DOMAIN}/api
             #   AI_PROVIDER: ollama
