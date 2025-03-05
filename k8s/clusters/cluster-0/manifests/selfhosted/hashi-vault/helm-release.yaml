@@ -21,11 +21,11 @@ spec:
     injector:
       agentImage:
         repository: "hashicorp/vault"
-        tag: "1.18.5"
+        tag: "1.19.0"
     server:
       image:
         repository: "hashicorp/vault"
-        tag: "1.18.5"
+        tag: "1.19.0"
       dataStorage:
         enabled: true
         storageClass: "ceph-block"
