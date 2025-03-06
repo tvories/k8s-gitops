@@ -78,9 +78,12 @@ spec:
         enabled: true
         className: "nginx-external"
         annotations:
+          nginx.ingress.kubernetes.io/proxy-buffer-size: 32k
+          nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+          nginx.ingress.kubernetes.io/proxy-busy-buffers-size: 64k
           nginx.ingress.kubernetes.io/configuration-snippet: |
             proxy_set_header Accept-Encoding "";
-            sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/calibreweb/plex.css"></head>';
+            # sub_filter '</head>' '<link rel="stylesheet" type="text/css" href="https://theme-park.${SECRET_DOMAIN}/css/base/calibreweb/plex.css"></head>';
             sub_filter_once on;
 
         hosts:
