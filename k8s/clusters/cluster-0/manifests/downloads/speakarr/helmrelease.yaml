@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/readarr-nightly
-              tag: "0.4.12.2753"
+              tag: "0.4.13.2754"
 
             env:
               TZ: "${TIMEZONE}"
