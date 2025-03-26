@@ -76,6 +76,7 @@ spec:
               FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
               TZ: "${TIMEZONE}"
               WIREGUARD_PRESHARED_KEY: ""
+              DOT: "off"
             envFrom:
               - secretRef:
                   name: qbittorrent-config
