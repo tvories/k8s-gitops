@@ -67,7 +67,7 @@ spec:
             env:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
-              # VPN_INTERFACE: wg0
+              VPN_INTERFACE: wg0
               # WIREGUARD_ENDPOINT_PORT: 51820
               VPN_PORT_FORWARDING: on
               VPN_PORT_FORWARDING_PROVIDER: protonvpn
@@ -75,8 +75,8 @@ spec:
               FIREWALL_VPN_INPUT_PORTS: *port-bt
               FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
               TZ: "${TIMEZONE}"
-              WIREGUARD_PRESHARED_KEY: ""
-              # DOT: "off"
+              # WIREGUARD_PRESHARED_KEY: ""
+              DOT: "off"
             envFrom:
               - secretRef:
                   name: qbittorrent-config
