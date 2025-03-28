@@ -6,7 +6,7 @@ namespace: kube-system
 resources:
   - ./helmrelease.yaml
 configMapGenerator:
-  - name: generic-device-plugin-configmap
+  - name: generic-device-plugin
     files:
       - ./config/config.yaml
 generatorOptions:
