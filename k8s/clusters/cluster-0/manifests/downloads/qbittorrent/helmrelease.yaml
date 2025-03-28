@@ -87,7 +87,7 @@ spec:
               # allowPrivilegeEscalation: false
             resources:
               limits:
-                kernel.org/tun: 1
+                squat.ai/tun: "1"
 
           # port-forward:
           #   image:
