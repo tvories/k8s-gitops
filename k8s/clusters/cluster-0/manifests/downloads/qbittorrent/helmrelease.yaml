@@ -20,6 +20,8 @@ spec:
   values:
     controllers:
       qbittorrent:
+        annotations:
+          secret.reloader.stakater.com/reload: qbittorrent-config
         pod:
           securityContext:
             # runAsUser: 568
@@ -29,6 +31,46 @@ spec:
             supplementalGroups:
               - 65539 # media-rw
               - 10000
+        initContainers:
+          coredns:
+            image:
+              repository: mirror.gcr.io/coredns/coredns
+              tag: 1.12.0
+            args:
+              - -conf
+              - /etc/coredns/Corefile
+            restartPolicy: Always
+
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.40.0
+            env:
+              VPN_SERVICE_PROVIDER: custom
+              VPN_TYPE: wireguard
+              # VPN_INTERFACE: wg0
+              # WIREGUARD_ENDPOINT_PORT: 51820
+              VPN_PORT_FORWARDING: on
+              VPN_PORT_FORWARDING_PROVIDER: protonvpn
+              FIREWALL_INPUT_PORTS: *port
+              FIREWALL_VPN_INPUT_PORTS: *port-bt
+              FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
+              TZ: "${TIMEZONE}"
+              # WIREGUARD_PRESHARED_KEY: ""
+              DOT: "off"
+              DNS_ADDRESS: "127.0.0.2"
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-config
+            restartPolicy: Always
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
+            resources:
+              limits:
+                squat.ai/tun: "1"
         containers:
           app:
             image:
@@ -60,34 +102,7 @@ spec:
               runAsGroup: 568
               # runAsNonRoot: true
 
-          gluetun:
-            image:
-              repository: ghcr.io/qdm12/gluetun
-              tag: v3.40.0
-            env:
-              VPN_SERVICE_PROVIDER: custom
-              VPN_TYPE: wireguard
-              # VPN_INTERFACE: wg0
-              # WIREGUARD_ENDPOINT_PORT: 51820
-              VPN_PORT_FORWARDING: on
-              VPN_PORT_FORWARDING_PROVIDER: protonvpn
-              FIREWALL_INPUT_PORTS: *port
-              FIREWALL_VPN_INPUT_PORTS: *port-bt
-              FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
-              TZ: "${TIMEZONE}"
-              # WIREGUARD_PRESHARED_KEY: ""
-              DOT: "off"
-            envFrom:
-              - secretRef:
-                  name: qbittorrent-config
-            securityContext:
-              capabilities:
-                add:
-                  - NET_ADMIN
-              # allowPrivilegeEscalation: false
-            resources:
-              limits:
-                squat.ai/tun: "1"
+          
 
           # port-forward:
           #   image:

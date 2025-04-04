@@ -8,10 +8,9 @@ resources:
   - ./externalsecret.yaml
   - ./volsync.yaml
 configMapGenerator:
-  - name: qbittorrent-config
+  - name: qbittorrent-coredns
     files:
-      - config/categories.json
-      - config/qBittorrent.conf
-      # - config/watched_folders.json
+      - ./config/Corefile
 generatorOptions:
-  disableNameSuffixHash: true
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
