@@ -52,8 +52,8 @@ spec:
               # WIREGUARD_ENDPOINT_PORT: 51820
               VPN_PORT_FORWARDING: on
               VPN_PORT_FORWARDING_PROVIDER: protonvpn
-              FIREWALL_INPUT_PORTS: *port
-              FIREWALL_VPN_INPUT_PORTS: *port-bt
+              FIREWALL_INPUT_PORTS: &port 8080
+              FIREWALL_VPN_INPUT_PORTS: &port-bt 58844
               FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
               TZ: "${TIMEZONE}"
               # WIREGUARD_PRESHARED_KEY: ""
@@ -79,8 +79,8 @@ spec:
             env:
               UMASK: "022"
               TZ: "${TIMEZONE}"
-              QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &port-bt 58844
+              QBITTORRENT__PORT: *port
+              QBITTORRENT__BT_PORT: *port-bt
             probes:
               liveness:
                 enabled: false
@@ -101,8 +101,6 @@ spec:
               runAsUser: 568
               runAsGroup: 568
               # runAsNonRoot: true
-
-          
 
           # port-forward:
           #   image:
