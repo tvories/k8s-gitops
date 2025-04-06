@@ -58,7 +58,7 @@ spec:
               TZ: "${TIMEZONE}"
               WIREGUARD_PRESHARED_KEY: ""
               DOT: "off"
-              DNS_ADDRESS: "127.0.0.2"
+              # DNS_ADDRESS: "127.0.0.2"
             envFrom:
               - secretRef:
                   name: qbittorrent-config
