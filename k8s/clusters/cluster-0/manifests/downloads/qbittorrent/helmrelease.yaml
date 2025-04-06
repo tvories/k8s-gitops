@@ -176,6 +176,15 @@ spec:
         existingClaim: downloads-nfs-media
         globalMounts:
           - path: /media
+      coredns:
+        type: configMap
+        name: qbittorrent-coredns
+        advancedMounts:
+          qbittorrent:
+            coredns:
+              - path: /etc/coredns/Corefile
+                subPath: Corefile
+                readOnly: true
       # tun:
       #   enabled: true
       #   type: hostPath
