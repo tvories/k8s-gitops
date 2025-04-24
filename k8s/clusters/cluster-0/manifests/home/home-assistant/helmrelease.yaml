@@ -204,10 +204,17 @@ spec:
                 service:
                   identifier: app
                   port: http
+          - host: "ha-local.${SECRET_DOMAIN}" # used for dumb iot devices that won't use local dns
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - secretName: tls.homeassistant
             hosts:
               - *host
+              - ha.local.${SECRET_DOMAIN}
 
       codeserver:
         className: nginx-internal
