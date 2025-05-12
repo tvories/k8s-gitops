@@ -74,7 +74,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/qbittorrent-beta
+              repository: ghcr.io/home-operations/qbittorrent
               tag: 5.1.0@sha256:fe26058628e9eb57b542204b76443b7304ed8820151d51b5c285e1828ca175a0
             env:
               UMASK: "022"
