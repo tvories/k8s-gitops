@@ -32,7 +32,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/jalim/postgres-init
-              tag: 16
+              tag: 17.4.0
               pullPolicy: IfNotPresent
             envFrom: &envFrom
               - secretRef:
