@@ -61,9 +61,9 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    initdb:
-      postInitSQL:
-        - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+    # initdb:
+    #   postInitSQL:
+    #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
     recovery:
       source: &previous-cluster postgres
 
