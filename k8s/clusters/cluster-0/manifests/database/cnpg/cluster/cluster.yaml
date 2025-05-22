@@ -18,7 +18,7 @@ spec:
 
   postgresql:
     shared_preload_libraries:
-      - vectors.so
+      - "vectors.so"
       - vchord.so
     parameters:
       max_connections: "300"
