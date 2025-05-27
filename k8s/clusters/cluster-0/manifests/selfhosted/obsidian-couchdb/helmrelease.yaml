@@ -33,7 +33,7 @@ spec:
           init-config:
             image:
               repository: public.ecr.aws/docker/library/busybox
-              tag: latest@sha256:ce4f0c0a6e67a3a1469e7a8e1fe781f64ba7c652823fdf2d5eac677dd4d095d6
+              tag: latest@sha256:f64ff79725d0070955b368a4ef8dc729bd8f3d8667823904adcb299fe58fc3da
               pullPolicy: IfNotPresent
             command:
               - "/bin/sh"
