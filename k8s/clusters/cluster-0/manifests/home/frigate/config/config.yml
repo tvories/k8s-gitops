@@ -31,7 +31,7 @@ record:
     mode: all
   detections:
     retain:
-      default: 20
+      days: 20
       mode: active_objects
 
 objects:
