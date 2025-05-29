@@ -29,7 +29,7 @@ record:
   retain:
     days: 10
     mode: all
-  events:
+  detections:
     retain:
       default: 20
       mode: active_objects
