@@ -36,7 +36,7 @@ spec:
             fsGroupChangePolicy: OnRootMismatch
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
-        strategy: RollingUpdate
+        # strategy: RollingUpdate
         containers:
           app:
             image:
