@@ -252,9 +252,11 @@ spec:
 
       networking:
         opnsense:
-          # https://grafana.com/grafana/dashboards/21113-opnsense/
+          # renovate: depName="OPNsense"
           gnetId: 21113
-          datasource: Prometheus
+          revision: 1
+          datasource:
+            - { name: DS_PROMETHEUS-K0, value: Prometheus }
         # opnsense:
         #   gnetId: 13386
         #   revision: 1
