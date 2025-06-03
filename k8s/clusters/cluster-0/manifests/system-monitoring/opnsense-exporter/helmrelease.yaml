@@ -40,6 +40,9 @@ spec:
               TZ: "${TIMEZONE}"
               OPNSENSE_EXPORTER_OPS_PROTOCOL: https
               OPNSENSE_EXPORTER_INSTANCE_LABEL: firewall
+              OPNSENSE_EXPORTER_DISABLE_UNBOUND: "true"
+              OPNSENSE_EXPORTER_DISABLE_OPENVPN: "true"
+
             envFrom:
               - secretRef:
                   name: opnsense-exporter-secret
