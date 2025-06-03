@@ -185,6 +185,7 @@ spec:
         enabled: true
 
       prometheusSpec:
+        serviceMonitorSelector: {}
         replicas: 1
         replicaExternalLabelName: "replica"
         ruleSelectorNilUsesHelmValues: false
