@@ -21,16 +21,10 @@ metadata:
   name: kube-prometheus-stack
   namespace: system-monitoring
 spec:
-  interval: 6h
-  timeout: 20m
-  chart:
-    spec:
-      chart: kube-prometheus-stack
-      version: 72.9.1
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community-charts
-        namespace: flux-system
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
   install:
     remediation:
       retries: 1
