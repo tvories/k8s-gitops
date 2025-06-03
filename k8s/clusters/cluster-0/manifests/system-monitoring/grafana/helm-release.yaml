@@ -251,6 +251,10 @@ spec:
           datasource: Prometheus
 
       networking:
+        opnsense:
+          # https://grafana.com/grafana/dashboards/21113-opnsense/
+          gnetId: 21113
+          datasource: Prometheus
         # opnsense:
         #   gnetId: 13386
         #   revision: 1

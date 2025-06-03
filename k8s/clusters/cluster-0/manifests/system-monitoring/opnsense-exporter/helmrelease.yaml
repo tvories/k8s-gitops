@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: opnsense-exporter
+  namespace: system-monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      opnsense-exporter:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/athennamind/opnsense-exporter
+              tag: 0.0.7@sha256:4b1981b836781b2dbb115fe1167ab4ddc4c7bece28f2b1c6c4c9f105be45fbf4
+            args:
+              - --web.listen-address=:8080
+            env:
+              TZ: "${TIMEZONE}"
+              OPNSENSE_EXPORTER_OPS_PROTOCOL: https
+              OPNSENSE_EXPORTER_INSTANCE_LABEL: firewall
+            envFrom:
+              - secretRef:
+                  name: opnsense-exporter-secret
+            probes:
+              liveness: &probes
+                enabled: true
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+        pod:
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+            fsGroup: 65534
+            fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: opnsense-exporter
+        ports:
+          http:
+            port: 8080
+    serviceMonitor:
+      app:
+        serviceName: opnsense-exporter
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
+            metricRelabelings:
+              - action: replace
+                targetLabel: opnsense_instance
+                replacement: opnsense
