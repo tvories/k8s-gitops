@@ -4,7 +4,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: kube-prometheus-stack
-  namespace: flux-system
+  namespace: system-monitoring
 spec:
   interval: 5m
   layerSelector:
