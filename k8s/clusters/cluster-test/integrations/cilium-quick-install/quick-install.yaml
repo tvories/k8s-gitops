@@ -550,7 +550,7 @@ spec:
     spec:
       containers:
         - name: cilium-agent
-          image: "quay.io/cilium/cilium:v1.15.17@sha256:8824313a6f17d934b4e63902fee71e6ca36be6f69d68ae174df28f1b0705e587"
+          image: "quay.io/cilium/cilium:v1.15.18@sha256:106bb45c89e1e0abca82c798b16ccc1f5b1c6cfa1205d811b69989fd1507fc5b"
           imagePullPolicy: IfNotPresent
           command:
             - cilium-agent
@@ -663,7 +663,7 @@ spec:
         # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
         # We use nsenter command with host's cgroup and mount namespaces enabled.
         - name: mount-cgroup
-          image: "quay.io/cilium/cilium:v1.15.17@sha256:8824313a6f17d934b4e63902fee71e6ca36be6f69d68ae174df28f1b0705e587"
+          image: "quay.io/cilium/cilium:v1.15.18@sha256:106bb45c89e1e0abca82c798b16ccc1f5b1c6cfa1205d811b69989fd1507fc5b"
           imagePullPolicy: IfNotPresent
           env:
             - name: CGROUP_ROOT
@@ -690,7 +690,7 @@ spec:
           securityContext:
             privileged: true
         - name: apply-sysctl-overwrites
-          image: "quay.io/cilium/cilium:v1.15.17@sha256:8824313a6f17d934b4e63902fee71e6ca36be6f69d68ae174df28f1b0705e587"
+          image: "quay.io/cilium/cilium:v1.15.18@sha256:106bb45c89e1e0abca82c798b16ccc1f5b1c6cfa1205d811b69989fd1507fc5b"
           imagePullPolicy: IfNotPresent
           env:
             - name: BIN_PATH
@@ -715,7 +715,7 @@ spec:
           securityContext:
             privileged: true
         - name: clean-cilium-state
-          image: "quay.io/cilium/cilium:v1.15.17@sha256:8824313a6f17d934b4e63902fee71e6ca36be6f69d68ae174df28f1b0705e587"
+          image: "quay.io/cilium/cilium:v1.15.18@sha256:106bb45c89e1e0abca82c798b16ccc1f5b1c6cfa1205d811b69989fd1507fc5b"
           imagePullPolicy: IfNotPresent
           command:
             - /init-container.sh
@@ -858,7 +858,7 @@ spec:
     spec:
       containers:
         - name: cilium-operator
-          image: quay.io/cilium/operator-generic:v1.15.17@sha256:a0f5b5dc8cecd4e5ead7d3bddb3756e4b34beba8e7aa089e7e2fb761725defe1
+          image: quay.io/cilium/operator-generic:v1.15.18@sha256:ebc7a075ac4c3d95e98f11512853feb700e48f87b5beeff466128bdafb5e0cb9
           imagePullPolicy: IfNotPresent
           command:
             - cilium-operator-generic
