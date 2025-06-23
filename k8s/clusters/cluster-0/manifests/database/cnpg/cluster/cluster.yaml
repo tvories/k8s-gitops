@@ -7,7 +7,7 @@ metadata:
   namespace: database
 spec:
   instances: 3
-  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:15.13-0.4.1@sha256:3e731aa0d48f37317d2d0abbac7186d5134b8f9705d8b3c7ba8570bf9641007c
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16-0.4.1@sha256:ed5ff8a789eaa88d1bde2e879a75dd02c104bc4f7a18c341848dde673db90d13
   enableSuperuserAccess: true
 
   storage:
