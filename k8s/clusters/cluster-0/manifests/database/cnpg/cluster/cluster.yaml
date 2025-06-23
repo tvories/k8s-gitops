@@ -7,7 +7,7 @@ metadata:
   namespace: database
 spec:
   instances: 3
-  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:15.13-0.4.1@sha256:28cbe026f421662094a7c96d7a5ded19bf58cf2c0910dd7307524a804f3cf3f3
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16-0.4.1@sha256:ed5ff8a789eaa88d1bde2e879a75dd02c104bc4f7a18c341848dde673db90d13
   enableSuperuserAccess: true
 
   storage:
@@ -61,9 +61,9 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    # initdb:
-    #   postInitSQL:
-    #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+    initdb:
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
     recovery:
       source: &previous-cluster postgres
 
