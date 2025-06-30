@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/postgresql.cnpg.io/cluster_v1.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/postgresql.cnpg.io/cluster_v1.json
 # Example of PostgreSQL cluster
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
