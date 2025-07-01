@@ -51,7 +51,7 @@ spec:
         maxParallel: 12
       destinationPath: s3://cnpg/
       endpointURL: https://s3.nas.t-vo.us:443
-      serverName: &currentCluster postgres2
+      serverName: &currentCluster postgres3
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -65,7 +65,7 @@ spec:
     #   postInitSQL:
     #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
     recovery:
-      source: &previous-cluster postgres
+      source: &previous-cluster postgres2
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
