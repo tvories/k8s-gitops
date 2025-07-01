@@ -60,12 +60,12 @@ spec:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
 
-  # bootstrap:
-  #   initdb:
-  #     postInitSQL:
-  #       - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
-  #   recovery:
-  #     source: &previous-cluster postgres
+  bootstrap:
+    # initdb:
+    #   postInitSQL:
+    #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+    recovery:
+      source: &previous-cluster postgres
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
