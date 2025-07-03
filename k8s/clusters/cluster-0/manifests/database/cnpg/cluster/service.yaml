@@ -15,7 +15,7 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgres3
+    cnpg.io/cluster: postgres4
     role: primary
 ---
 apiVersion: v1
@@ -30,5 +30,5 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgres3 #! This needs to change whenever the cluster name changes
+    cnpg.io/cluster: postgres4 #! This needs to change whenever the cluster name changes
     role: primary
