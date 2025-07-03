@@ -65,7 +65,7 @@ spec:
     #   postInitSQL:
     #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
     recovery:
-      source: &previous-cluster postgres3
+      source: &previous-cluster postgres2
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
