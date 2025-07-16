@@ -3,11 +3,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: postgres4
+  name: postgres5
   namespace: database
 spec:
   instances: 3
-  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16-0.4.3@sha256:bdb8d8829bd68c9204628cde5c495db9db0d2b45e958ddd17de1703338a3b98b
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:15-0.4.3@sha256:136256c5dc4ae313360c8e4f54121afb9aa6d52493a85bdb733d0b6b5290b4b1
   enableSuperuserAccess: true
 
   storage:
@@ -51,7 +51,7 @@ spec:
         maxParallel: 12
       destinationPath: s3://cnpg/
       endpointURL: https://s3.nas.t-vo.us:443
-      serverName: &currentCluster postgres4
+      serverName: &currentCluster postgres5
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -65,7 +65,7 @@ spec:
     #   postInitSQL:
     #     - CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
     recovery:
-      source: &previous-cluster postgres2
+      source: &previous-cluster postgres4
 
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # Disabled until first cluster goes up
