@@ -858,7 +858,7 @@ spec:
     spec:
       containers:
         - name: cilium-operator
-          image: quay.io/cilium/operator-generic:v1.15.18@sha256:ebc7a075ac4c3d95e98f11512853feb700e48f87b5beeff466128bdafb5e0cb9
+          image: quay.io/cilium/operator-generic:v1.15.19@sha256:391c192af8f11a5733bcdc88cc09e2f3768d2c3aa663bf136208e72e07fa80bc
           imagePullPolicy: IfNotPresent
           command:
             - cilium-operator-generic
