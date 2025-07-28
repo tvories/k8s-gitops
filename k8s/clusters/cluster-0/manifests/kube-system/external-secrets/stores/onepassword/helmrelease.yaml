@@ -40,7 +40,7 @@ spec:
             image:
               # https://github.com/1Password/connect/issues/56
               repository: docker.io/1password/connect-api
-              tag: 1.7.3
+              tag: 1.7.4
             env:
               OP_BUS_PORT: "11220"
               OP_BUS_PEERS: "localhost:11221"
@@ -80,7 +80,7 @@ spec:
           sync:
             image:
               repository: docker.io/1password/connect-sync
-              tag: 1.7.3
+              tag: 1.7.4
             env:
               - { name: OP_HTTP_PORT, value: &sport 8081 }
               - { name: OP_BUS_PORT, value: "11221" }
