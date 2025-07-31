@@ -155,16 +155,16 @@ spec:
               - path: /opt/recipes/cookbook/static/django_js_reverse
             migrations:
               - path: /opt/recipes/cookbook/static/django_js_reverse
-      static:
-        type: emptyDir
-        advancedMounts:
-          tandoor:
-            app:
-              - path: /opt/recipes/staticfiles
-            nginx:
-              - path: /static
-            migrations:
-              - path: /opt/recipes/staticfiles
+      # static:
+      #   type: emptyDir
+      #   advancedMounts:
+      #     tandoor:
+      #       app:
+      #         - path: /opt/recipes/staticfiles
+      #       nginx:
+      #         - path: /static
+      #       migrations:
+      #         - path: /opt/recipes/staticfiles
       cache:
         type: emptyDir
         advancedMounts:
