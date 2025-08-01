@@ -9,9 +9,9 @@ resources:
   # - ./pg-secret.sops.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
-configMapGenerator:
-  - name: tandoor-configmap
-    files:
-      - ./config/nginx-config
-generatorOptions:
-  disableNameSuffixHash: true
+# configMapGenerator:
+#   - name: tandoor-configmap
+#     files:
+#       - ./config/nginx-config
+# generatorOptions:
+#   disableNameSuffixHash: true
