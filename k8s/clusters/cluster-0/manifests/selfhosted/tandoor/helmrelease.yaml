@@ -29,7 +29,7 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
+        # runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
@@ -77,10 +77,10 @@ spec:
               SHOPPING_MIN_AUTOSYNC_INTERVAL: "5"
               GUNICORN_MEDIA: "0"
             envFrom: *envFrom
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+            # securityContext:
+            #   allowPrivilegeEscalation: false
+            #   readOnlyRootFilesystem: true
+            #   capabilities: { drop: ["ALL"] }
 
             # command:
             #   - /opt/recipes/venv/bin/gunicorn
