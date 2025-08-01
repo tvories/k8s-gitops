@@ -28,8 +28,8 @@ spec:
     keepHistory: false
   values:
     defaultPodOptions:
-      enableServiceLinks: false
       securityContext:
+        runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
