@@ -32,6 +32,8 @@ spec:
       securityContext:
         runAsUser: 568
         runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
     controllers:
       tandoor:
         annotations:
@@ -44,26 +46,26 @@ spec:
             envFrom: &envFrom
               - secretRef:
                   name: tandoor-secret
-          migrations:
-            image:
-              repository: ghcr.io/tandoorrecipes/recipes
-              tag: 2.0.1@sha256:b95f7b3e3df000cd39a152be0ddff7139c6d7c5f59cd306f325da44c50a81d05
-            envFrom: *envFrom
-            command:
-              - sh
-              - -c
-              - |
-                set -e
-                source /opt/recipes/venv/bin/activate
-                echo "Updating database"
-                python3 /opt/recipes/manage.py migrate
-                python3 /opt/recipes/manage.py collectstatic_js_reverse
-                python3 /opt/recipes/manage.py collectstatic --noinput
+          # migrations:
+          #   image:
+          #     repository: ghcr.io/tandoorrecipes/recipes
+          #     tag: 2.0.1@sha256:b95f7b3e3df000cd39a152be0ddff7139c6d7c5f59cd306f325da44c50a81d05
+          #   envFrom: *envFrom
+          #   command:
+          #     - sh
+          #     - -c
+          #     - |
+          #       set -e
+          #       source /opt/recipes/venv/bin/activate
+          #       echo "Updating database"
+          #       python3 /opt/recipes/manage.py migrate
+          #       python3 /opt/recipes/manage.py collectstatic_js_reverse
+          #       python3 /opt/recipes/manage.py collectstatic --noinput
         containers:
           app:
             image:
-              repository: vabene1111/recipes
-              tag: 2.0.0
+              repository: ghcr.io/tandoorrecipes/recipes
+              tag: 2.0.1@sha256:b95f7b3e3df000cd39a152be0ddff7139c6d7c5f59cd306f325da44c50a81d05
             env:
               TIMEZONE: "${TIMEZONE}"
               DEBUG: "0"
@@ -76,27 +78,27 @@ spec:
               GUNICORN_MEDIA: "0"
             envFrom: *envFrom
 
-            command:
-              - /opt/recipes/venv/bin/gunicorn
-              - -b
-              - :8888
-              - --access-logfile
-              - "-"
-              - --error-logfile
-              - "-"
-              - --log-level
-              - INFO
-              - recipes.wsgi:application
+            # command:
+            #   - /opt/recipes/venv/bin/gunicorn
+            #   - -b
+            #   - :8888
+            #   - --access-logfile
+            #   - "-"
+            #   - --error-logfile
+            #   - "-"
+            #   - --log-level
+            #   - INFO
+            #   - recipes.wsgi:application
             resources:
               requests:
                 cpu: 100m
                 memory: 256Mi
               limits:
                 memory: 512Mi
-          nginx:
-            image:
-              repository: ghcr.io/nginxinc/nginx-unprivileged
-              tag: 1.27-alpine-perl@sha256:c4afe6a4696f9025ac68a83e5cab03814a71979ed3169878f6363434a04dfa62
+          # nginx:
+          #   image:
+          #     repository: ghcr.io/nginxinc/nginx-unprivileged
+          #     tag: 1.27-alpine-perl@sha256:c4afe6a4696f9025ac68a83e5cab03814a71979ed3169878f6363434a04dfa62
 
     service:
       app:
@@ -104,8 +106,8 @@ spec:
         ports:
           http:
             port: *port
-          nginx:
-            port: &port2 8080
+          # nginx:
+          #   port: &port2 8080
 
     ingress:
       app:
@@ -117,14 +119,14 @@ spec:
                 service:
                   identifier: app
                   port: http
-              - path: /media
-                service:
-                  identifier: app
-                  port: *port2
-              - path: /static
-                service:
-                  identifier: app
-                  port: *port2
+              # - path: /media
+              #   service:
+              #     identifier: app
+              #     port: *port2
+              # - path: /static
+              #   service:
+              #     identifier: app
+              #     port: *port2
         tls:
           - hosts:
               - *host
@@ -137,37 +139,53 @@ spec:
           tandoor:
             app:
               - path: /opt/recipes/mediafiles
-            nginx:
-              - path: /media
-      nginx-config:
-        type: configMap
-        name: tandoor-configmap
-        advancedMounts:
-          tandoor:
-            nginx:
-              - path: /etc/nginx/nginx.conf
-                subPath: nginx-config
-      django-js-reverse:
+                subPath: mediafiles
+              - path: /opt/recipes/staticfiles
+                subPath: staticfiles
+      tmpfs:
         type: emptyDir
         advancedMounts:
           tandoor:
             app:
               - path: /opt/recipes/cookbook/static/django_js_reverse
-            migrations:
-              - path: /opt/recipes/cookbook/static/django_js_reverse
-      static:
-        type: emptyDir
-        advancedMounts:
-          tandoor:
-            app:
-              - path: /opt/recipes/staticfiles
-            nginx:
-              - path: /static
-            migrations:
-              - path: /opt/recipes/staticfiles
-      cache:
-        type: emptyDir
-        advancedMounts:
-          tandoor:
-            nginx:
-              - path: /var/cache/nginx
+                subPath: django_js_reverse
+              - path: /var/lib/nginx/logs
+                subPath: nginx_logs
+              - path: /var/lib/nginx/tmp
+                subPath: nginx_tmp
+              - path: /tmp
+                subPath: tmp
+            # nginx:
+            #   - path: /media
+      # nginx-config:
+      #   type: configMap
+      #   name: tandoor-configmap
+      #   advancedMounts:
+      #     tandoor:
+      #       nginx:
+      #         - path: /etc/nginx/nginx.conf
+      #           subPath: nginx-config
+      # django-js-reverse:
+      #   type: emptyDir
+      #   advancedMounts:
+      #     tandoor:
+      #       app:
+      #         - path: /opt/recipes/cookbook/static/django_js_reverse
+      #       migrations:
+      #         - path: /opt/recipes/cookbook/static/django_js_reverse
+      # static:
+      #   type: emptyDir
+      #   advancedMounts:
+      #     tandoor:
+      #       app:
+      #         - path: /opt/recipes/staticfiles
+      #       nginx:
+      #         - path: /static
+      #       migrations:
+      #         - path: /opt/recipes/staticfiles
+      # cache:
+      #   type: emptyDir
+      #   advancedMounts:
+      #     tandoor:
+      #       nginx:
+      #         - path: /var/cache/nginx
