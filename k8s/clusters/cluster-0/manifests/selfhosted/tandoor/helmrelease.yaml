@@ -77,6 +77,10 @@ spec:
               SHOPPING_MIN_AUTOSYNC_INTERVAL: "5"
               GUNICORN_MEDIA: "0"
             envFrom: *envFrom
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
 
             # command:
             #   - /opt/recipes/venv/bin/gunicorn
@@ -91,10 +95,10 @@ spec:
             #   - recipes.wsgi:application
             resources:
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 256Mi
               limits:
-                memory: 512Mi
+                memory: 1024Mi
           # nginx:
           #   image:
           #     repository: ghcr.io/nginxinc/nginx-unprivileged
