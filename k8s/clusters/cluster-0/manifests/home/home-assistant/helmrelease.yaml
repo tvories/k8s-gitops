@@ -112,7 +112,7 @@ spec:
           matterserver:
             image:
               repository: ghcr.io/home-assistant-libs/python-matter-server
-              tag: 8.0.0
+              tag: 8.1.0
             workingDir: "/matter_data"
             env:
               TZ: "${TIMEZONE}"
