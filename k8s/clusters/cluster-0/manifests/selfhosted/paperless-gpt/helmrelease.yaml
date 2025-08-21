@@ -37,12 +37,14 @@ spec:
               tag: v0.22.0@sha256:58840e45ebe67b5b717f80783414b4e9c4f57188e73051c0c83db805377e231f
             env:
               PAPERLESS_BASE_URL: http://paperless-app.selfhosted.svc.cluster.local:8000
-              LLM_PROVIDER: ollama
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
+              LLM_PROVIDER: ollama
               LLM_MODEL: llama3.2:3b # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
               VISION_LLM_MODEL: llama3.2:3b
+              # AUTO_GENERATE_TAGS: "false"
+              AUTO_GENERATE_CORRESPONDENTS: "false"
               LOG_LEVEL: "debug"
             envFrom:
               - secretRef:
