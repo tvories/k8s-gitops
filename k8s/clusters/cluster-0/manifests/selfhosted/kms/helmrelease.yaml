@@ -78,7 +78,7 @@ spec:
       app:
         className: "nginx-internal"
         hosts:
-          - host: kms-ui.${SECRET_DOMAIN}"
+          - host: "kms-ui.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
