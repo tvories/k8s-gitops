@@ -43,10 +43,10 @@ spec:
               tag: 1.0.3@sha256:f3d9365e634fb3f505b6b759c380ce09a6790e615e42a1587c37686fdf7ca1f7
             env:
               TZ: ${TIMEZONE}
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+            # securityContext:
+            #   allowPrivilegeEscalation: false
+            #   readOnlyRootFilesystem: true
+            #   capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
