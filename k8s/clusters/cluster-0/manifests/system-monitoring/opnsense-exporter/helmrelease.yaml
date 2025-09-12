@@ -33,7 +33,7 @@ spec:
           app:
             image:
               repository: ghcr.io/athennamind/opnsense-exporter
-              tag: 0.0.10@sha256:a8a90260e30ce3bd8d06caf2d534d143c96a51cfc2d004c09b7a4911a4b84db2
+              tag: 0.0.11@sha256:7c5977edd1304af762bb3908dbe0cab259ccd7cb73f1fc98a43a28185d7efea3
             args:
               - --web.listen-address=:8080
             env:
