@@ -159,7 +159,7 @@ spec:
       enabled: true
       image:
         repository: nginx
-        tag: "1.29.1"
+        tag: "1.29.2"
       config:
         default: true
       resources:
