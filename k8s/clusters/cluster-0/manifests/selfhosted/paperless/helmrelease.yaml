@@ -85,9 +85,8 @@ spec:
 
           redis:
             image:
-              repository: public.ecr.aws/docker/library/redis
-              tag: 8.2.1
-              pullPolicy: IfNotPresent
+              repository: ghcr.io/valkey-io/valkey
+              tag: 9.0.0
             resources:
               requests:
                 cpu: 5m
