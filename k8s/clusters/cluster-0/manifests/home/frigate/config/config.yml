@@ -99,6 +99,7 @@ cameras:
           #   roles:
           #     - detect
     detect:
+      enabled: True
       width: 720
       height: 576
       fps: 15
@@ -159,6 +160,7 @@ cameras:
         #   # - record
         #   # - clips
     detect:
+      enabled: True
       width: 640
       height: 480
       fps: 10
@@ -210,6 +212,7 @@ cameras:
         #   # - record
         #   # - clips
     detect:
+      enabled: True
       width: 640
       height: 480
       fps: 10
