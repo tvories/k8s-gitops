@@ -75,7 +75,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/qbittorrent
-              tag: 5.1.2@sha256:285daaa6403d89f77b4c94fdbd0fba571b7cc505c6c576b1e89e60c7aa2dfb47
+              tag: 5.1.3@sha256:2feb2c8d188db4de330ca4840c167282e10e3252f4c6d1bce7943c7f46099836
             env:
               UMASK: "022"
               TZ: "${TIMEZONE}"
