@@ -11,7 +11,7 @@ spec:
     spec:
       # renovate: registryUrl=https://nextcloud.github.io/helm/
       chart: nextcloud
-      version: 8.0.0
+      version: 8.5.2
       sourceRef:
         kind: HelmRepository
         name: nextcloud-charts
@@ -189,7 +189,7 @@ spec:
 
     redis:
       enabled: true
-      architecture: standalone
+      # architecture: standalone
       auth:
         enabled: true
         existingSecret: *secret
@@ -226,8 +226,8 @@ spec:
 
     cronjob:
       enabled: true
-      # failedJobsHistoryLimit: 1
-      # successfulJobsHistoryLimit: 1
+      failedJobsHistoryLimit: 1
+      successfulJobsHistoryLimit: 1
 
     persistence:
       enabled: true
