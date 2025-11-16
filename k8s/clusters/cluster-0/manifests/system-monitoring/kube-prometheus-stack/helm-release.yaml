@@ -88,9 +88,9 @@ spec:
           runAsGroup: 64535
           fsGroup: 64535
         thanos:
-          image: quay.io/thanos/thanos:v0.39.2
+          image: quay.io/thanos/thanos:v0.40.1
           # renovate: datasource=docker depName=quay.io/thanos/thanos
-          version: v0.39.2
+          version: v0.40.1
           objectStorageConfig:
             name: thanos-objstore-secret
             key: objstore.yml
