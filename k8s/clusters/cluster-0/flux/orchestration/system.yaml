@@ -37,7 +37,7 @@ spec:
 #   url: https://github.com/kyverno/kyverno.git
 #   ref:
 #     # renovate: registryUrl=https://kyverno.github.io/kyverno chart=kyverno
-#     tag: kyverno-chart-3.6.0
+#     tag: kyverno-chart-3.6.1
 #   ignore: |
 #     # exclude all
 #     /*
