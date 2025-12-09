@@ -49,6 +49,12 @@ spec:
             envFrom:
               - secretRef:
                   name: paperless-secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
     service:
       app:
         controller: paperless-gpt
