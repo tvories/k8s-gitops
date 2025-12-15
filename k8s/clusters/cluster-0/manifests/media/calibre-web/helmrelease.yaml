@@ -41,7 +41,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/bjw-s/calibre-web
+              repository: ghcr.io/bjw-s-labs/calibre-web
               tag: 0.6.25
 
             env:
