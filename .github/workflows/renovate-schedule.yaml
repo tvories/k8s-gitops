@@ -10,11 +10,15 @@ on: # yamllint disable-line rule:truthy
   schedule:
     - cron: "0 */12 * * *"
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   renovate-helm-releases:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v6.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1

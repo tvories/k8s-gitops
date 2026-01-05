@@ -1,7 +1,8 @@
 ---
-name: PR - MEGALinter
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Lint
 
-on: # yamllint disable-line rule:truthy
+on:
   workflow_dispatch:
   pull_request:
     branches:
@@ -10,27 +11,32 @@ on: # yamllint disable-line rule:truthy
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Generate Token
-        uses: tibdex/github-app-token@v2
-        id: generate-token
+        uses: actions/create-github-app-token@v2
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        id: app-token
         with:
-          app_id: ${{ secrets.TVORIES_APP_ID }}
-          private_key: ${{ secrets.TVORIES_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.TVORIES_APP_ID }}
+          private-key: ${{ secrets.TVORIES_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: megalinter/megalinter/flavors/terraform@v9
+        uses: oxsecurity/megalinter/flavors/terraform@v7.11.1
         env:
-          GITHUB_TOKEN: "${{ steps.generate-token.outputs.token }}"
+          GITHUB_TOKEN: "${{ steps.app-token.outputs.token || github.token }}"
           PRINT_ALPACA: false
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'workflow_dispatch' }}
           ENABLE_LINTERS: |-
@@ -40,12 +46,12 @@ jobs:
                   [
                     "ACTION_ACTIONLINT",
                     "ANSIBLE_ANSIBLE_LINT",
-                    "CREDENTIALS_SECRETLINT",
-                    "GIT_GIT_DIFF",
-                    "KUBERNETES_KUBEVAL",
+                    "COPYPASTE_JSCPD",
                     "MARKDOWN_MARKDOWNLINT",
-                    "PYTHON_PYLINT",
                     "PYTHON_FLAKE8",
+                    "PYTHON_PYLINT",
+                    "REPOSITORY_GIT_DIFF",
+                    "REPOSITORY_SECRETLINT",
                     "TERRAFORM_TERRAFORM_FMT",
                     "YAML_PRETTIER",
                     "YAML_YAMLLINT"
@@ -54,19 +60,8 @@ jobs:
                 ','
               )
             }}
-          KUBERNETES_DIRECTORY: k8s
-          KUBERNETES_KUBEVAL_ARGUMENTS: --ignore-missing-schemas
-          KUBERNETES_KUBEVAL_FILTER_REGEX_INCLUDE: "(k8s/clusters|k8s/global)"
           MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .github/linters/.markdownlint.yaml
           PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
           YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yaml
-          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: "(.*\\.sops\\.ya?ml)"
-
-      - name: Archive artifacts
-        if: ${{ success() }} || ${{ failure() }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: MegaLinter reports
-          path: |
-            report
-            mega-linter.log
+          YAML_PRETTIER_CONFIG_FILE: .github/linters/.prettierrc.yaml
+          YAML_PRETTIER_ARGUMENTS: --ignore-path .github/linters/.prettierignore

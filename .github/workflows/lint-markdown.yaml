@@ -6,12 +6,15 @@ on: # yamllint disable-line rule:truthy
     paths:
       - "**.md"
 
+permissions:
+  contents: read
+
 jobs:
   markdownlint:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@v6
       - name: Get changes
         uses: dorny/paths-filter@v3
         id: filter
@@ -22,7 +25,7 @@ jobs:
               - added|modified: "**.md"
       - name: Lint files
         if: ${{ steps.filter.outputs.markdown == 'true' }}
-        uses: reviewdog/action-shellcheck@v1
+        uses: DavidAnson/markdownlint-cli2-action@v22
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          markdownlint_flags: "-c '.github/lint/.markdownlint.yaml' ${{ steps.filter.outputs.markdown_files }}"
+          config: .github/linters/.markdownlint.yaml
+          globs: ${{ steps.filter.outputs.markdown_files }}

@@ -8,13 +8,16 @@ on:
       - unlabeled
       - reopened
 
+permissions:
+  issues: write
+
 jobs:
   support:
     runs-on: ubuntu-24.04
     steps:
       - uses: dessant/support-requests@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
           support-label: "support"
           issue-comment: >
             :wave: @{issue-author}, we use the issue tracker exclusively
