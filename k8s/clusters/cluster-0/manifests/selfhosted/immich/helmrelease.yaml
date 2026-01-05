@@ -28,28 +28,6 @@ spec:
         library:
           existingClaim: immich-nfs
 
-    # Database configuration - set at top level for all components
-    env:
-      DB_DATABASE_NAME: immich
-      DB_HOSTNAME: postgres.database.svc.cluster.local
-      DB_PORT: "5432"
-      DB_USERNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-secret
-            key: DB_USERNAME
-      DB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-secret
-            key: DB_PASSWORD
-      REDIS_HOSTNAME: immich-valkey
-      REDIS_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-secret
-            key: REDIS_PASSWORD
-
     image:
       # renovate: datasource=github-releases depName=immich-app/immich
       tag: "v2.4.1"
@@ -62,6 +40,26 @@ spec:
         requests:
           cpu: 1500m
           memory: 2048M
+      env:
+        DB_DATABASE_NAME: immich
+        DB_HOSTNAME: postgres.database.svc.cluster.local
+        DB_PORT: "5432"
+        DB_USERNAME:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_USERNAME
+        DB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_PASSWORD
+        REDIS_HOSTNAME: immich-valkey
+        REDIS_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: REDIS_PASSWORD
       ingress:
         main:
           enabled: true
@@ -90,6 +88,26 @@ spec:
         requests:
           cpu: 100m
           memory: 2048M
+      env:
+        DB_DATABASE_NAME: immich
+        DB_HOSTNAME: postgres.database.svc.cluster.local
+        DB_PORT: "5432"
+        DB_USERNAME:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_USERNAME
+        DB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_PASSWORD
+        REDIS_HOSTNAME: immich-valkey
+        REDIS_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: REDIS_PASSWORD
       # Relaxed probes for library migration (mount path changed to /data)
       probes:
         liveness:
