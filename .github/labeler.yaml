@@ -1,11 +1,16 @@
 ---
 area/ci:
-  - ".github/**/*"
+  - changed-files:
+      - any-glob-to-any-file: ".github/**/*"
 area/cluster:
-  - "k8s/global/**/*"
-  - "k8s/clusters/**/*"
-  - "k8s/manifests/**/*"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "k8s/global/**/*"
+          - "k8s/clusters/**/*"
+          - "k8s/manifests/**/*"
 area/docs:
-  - "docs/**/*"
+  - changed-files:
+      - any-glob-to-any-file: "docs/**/*"
 area/os:
-  - "k8s/talos/**/*"
+  - changed-files:
+      - any-glob-to-any-file: "k8s/talos/**/*"
