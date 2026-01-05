@@ -8,87 +8,21 @@ spec:
   chart:
     spec:
       chart: immich
-      version: 0.9.3
+      version: 0.10.3
       sourceRef:
         kind: HelmRepository
         name: immich-charts
         namespace: flux-system
       interval: 15m
   values:
-    env:
-      DB_DATABASE_NAME: immich
-      DB_HOSTNAME: postgres.database.svc.cluster.local
-      DB_USERNAME:
-        valueFrom:
-          secretKeyRef:
-            name: immich-secret
-            key: DB_USERNAME
-      DB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-secret
-            key: DB_PASSWORD
-      DB_PORT: "5432"
-      DISABLE_REVERSE_GEOCODING: "false"
-      REVERSE_GEOCODING_PRECISION: "2"
-      # ENABLE_MAPBOX: "false"
-      LOG_LEVEL: verbose
-      # NODE_ENV: "production"
-      # REDIS_HOSTNAME: immich-redis.selfhosted.svc.cluster.local
-      # REDIS_PORT: "6379"
-      # REDIS_DBINDEX: "0"
-      # TYPESENSE_HOST: immich-typesense.selfhosted.svc.cluster.local
-      # TYPESENSE_DATA_DIR: /config
-      # IMMICH_WEB_URL: http://immich-web.selfhosted.svc.cluster.local:3000
-      # IMMICH_SERVER_URL: http://immich-server.selfhosted.svc.cluster.local:3001
-      # IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning.selfhosted.svc.cluster.local:3003
-      OAUTH_ENABLED: "false"
-      # OAUTH_ISSUER_URL: "https://auth.${SECRET_DOMAIN}/.well-known/openid-configuration"
-      # OAUTH_CLIENT_ID: immich
-      # OAUTH_CLIENT_SECRET: "${SECRET_IMMICH_OAUTH_CLIENT_SECRET}"
-      # OAUTH_AUTO_REGISTER: "true"
-      # OAUTH_BUTTON_TEXT: "Login with Authelia"
-    envFrom:
-      - secretRef:
-          name: immich-secret
-
-    postgres:
-      enabled: false
-      global:
-        postgresql:
-          auth:
-            username: immich
-            database: immich
-            existingSecret: immich-secret
-            secretKeys:
-              userPasswordKey: DB_PASSWORD
-
-    redis:
+    # Valkey (Redis replacement) - new in v0.10.0
+    valkey:
       enabled: true
       auth:
-        enabled: true
         existingSecret: immich-secret
         existingSecretPasswordKey: REDIS_PASSWORD
-      master:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128M
-          limits:
-            cpu: 200m
-            memory: 198M
 
-    # typesense:
-    #   enabled: true
-    #   persistence:
-    #     tsdata:
-    #       enabled: true
-    #       storageClass: ceph-block
-    #   resources:
-    #     requests:
-    #       cpu: 15m
-    #       memory: 145M
-
+    # Persistence for photo library (mount path changed to /data in v0.10.0)
     immich:
       persistence:
         library:
@@ -98,11 +32,39 @@ spec:
       # renovate: datasource=github-releases depName=immich-app/immich
       tag: "v2.4.1"
 
+    # Server configuration - common library 4.x structure
     server:
+      controller:
+        replicas: 1
       resources:
         requests:
           cpu: 1500m
           memory: 2048M
+      env:
+        - name: DB_DATABASE_NAME
+          value: immich
+        - name: DB_HOSTNAME
+          value: postgres.database.svc.cluster.local
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_PASSWORD
+        - name: DISABLE_REVERSE_GEOCODING
+          value: "false"
+        - name: REVERSE_GEOCODING_PRECISION
+          value: "2"
+        - name: LOG_LEVEL
+          value: verbose
+        - name: OAUTH_ENABLED
+          value: "false"
       envFrom:
         - secretRef:
             name: immich-secret
@@ -111,7 +73,7 @@ spec:
       ingress:
         main:
           enabled: true
-          ingressClassName: nginx-internal
+          className: nginx-internal
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-production
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
@@ -120,32 +82,74 @@ spec:
               paths:
                 - path: /
                   pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
           tls:
             - hosts:
                 - *host
               secretName: *host
 
+    # Machine Learning configuration - common library 4.x structure
     machine-learning:
+      controller:
+        replicas: 1
       resources:
         requests:
           cpu: 100m
           memory: 2048M
+      env:
+        - name: DB_DATABASE_NAME
+          value: immich
+        - name: DB_HOSTNAME
+          value: postgres.database.svc.cluster.local
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_PASSWORD
+      envFrom:
+        - secretRef:
+            name: immich-secret
+      # Relaxed probes for library migration (mount path changed to /data)
       probes:
         liveness:
-          enabled: false
+          enabled: true
+          custom: true
           spec:
-            initialDelaySeconds: 90
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
         readiness:
-          enabled: false
+          enabled: true
+          custom: true
           spec:
-            initialDelaySeconds: 90
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
         startup:
-          enabled: false
+          enabled: true
+          custom: true
           spec:
-            initialDelaySeconds: 90
-            # persistence:
-            #   cache:
-            #     size: 10Gi
-            #     type: pvc
-            #     accessMode: ReadWriteOnce
-            #     storageClass: ceph-block
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 30
