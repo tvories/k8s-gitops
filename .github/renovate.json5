@@ -23,7 +23,7 @@
   // repositories: ["tvories/k8s-gitops"],
   // onboarding: false,
   // requireConfig: "optional",
-  gitAuthor: "tvories-tbot <tvories-tbot@users.noreply.github.com>",
+  gitAuthor: "tvories-tbot[bot] <107635591+tvories-tbot[bot]@users.noreply.github.com>",
   timezone: "America/Denver",
   dependencyDashboardTitle: "Renovate Dashboard",
   suppressNotifications: ["prIgnoreNotification"],
