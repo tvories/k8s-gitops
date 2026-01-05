@@ -15,51 +15,45 @@ spec:
         namespace: flux-system
       interval: 15m
   values:
-    # Valkey (Redis replacement) - new in v0.10.0
+    # Valkey (Redis replacement)
     valkey:
       enabled: true
-      auth:
-        existingSecret: immich-secret
-        existingSecretPasswordKey: REDIS_PASSWORD
 
-    # Persistence for photo library (mount path changed to /data in v0.10.0)
+    # Persistence for photo library
     immich:
       persistence:
         library:
           existingClaim: immich-nfs
 
-    image:
-      # renovate: datasource=github-releases depName=immich-app/immich
-      tag: "v2.4.1"
-
-    # Server configuration - common library 4.x structure
+    # Server configuration
     server:
-      controller:
-        replicas: 1
-      resources:
-        requests:
-          cpu: 1500m
-          memory: 2048M
-      env:
-        DB_DATABASE_NAME: immich
-        DB_HOSTNAME: postgres.database.svc.cluster.local
-        DB_PORT: "5432"
-        DB_USERNAME:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_USERNAME
-        DB_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_PASSWORD
-        REDIS_HOSTNAME: immich-valkey
-        REDIS_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: REDIS_PASSWORD
+      enabled: true
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                # renovate: datasource=github-releases depName=immich-app/immich
+                tag: "v2.4.1"
+              resources:
+                requests:
+                  cpu: 1500m
+                  memory: 2048M
+              env:
+                # Database connection
+                DB_DATABASE_NAME: immich
+                DB_HOSTNAME: postgres.database.svc.cluster.local
+                DB_PORT: "5432"
+                DB_USERNAME:
+                  valueFrom:
+                    secretKeyRef:
+                      name: immich-secret
+                      key: DB_USERNAME
+                DB_PASSWORD:
+                  valueFrom:
+                    secretKeyRef:
+                      name: immich-secret
+                      key: DB_PASSWORD
       ingress:
         main:
           enabled: true
@@ -80,66 +74,14 @@ spec:
                 - *host
               secretName: *host
 
-    # Machine Learning configuration - common library 4.x structure
+    # Machine Learning configuration
     machine-learning:
-      controller:
-        replicas: 1
-      resources:
-        requests:
-          cpu: 100m
-          memory: 2048M
-      env:
-        DB_DATABASE_NAME: immich
-        DB_HOSTNAME: postgres.database.svc.cluster.local
-        DB_PORT: "5432"
-        DB_USERNAME:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_USERNAME
-        DB_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_PASSWORD
-        REDIS_HOSTNAME: immich-valkey
-        REDIS_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: REDIS_PASSWORD
-      # Relaxed probes for library migration (mount path changed to /data)
-      probes:
-        liveness:
-          enabled: true
-          custom: true
-          spec:
-            httpGet:
-              path: /ping
-              port: http
-            initialDelaySeconds: 0
-            periodSeconds: 10
-            timeoutSeconds: 1
-            failureThreshold: 3
-        readiness:
-          enabled: true
-          custom: true
-          spec:
-            httpGet:
-              path: /ping
-              port: http
-            initialDelaySeconds: 0
-            periodSeconds: 10
-            timeoutSeconds: 1
-            failureThreshold: 3
-        startup:
-          enabled: true
-          custom: true
-          spec:
-            httpGet:
-              path: /ping
-              port: http
-            initialDelaySeconds: 0
-            periodSeconds: 10
-            timeoutSeconds: 1
-            failureThreshold: 30
+      enabled: true
+      controllers:
+        main:
+          containers:
+            main:
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 2048M
