@@ -28,6 +28,28 @@ spec:
         library:
           existingClaim: immich-nfs
 
+    # Database configuration - set at top level for all components
+    env:
+      DB_DATABASE_NAME: immich
+      DB_HOSTNAME: postgres.database.svc.cluster.local
+      DB_PORT: "5432"
+      DB_USERNAME:
+        valueFrom:
+          secretKeyRef:
+            name: immich-secret
+            key: DB_USERNAME
+      DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: immich-secret
+            key: DB_PASSWORD
+      REDIS_HOSTNAME: immich-valkey
+      REDIS_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: immich-secret
+            key: REDIS_PASSWORD
+
     image:
       # renovate: datasource=github-releases depName=immich-app/immich
       tag: "v2.4.1"
@@ -40,36 +62,6 @@ spec:
         requests:
           cpu: 1500m
           memory: 2048M
-      env:
-        - name: DB_DATABASE_NAME
-          value: immich
-        - name: DB_HOSTNAME
-          value: postgres.database.svc.cluster.local
-        - name: DB_PORT
-          value: "5432"
-        - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_USERNAME
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_PASSWORD
-        - name: DISABLE_REVERSE_GEOCODING
-          value: "false"
-        - name: REVERSE_GEOCODING_PRECISION
-          value: "2"
-        - name: LOG_LEVEL
-          value: verbose
-        - name: OAUTH_ENABLED
-          value: "false"
-      envFrom:
-        - secretRef:
-            name: immich-secret
-        - configMapRef:
-            name: immich
       ingress:
         main:
           enabled: true
@@ -98,26 +90,6 @@ spec:
         requests:
           cpu: 100m
           memory: 2048M
-      env:
-        - name: DB_DATABASE_NAME
-          value: immich
-        - name: DB_HOSTNAME
-          value: postgres.database.svc.cluster.local
-        - name: DB_PORT
-          value: "5432"
-        - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_USERNAME
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: immich-secret
-              key: DB_PASSWORD
-      envFrom:
-        - secretRef:
-            name: immich-secret
       # Relaxed probes for library migration (mount path changed to /data)
       probes:
         liveness:
