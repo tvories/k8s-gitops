@@ -34,7 +34,7 @@ jobs:
           private-key: ${{ secrets.TVORIES_APP_PRIVATE_KEY }}
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/terraform@v7.11.1
+        uses: oxsecurity/megalinter/flavors/terraform@v7.13.0
         env:
           GITHUB_TOKEN: "${{ steps.app-token.outputs.token || github.token }}"
           PRINT_ALPACA: false
