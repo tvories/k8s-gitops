@@ -40,6 +40,10 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Exclude manage-flux from test
+        run: |
+          mv k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
+
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
         with:
@@ -68,12 +72,20 @@ jobs:
           path: pull
           persist-credentials: false
 
+      - name: Exclude manage-flux from pull branch
+        run: |
+          mv pull/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml pull/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
+
       - name: Checkout Default Branch
         uses: actions/checkout@v6
         with:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
           persist-credentials: false
+
+      - name: Exclude manage-flux from default branch
+        run: |
+          mv default/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml default/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
 
       - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
