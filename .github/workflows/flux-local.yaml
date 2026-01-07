@@ -47,7 +47,7 @@ jobs:
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
         with:
-          args: test --enable-helm --all-namespaces --path /github/workspace/k8s/clusters/cluster-0/flux -v
+          args: test --enable-helm --all-namespaces --path /github/workspace/k8s/clusters/cluster-0/flux --sources k8s-gitops -v
 
   diff:
     if: ${{ needs.filter-changes.outputs.changed-files != '[]' }}
@@ -72,20 +72,12 @@ jobs:
           path: pull
           persist-credentials: false
 
-      - name: Exclude manage-flux from pull branch
-        run: |
-          mv pull/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml pull/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
-
       - name: Checkout Default Branch
         uses: actions/checkout@v6
         with:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
           persist-credentials: false
-
-      - name: Exclude manage-flux from default branch
-        run: |
-          mv default/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml default/k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
 
       - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
@@ -98,6 +90,7 @@ jobs:
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
+            --sources k8s-gitops
             --output-file diff.patch
 
       - name: Generate Diff
