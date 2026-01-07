@@ -27,7 +27,6 @@ spec:
       name: cilium-values
   values:
     routingMode: native
-    tunnel: disabled
     l7proxy: false
     # securityContext:
     #   privileged: true
