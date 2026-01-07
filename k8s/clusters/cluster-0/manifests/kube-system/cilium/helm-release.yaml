@@ -113,11 +113,13 @@ spec:
     prometheus:
       serviceMonitor:
         enabled: true
+        trustCRDsExist: true
 
     operator:
       prometheus:
         serviceMonitor:
           enabled: true
+          trustCRDsExist: true
 
     # bgp:
     #   enabled: false

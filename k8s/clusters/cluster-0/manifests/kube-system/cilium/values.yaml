@@ -60,6 +60,7 @@ hubble:
   enabled: true
   serviceMonitor:
     enabled: false
+    trustCRDsExist: true
 
   metrics:
     enabled:
