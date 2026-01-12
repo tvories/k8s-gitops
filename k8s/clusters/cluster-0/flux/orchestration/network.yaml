@@ -111,3 +111,20 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: network-technitium
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/technitium"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops

@@ -1,0 +1,110 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app technitium
+  namespace: network
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: 10m
+    recreate: true
+    cleanupOnFail: true
+  values:
+    controllers:
+      technitium:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: technitium/dns-server
+              tag: 14.3.0
+
+            env:
+              DNS_SERVER_DOMAIN: "dns2.${SECRET_INTERNAL_DOMAIN}"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1200Mi
+              limits:
+                memory: 2000Mi
+
+    service:
+      app:
+        enabled: true
+        controller: *app
+        ports:
+          http:
+            enabled: true
+            port: 5380
+            targetPort: 5380
+            protocol: TCP
+      dns:
+        controller: *app
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: "192.168.1.240"
+        externalTrafficPolicy: Cluster
+        ports:
+          dns-tcp:
+            enabled: true
+            port: 53
+            targetPort: 53
+            protocol: TCP
+          dns-udp:
+            enabled: true
+            port: 53
+            targetPort: 53
+            protocol: UDP
+          dhcp-udp:
+            enabled: true
+            port: 67
+            targetPort: 67
+            protocol: UDP
+
+    ingress:
+      app:
+        className: nginx-internal
+        hosts:
+          - host: &host tdns2.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.technitium
+    persistence:
+      data:
+        globalMounts:
+          - path: /etc/dns
+        existingClaim: technitium-data
+      logs:
+        existingClaim: technitium-logs
+        globalMounts:
+          - path: /var/log/technitium
