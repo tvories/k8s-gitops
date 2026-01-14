@@ -41,7 +41,7 @@ spec:
 
     cephClusterSpec:
       mon:
-        count: 1
+        count: 3
       # cephVersion:
       # image: quay.io/ceph/ceph:v17.2.0
       network:
