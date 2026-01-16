@@ -100,9 +100,16 @@ spec:
                 service:
                   identifier: app
                   port: http
+          - host: dns2.cluster-dns.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                service:
+                  identifier: dns
+                  port: dns-cluster-tcp
         tls:
           - hosts:
               - *host
+              - dns2.cluster-dns.${SECRET_DOMAIN}
             secretName: tls.technitium
     persistence:
       data:
