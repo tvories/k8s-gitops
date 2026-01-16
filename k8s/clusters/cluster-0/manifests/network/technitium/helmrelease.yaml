@@ -39,7 +39,7 @@ spec:
               tag: 14.3.0
 
             env:
-              DNS_SERVER_DOMAIN: "dns2.${SECRET_INTERNAL_DOMAIN}"
+              DNS_SERVER_DOMAIN: "tdns2.${SECRET_INTERNAL_DOMAIN}"
             probes:
               liveness:
                 enabled: true
