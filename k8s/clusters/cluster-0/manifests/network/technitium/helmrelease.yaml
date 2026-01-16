@@ -84,6 +84,11 @@ spec:
             port: 67
             targetPort: 67
             protocol: UDP
+          dns-cluster-tcp:
+            enabled: true
+            port: 53443
+            targetPort: 53443
+            protocol: TCP
 
     ingress:
       app:
