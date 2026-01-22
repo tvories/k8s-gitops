@@ -12,17 +12,8 @@ spec:
     destinationPVC: "${claim}"
     copyMethod: Direct
     storageClassName: ceph-block
-    # IMPORTANT NOTE:
-    #   Set to the last X number of snapshots to restore from
-    # previous: 2
-    # OR;
-    # IMPORTANT NOTE:
-    #   On bootstrap set `restoreAsOf` to the time the old cluster was destroyed.
-    #   This will essentially prevent volsync from trying to restore a backup
-    #   from a application that started with default data in the PVC.
-    #   Do not restore snapshots made after the following RFC3339 Timestamp.
-    #   date --rfc-3339=seconds (--utc)
-    restoreAsOf: "2024-02-12T07:00:00-07:00"
+    # Restore from the Nth most recent snapshot (1 = latest, 2 = second-to-last, etc.)
+    previous: $snapshot
     moverSecurityContext:
       runAsUser: 10000
       runAsGroup: 10000

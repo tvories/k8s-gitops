@@ -8,6 +8,7 @@ x-task-vars: &task-vars
   claim: "{{.claim}}"
   ts: "{{.ts}}"
   kustomization: "{{.kustomization}}"
+  snapshot: "{{.snapshot}}"
 
 vars:
   destinationTemplate: "ReplicationDestination.tmpl.yaml"
@@ -76,7 +77,7 @@ tasks:
   #   - kubectl get replicationsources --all-namespaces --no-headers | awk '{print $2, $1}' | xargs --max-procs=2 -l bash -c 'task volsync:restore rsrc=$0 namespace=$1'
   #
   restore:
-    desc: Trigger a Restic ReplicationSource restore (ex. task volsync:restore rsrc=plex [namespace=default])
+    desc: Trigger a Restic ReplicationSource restore (ex. task volsync:restore rsrc=plex [namespace=default] [snapshot=2])
     cmds:
       - task: restore-suspend-app
         vars: *task-vars
@@ -89,6 +90,7 @@ tasks:
     vars:
       rsrc: '{{ or .rsrc (fail "Variable `rsrc` is required") }}'
       namespace: '{{.namespace | default "default"}}'
+      snapshot: '{{.snapshot | default "1"}}'
       # 1) Query to find the Flux Kustomization associated with the ReplicationSource (rsrc)
       kustomization:
         sh: |

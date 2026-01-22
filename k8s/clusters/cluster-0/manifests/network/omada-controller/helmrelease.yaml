@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: mbentley/omada-controller
-              tag: 5.15.8.2
+              tag: 6.1.0.19
 
             env:
               TZ: "${TIMEZONE}"
