@@ -55,8 +55,8 @@ spec:
               requests:
                 cpu: 500m
                 memory: 1200Mi
-              limits:
-                memory: 2000Mi
+              # limits:
+              #   memory: 2000Mi
 
     service:
       app:
