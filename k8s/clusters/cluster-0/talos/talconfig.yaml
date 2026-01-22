@@ -68,8 +68,8 @@ nodes:
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
     nameservers:
+      - 192.168.1.243
       - 192.168.1.240
-      - 192.168.1.241
     networkInterfaces:
       - interface: en02
         dhcp: false
@@ -222,8 +222,8 @@ controlPlane:
       machine:
         network:
           nameservers:
+            - 192.168.1.243
             - 192.168.1.240
-            - 192.168.1.241
 
     # Configure NTP
     - |-
@@ -366,8 +366,8 @@ worker:
     #   machine:
     #     network:
     #       nameservers:
+    #         - 192.168.1.243
     #         - 192.168.1.240
-    #         - 192.168.1.241
     # Configure NTP
     - |-
       machine:
