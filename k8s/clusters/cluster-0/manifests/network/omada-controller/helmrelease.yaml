@@ -48,9 +48,31 @@ spec:
               SHOW_MONGODB_LOGS: "true"
             probes:
               liveness:
-                enabled: true
+                enabled: false
               readiness:
                 enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /login
+                    port: 8043
+                    scheme: HTTPS
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /login
+                    port: 8043
+                    scheme: HTTPS
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 30
             resources:
               requests:
                 cpu: 500m
