@@ -11,7 +11,7 @@ x-task-vars: &task-vars
 
 vars:
   destinationTemplate: "ReplicationDestination.tmpl.yaml"
-  wipeJobTemplate: "WipeJob.tmpl.yaml"
+  # wipeJobTemplate: "WipeJob.tmpl.yaml"
   waitForJobScript: "../_scripts/wait-for-k8s-job.sh"
   listJobTemplate: "ListJob.tmpl.yaml"
   unlockJobTemplate: "UnlockJob.tmpl.yaml"
@@ -80,8 +80,8 @@ tasks:
     cmds:
       - task: restore-suspend-app
         vars: *task-vars
-      - task: restore-wipe-job
-        vars: *task-vars
+      # - task: restore-wipe-job
+      #   vars: *task-vars
       - task: restore-volsync-job
         vars: *task-vars
       - task: restore-resume-app
