@@ -9,11 +9,11 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: gitlab-charts
+      chart: gitlab
       version: 9.7.1
       sourceRef:
         kind: HelmRepository
-        name: gitlab
+        name: gitlab-charts
         namespace: flux-system
   maxHistory: 2
   install:
