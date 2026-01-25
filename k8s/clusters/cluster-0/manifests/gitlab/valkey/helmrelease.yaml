@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app gitlab-valkey
+  namespace: gitlab
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.6.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    containers:
+      app:
+        image:
+          repository: ghcr.io/valkey-io/valkey
+          tag: 9.0.1
+        resources:
+          requests:
+            cpu: 5m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        env:
+          TZ: "${TIMEZONE}"

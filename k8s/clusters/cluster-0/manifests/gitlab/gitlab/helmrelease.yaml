@@ -1,0 +1,187 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.0.1/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app gitlab
+  namespace: gitlab
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: gitlab-charts
+      version: 9.7.1
+      sourceRef:
+        kind: HelmRepository
+        name: gitlab
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    global:
+      gitlabVersion: "18.7.1"
+      edition: ce
+      timezone: ${TIMEZONE}
+      hosts:
+        domain: ${SECRET_DOMAIN}
+        gitlab:
+          name: gitlab.${SECRET_DOMAIN}
+          https: true
+      monitoring:
+        enabled: true
+      minio:
+        enabled: false
+      email:
+        display_name: Gitlab
+        from: gitlab@${SECRET_DOMAIN}
+        reply_to: "gitlab@${SECRET_DOMAIN}"
+      smtp:
+        enabled: true
+        address: "${GATEWAY_IP}"
+        port: 25
+      redis:
+        host: gitlab-valkey.gitlab.svc.cluster.local
+      gitaly:
+        enabled: true
+        persistence:
+          enabled: true
+          storageClass: ceph-block
+          accessMode: ReadWriteOnce
+          size: 20Gi
+          subPath: "data"
+      praefect:
+        ntpHost: ${GATEWAY_IP}
+        enabled: true
+        virtualStorages:
+          - name: default
+            gitalyReplicas: 1
+            maxUnavailable: 0
+        dbSecret:
+          secret: gitlab-secrets
+          key: postgres_password
+        psql:
+          host: postgres.database.svc.cluster.local
+          dbname: praefect_production
+          username: gitlab
+    redis:
+      install: false
+    postgresql:
+      install: false
+    prometheus:
+      install: false
+    nginx-ingress:
+      enabled: false
+    installCertmanager: false
+    certmanager:
+      installCRDs: false
+    gitlab-runner:
+      install: true
+
+      appConfig:
+        object_store:
+          enabled: true
+          connection:
+            secret: gitlab-object-storage
+            key: connection
+        lfs:
+          enabled: true
+          bucket: gitlab-lfs
+        artifacts:
+          bucket: gitlab-artifacts
+        uploads:
+          bucket: gitlab-uploads
+        externalDiffs:
+          enabled: true
+          bucket: gitlab-external-diffs
+        ciSecureFiles:
+          enabled: true
+          bucket: gitlab-ci-secure-files
+          connection:
+            secret: gitlab-object-storage
+            key: connection
+        packages:
+          bucket: gitlab-packages
+        backups:
+          bucket: gitlab-backups
+          tmpBucket: gitlab-tmp
+        dependencyProxy:
+          enabled: true
+          bucket: gitlab-dependency-proxy
+        terraformState:
+          enabled: true
+          bucket: gitlab-terraform-state
+        ingress:
+          enabled: true
+          configureCertmanager: false
+          class: nginx-external
+          annotations:
+            kubernetes.io/ingress.allow-http: "false"
+          tls:
+            enabled: false # we use the default certificate set up in the ingress-nginx controller
+    gitlab:
+      migrations:
+        enabled: true
+        extraInitContainers: |
+          - name: init-db
+            image: ghcr.io/home-operations/postgres-init:18.1
+            envFrom:
+              - secretRef:
+                  name: gitlab-secrets
+      gitlab-shell:
+        sshDaemon: gitlab-sshd
+      gitaly:
+        extraEnvFrom:
+          # Mount the existing object store secret to the expected environment variables.
+          AWS_ACCESS_KEY_ID:
+            secretKeyRef:
+              name: gitlab-object-storage
+              key: AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY:
+            secretKeyRef:
+              name: gitlab-object-storage
+              key: AWS_SECRET_ACCESS_KEY
+        backup:
+          # This is the connection string for Gitaly server side backups.
+          goCloudUrl: "s3://s3.nas.${SECRET_DOMAIN}/gitlab-backups"
+      webservice:
+        maxReplicas: 2
+        maxUnavailable: 1
+        minReplicas: 1
+        resources:
+          requests:
+            cpu: .5
+            memory: 1.25
+          limits:
+            memory: 2
+        workerProcesses: 1
+        ingress:
+          proxyBodySize: 0 # To allow large file uploads like imports
+      sidekiq:
+        maxReplicas: 2
+        minReplicas: 1
+        resources:
+          limits:
+            memory: 2G
+          requests:
+            cpu: 200m # Assume single-process, 1 CPU
+            memory: 250M
+      toolbox:
+        enabled: true
+        backups:
+          cron:
+            enabled: true
+            schedule: "0 5 * * *" # 5 AM UTC
+          objectStorage:
+            # https://docs.gitlab.com/charts/backup-restore/#configuring-workload-identity-federation-for-gke
+            backend: s3cmd # using rustfs
+        extraEnv:
+          GITLAB_BACKUP_MAX_CONCURRENCY: 4
+          GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY: 1
