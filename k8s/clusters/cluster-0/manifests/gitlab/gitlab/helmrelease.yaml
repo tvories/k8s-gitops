@@ -49,6 +49,8 @@ spec:
         port: 25
         authentication: ""
         ssl_verify_mode: none
+        password: {}
+
       redis:
         host: gitlab-valkey.gitlab.svc.cluster.local
       gitaly:
