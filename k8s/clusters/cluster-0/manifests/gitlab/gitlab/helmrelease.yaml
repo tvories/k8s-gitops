@@ -47,6 +47,8 @@ spec:
         enabled: true
         address: "${GATEWAY_IP}"
         port: 25
+        authentication: ""
+        ssl_verify_mode: none
       redis:
         host: gitlab-valkey.gitlab.svc.cluster.local
       gitaly:
