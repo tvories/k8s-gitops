@@ -43,3 +43,8 @@ spec:
                 memory: 128Mi
             env:
               TZ: "${TIMEZONE}"
+    service:
+      app:
+        ports:
+          http:
+            port: 6379
