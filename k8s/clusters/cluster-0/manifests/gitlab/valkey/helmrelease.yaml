@@ -26,16 +26,20 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    containers:
-      app:
-        image:
-          repository: ghcr.io/valkey-io/valkey
-          tag: 9.0.1
-        resources:
-          requests:
-            cpu: 5m
-            memory: 32Mi
-          limits:
-            memory: 128Mi
-        env:
-          TZ: "${TIMEZONE}"
+    controllers:
+      valkey:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/valkey-io/valkey
+              tag: 9.0.1
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            env:
+              TZ: "${TIMEZONE}"
