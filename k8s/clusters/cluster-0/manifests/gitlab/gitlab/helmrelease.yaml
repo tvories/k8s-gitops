@@ -122,14 +122,14 @@ spec:
         terraformState:
           enabled: true
           bucket: gitlab-terraform-state
-        ingress:
-          enabled: true
-          configureCertmanager: false
-          class: nginx-external
-          annotations:
-            kubernetes.io/ingress.allow-http: "false"
-          tls:
-            enabled: false # we use the default certificate set up in the ingress-nginx controller
+      ingress:
+        enabled: true
+        configureCertmanager: false
+        class: nginx-external
+        annotations:
+          kubernetes.io/ingress.allow-http: "false"
+        tls:
+          enabled: false # we use the default certificate set up in the ingress-nginx controller
     gitlab:
       migrations:
         enabled: true
