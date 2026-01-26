@@ -43,6 +43,11 @@ spec:
                 memory: 128Mi
             env:
               TZ: "${TIMEZONE}"
+              VALKEY_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: gitlab-redis-secret
+                    key: password
     service:
       app:
         ports:
