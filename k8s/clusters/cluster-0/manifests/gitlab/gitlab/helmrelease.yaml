@@ -71,19 +71,6 @@ spec:
           host: postgres.database.svc.cluster.local
           dbname: praefect_production
           username: gitlab
-    redis:
-      install: false
-    postgresql:
-      install: false
-    prometheus:
-      install: false
-    nginx-ingress:
-      enabled: false
-    installCertmanager: false
-    certmanager:
-      installCRDs: false
-    gitlab-runner:
-      install: true
 
       appConfig:
         object_store:
@@ -126,6 +113,21 @@ spec:
           kubernetes.io/ingress.allow-http: "false"
         tls:
           enabled: false # we use the default certificate set up in the ingress-nginx controller
+    redis:
+      install: false
+    postgresql:
+      install: false
+    prometheus:
+      install: false
+    nginx-ingress:
+      enabled: false
+    installCertmanager: false
+    certmanager:
+      installCRDs: false
+    certmanager-issuer:
+      install: false
+    gitlab-runner:
+      install: true
     gitlab:
       migrations:
         enabled: true
