@@ -83,7 +83,11 @@ spec:
               accessMode: ReadWriteOnce
               size: 20Gi
       ingress:
+        enabled: true
+        configureCertmanager: false
+        class: nginx-external
         annotations:
+          kubernetes.io/ingress.allow-http: "false"
           kubernetes.io/tls-acme: true
       initialRootPassword:
         secret: gitlab-secrets
@@ -94,21 +98,6 @@ spec:
       railsSecrets:
         secret: gitlab-secrets
         key: secrets.yml
-    redis:
-      install: false
-    postgresql:
-      install: false
-    prometheus:
-      install: false
-    nginx-ingress:
-      enabled: false
-    installCertmanager: false
-    certmanager:
-      installCRDs: false
-    gitlab-runner:
-      install: true
-    certmanager-issuer:
-      email: ${SECRET_CLOUDFLARE_EMAIL}
 
       appConfig:
         object_store:
@@ -167,14 +156,21 @@ spec:
           connection:
             secret: gitlab-object-storage
             key: connection
-      ingress:
-        enabled: true
-        configureCertmanager: false
-        class: nginx-external
-        annotations:
-          kubernetes.io/ingress.allow-http: "false"
-        # tls:
-        #   enabled: false # we use the default certificate set up in the ingress-nginx controller
+    redis:
+      install: false
+    postgresql:
+      install: false
+    prometheus:
+      install: false
+    nginx-ingress:
+      enabled: false
+    installCertmanager: false
+    certmanager:
+      installCRDs: false
+    gitlab-runner:
+      install: true
+    certmanager-issuer:
+      email: ${SECRET_CLOUDFLARE_EMAIL}
     gitlab:
       migrations:
         enabled: true
