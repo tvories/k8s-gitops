@@ -51,6 +51,9 @@ spec:
         host: gitlab-valkey.gitlab.svc.cluster.local
       gitaly:
         enabled: true
+        authToken:
+          secret: gitlab-secrets
+          key: praefect_auth_token
         persistence:
           enabled: true
           storageClass: ceph-block
@@ -71,6 +74,31 @@ spec:
           host: postgres.database.svc.cluster.local
           dbname: praefect_production
           username: gitlab
+      ingress:
+        annotations:
+          kubernetes.io/tls-acme: true
+      initialRootPassword:
+        secret: gitlab-secrets
+        key: initial_root_password
+      shell:
+        secret: gitlab-secrets
+        key: gitlab_shell_secre
+      railsSecrets:
+        secret: gitlab-secrets
+        key: secrets.yml
+    redis:
+      install: false
+    postgresql:
+      install: false
+    prometheus:
+      install: false
+    nginx-ingress:
+      enabled: false
+    installCertmanager: false
+    certmanager:
+      installCRDs: false
+    gitlab-runner:
+      install: true
 
       appConfig:
         object_store:
@@ -111,23 +139,8 @@ spec:
         class: nginx-external
         annotations:
           kubernetes.io/ingress.allow-http: "false"
-        tls:
-          enabled: false # we use the default certificate set up in the ingress-nginx controller
-    redis:
-      install: false
-    postgresql:
-      install: false
-    prometheus:
-      install: false
-    nginx-ingress:
-      enabled: false
-    installCertmanager: false
-    certmanager:
-      installCRDs: false
-    certmanager-issuer:
-      install: false
-    gitlab-runner:
-      install: true
+        # tls:
+        #   enabled: false # we use the default certificate set up in the ingress-nginx controller
     gitlab:
       migrations:
         enabled: true
@@ -137,6 +150,10 @@ spec:
             envFrom:
               - secretRef:
                   name: gitlab-secrets
+      kas:
+        ingress:
+          tls:
+            secretName: RELEASE-kas-tls
       gitlab-shell:
         sshDaemon: gitlab-sshd
       gitaly:
@@ -166,6 +183,12 @@ spec:
         workerProcesses: 1
         ingress:
           proxyBodySize: 0 # To allow large file uploads like imports
+          tls:
+            secretName: RELEASE-gitlab-tls
+      registry:
+        ingress:
+          tls:
+            secretName: RELEASE-registry-tls
       sidekiq:
         maxReplicas: 2
         minReplicas: 1
