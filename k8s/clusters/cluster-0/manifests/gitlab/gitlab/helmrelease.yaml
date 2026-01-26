@@ -63,8 +63,9 @@ spec:
           secret: gitlab-secrets
           key: praefect_auth_token
 
-        dbSecret: gitlab-secrets
-        dbSecretKey: postgres_password
+        dbSecret:
+          secret: gitlab-secrets # The name of your K8s secret
+          key: postgres_password
 
         psql:
           host: postgres.database.svc.cluster.local
