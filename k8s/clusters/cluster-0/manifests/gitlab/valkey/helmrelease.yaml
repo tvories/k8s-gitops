@@ -47,7 +47,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: gitlab-redis-secret
-                    key: password
+                    key: secret
     service:
       app:
         ports:
