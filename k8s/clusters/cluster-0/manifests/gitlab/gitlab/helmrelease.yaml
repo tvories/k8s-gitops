@@ -54,26 +54,33 @@ spec:
         authToken:
           secret: gitlab-secrets
           key: praefect_auth_token
-        persistence:
-          enabled: true
-          storageClass: ceph-block
-          accessMode: ReadWriteOnce
-          size: 20Gi
-          subPath: "data"
+
       praefect:
-        ntpHost: ${GATEWAY_IP}
         enabled: true
-        virtualStorages:
-          - name: default
-            gitalyReplicas: 1
-            maxUnavailable: 0
-        dbSecret:
+        ntpHost: ${GATEWAY_IP}
+        # This token is used by Rails/Workhorse to talk to Praefect
+        authToken:
           secret: gitlab-secrets
-          key: postgres_password
+          key: praefect_auth_token
+
+        dbSecret: gitlab-secrets
+        dbSecretKey: postgres_password
+
         psql:
           host: postgres.database.svc.cluster.local
           dbname: praefect_production
           username: gitlab
+          sslmode: disable
+
+        virtualStorages:
+          - name: default
+            gitalyReplicas: 1
+            maxUnavailable: 0
+            persistence:
+              enabled: true
+              storageClass: ceph-block
+              accessMode: ReadWriteOnce
+              size: 20Gi
       ingress:
         annotations:
           kubernetes.io/tls-acme: true
