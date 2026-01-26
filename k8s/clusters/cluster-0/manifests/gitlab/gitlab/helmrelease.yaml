@@ -111,13 +111,25 @@ spec:
         lfs:
           enabled: true
           bucket: gitlab-lfs
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         artifacts:
           bucket: gitlab-artifacts
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         uploads:
           bucket: gitlab-uploads
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         externalDiffs:
           enabled: true
           bucket: gitlab-external-diffs
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         ciSecureFiles:
           enabled: true
           bucket: gitlab-ci-secure-files
@@ -126,15 +138,27 @@ spec:
             key: connection
         packages:
           bucket: gitlab-packages
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         backups:
           bucket: gitlab-backups
           tmpBucket: gitlab-tmp
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         dependencyProxy:
           enabled: true
           bucket: gitlab-dependency-proxy
+          connection:
+            secret: gitlab-object-storage
+            key: connection
         terraformState:
           enabled: true
           bucket: gitlab-terraform-state
+          connection:
+            secret: gitlab-object-storage
+            key: connection
       ingress:
         enabled: true
         configureCertmanager: false
