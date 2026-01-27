@@ -47,7 +47,7 @@ spec:
         ssl_verify_mode: none
         password: {}
       psql:
-        host: postgres.database.svc.cluster.local
+        host: postgres6-rw.database.svc.cluster.local
         port: 5432
         password:
           useSecret: true
@@ -108,7 +108,7 @@ spec:
         key: initial_root_password
       shell:
         secret: gitlab-secrets
-        key: gitlab_shell_secre
+        key: gitlab_shell_secret
       railsSecrets:
         secret: gitlab-secrets
         key: secrets.yml
