@@ -228,7 +228,7 @@ spec:
         enabled: true
         backups:
           cron:
-            enabled: true
+            enabled: false # not working right now
             schedule: "0 5 * * *" # 5 AM UTC
           objectStorage:
             # https://docs.gitlab.com/charts/backup-restore/#configuring-workload-identity-federation-for-gke
@@ -236,6 +236,6 @@ spec:
             config:
               secret: gitlab-object-storage
               key: connection
-        extraEnv:
-          GITLAB_BACKUP_MAX_CONCURRENCY: 4
-          GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY: 1
+        # extraEnv:
+        #   GITLAB_BACKUP_MAX_CONCURRENCY: 4
+        #   GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY: 1
