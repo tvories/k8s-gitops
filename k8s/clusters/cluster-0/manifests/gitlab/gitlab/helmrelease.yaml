@@ -202,10 +202,10 @@ spec:
         minReplicas: 1
         resources:
           requests:
-            cpu: .5
-            memory: 1.25
+            cpu: 100m
+            memory: 1Gi
           limits:
-            memory: 2
+            memory: 2Gi
         workerProcesses: 1
         ingress:
           proxyBodySize: 0 # To allow large file uploads like imports
@@ -220,9 +220,9 @@ spec:
         minReplicas: 1
         resources:
           limits:
-            memory: 2G
+            memory: 2Gi
           requests:
-            cpu: 200m # Assume single-process, 1 CPU
+            cpu: 100m # Assume single-process, 1 CPU
             memory: 250M
       toolbox:
         enabled: true
