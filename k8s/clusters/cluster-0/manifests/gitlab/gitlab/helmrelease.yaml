@@ -179,7 +179,7 @@ spec:
       kas:
         ingress:
           tls:
-            secretName: RELEASE-kas-tls
+            secretName: kas-tls
       gitlab-shell:
         sshDaemon: gitlab-sshd
       gitaly:
@@ -210,11 +210,11 @@ spec:
         ingress:
           proxyBodySize: 0 # To allow large file uploads like imports
           tls:
-            secretName: RELEASE-gitlab-tls
+            secretName: gitlab-tls
       registry:
         ingress:
           tls:
-            secretName: RELEASE-registry-tls
+            secretName: registry-tls
       sidekiq:
         maxReplicas: 2
         minReplicas: 1
