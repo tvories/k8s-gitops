@@ -57,6 +57,11 @@ spec:
 
       redis:
         host: gitlab-valkey.gitlab.svc.cluster.local
+        port: 6379
+        password:
+          enabled: true
+          secret: gitlab-redis-secret
+          key: redis_password
       gitaly:
         enabled: true
         authToken:
@@ -78,9 +83,9 @@ spec:
         psql:
           host: postgres.database.svc.cluster.local
           port: 5432
-          dbname: praefect_production
+          dbName: praefect_production
           user: gitlab
-          sslmode: disable
+          sslMode: disable
 
         virtualStorages:
           - name: default
