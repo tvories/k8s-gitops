@@ -233,9 +233,9 @@ spec:
           objectStorage:
             # https://docs.gitlab.com/charts/backup-restore/#configuring-workload-identity-federation-for-gke
             backend: s3cmd # using rustfs
-            config:
-              secret: gitlab-object-storage
-              key: connection
+            # config:
+            #   secret: gitlab-object-storage
+            #   key: connection
         # extraEnv:
         #   GITLAB_BACKUP_MAX_CONCURRENCY: 4
         #   GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY: 1
