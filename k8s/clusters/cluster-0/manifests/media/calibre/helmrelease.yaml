@@ -42,7 +42,7 @@ spec:
               UMASK_SET: "022"
             resources:
               requests:
-                cpu: 100m
+                cpu: 75m
                 memory: 200M
               limits:
                 memory: 3Gi

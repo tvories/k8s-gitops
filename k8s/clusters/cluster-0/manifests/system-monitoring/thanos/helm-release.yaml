@@ -33,6 +33,9 @@ spec:
         region: ""
     queryFrontend:
       enabled: false
+      resources:
+        requests:
+          cpu: 10m
     query:
       enabled: true
       replicaCount: 3
@@ -45,7 +48,9 @@ spec:
         # stores:
         #   - "dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery"
         #   - "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}:443"
-
+      resources:
+        requests:
+          cpu: 10m
         # limits:
         #   memory: 99M
 
@@ -59,8 +64,14 @@ spec:
               - *host
     bucketweb:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
     compactor:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
       # extraFlags:
       #   - "--compact.concurrency"
       #   - "4"
@@ -81,12 +92,18 @@ spec:
         size: 100Gi
     storegateway:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
       persistence:
         enabled: true
         storageClass: "ceph-block"
         size: 10Gi
     ruler:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
       dnsDiscovery:
         enabled: true
       alertmanagers:

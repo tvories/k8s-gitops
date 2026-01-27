@@ -164,7 +164,7 @@ spec:
         default: true
       resources:
         requests:
-          cpu: 50m
+          cpu: 15m
           memory: 20Mi
         # limits:
         #   memory: 100Mi
@@ -262,7 +262,7 @@ spec:
 
     resources:
       requests:
-        cpu: 200m
+        cpu: 50m
         memory: 250M
       # limits:
       #   memory: 508M

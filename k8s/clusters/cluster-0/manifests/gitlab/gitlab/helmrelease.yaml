@@ -202,7 +202,7 @@ spec:
         minReplicas: 1
         resources:
           requests:
-            cpu: 100m
+            cpu: 50m
             memory: 1Gi
           limits:
             memory: 2Gi
@@ -222,7 +222,7 @@ spec:
           limits:
             memory: 2Gi
           requests:
-            cpu: 100m # Assume single-process, 1 CPU
+            cpu: 50m # Assume single-process, 1 CPU
             memory: 250M
       toolbox:
         enabled: true

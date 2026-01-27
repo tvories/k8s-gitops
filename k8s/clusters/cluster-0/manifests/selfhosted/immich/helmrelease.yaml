@@ -37,7 +37,7 @@ spec:
                 tag: "v2.4.1"
               resources:
                 requests:
-                  cpu: 750m
+                  cpu: 100m
                   memory: 2048M
               env:
                 # Database connection
