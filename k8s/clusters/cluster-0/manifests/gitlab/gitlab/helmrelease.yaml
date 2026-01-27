@@ -46,6 +46,14 @@ spec:
         authentication: ""
         ssl_verify_mode: none
         password: {}
+      psql:
+        host: postgres.database.svc.cluster.local
+        port: 5432
+        password:
+          useSecret: true
+          secret: gitlab-secrets
+          key: postgres_password
+        sslmode: disable
 
       redis:
         host: gitlab-valkey.gitlab.svc.cluster.local
@@ -64,13 +72,14 @@ spec:
           key: praefect_auth_token
 
         dbSecret:
-          secret: gitlab-secrets # The name of your K8s secret
+          secret: gitlab-secrets
           key: postgres_password
 
         psql:
           host: postgres.database.svc.cluster.local
+          port: 5432
           dbname: praefect_production
-          username: gitlab
+          user: gitlab
           sslmode: disable
 
         virtualStorages:
