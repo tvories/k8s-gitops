@@ -60,7 +60,7 @@ spec:
         port: 6379
         password:
           enabled: true
-          secret: gitlab-redis-secret
+          secret: gitlab-secrets
           key: redis_password
       gitaly:
         enabled: true
