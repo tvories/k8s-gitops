@@ -83,5 +83,5 @@ spec:
             main:
               resources:
                 requests:
-                  cpu: 100m
+                  cpu: 20m
                   memory: 2048M

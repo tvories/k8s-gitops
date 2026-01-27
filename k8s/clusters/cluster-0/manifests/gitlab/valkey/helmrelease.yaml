@@ -35,6 +35,10 @@ spec:
             image:
               repository: ghcr.io/valkey-io/valkey
               tag: 9.0.1
+            command:
+              - valkey-server
+              - --requirepass
+              - $(VALKEY_PASSWORD)
             resources:
               requests:
                 cpu: 5m
