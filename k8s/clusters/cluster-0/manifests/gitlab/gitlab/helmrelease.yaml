@@ -235,7 +235,7 @@ spec:
             backend: s3cmd # using rustfs
             config:
               secret: gitlab-object-storage
-              key: connection
+              key: s3cfg
         # extraEnv:
         #   GITLAB_BACKUP_MAX_CONCURRENCY: 4
         #   GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY: 1
