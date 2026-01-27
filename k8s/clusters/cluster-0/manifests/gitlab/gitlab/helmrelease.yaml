@@ -81,7 +81,7 @@ spec:
           key: postgres_password
 
         psql:
-          host: postgres.database.svc.cluster.local
+          host: postgres6-rw.database.svc.cluster.local
           port: 5432
           dbName: praefect_production
           user: gitlab
