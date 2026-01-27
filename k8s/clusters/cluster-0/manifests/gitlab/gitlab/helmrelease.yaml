@@ -228,11 +228,11 @@ spec:
         enabled: true
         backups:
           cron:
-            enabled: false # not working right now
+            enabled: true # not working right now
             schedule: "0 5 * * *" # 5 AM UTC
           objectStorage:
             # https://docs.gitlab.com/charts/backup-restore/#configuring-workload-identity-federation-for-gke
-            backend: s3cmd # using rustfs
+            backend: s3 # using rustfs (s3-compatible)
             config:
               secret: gitlab-object-storage
               key: s3cfg
