@@ -165,6 +165,7 @@ spec:
       installCRDs: false
     gitlab-runner:
       install: true
+      secret: gitlab-runner-secret
     certmanager-issuer:
       email: ${SECRET_CLOUDFLARE_EMAIL}
     gitlab:
