@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: gitlab
-      version: 9.7.1
+      version: 9.8.2
       sourceRef:
         kind: HelmRepository
         name: gitlab-charts
@@ -23,7 +23,7 @@ spec:
     keepHistory: false
   values:
     global:
-      gitlabVersion: "18.7.1"
+      gitlabVersion: "18.8.2"
       edition: ce
       timezone: ${TIMEZONE}
       hosts:
