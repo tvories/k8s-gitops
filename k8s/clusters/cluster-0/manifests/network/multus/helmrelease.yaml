@@ -53,7 +53,7 @@ spec:
           uninstall:
             image:
               repository: alpine
-              tag: 3.23.2
+              tag: 3.23.3
 
             command:
               - /bin/sh
