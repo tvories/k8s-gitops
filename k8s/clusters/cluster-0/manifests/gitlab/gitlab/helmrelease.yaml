@@ -165,7 +165,13 @@ spec:
       installCRDs: false
     gitlab-runner:
       install: true
-      secret: gitlab-runner-secret
+      runners:
+        secret: gitlab-runner-secret
+        config: |
+          [[runners]]
+            [runners.kubernetes]
+              namespace = "{{.Release.Namespace}}"
+              image = "ubuntu:24.04"
     certmanager-issuer:
       email: ${SECRET_CLOUDFLARE_EMAIL}
     gitlab:
