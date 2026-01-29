@@ -56,7 +56,8 @@ spec:
       grafana_net:
         url: https://grafana.net
       auth.basic:
-        disable_login_form: false
+        disable_login_form: true
+        signout_redirect_url: "https://authentik.${SECRET_DOMAIN}/application/o/grafana/end-session/"
       auth.generic_oauth:
         enabled: true
         name: Authentik
@@ -66,7 +67,7 @@ spec:
         auth_url: https://authentik.${SECRET_DOMAIN}/application/o/authorize/
         token_url: https://authentik.${SECRET_DOMAIN}/application/o/token/
         api_url: https://authentik.${SECRET_DOMAIN}/application/o/userinfo/
-        role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'authentik Admins') && 'Admin' || 'Viewer'
+        role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
         allow_sign_up: true
         auto_login: false
 
