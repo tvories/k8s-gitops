@@ -34,6 +34,13 @@ spec:
       userKey: adminUser
       passwordKey: adminPass
 
+    extraSecretMounts:
+      - name: oauth-secrets
+        secretName: grafana-oauth-secrets
+        defaultMode: 0440
+        mountPath: /etc/secrets/oauth
+        readOnly: true
+
     grafana.ini:
       server:
         root_url: "https://grafana.${CLUSTER_NAME}.${SECRET_DOMAIN}"
@@ -50,6 +57,18 @@ spec:
         url: https://grafana.net
       auth.basic:
         disable_login_form: false
+      auth.generic_oauth:
+        enabled: true
+        name: Authentik
+        client_id: $__file{/etc/secrets/oauth/client_id}
+        client_secret: $__file{/etc/secrets/oauth/client_secret}
+        scopes: openid email profile
+        auth_url: https://authentik.${CLUSTER_NAME}.${SECRET_DOMAIN}/application/o/authorize/
+        token_url: https://authentik.${CLUSTER_NAME}.${SECRET_DOMAIN}/application/o/token/
+        api_url: https://authentik.${CLUSTER_NAME}.${SECRET_DOMAIN}/application/o/userinfo/
+        role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'authentik Admins') && 'Admin' || 'Viewer'
+        allow_sign_up: true
+        auto_login: false
 
     dashboardProviders:
       dashboardproviders.yaml:

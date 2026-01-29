@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
+  - ./externalsecret.yaml
   - ./helm-release.yaml
   - ./volsync.yaml
