@@ -119,6 +119,9 @@ spec:
           allowSingleSignOn: ["openid_connect"]
           blockAutoCreatedUsers: false
           autoLinkUser: ["openid_connect"]
+          syncProfileFromProvider: ["openid_connect"]
+          syncProfileAttributes: ["email", "name", "groups"]
+          allowBypassTwoFactor: ["openid_connect"]
           providers:
             - secret: gitlab-oauth
               key: provider
