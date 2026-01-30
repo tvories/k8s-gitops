@@ -125,7 +125,7 @@ spec:
             - secret: gitlab-oauth
               key: provider
         ldap:
-          preventSignin: true
+          # preventSignin: true
           servers:
             main:
               label: Authentik
