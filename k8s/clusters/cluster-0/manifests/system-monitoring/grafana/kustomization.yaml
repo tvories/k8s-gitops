@@ -5,5 +5,5 @@ resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
   - ./externalsecret.yaml
-  - ./helm-release.yaml
+  - ./helmrelease.yaml
   - ./volsync.yaml

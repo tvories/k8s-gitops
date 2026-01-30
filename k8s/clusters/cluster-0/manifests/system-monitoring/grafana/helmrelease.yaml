@@ -396,7 +396,7 @@ spec:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-      ingressClassName: nginx-internal
+      ingressClassName: nginx-external
       hosts:
         - "grafana.${CLUSTER_NAME}.${SECRET_DOMAIN}"
       tls:
