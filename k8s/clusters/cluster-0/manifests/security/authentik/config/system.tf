@@ -49,6 +49,7 @@ resource "authentik_brand" "default" {
 #   flow_user_settings  = authentik_flow.user-settings.uuid
 # }
 
+# Kubernetes service connection for the outpost
 resource "authentik_service_connection_kubernetes" "local" {
   name  = "local"
   local = true

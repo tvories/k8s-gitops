@@ -46,3 +46,9 @@ variable "gitlab_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "gitlab_svc_password" {
+  description = "Password for the Gitlab LDAP service account."
+  type        = string
+  sensitive   = true
+}

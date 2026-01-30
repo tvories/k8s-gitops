@@ -83,17 +83,6 @@ data "authentik_property_mapping_provider_scope" "scope-openid" {
   name = "authentik default OAuth Mapping: OpenID 'openid'"
 }
 
-# Create a custom groups scope mapping since Authentik doesn't have one by default
-resource "authentik_property_mapping_provider_scope" "scope-groups" {
-  name       = "OAuth Mapping: OpenID 'groups'"
-  scope_name = "groups"
-  expression = <<-EOF
-    return {
-        "groups": [group.name for group in user.ak_groups.all()]
-    }
-  EOF
-}
-
 data "authentik_flow" "invalidation_flow" {
   slug = "default-provider-invalidation-flow"
 }
@@ -109,7 +98,6 @@ resource "authentik_provider_oauth2" "oauth2" {
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
-    authentik_property_mapping_provider_scope.scope-groups.id,
   ]
   access_token_validity = "hours=4"
   allowed_redirect_uris = [
