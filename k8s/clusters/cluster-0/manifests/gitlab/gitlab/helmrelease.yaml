@@ -114,6 +114,14 @@ spec:
         key: secrets.yml
 
       appConfig:
+        omniauth:
+          enabled: true
+          allowSingleSignOn: ["openid_connect"]
+          blockAutoCreatedUsers: false
+          autoLinkUser: ["openid_connect"]
+          providers:
+            - secret: gitlab-oauth
+              key: provider
         object_store:
           enabled: true
           connection:

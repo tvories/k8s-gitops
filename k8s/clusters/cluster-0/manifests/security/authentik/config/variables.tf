@@ -36,7 +36,13 @@ variable "CLUSTER_DOMAIN" {
   type        = string
 }
 
-variable "authentik_url" {
-  description = "value"
+variable "gitlab_client_id" {
+  description = "The client ID for GitLab in Authentik."
   type        = string
+}
+
+variable "gitlab_client_secret" {
+  description = "The client secret for GitLab in Authentik."
+  type        = string
+  sensitive   = true
 }

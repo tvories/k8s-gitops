@@ -18,6 +18,11 @@ resource "authentik_group" "grafana_admin" {
   is_superuser = false
 }
 
+resource "authentik_group" "gitlab_admin" {
+  name         = "GitLab Admins"
+  is_superuser = false
+}
+
 resource "authentik_group" "default" {
   for_each     = local.authentik_groups
   name         = each.value.name

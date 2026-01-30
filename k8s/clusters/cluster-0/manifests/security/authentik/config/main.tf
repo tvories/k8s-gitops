@@ -16,6 +16,14 @@ locals {
       redirect_uri  = "https://grafana.cluster-0.t-vo.us/login/generic_oauth"
       launch_url    = "https://grafana.cluster-0.t-vo.us/login/generic_oauth"
     },
+    gitlab = {
+      client_id     = var.gitlab_client_id
+      client_secret = var.gitlab_client_secret
+      group         = "infrastructure"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/gitlab.png"
+      redirect_uri  = "https://gitlab.${var.CLUSTER_DOMAIN}/users/auth/openid_connect/callback"
+      launch_url    = "https://gitlab.${var.CLUSTER_DOMAIN}"
+    },
     # headlamp = {
     #   client_id     = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_ID"]
     #   client_secret = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_SECRET"]
