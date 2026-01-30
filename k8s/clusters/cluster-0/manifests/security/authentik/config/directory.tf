@@ -32,6 +32,33 @@ resource "authentik_policy_binding" "application_policy_binding" {
   order  = 0
 }
 
+# Google OAuth Source
+data "authentik_flow" "default-source-authentication" {
+  slug = "default-source-authentication"
+}
+
+data "authentik_flow" "default-source-enrollment" {
+  slug = "default-source-enrollment"
+}
+
+resource "authentik_source_oauth" "google" {
+  name = "Google"
+  slug = "google"
+  # Note: Ensure these data source names match your actual data blocks
+  authentication_flow = data.authentik_flow.default-source-authentication.id
+  enrollment_flow     = data.authentik_flow.default-source-enrollment.id
+  user_matching_mode  = "email_link"
+
+  provider_type = "google"
+  # Reference variables instead of the deprecated resource
+  consumer_key    = var.google_oauth_client_id
+  consumer_secret = var.google_oauth_client_secret
+
+  # For Google, Authentik's 'google' provider_type usually handles
+  # these automatically, but keeping them is fine for clarity:
+  oidc_well_known_url = "https://accounts.google.com/.well-known/openid-configuration"
+}
+
 # module "onepassword_discord" {
 #   source = "github.com/joryirving/terraform-1password-item"
 #   vault  = "Kubernetes"

@@ -84,11 +84,13 @@ resource "authentik_provider_oauth2" "oauth2" {
   client_id          = each.value.client_id
   client_secret      = each.value.client_secret
   authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  # authentication_flow   = authentik_flow.authentication.uuid
-  invalidation_flow = data.authentik_flow.invalidation_flow.id
-  # property_mappings     = data.authentik_property_mapping_provider_scope.oauth2.ids
+  invalidation_flow  = data.authentik_flow.invalidation_flow.id
+  property_mappings = [
+    data.authentik_property_mapping_provider_scope.scope-email.id,
+    data.authentik_property_mapping_provider_scope.scope-profile.id,
+    data.authentik_property_mapping_provider_scope.scope-openid.id,
+  ]
   access_token_validity = "hours=4"
-  # signing_key           = data.authentik_certificate_key_pair.generated.id
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
@@ -108,5 +110,3 @@ resource "authentik_application" "application" {
   meta_launch_url    = each.value.launch_url
   policy_engine_mode = "all"
 }
-
-

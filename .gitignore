@@ -31,3 +31,4 @@ secrets.yml
 compare.yaml
 *.tfstate*
 .env
+*secrets.json
