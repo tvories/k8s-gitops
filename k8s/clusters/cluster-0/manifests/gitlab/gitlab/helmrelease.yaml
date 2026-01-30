@@ -117,15 +117,15 @@ spec:
         omniauth:
           enabled: true
           allowSingleSignOn: ["openid_connect"]
-          autoSignInWithProvider: openid_connect
-          autoLinkLdapUser: true
+          # autoSignInWithProvider: openid_connect
+          # autoLinkLdapUser: true
           blockAutoCreatedUsers: false
           # autoLinkUser: ["openid_connect"]
           providers:
             - secret: gitlab-oauth
               key: provider
         ldap:
-          # preventSignin: true
+          preventSignin: true
           servers:
             main:
               label: Authentik
