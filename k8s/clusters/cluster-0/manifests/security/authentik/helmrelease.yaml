@@ -40,10 +40,6 @@ spec:
           value: "587"
         - name: AUTHENTIK_EMAIL__USE_TLS
           value: "true"
-        - name: AUTHENTIK_HOST
-          value: "https://authentik.${SECRET_DOMAIN}"
-        - name: AUTHENTIK_HOST_BROWSER
-          value: "https://authentik.${SECRET_DOMAIN}"
     # controller:
     #   annotations:
     #     secret.reloader.stakater.com/reload: &secret authentik-config
