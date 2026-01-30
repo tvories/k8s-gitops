@@ -117,17 +117,20 @@ spec:
         omniauth:
           enabled: true
           allowSingleSignOn: ["openid_connect"]
+          autoSignInWithProvider: openid_connect
+          autoLinkLdapUser: true
           blockAutoCreatedUsers: false
-          autoLinkUser: ["openid_connect"]
+          # autoLinkUser: ["openid_connect"]
           providers:
             - secret: gitlab-oauth
               key: provider
         ldap:
+          preventSignin: true
           servers:
             main:
-              label: "Authentik"
-              host: "ak-outpost-tvo-ldap.security.svc.cluster.local"
-              port: 389
+              label: Authentik
+              hosts:
+                - [ak-outpost-tvo-ldap.security.svc.cluster.local, 389]
               uid: "uid"
               bind_dn:
                 secret: gitlab-secrets
@@ -140,7 +143,7 @@ spec:
               active_directory: false
               base: "dc=ldap,dc=t-vo,dc=us"
               user_filter: ""
-              group_base: "ou=groups,dc=ldap,dc=t-vo,dc=us"
+              group_base: "dc=ldap,dc=t-vo,dc=us"
               admin_group: "GitLab Admins"
               sync_ssh_keys: false
         object_store:
