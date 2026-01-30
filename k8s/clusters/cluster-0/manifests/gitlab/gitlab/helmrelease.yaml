@@ -129,12 +129,10 @@ spec:
           servers:
             main:
               label: Authentik
-              hosts:
-                - [ak-outpost-tvo-ldap.security.svc.cluster.local, 389]
-              uid: "uid"
-              bind_dn:
-                secret: gitlab-secrets
-                key: ldap_bind_dn
+              host: ak-outpost-tvo-ldap.security.svc.cluster.local
+              port: 389
+              uid: uid
+              bind_dn: cn=svc_gitlab,ou=users,dc=ldap,dc=t-vo,dc=us
               password:
                 secret: gitlab-secrets
                 key: ldap_password
