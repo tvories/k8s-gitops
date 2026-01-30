@@ -119,12 +119,30 @@ spec:
           allowSingleSignOn: ["openid_connect"]
           blockAutoCreatedUsers: false
           autoLinkUser: ["openid_connect"]
-          syncProfileFromProvider: ["openid_connect"]
-          syncProfileAttributes: ["email", "name", "groups"]
-          allowBypassTwoFactor: ["openid_connect"]
           providers:
             - secret: gitlab-oauth
               key: provider
+        ldap:
+          servers:
+            main:
+              label: "Authentik"
+              host: "ak-outpost-tvo-ldap.security.svc.cluster.local"
+              port: 389
+              uid: "uid"
+              bind_dn:
+                secret: gitlab-secrets
+                key: ldap_bind_dn
+              password:
+                secret: gitlab-secrets
+                key: ldap_password
+              encryption: "plain"
+              verify_certificates: false
+              active_directory: false
+              base: "dc=ldap,dc=t-vo,dc=us"
+              user_filter: ""
+              group_base: "ou=groups,dc=ldap,dc=t-vo,dc=us"
+              admin_group: "GitLab Admins"
+              sync_ssh_keys: false
         object_store:
           enabled: true
           connection:
