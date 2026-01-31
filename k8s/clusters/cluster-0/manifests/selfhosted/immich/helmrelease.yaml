@@ -14,6 +14,11 @@ spec:
         name: immich-charts
         namespace: flux-system
       interval: 15m
+  valuesFrom:
+    - kind: Secret
+      name: immich-secret
+      valuesKey: immich-oauth-values
+      optional: false
   values:
     # Valkey (Redis replacement)
     valkey:
@@ -24,6 +29,14 @@ spec:
       persistence:
         library:
           existingClaim: immich-nfs
+      configuration:
+        oauth:
+          enabled: true
+          autoLaunch: true
+          autoRegister: true
+          buttonText: Login with Authentik
+          issuerUrl: https://authentik.t-vo.us/application/o/immich/.well-known/openid-configuration
+          scope: openid email profile
 
     # Server configuration
     server:
