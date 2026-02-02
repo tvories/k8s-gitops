@@ -23,6 +23,8 @@ spec:
     # Valkey (Redis replacement)
     valkey:
       enabled: true
+    metrics:
+      enabled: true
 
     # Persistence for photo library
     immich:
@@ -37,6 +39,15 @@ spec:
           buttonText: Login with Authentik
           issuerUrl: https://authentik.t-vo.us/application/o/immich/.well-known/openid-configuration
           scope: openid email profile
+        notifications:
+          smtp:
+            enabled: true
+            from: immich@${SECRET_DOMAIN}
+            replyTo: immich@${SECRET_DOMAIN}
+            transport:
+              host: ${GATEWAY_IP}
+              ignoreCert: true
+              port: 25
 
     # Server configuration
     server:

@@ -52,3 +52,14 @@ variable "gitlab_svc_password" {
   type        = string
   sensitive   = true
 }
+
+variable "immich_client_id" {
+  description = "The client ID for Immich in Authentik."
+  type        = string
+}
+
+variable "immich_client_secret" {
+  description = "The client secret for Immich in Authentik."
+  type        = string
+  sensitive   = true
+}

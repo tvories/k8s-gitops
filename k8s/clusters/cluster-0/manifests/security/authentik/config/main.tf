@@ -24,6 +24,18 @@ locals {
       redirect_uri  = "https://gitlab.${var.CLUSTER_DOMAIN}/users/auth/openid_connect/callback"
       launch_url    = "https://gitlab.${var.CLUSTER_DOMAIN}"
     },
+    immich = {
+      client_id     = var.immich_client_id
+      client_secret = var.immich_client_secret
+      group         = "users"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/immich.png"
+      redirect_uris = [
+        "app.immich:///oauth-callback",
+        "https://photos.${var.CLUSTER_DOMAIN}/auth/login",
+        "https://photos.${var.CLUSTER_DOMAIN}/user-settings",
+      ]
+      launch_url = "https://photos.${var.CLUSTER_DOMAIN}/auth/login?autoLaunch=1"
+    },
     # headlamp = {
     #   client_id     = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_ID"]
     #   client_secret = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_SECRET"]
@@ -101,9 +113,9 @@ resource "authentik_provider_oauth2" "oauth2" {
   ]
   access_token_validity = "hours=4"
   allowed_redirect_uris = [
-    {
+    for uri in try(each.value.redirect_uris, [each.value.redirect_uri]) : {
       matching_mode = "strict",
-      url           = each.value.redirect_uri,
+      url           = uri,
     }
   ]
 }
