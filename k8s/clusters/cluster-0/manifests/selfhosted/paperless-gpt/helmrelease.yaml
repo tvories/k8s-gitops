@@ -42,7 +42,7 @@ spec:
               LLM_MODEL: llama3.2:3b # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
               OLLAMA_HOST: http://192.168.1.50:11434
               VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: llama3.2-vision
+              VISION_LLM_MODEL: deepseek-ocr:3b
               # AUTO_GENERATE_TAGS: "false"
               AUTO_GENERATE_CORRESPONDENTS: "false"
               LOG_LEVEL: "debug"
