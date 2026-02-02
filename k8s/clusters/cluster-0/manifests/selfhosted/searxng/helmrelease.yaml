@@ -53,7 +53,7 @@ spec:
                 cpu: 10m
                 memory: 256Mi
               limits:
-                memory: 24Gi
+                memory: 10Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -66,52 +66,18 @@ spec:
                   - SETUID
                   - DAC_OVERRIDE
 
-      redis:
-        pod:
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
-        strategy: RollingUpdate
-        containers:
-          redis:
-            image:
-              repository: docker.io/valkey/valkey
-              tag: 8.0.1
-            args:
-              - --save
-              - ""
-              - --appendonly
-              - "no"
-            resources:
-              requests:
-                cpu: 5m
-                memory: 32Mi
-              limits:
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
     service:
       app:
         controller: searxng
         ports:
           http:
             port: *httpPort
-      redis:
-        controller: redis
-        ports:
-          http:
-            port: 6379
 
     ingress:
       app:
-        className: "internal-nginx"
+        className: "nginx-internal"
         hosts:
-          - host: search.holthome.net
+          - host: search.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
@@ -121,7 +87,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: searxng-configmap
+        name: searxng-config
         globalMounts:
           - path: /etc/searxng/settings.yml
             subPath: settings.yml
