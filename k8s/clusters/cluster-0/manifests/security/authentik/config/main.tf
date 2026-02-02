@@ -106,6 +106,7 @@ resource "authentik_provider_oauth2" "oauth2" {
   client_secret      = each.value.client_secret
   authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
   invalidation_flow  = data.authentik_flow.invalidation_flow.id
+  signing_key        = data.authentik_certificate_key_pair.generated.id
   property_mappings = [
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
