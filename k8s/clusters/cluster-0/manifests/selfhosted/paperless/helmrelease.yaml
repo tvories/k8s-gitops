@@ -79,8 +79,8 @@ spec:
             envFrom: *envFrom
             resources:
               requests:
-                cpu: 15m
-                memory: 1000M
+                cpu: 500m
+                memory: 2Gi
               limits:
                 # cpu: 1311m
                 memory: 8000M # Something is eating memory
@@ -94,8 +94,8 @@ spec:
                 cpu: 5m
                 memory: 32Mi
               limits:
-                memory: 128Mi
-          # tika:
+                memory: 1Gi
+          # tika:li
           #   image:
           #     repository: ghcr.io/paperless-ngx/tika
           #     tag: 2.9.1-full
