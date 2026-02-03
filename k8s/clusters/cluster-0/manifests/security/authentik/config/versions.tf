@@ -6,7 +6,7 @@ terraform {
     }
     onepassword = {
       source  = "1Password/onepassword"
-      version = "3.1.2"
+      version = "3.2.0"
     }
     google = {
       source  = "hashicorp/google"
