@@ -59,9 +59,9 @@ spec:
               PAPERLESS_DATA_DIR: /library/data
               PAPERLESS_EXPORT_DIR: /library/export
               PAPERLESS_MEDIA_ROOT: /library/media
-              PAPERLESS_TASK_WORKERS: 1
-              PAPERLESS_THREADS_PER_WORKER: 2
-              PAPERLESS_OCR_THREADS: 2
+              # PAPERLESS_TASK_WORKERS: 1
+              # PAPERLESS_THREADS_PER_WORKER: 2
+              # PAPERLESS_OCR_THREADS: 2
               PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
               # PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN},paperless-app." $ Defaults to "*"
