@@ -46,6 +46,7 @@ spec:
               VISION_LLM_MODEL: minicpm-v
               TOKEN_LIMIT: 1000 # Recommended for smaller models
               # AUTO_GENERATE_TAGS: "false"
+              OCR_PROVIDER: llm
               AUTO_GENERATE_CORRESPONDENTS: "false"
               AUTO_OCR_TAG: paperless-gpt-ocr-auto
               AUTO_TAG: paperless-gpt-auto
