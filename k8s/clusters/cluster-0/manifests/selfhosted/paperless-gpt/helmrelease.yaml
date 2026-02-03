@@ -43,7 +43,7 @@ spec:
               OLLAMA_HOST: http://192.168.1.50:11434
               OLLAMA_CONTEXT_LENGTH: "8192" # From techno tim
               VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: deepseek-ocr:3b
+              VISION_LLM_MODEL: minicpm-v
               TOKEN_LIMIT: 1000 # Recommended for smaller models
               # AUTO_GENERATE_TAGS: "false"
               AUTO_GENERATE_CORRESPONDENTS: "false"
@@ -51,7 +51,7 @@ spec:
               AUTO_TAG: paperless-gpt-auto
               MANUAL_TAG: paperless-gpt-manual
               PDF_OCR_TAGGING: "true"
-              PAPERLESS_API_PAGE_SIZE: "9999"
+              PDF_OCR_COMPLETE_TAG: paperless-gpt-ocr-complete
 
               LOG_LEVEL: "debug"
             envFrom:
