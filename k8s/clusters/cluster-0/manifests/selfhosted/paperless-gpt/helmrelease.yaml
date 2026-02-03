@@ -38,13 +38,10 @@ spec:
             env:
               PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
-              LLM_PROVIDER: ollama
-              LLM_MODEL: llama3.2:3b # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
-              OLLAMA_HOST: http://192.168.1.50:11434
-              OLLAMA_CONTEXT_LENGTH: "8192" # From techno tim
-              VISION_LLM_PROVIDER: ollama
-              VISION_LLM_MODEL: minicpm-v
-              TOKEN_LIMIT: 1000 # Recommended for smaller models
+              LLM_PROVIDER: anthropic
+              LLM_MODEL: claude-haiku-3-5
+              VISION_LLM_PROVIDER: anthropic
+              VISION_LLM_MODEL: claude-haiku-3-5
               # AUTO_GENERATE_TAGS: "false"
               OCR_PROVIDER: llm
               AUTO_GENERATE_CORRESPONDENTS: "false"
@@ -58,6 +55,8 @@ spec:
             envFrom:
               - secretRef:
                   name: paperless-secret
+              - secretRef:
+                  name: paperless-gpt-secret
             resources:
               requests:
                 cpu: 10m
