@@ -39,9 +39,9 @@ spec:
               PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LLM_PROVIDER: anthropic
-              LLM_MODEL: claude-haiku-3-5
+              LLM_MODEL: claude-haiku-4-5
               VISION_LLM_PROVIDER: anthropic
-              VISION_LLM_MODEL: claude-haiku-3-5
+              VISION_LLM_MODEL: claude-haiku-4-5
               # AUTO_GENERATE_TAGS: "false"
               OCR_PROVIDER: llm
               AUTO_GENERATE_CORRESPONDENTS: "false"
