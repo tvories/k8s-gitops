@@ -94,8 +94,9 @@ spec:
   instances: 3
   imageName: ghcr.io/tensorchord/cloudnative-vectorchord:17-1.0.0
   enableSuperuserAccess: true
-  enablePodAntiAffinity: true
-  podAntiAffinityType: preferred
+  affinity:
+    enablePodAntiAffinity: true
+    podAntiAffinityType: preferred
 
   storage:
     size: 75Gi
