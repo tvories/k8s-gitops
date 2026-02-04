@@ -96,7 +96,7 @@ spec:
   enableSuperuserAccess: true
   affinity:
     enablePodAntiAffinity: true
-    podAntiAffinityType: preferred
+    podAntiAffinityType: required
 
   storage:
     size: 75Gi
