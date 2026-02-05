@@ -63,41 +63,6 @@ nodes:
   #   #           - name: gasket
   #   #           - name: apex
 
-  - hostname: m720q-4.${domain_name}
-    controlPlane: false
-    ipAddress: 192.168.80.90
-    installDisk: /dev/sda
-    nameservers:
-      - 192.168.1.243
-      - 192.168.1.240
-    networkInterfaces:
-      - interface: eth0
-        dhcp: false
-        mtu: 9000
-        vlans:
-          - &vlan80
-            vlanId: 80
-            mtu: 9000
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 2048
-          # - &vlan50
-          #   vlanId: 50
-          #   mtu: 1500
-          #   dhcp: true
-          #   dhcpOptions:
-          #     routeMetric: 4096
-    # patches:
-    #   - |-
-    #     machine:
-    #       install:
-    #         extensions:
-    #           - image: ${gasket_image}
-    #       kernel:
-    #         modules:
-    #           - name: gasket
-    #           - name: apex
-
   # - hostname: sff1.${domain_name}
   #   controlPlane: true
   #   ipAddress: 192.168.80.97
@@ -126,7 +91,12 @@ nodes:
           ip: *talosControlplaneVip
         mtu: 9000
         vlans:
-          - *vlan80
+          - &vlan80
+            vlanId: 80
+            mtu: 9000
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 2048
           # - *vlan50
     installDisk: /dev/sda
     schematic:
@@ -163,6 +133,8 @@ nodes:
         vip:
           ip: *talosControlplaneVip
         mtu: 9000
+        vlans:
+          - *vlan80
     installDisk: /dev/sda
     schematic:
       customization:
@@ -183,11 +155,27 @@ nodes:
         vip:
           ip: *talosControlplaneVip
         mtu: 9000
+        vlans:
+          - *vlan80
     installDisk: /dev/sda
     schematic:
       customization:
         systemExtensions:
           officialExtensions: *m720q
+
+  - hostname: m720q-4.${domain_name}
+    controlPlane: false
+    ipAddress: 192.168.80.90
+    installDisk: /dev/sda
+    nameservers:
+      - 192.168.1.243
+      - 192.168.1.240
+    networkInterfaces:
+      - interface: eth0
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - *vlan80
 
   # - hostname: talos-worker-1.${domain_name}
   #   ipAddress: 192.168.80.94
@@ -336,23 +324,11 @@ controlPlane:
             runtime-config: admissionregistration.k8s.io/v1alpha1=true
             feature-gates: MutatingAdmissionPolicy=true
 
-    # Load i915 kernel module for Intel GPU
-    - |-
-      machine:
-        kernel:
-          modules:
-            - name: i915
-
 worker:
   schematic:
     customization:
       extraKernelArgs:
         - net.ifnames=0
-      systemExtensions:
-        officialExtensions:
-          - siderolabs/intel-ucode
-          - siderolabs/gasket-driver
-          # - siderolabs/i915-ucode
   patches:
     # Disable search domain everywhere
     - |-
@@ -413,10 +389,3 @@ worker:
               rsize=131072
               wsize=131072
               nconnect=8
-
-    # Load i915 kernel module for Intel GPU
-    - |-
-      machine:
-        kernel:
-          modules:
-            - name: i915
