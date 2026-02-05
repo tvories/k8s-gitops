@@ -105,6 +105,7 @@ spec:
         requests:
           cpu: 10m
       alertmanagersConfig:
+        create: true
         value: |-
           alertmanagers:
             - static_configs:
@@ -117,6 +118,7 @@ spec:
         - --label=replica="__replica__"
         - --web.prefix-header=X-Forwarded-Prefix
       rules:
+        create: true
         value: |-
           groups:
             - name: PrometheusWatcher
