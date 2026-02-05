@@ -99,7 +99,7 @@ spec:
     podAntiAffinityType: required
 
   storage:
-    size: 50Gi
+    size: 75Gi
     storageClass: local-hostpath
   superuserSecret:
     name: cloudnative-pg-secret
