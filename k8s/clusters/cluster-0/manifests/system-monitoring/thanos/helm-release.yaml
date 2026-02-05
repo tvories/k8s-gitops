@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -6,14 +7,9 @@ metadata:
   namespace: system-monitoring
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: thanos
-      version: 17.3.1
-      sourceRef:
-        kind: HelmRepository
-        name: bitnami-charts
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: thanos
   maxHistory: 2
   install:
     remediation:
@@ -25,131 +21,114 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    # Reference existing secret with objstore.yml
     objstoreConfig:
-      type: s3
-      config:
-        bucket: thanos
-        endpoint: "s3.nas.${SECRET_DOMAIN}"
-        region: ""
+      create: false
+      name: thanos-objstore-secret
+      key: objstore.yml
+
+    # Discover Prometheus sidecars
+    additionalEndpoints:
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.system-monitoring.svc.cluster.local
+    additionalReplicaLabels:
+      - replica
+
+    serviceMonitor:
+      enabled: true
+
     queryFrontend:
       enabled: false
-      resources:
-        requests:
-          cpu: 10m
+
     query:
-      enabled: true
-      replicaCount: 3
-      podAntiAffinityPreset: hard
-      replicaLabel:
-        - replica
-      dnsDiscovery:
-        sidecarsService: kube-prometheus-stack-thanos-discovery
-        sidecarsNamespace: system-monitoring
-        # stores:
-        #   - "dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery"
-        #   - "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}:443"
+      replicas: 3
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: thanos
+                  app.kubernetes.io/component: query
+              topologyKey: kubernetes.io/hostname
       resources:
         requests:
           cpu: 10m
-        # limits:
-        #   memory: 99M
+      ingress:
+        enabled: true
+        ingressClassName: nginx-internal
+        hosts:
+          - thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}
+        tls:
+          - hosts:
+              - thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}
 
-      ingress:
-        enabled: true
-        hostname: &host "thanos.${CLUSTER_NAME}.${SECRET_DOMAIN}"
-        ingressClassName: "nginx-internal"
-        tls: true
-        extraTls:
-          - hosts:
-              - *host
-    bucketweb:
+    bucketWeb:
       enabled: true
       resources:
         requests:
           cpu: 10m
-    compactor:
+
+    compact:
       enabled: true
       resources:
         requests:
           cpu: 10m
-      # extraFlags:
-      #   - "--compact.concurrency"
-      #   - "4"
-      retentionResolutionRaw: 14d
-      retentionResolution5m: 30d
-      retentionResolution1h: 180d
-      ingress:
-        enabled: true
-        hostname: &hostc "thanos-compactor.${SECRET_DOMAIN}"
-        ingressClassName: "nginx-internal"
-        tls: true
-        extraTls:
-          - hosts:
-              - *hostc
+      extraArgs:
+        - --retention.resolution-raw=14d
+        - --retention.resolution-5m=30d
+        - --retention.resolution-1h=180d
       persistence:
         enabled: true
-        storageClass: "ceph-block"
+        storageClass: ceph-block
         size: 100Gi
-    storegateway:
+      ingress:
+        enabled: true
+        ingressClassName: nginx-internal
+        hosts:
+          - thanos-compactor.${SECRET_DOMAIN}
+        tls:
+          - hosts:
+              - thanos-compactor.${SECRET_DOMAIN}
+
+    storeGateway:
       enabled: true
       resources:
         requests:
           cpu: 10m
       persistence:
         enabled: true
-        storageClass: "ceph-block"
+        storageClass: ceph-block
         size: 10Gi
-    ruler:
+
+    rule:
       enabled: true
       resources:
         requests:
           cpu: 10m
-      dnsDiscovery:
-        enabled: true
-      alertmanagers:
-        - http://kube-prometheus-stack-alertmanager.system-monitoring:9093
-      clusterName: ${CLUSTER_NAME}
-      replicaLabel: __replica__
-      extraFlags: ["--web.prefix-header=X-Forwarded-Prefix"]
-      config: |-
-        groups:
-          - name: PrometheusWatcher
-            rules:
-              - alert: PrometheusDown
-                annotations:
-                  summary: A Prometheus has disappeared from Prometheus target discovery
-                expr: absent(up{job="kube-prometheus-stack-prometheus"})
-                for: 5m
-                labels:
-                  severity: critical
+      alertmanagersConfig:
+        value: |-
+          alertmanagers:
+            - static_configs:
+                - targets:
+                    - kube-prometheus-stack-alertmanager.system-monitoring:9093
+              scheme: http
+              api_version: v2
+      extraArgs:
+        - --label=cluster="${CLUSTER_NAME}"
+        - --label=replica="__replica__"
+        - --web.prefix-header=X-Forwarded-Prefix
+      rules:
+        value: |-
+          groups:
+            - name: PrometheusWatcher
+              rules:
+                - alert: PrometheusDown
+                  annotations:
+                    summary: A Prometheus has disappeared from Prometheus target discovery
+                  expr: absent(up{job="kube-prometheus-stack-prometheus"})
+                  for: 5m
+                  labels:
+                    severity: critical
       persistence:
         enabled: true
-        storageClass: "ceph-block"
+        storageClass: ceph-block
         size: 2Gi
-
-    metrics:
-      enabled: true
-      serviceMonitor:
-        enabled: true
-
-  valuesFrom:
-    - kind: Secret
-      name: thanos-secret
-      valuesKey: s3-bucket
-      targetPath: objstoreConfig.config.bucket
-    - kind: Secret
-      name: thanos-secret
-      valuesKey: s3-endpoint
-      targetPath: objstoreConfig.config.endpoint
-    # - kind: ConfigMap
-    #   name: thanos-ceph-bucket
-    #   valuesKey: BUCKET_REGION
-    #   targetPath: objstoreConfig.config.region
-    - kind: Secret
-      name: thanos-secret
-      valuesKey: access-key
-      targetPath: objstoreConfig.config.access_key
-    - kind: Secret
-      name: thanos-secret
-      valuesKey: secret-key
-      targetPath: objstoreConfig.config.secret_key
