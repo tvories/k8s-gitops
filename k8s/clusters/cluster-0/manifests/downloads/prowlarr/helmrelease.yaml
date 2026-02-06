@@ -130,9 +130,9 @@ spec:
     #   enabled: true
     #   type: emptyDir
     #   mountPath: /shared
-    backup:
-      type: nfs
-      server: ${SECRET_NAS3}
-      path: /ook/Backup/k8s/applications/prowlarr
-      globalMounts:
-        - path: /config/Backups
+    # backup:
+    #   type: nfs
+    #   server: ${SECRET_NAS3}
+    #   path: /ook/Backup/k8s/applications/prowlarr
+    #   globalMounts:
+    #     - path: /config/Backups
