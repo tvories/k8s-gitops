@@ -58,7 +58,7 @@ spec:
             main:
               image:
                 # renovate: datasource=github-releases depName=immich-app/immich
-                tag: "v2.5.3"
+                tag: "v2.5.5"
               resources:
                 requests:
                   cpu: 100m
