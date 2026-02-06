@@ -36,6 +36,14 @@ locals {
       ]
       launch_url = "https://photos.${var.CLUSTER_DOMAIN}/auth/login?autoLaunch=1"
     },
+    tandoor = {
+      client_id     = var.tandoor_client_id
+      client_secret = var.tandoor_client_secret
+      group         = "home"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/tandoor-recipes.png"
+      redirect_uri  = "https://tandoor.${var.CLUSTER_DOMAIN}/accounts/oidc/authentik/login/callback/"
+      launch_url    = "https://tandoor.${var.CLUSTER_DOMAIN}"
+    },
     # headlamp = {
     #   client_id     = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_ID"]
     #   client_secret = module.onepassword_application["headlamp"].fields["HEADLAMP_CLIENT_SECRET"]

@@ -63,3 +63,14 @@ variable "immich_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "tandoor_client_id" {
+  description = "The client ID for Tandoor in Authentik."
+  type        = string
+}
+
+variable "tandoor_client_secret" {
+  description = "The client secret for Tandoor in Authentik."
+  type        = string
+  sensitive   = true
+}
