@@ -109,8 +109,7 @@ spec:
         value: |-
           alertmanagers:
             - static_configs:
-                - targets:
-                    - "kube-prometheus-stack-alertmanager.system-monitoring:9093"
+                - "kube-prometheus-stack-alertmanager.system-monitoring:9093"
               scheme: http
               api_version: v2
       extraArgs:
