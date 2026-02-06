@@ -1,11 +1,1 @@
-cluster-0-talos-cp-1.mcbadass.local.yaml
-cluster-0-talos-cp-2.mcbadass.local.yaml
-cluster-0-physical1.mcbadass.local.yaml
-cluster-0-physical2.mcbadass.local.yaml
-cluster-0-sff1.mcbadass.local.yaml
-cluster-0-talos-worker-1.mcbadass.local.yaml
-cluster-0-talos-worker-2.mcbadass.local.yaml
-talosconfig
-cluster-0-m720q-1.mcbadass.local.yaml
-cluster-0-m720q-2.mcbadass.local.yaml
-cluster-0-m720q-3.mcbadass.local.yaml
+*
