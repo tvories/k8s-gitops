@@ -133,6 +133,6 @@ spec:
     backup:
       type: nfs
       server: ${SECRET_NAS3}
-      path: //ook/Backup/k8s/applications/prowlarr
+      path: /ook/Backup/k8s/applications/prowlarr
       globalMounts:
         - path: /config/Backups
