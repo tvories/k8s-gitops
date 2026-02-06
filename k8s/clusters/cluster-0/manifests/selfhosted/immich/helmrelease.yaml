@@ -66,7 +66,7 @@ spec:
               env:
                 # Database connection
                 DB_DATABASE_NAME: immich
-                DB_HOSTNAME: postgres.database.svc.cluster.local
+                DB_HOSTNAME: postgres6-rw.database.svc.cluster.local
                 DB_PORT: "5432"
                 DB_USERNAME:
                   valueFrom:
