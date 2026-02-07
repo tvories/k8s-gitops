@@ -7,13 +7,9 @@ metadata:
   namespace: downloads
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 4.6.2
-      sourceRef:
-        kind: OCIRepository
-        name: app-template
+  chartRef:
+    kind: OCIRepository
+    name: speakarr
   maxHistory: 2
   install:
     remediation:
