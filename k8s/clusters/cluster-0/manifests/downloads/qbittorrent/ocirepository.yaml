@@ -2,6 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
+  namespace: downloads
   name: qbittorrent
 spec:
   interval: 15m
