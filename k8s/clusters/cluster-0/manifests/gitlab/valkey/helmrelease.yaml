@@ -7,14 +7,9 @@ metadata:
   namespace: gitlab
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 4.6.2
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s-charts
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: valkey
   maxHistory: 2
   install:
     remediation:

@@ -8,14 +8,9 @@ metadata:
 spec:
   releaseName: esphome
   interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 3.7.3
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s-charts
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: esphome
   install:
     remediation:
       retries: 3

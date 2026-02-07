@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: home
 # namePrefix: frigate-
 resources:
+  - ocirepository.yaml
   - ./pvc.yaml
   - ./secret.sops.yaml
   - ./externalsecret.yaml
