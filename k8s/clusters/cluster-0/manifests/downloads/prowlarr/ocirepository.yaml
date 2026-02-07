@@ -1,9 +1,8 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: bjw-s-charts-oci
-  namespace: flux-system
+  name: app-template
 spec:
   interval: 15m
   layerSelector:

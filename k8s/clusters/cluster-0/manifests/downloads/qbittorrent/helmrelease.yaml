@@ -14,8 +14,7 @@ spec:
       interval: 30m
       sourceRef:
         kind: OCIRepository
-        name: bjw-s-charts-oci
-        namespace: flux-system
+        name: app-template
 
   values:
     controllers:
