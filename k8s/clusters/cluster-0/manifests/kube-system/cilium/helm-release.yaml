@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: 1.15.19
+      version: 1.19.0
       sourceRef:
         kind: HelmRepository
         name: cilium-charts
