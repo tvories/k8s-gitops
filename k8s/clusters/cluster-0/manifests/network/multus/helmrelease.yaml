@@ -66,6 +66,7 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
+          serviceAccountName: multus
           hostNetwork: true
           hostPID: true
 
@@ -205,6 +206,3 @@ spec:
             multus-daemon:
               - path: /run/netns/
                 mountPropagation: HostToContainer
-
-    defaultPodOptions:
-      serviceAccountName: multus
