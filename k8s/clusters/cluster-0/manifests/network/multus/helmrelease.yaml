@@ -205,6 +205,3 @@ spec:
             multus-daemon:
               - path: /run/netns/
                 mountPropagation: HostToContainer
-
-    serviceAccount:
-      create: true
