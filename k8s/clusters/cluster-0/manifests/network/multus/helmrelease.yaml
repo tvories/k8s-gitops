@@ -205,3 +205,6 @@ spec:
             multus-daemon:
               - path: /run/netns/
                 mountPropagation: HostToContainer
+
+    defaultPodOptions:
+      serviceAccountName: multus

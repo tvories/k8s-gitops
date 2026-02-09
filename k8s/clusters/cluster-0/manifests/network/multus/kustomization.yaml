@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: network
 resources:
   - ocirepository.yaml
+  - ./serviceaccount.yaml
   - ./helmrelease.yaml
   - ./crd.yaml
   - ./rbac.yaml
