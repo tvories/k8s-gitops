@@ -101,80 +101,82 @@ spec:
           #   memory: "1G"
 
       csi:
-        csiRBDPluginResource: |
-          - name : driver-registrar
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 50m
-              limits:
-                memory: 256Mi
-                cpu: 100m
-          - name : csi-rbdplugin
-            resource:
-              requests:
-                memory: 512Mi
-                cpu: 60m
-              limits:
-                memory: 1Gi
-                cpu: 500m
-          - name : liveness-prometheus
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 50m
-              limits:
-                memory: 256Mi
-                cpu: 100m
-        csiCephFSProvisionerResource: |
-          - name : csi-provisioner
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 20m
-              limits:
-                memory: 256Mi
-                cpu: 200m
-          - name : csi-resizer
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 20m
-              limits:
-                memory: 256Mi
-                cpu: 200m
-          - name : csi-attacher
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 20m
-              limits:
-                memory: 256Mi
-                cpu: 200m
-          - name : csi-snapshotter
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 20m
-              limits:
-                memory: 256Mi
-                cpu: 200m
-          - name : csi-cephfsplugin
-            resource:
-              requests:
-                memory: 512Mi
-                cpu: 50m
-              limits:
-                memory: 1Gi
-                cpu: 500m
-          - name : liveness-prometheus
-            resource:
-              requests:
-                memory: 128Mi
-                cpu: 10m
-              limits:
-                memory: 256Mi
-                cpu: 100m
+        readAffinity:
+          enabled: false
+        # csiRBDPluginResource: |
+        #   - name : driver-registrar
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 50m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 100m
+        #   - name : csi-rbdplugin
+        #     resource:
+        #       requests:
+        #         memory: 512Mi
+        #         cpu: 60m
+        #       limits:
+        #         memory: 1Gi
+        #         cpu: 500m
+        #   - name : liveness-prometheus
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 50m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 100m
+        # csiCephFSProvisionerResource: |
+        #   - name : csi-provisioner
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 20m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 200m
+        #   - name : csi-resizer
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 20m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 200m
+        #   - name : csi-attacher
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 20m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 200m
+        #   - name : csi-snapshotter
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 20m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 200m
+        #   - name : csi-cephfsplugin
+        #     resource:
+        #       requests:
+        #         memory: 512Mi
+        #         cpu: 50m
+        #       limits:
+        #         memory: 1Gi
+        #         cpu: 500m
+        #   - name : liveness-prometheus
+        #     resource:
+        #       requests:
+        #         memory: 128Mi
+        #         cpu: 10m
+        #       limits:
+        #         memory: 256Mi
+        #         cpu: 100m
 
       crashCollector:
         disable: false
@@ -182,6 +184,8 @@ spec:
       dashboard:
         enabled: true
         urlPrefix: /
+        ssl: false
+        prometheusEndpoint: http://prometheus-operated.system-monitoring.svc.cluster.local:9090
 
       storage:
         useAllNodes: false
