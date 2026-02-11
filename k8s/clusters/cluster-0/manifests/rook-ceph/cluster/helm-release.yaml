@@ -38,9 +38,6 @@ spec:
       [global]
       bdev_enable_discard = true
       bdev_async_discard = true
-      auth_cluster_required = none
-      auth_service_required = none
-      auth_client_required = none
 
     cephClusterSpec:
       mon:
