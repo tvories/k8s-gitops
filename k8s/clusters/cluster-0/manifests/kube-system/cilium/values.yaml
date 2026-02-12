@@ -5,12 +5,6 @@ cluster:
 cni:
   exclusive: false
 
-bgp:
-  enabled: false
-  announce:
-    loadbalancerIP: true
-    podCIDR: false
-
 bgpControlPlane:
   enabled: true
 
@@ -36,10 +30,6 @@ bpf:
 
 l7Proxy: true
 
-endpointStatus:
-  enabled: true
-  status: "policy"
-
 ipam:
   mode: "kubernetes"
 
@@ -49,19 +39,26 @@ ingressController:
 
 operator:
   rollOutPods: true
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      trustCRDsExist: true
 
 autoDirectNodeRoutes: true
 ipv4NativeRoutingCIDR: 10.244.0.0/16
 routingMode: native
-containerRuntime:
-  integration: containerd
 
 hubble:
   enabled: true
   serviceMonitor:
-    enabled: false
+    enabled: true
     trustCRDsExist: true
-
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    namespace: monitoring
+    labelValue: "1"
+    annotations: {}
   metrics:
     enabled:
       - dns:query;ignoreAAAA
@@ -71,16 +68,31 @@ hubble:
       - port-distribution
       - icmp
       - http
-
   relay:
     enabled: true
     rollOutPods: true
-
+    prometheus:
+      serviceMonitor:
+        enabled: true
   ui:
     enabled: true
-    ingress:
-      enabled: false
     rollOutPods: true
+    ingress:
+      enabled: true
+      className: nginx-internal
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+      hosts:
+        - "hubble.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+      tls:
+        - secretName: hubble-tls
+          hosts:
+            - "hubble.${CLUSTER_NAME}.${SECRET_DOMAIN}"
+
+prometheus:
+  serviceMonitor:
+    enabled: true
+    trustCRDsExist: true
 
 securityContext:
   capabilities:

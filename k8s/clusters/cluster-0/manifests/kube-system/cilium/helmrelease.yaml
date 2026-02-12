@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 15m
+  timeout: 30m
+  chartRef:
+    kind: OCIRepository
+    name: cilium
+  install:
+    remediation:
+      retries: 2
+  upgrade:
+    remediation:
+      retries: 2
+  valuesFrom:
+    - kind: ConfigMap
+      name: cilium-values

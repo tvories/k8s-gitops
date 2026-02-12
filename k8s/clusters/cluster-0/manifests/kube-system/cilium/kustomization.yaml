@@ -3,7 +3,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: kube-system
 resources:
-  - ./helm-release.yaml
+  - ./ocirepository.yaml
+  - ./helmrelease.yaml
   - ./bgppeeringpolicy.yaml
 configMapGenerator:
   - name: cilium-values
