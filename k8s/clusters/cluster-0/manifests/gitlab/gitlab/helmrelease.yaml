@@ -23,7 +23,6 @@ spec:
     keepHistory: false
   values:
     global:
-      gitlabVersion: "18.8.2"
       edition: ce
       timezone: ${TIMEZONE}
       hosts:
