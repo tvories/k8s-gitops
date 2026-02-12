@@ -27,6 +27,9 @@ bpf:
 
 l7Proxy: true
 
+bgpControlPlane:
+  enabled: true
+
 ipam:
   mode: "kubernetes"
 
