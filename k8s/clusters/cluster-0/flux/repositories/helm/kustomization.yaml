@@ -5,7 +5,7 @@ resources:
   - ../../../../../global/flux/repositories/helm
   # - bitnami-charts.yaml
   - ingress-nginx-charts.yaml
-  - cilium-charts.yaml
+  # - cilium-charts.yaml  # Migrated to OCIRepository
   # - jetstack-charts.yaml
   # - k8s-at-home-charts.yaml
   - metallb-charts.yaml
