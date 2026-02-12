@@ -5,7 +5,7 @@ namespace: kube-system
 resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
-  - ./bgppeeringpolicy.yaml
+  - ./bgp.yaml
 configMapGenerator:
   - name: cilium-values
     files:
