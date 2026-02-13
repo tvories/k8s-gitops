@@ -201,7 +201,7 @@ spec:
         enabled: true
         extraInitContainers: |
           - name: init-db
-            image: ghcr.io/home-operations/postgres-init:18.1
+            image: ghcr.io/home-operations/postgres-init:18.2
             envFrom:
               - secretRef:
                   name: gitlab-secrets
