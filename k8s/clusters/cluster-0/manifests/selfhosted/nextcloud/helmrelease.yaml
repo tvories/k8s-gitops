@@ -112,6 +112,8 @@ spec:
             'default_phone_region' => 'US',
             'trashbin_retention_obligation' => 'auto, 30',
             'auth.bruteforce.protection.enabled' => true,
+            'maintenance_window_start' => 1,
+            'overwrite.cli.url' => 'https://nc.${SECRET_DOMAIN}',
           );
 
       phpConfigs:
