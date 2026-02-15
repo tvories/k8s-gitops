@@ -13,7 +13,7 @@ resources:
   - kubernetes-sigs.yaml
   - vernemq.yaml
   - gitlab-charts.yaml
-  - nextcloud-charts.yaml
+  # - nextcloud-charts.yaml  # Migrated to OCIRepository
   - minecraft-charts.yaml
   - emqx-charts.yaml
   - hashicorp-charts.yaml
