@@ -3,6 +3,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
+  namespace: selfhosted
   name: nextcloud
 spec:
   interval: 15m
@@ -17,6 +18,7 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
+  namespace: selfhosted
   name: nextcloud-valkey
 spec:
   interval: 15m
