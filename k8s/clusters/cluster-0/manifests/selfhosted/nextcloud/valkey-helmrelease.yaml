@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app nextcloud-valkey
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: nextcloud-valkey
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      valkey:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/valkey-io/valkey
+              tag: 9.0.2
+            command:
+              - valkey-server
+              - --requirepass
+              - $(VALKEY_PASSWORD)
+              - --maxmemory
+              - "94371840"
+              - --maxmemory-policy
+              - allkeys-lru
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            env:
+              TZ: "${TIMEZONE}"
+              VALKEY_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: nextcloud-secret
+                    key: REDIS_PASSWORD
+    service:
+      app:
+        ports:
+          http:
+            port: 6379

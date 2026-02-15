@@ -6,3 +6,5 @@ resources:
   - ./externalsecret.yaml
   # - ./cnpg.yaml
   - ./helm-release.yaml
+  - ./ocirepository.yaml
+  - ./valkey-helmrelease.yaml

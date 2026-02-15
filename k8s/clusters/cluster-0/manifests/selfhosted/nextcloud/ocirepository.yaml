@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://datreeio.github.io/CRDs-catalog/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: nextcloud
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 8.9.1
+  url: oci://ghcr.io/nextcloud/helm/nextcloud
+---
+# yaml-language-server: $schema=https://datreeio.github.io/CRDs-catalog/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: nextcloud-valkey
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 4.6.2
+  url: oci://ghcr.io/bjw-s-labs/helm/app-template
