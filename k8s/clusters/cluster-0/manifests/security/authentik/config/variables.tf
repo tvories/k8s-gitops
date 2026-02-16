@@ -64,6 +64,17 @@ variable "immich_client_secret" {
   sensitive   = true
 }
 
+variable "nextcloud_client_id" {
+  description = "The client ID for Nextcloud in Authentik."
+  type        = string
+}
+
+variable "nextcloud_client_secret" {
+  description = "The client secret for Nextcloud in Authentik."
+  type        = string
+  sensitive   = true
+}
+
 variable "tandoor_client_id" {
   description = "The client ID for Tandoor in Authentik."
   type        = string

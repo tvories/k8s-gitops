@@ -36,6 +36,14 @@ locals {
       ]
       launch_url = "https://photos.${var.CLUSTER_DOMAIN}/auth/login?autoLaunch=1"
     },
+    nextcloud = {
+      client_id     = var.nextcloud_client_id
+      client_secret = var.nextcloud_client_secret
+      group         = "users"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/nextcloud.png"
+      redirect_uri  = "https://nc.${var.CLUSTER_DOMAIN}/apps/user_oidc/code"
+      launch_url    = "https://nc.${var.CLUSTER_DOMAIN}"
+    },
     tandoor = {
       client_id     = var.tandoor_client_id
       client_secret = var.tandoor_client_secret
