@@ -9,6 +9,17 @@ variable "authentik_url" {
   type        = string
 }
 
+variable "audiobookshelf_client_id" {
+  description = "The client ID for Audiobookshelf in Authentik."
+  type        = string
+}
+
+variable "audiobookshelf_client_secret" {
+  description = "The client secret for Audiobookshelf in Authentik."
+  type        = string
+  sensitive   = true
+}
+
 variable "grafana_client_id" {
   description = "The client ID for Grafana in Authentik."
   type        = string

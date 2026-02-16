@@ -101,6 +101,7 @@ spec:
             'auth.bruteforce.protection.enabled' => true,
             'maintenance_window_start' => 1,
             'overwrite.cli.url' => 'https://nc.${SECRET_DOMAIN}',
+            'allow_local_remote_servers' => true,
           );
 
       phpConfigs:

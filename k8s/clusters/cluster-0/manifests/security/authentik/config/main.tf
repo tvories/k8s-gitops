@@ -8,6 +8,17 @@ locals {
     #   redirect_uri  = "https://dashbrr.${var.CLUSTER_DOMAIN}/api/auth/callback"
     #   launch_url    = "https://dashbrr.${var.CLUSTER_DOMAIN}/api/auth/callback"
     # },
+    audiobookshelf = {
+      client_id     = var.audiobookshelf_client_id
+      client_secret = var.audiobookshelf_client_secret
+      group         = "media"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/audiobookshelf.png"
+      redirect_uris = [
+        "https://ab.${var.CLUSTER_DOMAIN}/auth/openid/callback",
+        "https://ab.${var.CLUSTER_DOMAIN}/auth/openid/mobile-redirect",
+      ]
+      launch_url = "https://ab.${var.CLUSTER_DOMAIN}"
+    },
     grafana = {
       client_id     = var.grafana_client_id
       client_secret = var.grafana_client_secret
