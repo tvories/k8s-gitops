@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tautilli
+  name: tautulli
   namespace: media
 spec:
   accessModes:
