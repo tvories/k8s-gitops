@@ -34,9 +34,9 @@ spec:
               TZ: ${TIMEZONE}
               TAUTULLI_HTTP_BASE_URL: "https://tautulli.${SECRET_DOMAIN}"
               TAUTULLI_HTTP_PORT: &port 80
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
+            # envFrom:
+            #   - secretRef:
+            #       name: "{{ .Release.Name }}-secret"
             probes:
               liveness: &probes
                 enabled: true
