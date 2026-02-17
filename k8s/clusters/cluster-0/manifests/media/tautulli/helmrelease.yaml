@@ -28,8 +28,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/joryirving/tautulli
-              tag: 2.16.1@sha256:3d87f44de6f2644a0595389342197d37157c2e2072b3b7dc7c3ab93ebfb4bb40
+              repository: ghcr.io/tautulli/tautulli
+              tag: 2.16.1
             env:
               TZ: ${TIMEZONE}
               TAUTULLI_HTTP_BASE_URL: "https://tautulli.${SECRET_DOMAIN}"
