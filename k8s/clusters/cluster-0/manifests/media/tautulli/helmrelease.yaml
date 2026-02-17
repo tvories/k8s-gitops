@@ -28,8 +28,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/tautulli/tautulli
-              tag: v2.16.1
+              repository: ghcr.io/home-operations/tautulli
+              tag: 2.16.1
             command:
               - /usr/local/bin/python
               - Tautulli.py
@@ -42,12 +42,12 @@ spec:
               - "8181"
             env:
               TZ: ${TIMEZONE}
-              TAUTULLI_HTTP_BASE_URL: "https://tautulli.${SECRET_DOMAIN}"
-              TAUTULLI_HTTP_PORT: &port 80
+              TAUTULLI_HTTP_BASE_URL: https://tautulli.${SECRET_DOMAIN}
+              TAUTULLI_HTTP_PORT: &port 8181
             # envFrom:
             #   - secretRef:
             #       name: "{{ .Release.Name }}-secret"
-            probes:
+            robes:
               liveness: &probes
                 enabled: true
                 custom: true
@@ -97,3 +97,23 @@ spec:
         existingClaim: tautulli
         globalMounts:
           - path: /config
+      cache:
+        existingClaim: tautulli-cache
+        globalMounts:
+          - path: /config/cache
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          tautulli:
+            app:
+              - path: /config/logs
+                subPath: logs
+              - path: /scripts
+                subPath: scripts
+              - path: /tmp
+                subPath: tmp
+            jbops:
+              - path: /scripts
+                subPath: scripts
+              - path: /tmp
+                subPath: tmp
