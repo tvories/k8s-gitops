@@ -59,9 +59,11 @@ resource "authentik_source_oauth" "google" {
   consumer_key    = var.google_oauth_client_id
   consumer_secret = var.google_oauth_client_secret
 
-  # For Google, Authentik's 'google' provider_type usually handles
-  # these automatically, but keeping them is fine for clarity:
   oidc_well_known_url = "https://accounts.google.com/.well-known/openid-configuration"
+  oidc_jwks_url       = "https://www.googleapis.com/oauth2/v3/certs"
+  access_token_url    = "https://oauth2.googleapis.com/token"
+  authorization_url   = "https://accounts.google.com/o/oauth2/v2/auth"
+  profile_url         = "https://openidconnect.googleapis.com/v1/userinfo"
 }
 
 # module "onepassword_discord" {
