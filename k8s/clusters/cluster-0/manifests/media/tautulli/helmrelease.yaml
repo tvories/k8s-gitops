@@ -30,6 +30,16 @@ spec:
             image:
               repository: ghcr.io/tautulli/tautulli
               tag: 2.16.1
+            command:
+              - /usr/local/bin/python
+              - Tautulli.py
+            args:
+              - --config
+              - /config/config.ini
+              - --datadir
+              - /config
+              - --port
+              - "8181"
             env:
               TZ: ${TIMEZONE}
               TAUTULLI_HTTP_BASE_URL: "https://tautulli.${SECRET_DOMAIN}"
@@ -71,8 +81,19 @@ spec:
         ports:
           http:
             port: *port
+    ingress:
+      app:
+        className: nginx-internal
+        hosts:
+          - host: "tautulli.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
     persistence:
       config:
-        existingClaim: "{{ .Release.Name }}"
-      tmp:
-        type: emptyDir
+        enabled: true
+        existingClaim: config-tautulli-2
+        globalMounts:
+          - path: /config
