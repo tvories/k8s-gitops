@@ -30,16 +30,6 @@ spec:
             image:
               repository: ghcr.io/home-operations/tautulli
               tag: 2.16.1
-            command:
-              - /usr/local/bin/python
-              - Tautulli.py
-            args:
-              - --config
-              - /config/config.ini
-              - --datadir
-              - /config
-              - --port
-              - "8181"
             env:
               TZ: ${TIMEZONE}
               TAUTULLI_HTTP_BASE_URL: https://tautulli.${SECRET_DOMAIN}
