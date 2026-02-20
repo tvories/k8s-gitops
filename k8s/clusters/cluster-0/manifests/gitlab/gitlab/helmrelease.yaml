@@ -234,10 +234,12 @@ spec:
         resources:
           requests:
             cpu: 50m
-            memory: 1Gi
+            memory: 1500Mi
           limits:
-            memory: 2Gi
+            memory: 3Gi
         workerProcesses: 1
+        puma:
+          workerMaxMemory: 1024
         ingress:
           proxyBodySize: 0 # To allow large file uploads like imports
           tls:
