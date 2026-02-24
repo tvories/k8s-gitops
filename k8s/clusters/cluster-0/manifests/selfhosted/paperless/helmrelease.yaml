@@ -61,6 +61,7 @@ spec:
               PAPERLESS_DATA_DIR: /library/data
               PAPERLESS_EXPORT_DIR: /library/export
               PAPERLESS_MEDIA_ROOT: /library/media
+              PAPERLESS_WEBSERVER_WORKERS: "2"
               # PAPERLESS_TASK_WORKERS: 1
               # PAPERLESS_THREADS_PER_WORKER: 2
               # PAPERLESS_OCR_THREADS: 2
@@ -118,6 +119,9 @@ spec:
     ingress:
       app:
         className: "nginx-internal"
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
         hosts:
           - host: &host "paperless.${SECRET_DOMAIN}"
             paths:
