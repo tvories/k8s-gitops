@@ -19,7 +19,7 @@ spec:
       secret.reloader.stakater.com/reload: &secret nextcloud-secret
     image:
       repository: nextcloud
-      tag: 32.0.6-fpm
+      tag: 33.0.0-fpm
 
     ingress:
       enabled: true
