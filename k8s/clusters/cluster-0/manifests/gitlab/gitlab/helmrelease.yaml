@@ -23,6 +23,8 @@ spec:
     keepHistory: false
   values:
     global:
+      serviceAccount:
+        enabled: true
       edition: ce
       timezone: ${TIMEZONE}
       hosts:
