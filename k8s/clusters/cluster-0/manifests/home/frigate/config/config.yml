@@ -26,9 +26,8 @@ snapshots:
 
 record:
   enabled: true
-  retain:
+  continuous:
     days: 10
-    mode: all
   detections:
     retain:
       days: 20
