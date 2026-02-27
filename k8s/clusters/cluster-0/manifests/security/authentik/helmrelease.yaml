@@ -50,7 +50,7 @@ spec:
       replicas: 1
       initContainers:
         - name: init-db
-          image: ghcr.io/home-operations/postgres-init:18.2
+          image: ghcr.io/home-operations/postgres-init:18.3
           envFrom:
             - secretRef:
                 name: *secret
