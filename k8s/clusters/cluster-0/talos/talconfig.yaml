@@ -96,7 +96,7 @@ nodes:
             mtu: 9000
             dhcp: true
             dhcpOptions:
-              routeMetric: 2048
+              routeMetric: 512
           # - *vlan50
     installDisk: /dev/sda
     schematic:
@@ -171,7 +171,7 @@ nodes:
       - 192.168.1.243
       - 192.168.1.240
     networkInterfaces:
-      - interface: eth0
+      - interface: eno1
         dhcp: false
         mtu: 9000
         vlans:
@@ -321,7 +321,7 @@ controlPlane:
             maxPods: 150
           nodeIP:
             validSubnets:
-                - 192.168.80.0/24
+              - 192.168.80.0/24
 
     # Enable MutatingAdmissionPolicy
     - |-
@@ -338,6 +338,13 @@ worker:
         - net.ifnames=0
   patches:
     # Note: disableSearchDomain removed - set via node config or causes conflict
+    # Kubelet configuration
+    - |-
+      machine:
+        kubelet:
+          nodeIP:
+            validSubnets:
+              - 192.168.80.0/24
     # Enable host dns
     - |-
       machine:
