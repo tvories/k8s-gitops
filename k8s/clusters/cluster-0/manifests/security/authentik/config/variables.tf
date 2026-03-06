@@ -96,3 +96,14 @@ variable "tandoor_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "paperless_client_id" {
+  description = "The client ID for Paperless in Authentik."
+  type        = string
+}
+
+variable "paperless_client_secret" {
+  description = "The client secret for Paperless in Authentik."
+  type        = string
+  sensitive   = true
+}

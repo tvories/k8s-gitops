@@ -87,14 +87,14 @@ locals {
     #   redirect_uri  = "https://lubelogger.${var.CLUSTER_DOMAIN}/Login/RemoteAuth"
     #   launch_url    = "https://lubelogger.${var.CLUSTER_DOMAIN}/Login/RemoteAuth"
     # },
-    # paperless = {
-    #   client_id     = module.onepassword_application["paperless"].fields["PAPERLESS_CLIENT_ID"]
-    #   client_secret = module.onepassword_application["paperless"].fields["PAPERLESS_CLIENT_SECRET"]
-    #   group         = "home"
-    #   icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/paperless.png"
-    #   redirect_uri  = "https://paperless.${var.CLUSTER_DOMAIN}/accounts/oidc/authentik/login/callback/"
-    #   launch_url    = "https://paperless.${var.CLUSTER_DOMAIN}/"
-    # },
+    paperless = {
+      client_id     = var.paperless_client_id
+      client_secret = var.paperless_client_secret
+      group         = "home"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/paperless.png"
+      redirect_uri  = "https://paperless.${var.CLUSTER_DOMAIN}/accounts/oidc/authentik/login/callback/"
+      launch_url    = "https://paperless.${var.CLUSTER_DOMAIN}/"
+    },
     # portainer = {
     #   client_id     = module.onepassword_application["portainer"].fields["PORTAINER_CLIENT_ID"]
     #   client_secret = module.onepassword_application["portainer"].fields["PORTAINER_CLIENT_SECRET"]

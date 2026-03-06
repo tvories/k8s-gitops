@@ -66,6 +66,13 @@ spec:
               # PAPERLESS_THREADS_PER_WORKER: 2
               # PAPERLESS_OCR_THREADS: 2
               PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_EMAIL_HOST: "${SECRET_SMTP_HOST}"
+              PAPERLESS_EMAIL_PORT: "25"
+              PAPERLESS_EMAIL_FROM: "paperless@${SECRET_DOMAIN}"
+              PAPERLESS_APPS: "allauth.socialaccount.providers.openid_connect"
+              PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+              PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: "true"
+              PAPERLESS_LOGOUT_REDIRECT_URL: "https://authentik.t-vo.us/application/o/paperless/end-session/"
               PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: 8
               # PAPERLESS_ALLOWED_HOSTS: "10.0.0.0/8,192.168.0.0/16,localhost,paperless.${SECRET_DOMAIN},paperless-app." $ Defaults to "*"
               # PAPERLESS_WORKER_TIMEOUT: 3600
