@@ -35,6 +35,7 @@ spec:
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LLM_PROVIDER: anthropic
               LLM_MODEL: claude-haiku-4-5-20251001
+              TOKEN_LIMIT: 40000
               VISION_LLM_PROVIDER: anthropic
               VISION_LLM_MODEL: claude-haiku-4-5-20251001
               # AUTO_GENERATE_TAGS: "false"
