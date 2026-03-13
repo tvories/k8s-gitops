@@ -8,7 +8,8 @@ resource "vault_policy" "auth-admin" {
   policy = file("${path.module}/policies/auth-admin.hcl")
 }
 
-resource "vault_password_policy" "ad" {
-  name   = "ad"
-  policy = file("${path.module}/policies/ad-password-policy.hcl")
-}
+# AD password policy - commented out, no longer using AD
+# resource "vault_password_policy" "ad" {
+#   name   = "ad"
+#   policy = file("${path.module}/policies/ad-password-policy.hcl")
+# }

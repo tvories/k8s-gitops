@@ -107,3 +107,14 @@ variable "paperless_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "vault_client_id" {
+  description = "The client ID for Vault in Authentik."
+  type        = string
+}
+
+variable "vault_client_secret" {
+  description = "The client secret for Vault in Authentik."
+  type        = string
+  sensitive   = true
+}

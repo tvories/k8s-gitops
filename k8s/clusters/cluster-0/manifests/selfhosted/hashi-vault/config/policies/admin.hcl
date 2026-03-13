@@ -37,15 +37,13 @@ path "sys/mounts/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
-# Manage ad secrets engine
-path "ad/*" {
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-// # Configure the ldap secrets engine and create roles
-// path "ldap/*" {
-//   capabilities = [ "create", "read", "update", "delete", "list" ]
-// }
+# AD/LDAP secret engine paths - commented out, no longer using AD
+# path "ad/*" {
+#   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+# }
+# path "ldap/*" {
+#   capabilities = ["create", "read", "update", "delete", "list"]
+# }
 
 # List existing secrets engines.
 path "sys/mounts" {

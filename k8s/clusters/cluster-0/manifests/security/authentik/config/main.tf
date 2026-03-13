@@ -95,6 +95,17 @@ locals {
       redirect_uri  = "https://paperless.${var.CLUSTER_DOMAIN}/accounts/oidc/authentik/login/callback/"
       launch_url    = "https://paperless.${var.CLUSTER_DOMAIN}/"
     },
+    vault = {
+      client_id     = var.vault_client_id
+      client_secret = var.vault_client_secret
+      group         = "infrastructure"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/vault.png"
+      redirect_uris = [
+        "https://vault.${var.CLUSTER_DOMAIN}/ui/vault/auth/oidc/oidc/callback",
+        "http://localhost:8250/oidc/callback",
+      ]
+      launch_url = "https://vault.${var.CLUSTER_DOMAIN}/"
+    },
     # portainer = {
     #   client_id     = module.onepassword_application["portainer"].fields["PORTAINER_CLIENT_ID"]
     #   client_secret = module.onepassword_application["portainer"].fields["PORTAINER_CLIENT_SECRET"]
