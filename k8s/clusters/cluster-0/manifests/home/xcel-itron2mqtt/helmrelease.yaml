@@ -1,0 +1,59 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app xcel-itron2mqtt
+  namespace: home
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: xcel-itron2mqtt
+  values:
+    controllers:
+      xcel-itron2mqtt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zaknye/xcel_itron2mqtt
+              tag: latest
+            env:
+              MQTT_SERVER: emqx.home.svc.cluster.local
+              MQTT_PORT: "1883"
+              MQTT_TOPIC_PREFIX: homeassistant/
+              MQTT_USER: "${SECRET_HA_MQTT_USER}"
+              MQTT_PASSWORD: "${SECRET_HA_MQTT_PASSWORD}"
+              METER_IP: "192.168.50.64" # TODO: set your meter IP
+              METER_PORT: "8081"
+              LOGLEVEL: INFO
+            envFrom:
+              - secretRef:
+                  name: xcel-itron2mqtt-secret
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+
+    service:
+      app:
+        controller: xcel-itron2mqtt
+        enabled: false
+
+    persistence:
+      certs:
+        type: secret
+        name: xcel-itron2mqtt-secret
+        advancedMounts:
+          xcel-itron2mqtt:
+            app:
+              - path: /opt/xcel_itron2mqtt/certs/cert.pem
+                subPath: cert.pem
+                readOnly: true
+              - path: /opt/xcel_itron2mqtt/certs/key.pem
+                subPath: key.pem
+                readOnly: true
