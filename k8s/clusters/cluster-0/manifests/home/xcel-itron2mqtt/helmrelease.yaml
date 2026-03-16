@@ -23,12 +23,12 @@ spec:
             env:
               MQTT_SERVER: emqx.home.svc.cluster.local
               MQTT_PORT: "1883"
-              MQTT_TOPIC_PREFIX: homeassistant/
+              # MQTT_TOPIC_PREFIX: homeassistant/
               MQTT_USER: "${SECRET_HA_MQTT_USER}"
               MQTT_PASSWORD: "${SECRET_HA_MQTT_PASSWORD}"
               METER_IP: "192.168.50.64" # TODO: set your meter IP
               METER_PORT: "8081"
-              LOGLEVEL: INFO
+              LOGLEVEL: DEBUG
               CERT_PATH: /opt/xcel_itron2mqtt/certs/cert.pem
               KEY_PATH: /opt/xcel_itron2mqtt/certs/key.pem
             envFrom:
