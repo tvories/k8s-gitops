@@ -64,20 +64,6 @@ spec:
         ports:
           http:
             port: 8080
-    ingress:
-      app:
-        className: "nginx-internal"
-        hosts:
-          - host: &host "lubelog.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - secretName: tls.lubelog
-            hosts:
-              - *host
     persistence:
       app:
         existingClaim: lubelog-data
