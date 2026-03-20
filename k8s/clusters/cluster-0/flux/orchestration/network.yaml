@@ -32,6 +32,39 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: network-envoy-gateway
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-namespace
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/envoy-gateway"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: network-envoy-gateway-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: network-envoy-gateway
+    - name: network-wildcard-certificate
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/network/envoy-gateway/gateway"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: network-ingress-nginx
   namespace: flux-system
 spec:
