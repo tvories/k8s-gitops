@@ -45,7 +45,7 @@ jobs:
           mv k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml k8s/clusters/cluster-0/flux/deploy/manage-flux.yaml.skip
 
       - name: Run flux-local test
-        uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
+        uses: docker://ghcr.io/allenporter/flux-local:v8.2.0
         with:
           args: test --enable-helm --all-namespaces --path /github/workspace/k8s/clusters/cluster-0/flux --sources k8s-gitops -v
 
@@ -80,7 +80,7 @@ jobs:
           persist-credentials: false
 
       - name: Run flux-local diff
-        uses: docker://ghcr.io/allenporter/flux-local:v8.1.0
+        uses: docker://ghcr.io/allenporter/flux-local:v8.2.0
         with:
           args: >-
             diff ${{ matrix.resources }}
