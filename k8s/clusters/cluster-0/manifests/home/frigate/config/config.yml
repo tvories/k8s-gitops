@@ -137,7 +137,7 @@ cameras:
     # rtmp:
     #   enabled: false
     ffmpeg:
-      hwaccel_args: preset-vaapi
+      hwaccel_args: []
       inputs:
         - path: rtsp://localhost:8554/frigate_front_door_lq
           roles:

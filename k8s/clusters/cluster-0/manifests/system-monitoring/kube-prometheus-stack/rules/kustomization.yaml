@@ -5,3 +5,4 @@ kind: Kustomization
 namespace: system-monitoring
 resources:
   - ./smartctl.yaml
+  - ./frigate-node.yaml

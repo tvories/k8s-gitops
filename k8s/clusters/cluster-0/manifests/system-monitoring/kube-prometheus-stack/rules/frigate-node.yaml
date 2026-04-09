@@ -1,0 +1,56 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: frigate-node-rules
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+    - name: frigate-node-memory
+      rules:
+        - alert: FrigateNodeMemoryWarning
+          expr: |
+            (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
+            * on(instance) group_left(node)
+              label_replace(
+                kube_pod_info{namespace="home", pod=~"frigate-.*"},
+                "instance", "$1", "host_ip", "(.*)"
+              ) < 20
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Low memory on frigate node ({{ $labels.node }})"
+            description: "Available memory on the frigate node has been below 20% for 10 minutes. Current: {{ $value | humanize }}%. The node may crash soon."
+
+        - alert: FrigateNodeMemoryCritical
+          expr: |
+            (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
+            * on(instance) group_left(node)
+              label_replace(
+                kube_pod_info{namespace="home", pod=~"frigate-.*"},
+                "instance", "$1", "host_ip", "(.*)"
+              ) < 10
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical memory on frigate node ({{ $labels.node }})"
+            description: "Available memory on the frigate node has been below 10% for 5 minutes. Current: {{ $value | humanize }}%. Node crash is imminent - consider cordon and draining."
+
+        - alert: FrigateNodeMemoryTrend
+          expr: |
+            predict_linear(node_memory_MemAvailable_bytes[2h], 4 * 3600)
+            * on(instance) group_left(node)
+              label_replace(
+                kube_pod_info{namespace="home", pod=~"frigate-.*"},
+                "instance", "$1", "host_ip", "(.*)"
+              ) < 0
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate node memory is trending toward exhaustion ({{ $labels.node }})"
+            description: "Memory on the frigate node is on a declining trend and is predicted to run out within 4 hours based on the last 2 hours of data."
