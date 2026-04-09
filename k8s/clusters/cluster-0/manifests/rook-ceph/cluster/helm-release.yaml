@@ -23,7 +23,7 @@ spec:
       retries: 3
   values:
     toolbox:
-      enabled: false
+      enabled: true
 
     monitoring:
       enabled: true
