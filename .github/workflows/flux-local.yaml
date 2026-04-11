@@ -118,7 +118,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add Comment
-        uses: marocchino/sticky-pull-request-comment@v3.0.3
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
         with:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           header: ${{ github.event.pull_request.number }}/k8s/${{ matrix.resources }}
