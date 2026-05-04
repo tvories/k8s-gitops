@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: technitium/dns-server
-              tag: 15.0.1
+              tag: 15.1.0
 
             env:
               DNS_SERVER_DOMAIN: "tdns2.${SECRET_DOMAIN}"
