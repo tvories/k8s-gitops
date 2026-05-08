@@ -19,7 +19,7 @@ spec:
           app:
             image:
               repository: ghcr.io/zaknye/xcel_itron2mqtt
-              tag: latest
+              tag: 1.2.0
             env:
               MQTT_SERVER: emqx.home.svc.cluster.local
               MQTT_PORT: "1883"
