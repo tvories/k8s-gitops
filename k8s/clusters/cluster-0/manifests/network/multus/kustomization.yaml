@@ -6,4 +6,5 @@ resources:
   - ocirepository.yaml
   - ./helmrelease.yaml
   # - ./crd.yaml
-  - ./rbac.yaml
+  # rbac is now managed by the app-template chart
+  # - ./rbac.yaml
