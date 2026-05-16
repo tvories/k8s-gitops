@@ -22,11 +22,11 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        fsGroup: 1001
+        fsGroup: 65539
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 1001
+        runAsGroup: 65539
         runAsNonRoot: true
-        runAsUser: 1001
+        runAsUser: 568
 
     controllers:
       chaptarr:
@@ -38,7 +38,7 @@ spec:
               repository: busybox
               tag: 1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
             command: ["sh", "-c"]
-            args: ["chown -R 1001:1001 /run"]
+            args: ["chown -R 568:65539 /run"]
             securityContext:
               runAsNonRoot: false
               runAsUser: 0
