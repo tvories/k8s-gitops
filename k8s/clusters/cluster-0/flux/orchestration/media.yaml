@@ -164,7 +164,7 @@ spec:
   dependsOn:
     - name: media-namespace
     - name: rook-ceph-cluster
-    - name: network-ingress-nginx
+    - name: network-envoy-gateway
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/chaptarr"
   prune: true

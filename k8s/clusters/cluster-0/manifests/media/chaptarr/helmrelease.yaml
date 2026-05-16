@@ -90,21 +90,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: nginx-internal
-        hosts:
-          - host: &host "chaptarr.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *host
-            secretName: tls.chaptarr
-
     persistence:
       config:
         existingClaim: chaptarr-config
