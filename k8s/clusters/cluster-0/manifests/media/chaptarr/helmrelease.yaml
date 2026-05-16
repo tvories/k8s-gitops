@@ -99,7 +99,6 @@ spec:
         existingClaim: media-nfs-media
         globalMounts:
           - path: /media
-            readOnly: true
       run:
         type: emptyDir
         globalMounts:
