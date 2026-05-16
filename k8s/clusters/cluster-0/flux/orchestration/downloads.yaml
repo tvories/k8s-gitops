@@ -198,6 +198,25 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: downloads-chaptarr
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: downloads-pvc
+    - name: rook-ceph-cluster
+    - name: network-envoy-gateway
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/chaptarr"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: downloads-unpackerr
   namespace: flux-system
 spec:

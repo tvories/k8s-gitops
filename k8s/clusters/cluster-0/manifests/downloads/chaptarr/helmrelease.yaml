@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app chaptarr
-  namespace: media
+  namespace: downloads
 spec:
   interval: 30m
   chartRef:
@@ -96,7 +96,7 @@ spec:
         globalMounts:
           - path: /config
       media:
-        existingClaim: media-nfs-media
+        existingClaim: downloads-nfs-media
         globalMounts:
           - path: /media
       run:
