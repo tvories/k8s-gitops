@@ -1,0 +1,125 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.0.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app chaptarr
+  namespace: media
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: chaptarr
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+
+    controllers:
+      chaptarr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          chown-run:
+            image:
+              repository: busybox
+              tag: 1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+            command: ["sh", "-c"]
+            args: ["chown -R 1001:1001 /run"]
+            securityContext:
+              runAsNonRoot: false
+              runAsUser: 0
+        containers:
+          app:
+            image:
+              repository: docker.io/robertlordhood/chaptarr
+              tag: develop@sha256:16e530c58e5d304fddeab0c877aaea0e3a34f7d88db597301fb3b3d3c0cd0590
+            env:
+              TZ: "${TIMEZONE}"
+              CHAPTARR__APP__INSTANCENAME: chaptarr
+              CHAPTARR__APPLICATION_URL: "https://chaptarr.${SECRET_DOMAIN}"
+              CHAPTARR__APP__THEME: dark
+              CHAPTARR__AUTH__METHOD: Forms
+              CHAPTARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              CHAPTARR__LOG__DBENABLED: "False"
+              CHAPTARR__LOG__LEVEL: info
+              CHAPTARR__SERVER__PORT: &port 8789
+              CHAPTARR__UPDATE__BRANCH: develop
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 50m
+                memory: 750Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              readOnlyRootFilesystem: true
+
+    service:
+      app:
+        controller: chaptarr
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      app:
+        className: nginx-internal
+        hosts:
+          - host: &host "chaptarr.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.chaptarr
+
+    persistence:
+      config:
+        existingClaim: chaptarr-config
+        globalMounts:
+          - path: /config
+      media:
+        existingClaim: media-nfs-media
+        globalMounts:
+          - path: /media
+            readOnly: true
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /run
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
