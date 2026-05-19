@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: zwavejs/zwave-js-ui
-              tag: 11.17.0
+              tag: 11.18.0
             env:
               TZ: "${TIMEZONE}"
               # NETWORK_KEY: ${SECRET_ZWAVEJS2MQTT_NETWORK_KEY}
