@@ -247,6 +247,9 @@ spec:
           tls:
             secretName: gitlab-tls
       registry:
+        storage:
+          secret: registry-storage
+          key: config
         ingress:
           tls:
             secretName: registry-tls

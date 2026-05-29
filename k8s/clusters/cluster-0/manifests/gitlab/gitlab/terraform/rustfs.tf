@@ -27,6 +27,7 @@ locals {
     "gitlab-ci-secure-files",
     "gitlab-backups",
     "gitlab-tmp",
+    "gitlab-registry",
   ]
 }
 

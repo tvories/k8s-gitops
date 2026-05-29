@@ -108,6 +108,7 @@ nodes:
             - siderolabs/intel-ucode
             - siderolabs/iscsi-tools
             - siderolabs/mei
+            - siderolabs/nfsrahead
     # patches:
     #   - |-
     #     machine:
@@ -331,6 +332,13 @@ controlPlane:
             runtime-config: admissionregistration.k8s.io/v1alpha1=true
             feature-gates: MutatingAdmissionPolicy=true
 
+    # Load i915 kernel module for Intel GPU
+    - |-
+      machine:
+        kernel:
+          modules:
+            - name: i915
+
 worker:
   schematic:
     customization:
@@ -399,3 +407,10 @@ worker:
               rsize=131072
               wsize=131072
               nconnect=8
+
+    # Load i915 kernel module for Intel GPU
+    - |-
+      machine:
+        kernel:
+          modules:
+            - name: i915
