@@ -183,6 +183,10 @@ spec:
           enabled: true
           bucket: gitlab-terraform-state
 
+    registry:
+      storage:
+        secret: registry-storage
+        key: config
     redis:
       install: false
     postgresql:
@@ -247,9 +251,6 @@ spec:
           tls:
             secretName: gitlab-tls
       registry:
-        storage:
-          secret: registry-storage
-          key: config
         ingress:
           tls:
             secretName: registry-tls
