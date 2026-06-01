@@ -26,15 +26,17 @@ spec:
       image:
         repository: "hashicorp/vault"
         tag: "2.0.1"
-      containerSecurityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          add:
-            - IPC_LOCK
-          drop:
-            - ALL
-        seccompProfile:
-          type: RuntimeDefault
+      statefulSet:
+        securityContext:
+          container:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - IPC_LOCK
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
       dataStorage:
         enabled: true
         storageClass: "ceph-block"
