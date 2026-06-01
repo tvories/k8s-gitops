@@ -26,16 +26,13 @@ spec:
       image:
         repository: "hashicorp/vault"
         tag: "2.0.1"
-      securityContext:
+      containerSecurityContext:
         allowPrivilegeEscalation: false
         capabilities:
           add:
             - IPC_LOCK
           drop:
             - ALL
-        runAsNonRoot: true
-        runAsUser: 100
-        runAsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       dataStorage:
