@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/theme-park
-              tag: 1.22.0@sha256:bdf4c26e440c0f8c58163e2497f557d04a5791588eeb1546319c8321bdae48e7
+              tag: 1.22.1@sha256:8087a8c3a81e342014ce2528870bc97a50c86ccd8e316287cac2d200d44e19c1
             resources:
               requests:
                 cpu: 15m
