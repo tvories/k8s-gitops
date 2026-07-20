@@ -5,3 +5,6 @@ namespace: system-monitoring
 resources:
   - ocirepository.yaml
   - ./helmrelease.yaml
+  - ./servicemonitor.yaml
+  - ./prometheusrule.yaml
+  - ./grafana.yaml

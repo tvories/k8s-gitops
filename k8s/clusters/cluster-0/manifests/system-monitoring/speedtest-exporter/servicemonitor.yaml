@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: &app speedtest-exporter
+  namespace: system-monitoring
+  labels:
+    app.kubernetes.io/name: *app
+    jobLabel: *app
+    release: *app
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: *app
+  endpoints:
+    - port: metrics
+      path: /metrics
+      # speedtest results are cached by the exporter; scrape infrequently
+      interval: 60m
+      scrapeTimeout: 1m
+      metricRelabelings:
+        - action: labeldrop
+          regex: (pod)

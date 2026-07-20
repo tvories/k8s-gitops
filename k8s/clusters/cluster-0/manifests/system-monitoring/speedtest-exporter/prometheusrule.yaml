@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: speedtest-exporter-rules
+  namespace: system-monitoring
+spec:
+  groups:
+    - name: speedtest-exporter.rules
+      rules:
+        - alert: SpeedtestExporterAbsent
+          annotations:
+            summary: Speedtest Exporter is down.
+            description: Speedtest Exporter has disappeared from Prometheus target discovery.
+          expr: |
+            absent(up{job=~".*speedtest-exporter.*"} == 1)
+          for: 75m
+          labels:
+            severity: critical
+        - alert: SpeedtestSlowInternetDownload
+          annotations:
+            summary: SpeedTest slow internet download.
+            description: Internet download speed (best server, 4h avg) is {{ humanize $value }} bytes/s.
+          # max() = the best server, so a single slow server doesn't trigger a false alert
+          expr: |
+            max(avg_over_time(speedtest_download_bandwidth_bytes{job=~".*speedtest-exporter.*"}[4h]))
+              < 50000000
+          for: 1h
+          labels:
+            severity: warning
+        - alert: SpeedtestSlowInternetUpload
+          annotations:
+            summary: SpeedTest slow internet upload.
+            description: Internet upload speed (best server, 4h avg) is {{ humanize $value }} bytes/s.
+          expr: |
+            max(avg_over_time(speedtest_upload_bandwidth_bytes{job=~".*speedtest-exporter.*"}[4h]))
+              < 50000000
+          for: 1h
+          labels:
+            severity: warning
+        - alert: SpeedtestHighPingLatency
+          annotations:
+            summary: SpeedTest high ping latency.
+            description: Internet ping latency (best server, 4h avg) is {{ humanize $value }} s.
+          expr: |
+            min(avg_over_time(speedtest_ping_latency_seconds{job=~".*speedtest-exporter.*"}[4h]))
+              > 0.020
+          for: 0m
+          labels:
+            severity: warning
