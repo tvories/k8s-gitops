@@ -21,30 +21,49 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+        seccompProfile:
+          type: RuntimeDefault
+
     controllers:
-      speedtest-exporter:
+      main:
         containers:
-          app:
+          main:
             image:
-              repository: ghcr.io/miguelndecarvalho/speedtest-exporter
-              tag: v3.5.4
-            env:
-              TZ: "${TIMEZONE}"
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
+              repository: ghcr.io/lpicanco/prometheus-speedtest-exporter
+              tag: 0.2.2@sha256:0c12ce9315bcb4e26071caa3236a2c2dab8612301a892fdec8911a41058da8e9
             resources:
               requests:
                 cpu: 10m
-                memory: 32Mi
+                memory: 15Mi
               limits:
-                cpu: 100m
                 memory: 100Mi
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9516
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              readOnlyRootFilesystem: true
     service:
       app:
-        controller: speedtest-exporter
+        controller: main
         ports:
           metrics:
             port: 9798
