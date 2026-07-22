@@ -67,7 +67,7 @@ spec:
           codeserver:
             image:
               repository: ghcr.io/coder/code-server
-              tag: 4.125.0@sha256:9a7848dd2627158e3873f88bd8743807a4168e4d580f26ec0cbc132a9d9ee78e
+              tag: 4.129.0@sha256:49d5e176224523b0c924ee35b05c51e9a87f9c170f650ee0f7da05a4581a79ff
             env:
               # password: ${SECRET_CODESERVER_PASSWORD}
               TZ: "${TIMEZONE}"
