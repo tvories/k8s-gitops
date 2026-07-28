@@ -54,7 +54,8 @@ spec:
               TZ: "${TIMEZONE}"
               PAPERLESS_REDIS: redis://paperless-redis.selfhosted.svc.cluster.local:6379
               PAPERLESS_TIME_ZONE: "${TIMEZONE}"
-              PAPERLESS_CONSUMER_POLLING: "60"
+              PAPERLESS_CONSUMER_POLLING_INTERVAL: "60"
+              PAPERLESS_CONSUMER_STABILITY_DELAY: "15" # default 5.0; bump for NFS
               PAPERLESS_CONSUMER_RECURSIVE: "true"
               PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
               PAPERLESS_CONSUMPTION_DIR: /library/consume
@@ -84,6 +85,7 @@ spec:
               PAPERLESS_OCR_LANGUAGE: eng
               PAPERLESS_PORT: &port "8000"
               PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16,192.168.80.0/24,192.168.83.0/24
+              PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT: "1"
               USERMAP_UID: 568
               USERMAP_GID: 65543
             envFrom: *envFrom
