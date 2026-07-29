@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: whisper
+  namespace: home
+spec:
+  releaseName: whisper
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: whisper
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    defaultPodOptions:
+      # Whisper bursts to several cores while transcribing. Keep it off the
+      # node currently running Plex so a transcode and a voice command don't
+      # contend for the same 6 cores.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: media
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: plex
+    controllers:
+      whisper:
+        containers:
+          app:
+            image:
+              repository: rhasspy/wyoming-whisper
+              tag: 3.5.0
+            args:
+              - --model
+              - small-int8
+              - --language
+              - en
+              - --beam-size
+              - "1"
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512M
+              limits:
+                cpu: 4000m
+                memory: 4Gi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &probe
+                  tcpSocket:
+                    port: 10300
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 10300
+                  # First boot downloads the model; give it room.
+                  failureThreshold: 60
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+
+    service:
+      app:
+        controller: whisper
+        ports:
+          wyoming:
+            port: 10300
+            protocol: TCP
+
+    persistence:
+      data:
+        existingClaim: whisper-data
+        globalMounts:
+          - path: /data
