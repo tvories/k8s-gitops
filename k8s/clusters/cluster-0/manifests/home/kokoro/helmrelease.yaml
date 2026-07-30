@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kokoro
+  namespace: home
+spec:
+  releaseName: kokoro
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: kokoro
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    defaultPodOptions:
+      # Kokoro synthesises on CPU and will happily eat several cores. Keep it
+      # off whichever node is running Plex so a transcode and a voice response
+      # don't contend for the same 6 cores.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: media
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: plex
+    controllers:
+      kokoro:
+        containers:
+          # Kokoro-FastAPI speaks an OpenAI-compatible HTTP API, not Wyoming.
+          app:
+            image:
+              repository: ghcr.io/remsky/kokoro-fastapi-cpu
+              tag: v0.6.0
+            env:
+              TZ: "${TIMEZONE}"
+              USE_GPU: "false"
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                cpu: 4000m
+                memory: 4Gi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &kokoroProbe
+                  httpGet:
+                    path: /v1/test
+                    port: 8880
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *kokoroProbe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/test
+                    port: 8880
+                  # First boot downloads the voice models.
+                  failureThreshold: 60
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+
+          # Wyoming <-> OpenAI bridge. This is what Home Assistant connects to;
+          # it proxies to the kokoro container over localhost.
+          bridge:
+            image:
+              repository: ghcr.io/roryeckel/wyoming_openai
+              tag: "0.5.0"
+            env:
+              TZ: "${TIMEZONE}"
+              WYOMING_URI: tcp://0.0.0.0:10200
+              WYOMING_LOG_LEVEL: INFO
+              WYOMING_LANGUAGES: en
+              TTS_OPENAI_URL: http://localhost:8880/v1
+              TTS_MODELS: kokoro
+              TTS_BACKEND: KOKORO_FASTAPI
+              TTS_STREAMING_MODELS: kokoro
+              TTS_VOICES: >-
+                af_heart af_bella af_nicole af_sarah af_sky
+                am_michael am_puck am_fenrir
+                bf_emma bf_isabella bm_george bm_fable
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64M
+              limits:
+                cpu: 500m
+                memory: 512M
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &bridgeProbe
+                  tcpSocket:
+                    port: 10200
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *bridgeProbe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 10200
+                  # Waits on the kokoro container starting alongside it.
+                  failureThreshold: 60
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+
+    service:
+      app:
+        controller: kokoro
+        ports:
+          wyoming:
+            port: 10200
+            protocol: TCP
+          # Kokoro's own web UI / API, handy for auditioning voices.
+          http:
+            port: 8880
+            protocol: TCP
+
+    persistence:
+      data:
+        existingClaim: kokoro-data
+        globalMounts:
+          - path: /app/cache
