@@ -38,7 +38,7 @@ spec:
               repository: ghcr.io/c4illin/convertx
               tag: v0.18.0
             env:
-              TZ: ${CONFIG_TIMEZONE}
+              TZ: "${TIMEZONE}"
               ACCOUNT_REGISTRATION: false
               HTTP_ALLOWED: false
               ALLOW_UNAUTHENTICATED: true

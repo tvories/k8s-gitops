@@ -6,6 +6,10 @@ metadata:
   namespace: system-monitoring
   annotations:
     grafana_folder: "Networking"
+    # ${DS_PROMETHEUS} is a Grafana template variable, not a Flux one. Without
+    # this, kustomize-controller's envsubst tries to resolve it and fails in
+    # strict mode.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
   labels:
     grafana_dashboard: "true"
 data:
