@@ -44,8 +44,11 @@ spec:
               repository: rhasspy/wyoming-whisper
               tag: 3.5.0
             args:
+              # base-int8 over small-int8: ~3x faster for short commands, and the
+              # Voice PE's XMOS front-end already hands us clean, gain-normalised
+              # audio so the accuracy cost is negligible.
               - --model
-              - small-int8
+              - base-int8
               - --language
               - en
               - --beam-size

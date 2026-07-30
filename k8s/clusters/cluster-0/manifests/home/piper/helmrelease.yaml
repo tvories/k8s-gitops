@@ -37,7 +37,9 @@ spec:
                 cpu: 10m
                 memory: 128M
               limits:
-                cpu: 1000m
+                # ONNX inference is multi-threaded; a 1-core cap was leaving
+                # most of the node on the table.
+                cpu: 4000m
                 memory: 1Gi
             probes:
               liveness:
