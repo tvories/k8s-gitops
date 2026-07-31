@@ -46,7 +46,7 @@ spec:
           app:
             image:
               repository: docker.io/robertlordhood/chaptarr
-              tag: develop@sha256:cd5813b16d2d00c5e6d439cc53876b5c7a24f0693bfc7111d61f5afacdc5b055
+              tag: develop@sha256:912f4f5b3049b478e8f76a05945999e5faafb94cd6e4976544d2334f011a11a1
             env:
               TZ: "${TIMEZONE}"
               CHAPTARR__APP__INSTANCENAME: chaptarr
