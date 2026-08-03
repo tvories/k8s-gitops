@@ -100,22 +100,10 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: home-piper
-  namespace: flux-system
-spec:
-  dependsOn:
-    - name: home-namespace
-    - name: rook-ceph-cluster
-  interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/home/piper"
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-gitops
+# home-piper removed 2026-08-03. Kokoro on the desktop GPU synthesises in
+# 0.12s versus Piper's 0.49s on CPU, so the fast-but-robotic fallback no
+# longer earns its place. The in-cluster CPU Kokoro (3.20s) remains as the
+# HAProxy backup path.
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -197,6 +185,28 @@ spec:
     - name: home-emqx
   interval: 5m
   path: "./k8s/clusters/cluster-0/manifests/home/xcel-itron2mqtt"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+
+---
+# Single-purpose L4 proxy for the voice stack: desktop GPU primary, in-cluster
+# CPU backup. Lives in `home` rather than `network` because it exists only for
+# whisper/kokoro and would not be reused for other HAProxy needs.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: home-haproxy-voice
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: home-namespace
+    - name: home-whisper
+    - name: home-kokoro
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home/haproxy-voice"
   prune: true
   wait: true
   sourceRef:

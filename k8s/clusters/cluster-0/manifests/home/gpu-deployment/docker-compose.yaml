@@ -1,0 +1,111 @@
+# GPU voice services for the desktop (RTX 3080).
+#
+# These are the *primary* backends behind the HAProxy VIP on OPNsense; the
+# in-cluster CPU pods (home/whisper, home/kokoro) are the fallback. Nothing in
+# this file is applied by Flux -- it lives here so the config sits beside the
+# cluster-side manifests it mirrors. Run it on the desktop:
+#
+#     docker compose up -d
+#
+# Ports are deliberately the same as the in-cluster services so HAProxy can
+# treat desktop and cluster as interchangeable backends:
+#   10300  Wyoming ASR   (whisper)
+#   10200  Wyoming TTS   (kokoro via the wyoming_openai bridge)
+#
+# Requires the NVIDIA Container Toolkit.  Verify the GPU is visible first:
+#     docker run --rm --gpus all nvidia/cuda:12.6.0-base-ubuntu24.04 nvidia-smi
+
+services:
+  # --- STT -------------------------------------------------------------------
+  # linuxserver's image (not rhasspy's) because it is the one that publishes
+  # CUDA builds. Note the config interface differs from the in-cluster pod:
+  # env vars here, command-line args there.
+  #
+  # WHISPER_MODEL is large-v3 on purpose. The cluster runs base-int8 for speed
+  # on CPU; the GPU can afford a far more accurate model at similar latency.
+  # Transcription quality therefore *changes* on failover -- that is the
+  # intended trade, not a bug.
+  whisper:
+    image: lscr.io/linuxserver/faster-whisper:3.5.0-gpu
+    container_name: wyoming-whisper-gpu
+    restart: unless-stopped
+    ports:
+      - "10300:10300"
+    environment:
+      TZ: America/Denver
+      PUID: "1000"
+      PGID: "1000"
+      WHISPER_MODEL: large-v3
+      WHISPER_BEAM: "1"
+      WHISPER_LANG: en
+    volumes:
+      - whisper-data:/config
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # --- TTS -------------------------------------------------------------------
+  # Kokoro speaks an OpenAI-compatible HTTP API, not Wyoming, so it is paired
+  # with the same wyoming_openai bridge the cluster uses. Same versions as
+  # home/kokoro so behaviour matches on failover.
+  kokoro:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.6.0
+    container_name: kokoro-gpu
+    restart: unless-stopped
+    expose:
+      - "8880"
+    environment:
+      TZ: America/Denver
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  kokoro-bridge:
+    image: ghcr.io/roryeckel/wyoming_openai:0.5.0
+    container_name: wyoming-kokoro-bridge
+    restart: unless-stopped
+    depends_on:
+      - kokoro
+    ports:
+      - "10200:10200"
+    environment:
+      TZ: America/Denver
+      WYOMING_URI: tcp://0.0.0.0:10200
+      WYOMING_LOG_LEVEL: INFO
+      WYOMING_LANGUAGES: en
+      # Service name, not localhost -- the bridge is a separate container here,
+      # unlike the cluster where both share a pod network namespace.
+      TTS_OPENAI_URL: http://kokoro:8880/v1
+      TTS_MODELS: kokoro
+      TTS_BACKEND: KOKORO_FASTAPI
+      TTS_STREAMING_MODELS: kokoro
+      # MUST stay identical to home/kokoro's list. Home Assistant stores the
+      # selected voice by name (currently bf_lily); a voice missing from one
+      # side would break TTS the moment HAProxy fails over to it.
+      TTS_VOICES: >-
+        af_alloy af_aoede af_bella af_heart af_jadzia af_jessica
+        af_kore af_nicole af_nova af_river af_sarah af_sky
+        af_v0 af_v0bella af_v0irulan af_v0nicole af_v0sarah af_v0sky
+        am_adam am_echo am_eric am_fenrir am_liam am_michael
+        am_onyx am_puck am_santa
+        am_v0adam am_v0gurney am_v0michael
+        bf_alice bf_emma bf_isabella bf_lily bf_v0emma bf_v0isabella
+        bm_daniel bm_fable bm_george bm_lewis bm_v0george bm_v0lewis
+        ef_dora em_alex em_santa ff_siwis
+        hf_alpha hf_beta hm_omega hm_psi
+        if_sara im_nicola
+        jf_alpha jf_gongitsune jf_nezumi jf_tebukuro jm_kumo
+        pf_dora pm_alex pm_santa
+        zf_xiaobei zf_xiaoni zf_xiaoxiao zf_xiaoyi
+        zm_yunjian zm_yunxi zm_yunxia zm_yunyang
+
+volumes:
+  whisper-data:

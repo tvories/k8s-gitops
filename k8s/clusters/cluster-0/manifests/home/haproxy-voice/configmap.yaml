@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-voice
+  namespace: home
+data:
+  haproxy.cfg: |
+    global
+        log stdout format raw local0 info
+        maxconn 4096
+
+    defaults
+        log     global
+        mode    tcp
+        option  tcplog
+        # Wyoming holds a connection open for the whole synthesis/transcription,
+        # so client/server timeouts must exceed the slowest backend. In-cluster
+        # CPU Kokoro measured 3.2s; 300s is generous headroom for long input.
+        timeout connect 5s
+        timeout client  300s
+        timeout server  300s
+
+    # Needed for the in-cluster backups: HAProxy resolves server addresses once
+    # at startup unless a resolver is attached, so a Service IP change after a
+    # redeploy would otherwise be missed until a restart.
+    resolvers coredns
+        nameserver dns1 10.96.0.10:53
+        resolve_retries 3
+        timeout resolve 1s
+        timeout retry   1s
+        hold valid   10s
+        hold other   10s
+        hold refused 10s
+        hold nx      10s
+        hold timeout 10s
+
+    #-------------------------------------------------------------------------
+    # Health check speaks Wyoming rather than just opening a socket -- a wedged
+    # container still accepts connections, which a plain TCP check would happily
+    # route traffic into.
+    #
+    # Both sides are hex so nothing has to survive quoting through haproxy.cfg
+    # and YAML. Captured from a live exchange on 2026-08-03:
+    #   send   {"type": "describe", "version": "1.5.0"}\n
+    #   reply  {"type": "info", "version": "1.10.0", "data_length": 1256}\n
+    #   expect "info"   (the quoted value, so it cannot match a field name)
+    #
+    # inter 5s / fall 2  -> a dead desktop is detected in ~10s.
+    #-------------------------------------------------------------------------
+
+    frontend stt_fe
+        bind :10300
+        default_backend stt_be
+
+    backend stt_be
+        option tcp-check
+        tcp-check send-binary 7b2274797065223a20226465736372696265222c202276657273696f6e223a2022312e352e30227d0a
+        tcp-check expect binary 22696e666f22
+        # Primary: desktop GPU, whisper large-v3 (measured 0.34s)
+        server desktop 192.168.1.50:10300 check inter 5s fall 2 rise 2
+        # Backup: in-cluster CPU, whisper base-int8 (measured 0.83s).
+        # init-addr none lets HAProxy start even if DNS is briefly unavailable.
+        server cluster whisper.home.svc.cluster.local:10300 check inter 5s fall 2 rise 2 backup resolvers coredns init-addr none
+
+    frontend tts_fe
+        bind :10200
+        default_backend tts_be
+
+    backend tts_be
+        option tcp-check
+        tcp-check send-binary 7b2274797065223a20226465736372696265222c202276657273696f6e223a2022312e352e30227d0a
+        tcp-check expect binary 22696e666f22
+        # Primary: desktop GPU kokoro (measured 0.12s for bf_lily)
+        server desktop 192.168.1.50:10200 check inter 5s fall 2 rise 2
+        # Backup: in-cluster CPU kokoro (measured 3.20s). Voice lists are kept
+        # identical between the two so failover cannot lose the selected voice.
+        server cluster kokoro.home.svc.cluster.local:10200 check inter 5s fall 2 rise 2 backup resolvers coredns init-addr none
+
+    # Which backend is actually serving, and why. Reachable on the LB IP :8404.
+    frontend stats_fe
+        bind :8404
+        mode http
+        stats enable
+        stats uri /
+        stats refresh 10s
+        stats show-legends

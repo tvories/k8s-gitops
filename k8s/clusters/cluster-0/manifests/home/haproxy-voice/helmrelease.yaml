@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: haproxy-voice
+  namespace: home
+spec:
+  releaseName: haproxy-voice
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: haproxy-voice
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      haproxy-voice:
+        annotations:
+          # Restart on config change -- HAProxy reads haproxy.cfg only at start.
+          configmap.reloader.stakater.com/reload: haproxy-voice
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            fsGroup: 10001
+            seccompProfile: { type: RuntimeDefault }
+        containers:
+          app:
+            image:
+              # mirror.gcr.io rather than Docker Hub: haproxy is not published
+              # to ghcr at all (haproxytech/* and haproxy/* both 404 there), and
+              # this mirror serves a byte-identical image -- verified same
+              # digest as registry-1.docker.io -- without the Hub rate limit.
+              repository: mirror.gcr.io/library/haproxy
+              tag: 3.4.3-alpine@sha256:fb87fc81943143b9acaea7442973e6ba654035fff76ffe7af6829dd1bcb0f7a5
+            args:
+              - -f
+              - /usr/local/etc/haproxy/haproxy.cfg
+              - -db
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32M
+              limits:
+                memory: 128M
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &probe
+                  httpGet:
+                    path: /
+                    port: 8404
+                  initialDelaySeconds: 5
+                  periodSeconds: 15
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+
+    service:
+      app:
+        controller: haproxy-voice
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: "192.168.83.55"
+        externalTrafficPolicy: Cluster
+        ports:
+          stt:
+            port: 10300
+            protocol: TCP
+          tts:
+            port: 10200
+            protocol: TCP
+          stats:
+            port: 8404
+            protocol: TCP
+
+    persistence:
+      config:
+        type: configMap
+        name: haproxy-voice
+        globalMounts:
+          - path: /usr/local/etc/haproxy/haproxy.cfg
+            subPath: haproxy.cfg
+            readOnly: true
+      # readOnlyRootFilesystem is on, and HAProxy writes its state socket and
+      # temp files under /tmp and /var/lib/haproxy.
+      tmp:
+        type: emptyDir
+        medium: Memory
+        globalMounts:
+          - path: /tmp
+      run:
+        type: emptyDir
+        medium: Memory
+        globalMounts:
+          - path: /var/lib/haproxy
