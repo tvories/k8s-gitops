@@ -1,0 +1,151 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: echomuse
+  namespace: home
+spec:
+  releaseName: echomuse
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: echomuse
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    defaultPodOptions:
+      # Upstream ships `network_mode: host` because the controller advertises
+      # itself over mDNS and opens one ESPHome TCP port per device (16001+),
+      # neither of which survives port mapping. A macvlan attachment on the IoT
+      # VLAN gives the same L2 reach plus a *stable* address, so SERVER_IP does
+      # not change when the pod reschedules.
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name":"multus-iot",
+            "namespace": "network",
+            "ips": ["192.168.50.35/24"]
+          }]
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              # multus-iot is a macvlan whose master is enp1s0.50. Only these
+              # two nodes actually have that VLAN subinterface: m720q-1 has no
+              # enp1s0.50 and m720q-4's untagged NIC is eno1. Scheduling
+              # anywhere else silently comes up without the IoT interface.
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values: ["m720q-2", "m720q-3"]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            # A macvlan child cannot talk to its own parent host. Home Assistant
+            # runs hostNetwork, so if it landed on the same node it could not
+            # reach the ESPHome ports on 192.168.50.35.
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: home-assistant
+              topologyKey: kubernetes.io/hostname
+
+    controllers:
+      echomuse:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/wilbowes/echomuse-controller
+              tag: 2.14.0
+            env:
+              TZ: "${TIMEZONE}"
+              # Network — bind everywhere, advertise the macvlan address
+              SERVER_HOST: 0.0.0.0
+              SERVER_PORT: &wsPort 8767
+              SERVER_TLS_PORT: &wssPort 8770
+              API_PORT: &apiPort 8768
+              SERVER_IP: 192.168.50.35
+              MDNS_NAME: echomuse
+              # Leave 0 until every device reports "wss (TLS)" in the dashboard.
+              # The credential push itself needs the plain shell plane.
+              REQUIRE_DEVICE_TLS: 0
+              # Voice pipeline — should track the controller image tag
+              ESPHOME_PROJECT_VERSION: 2.14.0
+              # Wake word (EchoMuse runs its own openWakeWord, independent of
+              # the wyoming-openwakeword release used by HA satellites)
+              OWW_MODEL: hey_jarvis
+              OWW_THRESHOLD: 0.3
+              DB_PATH: /app/data/echomuse.db
+              # strict — unknown devices wait in the pending queue for approval
+              DEVICE_APPROVAL: strict
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512M
+              limits:
+                memory: 4Gi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &probe
+                  tcpSocket:
+                    port: *apiPort
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: *apiPort
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+    service:
+      app:
+        controller: echomuse
+        ports:
+          http:
+            port: *apiPort
+          ws:
+            port: *wsPort
+            protocol: TCP
+          wss:
+            port: *wssPort
+            protocol: TCP
+
+    # Devices reach the controller over the macvlan IP; this is only so the
+    # dashboard is usable by name from a browser.
+    ingress:
+      app:
+        className: nginx-internal
+        annotations:
+          nginx.org/websocket-services: echomuse-app
+        hosts:
+          - host: &host "echomuse.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.echomuse
+
+    persistence:
+      data:
+        existingClaim: echomuse-data
+        globalMounts:
+          - path: /app/data

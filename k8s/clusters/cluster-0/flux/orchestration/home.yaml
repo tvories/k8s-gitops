@@ -138,6 +138,25 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
+# Controller for rooted Echo Dots, presented to HA as ESPHome voice satellites.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: home-echomuse
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: home-namespace
+    - name: rook-ceph-cluster
+    - name: network-ingress-nginx
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home/echomuse"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:

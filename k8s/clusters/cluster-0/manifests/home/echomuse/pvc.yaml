@@ -1,0 +1,16 @@
+---
+# SQLite database (devices, users, config) plus the controller-generated
+# device-link CA under tls/. Must survive upgrades or every Echo Dot has to be
+# re-provisioned.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: echomuse-data
+  namespace: home
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-block
+  resources:
+    requests:
+      storage: 5Gi
