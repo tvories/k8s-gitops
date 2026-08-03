@@ -28,19 +28,28 @@ metadata:
   name: paperless-ai
   namespace: selfhosted
 spec:
-  sourcePVC: paperless-ai-data
+  # Was "paperless-ai-data", which has never existed -- the PVC is
+  # paperless-ai-config (see pvc.yaml). Every sync since this was written
+  # failed with 'PersistentVolumeClaim "paperless-ai-data" not found', so
+  # there is no restic history for this app yet.
+  sourcePVC: paperless-ai-config
   trigger:
     schedule: "0 */12 * * *"
   restic:
     copyMethod: Snapshot
     pruneIntervalDays: 14
     repository: paperless-ai-restic-secret
+    # ~426Mi of data; 2Gi cache is comfortable.
     cacheCapacity: 2Gi
     volumeSnapshotClassName: csi-rbdplugin-snapclass
     storageClassName: ceph-block
+    # paperless-ai runs as root and every file on this PVC is owned 0:0.
+    # A 568 mover can read the app's own files (they are 0644/0755) but not
+    # the filesystem's lost+found (0700 root), which makes restic error on
+    # the walk. Matching the data's owner avoids that.
     moverSecurityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
     retain:
       daily: 14
