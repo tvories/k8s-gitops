@@ -82,6 +82,34 @@ spec:
               # PAPERLESS_TIKA_ENDPOINT: http://localhost:9998
               # PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
               # PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_REMOTE_USER
+              # --- AI (built in since paperless-ngx v2.20.4) -------------------
+              # Replaces the separate paperless-ai deployment.
+              #
+              # paperless-ngx supports only "openai-like" or "ollama" -- there is
+              # no native Anthropic backend. Anthropic publishes an
+              # OpenAI-compatible /chat/completions at api.anthropic.com/v1/, so
+              # the same key and model paperless-gpt uses work through that.
+              #
+              # Anthropic describes that compatibility layer as intended for
+              # evaluation rather than production, and it silently ignores
+              # response_format and tool `strict`. Watch for malformed suggestion
+              # payloads; if they appear, this is the first thing to suspect.
+              PAPERLESS_AI_ENABLED: "true"
+              PAPERLESS_AI_LLM_BACKEND: openai-like
+              PAPERLESS_AI_LLM_ENDPOINT: "https://api.anthropic.com/v1/"
+              PAPERLESS_AI_LLM_MODEL: claude-haiku-4-5-20251001
+              # PAPERLESS_AI_LLM_API_KEY comes from paperless-secret.
+
+              # Embeddings for document chat / RAG. Anthropic has NO embeddings
+              # API, so this cannot point at them -- huggingface runs
+              # sentence-transformers locally inside this container instead.
+              # First use downloads the model (~90MB) and costs CPU/RAM here.
+              # Drop these two lines to keep AI suggestions but disable chat.
+              PAPERLESS_AI_LLM_EMBEDDING_BACKEND: huggingface
+              PAPERLESS_AI_LLM_EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+              # Nightly re-index of embeddings; default is "10 2 * * *".
+              PAPERLESS_LLM_INDEX_TASK_CRON: "10 2 * * *"
+
               PAPERLESS_OCR_LANGUAGE: eng
               PAPERLESS_PORT: &port "8000"
               PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16,192.168.80.0/24,192.168.83.0/24

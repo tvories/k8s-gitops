@@ -5,7 +5,11 @@ namespace: selfhosted
 resources:
   - ocirepository.yaml
   - ./pvc.yaml
-  - ./helmrelease.yaml
+  # Disabled in favour of paperless-ngx's built-in AI (PAPERLESS_AI_* env on
+  # the paperless HelmRelease). Only the HelmRelease is removed -- the PVC and
+  # volsync entries stay so the existing data survives, and re-enabling is a
+  # one-line revert. Flux will prune the HelmRelease, which uninstalls the app.
+  # - ./helmrelease.yaml
   - ./volsync.yaml
   # - ./externalsecret.yaml
 # patchesStrategicMerge:
