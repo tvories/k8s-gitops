@@ -29,6 +29,27 @@ spec:
     kind: GitRepository
     name: k8s-gitops
 ---
+# Driver ServiceAccounts, RBAC and Driver CRs for the ceph-csi-operator. From
+# Rook v1.20.0 these are no longer part of the rook-ceph chart, so this must be
+# deployed for CSI to have anything to run as. Ordered after the operator, which
+# installs the ceph-csi-operator itself, and before the cluster.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: rook-ceph-csi-drivers
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: rook-ceph-namespace
+    - name: rook-ceph-operator
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/rook-ceph/csi-drivers"
+  prune: false
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:

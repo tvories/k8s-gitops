@@ -1,0 +1,13 @@
+---
+# Home of the ceph-csi-drivers chart. From Rook v1.20.0 the CSI driver
+# ServiceAccounts, RBAC and Driver CRs live here rather than in the rook-ceph
+# chart, so this repo is required alongside rook-ceph-charts.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: ceph-csi-charts
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: https://ceph.github.io/ceph-csi-operator
+  timeout: 3m

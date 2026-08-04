@@ -1,0 +1,136 @@
+---
+# Rook v1.20.0 moved the CSI driver ServiceAccounts, RBAC and Driver CRs out of
+# the rook-ceph chart into this one. Without it, rook-ceph >= v1.20 installs the
+# ceph-csi-operator but nothing creates the ServiceAccounts its generated
+# workloads reference, and every CSI plugin pod fails to schedule.
+#
+# releaseName and namespace are load-bearing: the Driver and OperatorConfig CRs
+# already in the cluster carry
+#   meta.helm.sh/release-name: ceph-csi-drivers
+#   meta.helm.sh/release-namespace: rook-ceph
+# so Helm adopts them only if this release matches exactly. Renaming it makes
+# the install fail with "invalid ownership metadata".
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ceph-csi-drivers
+  namespace: rook-ceph
+spec:
+  releaseName: ceph-csi-drivers
+  interval: 30m
+  chart:
+    spec:
+      chart: ceph-csi-drivers
+      version: 1.0.4
+      sourceRef:
+        kind: HelmRepository
+        name: ceph-csi-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    # cephConnections/clientProfiles are deliberately not set. Their chart
+    # defaults (a single entry with an empty name) render to nothing, and Rook
+    # owns those CRs at runtime -- CephConnection holds the live mon IPs and is
+    # rewritten as mons move, ClientProfile holds the provisioner secret refs.
+    #
+    # operatorConfig.create defaults to TRUE, which would overwrite the existing
+    # cluster OperatorConfig with chart defaults and silently drop the settings
+    # Rook wrote under v1.19.x: clusterName, the imageSet ConfigMap that pins
+    # CSI sidecar images, controllerPlugin.hostNetwork (the old
+    # csi.enableCSIHostNetwork: true) and replicas: 2. Rook v1.20 no longer
+    # manages CSI settings, so nothing would restore them. Keep it false and let
+    # the existing resource supply driverSpecDefaults.
+    operatorConfig:
+      create: false
+
+    drivers:
+      # Driver names must keep the "rook-ceph." prefix -- they must match the
+      # existing Driver CR names and the CSI driver names baked into every
+      # StorageClass provisioner field.
+      rbd:
+        name: rook-ceph.rbd.csi.ceph.com
+        enabled: true
+        clusterName: &clusterName rook-ceph
+        imageSet: &imageSet
+          # ConfigMap that Rook maintains; keeps CSI sidecar images pinned to
+          # the versions Rook was tested against rather than the chart's.
+          name: rook-csi-operator-image-set-configmap
+        cephFsClientType: &cephFsClientType kernel
+        fsGroupPolicy: &fsGroupPolicy File
+        deployCsiAddons: &deployCsiAddons false
+        generateOMapInfo: &generateOMapInfo false
+        attachRequired: &attachRequired true
+        enableFencing: &enableFencing false
+        grpcTimeout: &grpcTimeout 30
+        # Operator default; the chart would otherwise force "none" for rbd.
+        snapshotPolicy: volumeSnapshot
+        log: &log
+          verbosity: 0
+          rotation:
+            # Live Drivers run without a log rotator sidecar; keep it that way.
+            enabled: false
+        nodePlugin: &nodePlugin
+          priorityClassName: system-node-critical
+          kubeletDirPath: /var/lib/kubelet
+          enableSeLinuxHostMount: false
+          updateStrategy:
+            type: RollingUpdate
+          resources:
+            plugin:
+              requests: { cpu: 250m, memory: 512Mi }
+              limits: { memory: 1Gi }
+            registrar:
+              requests: { cpu: 50m, memory: 128Mi }
+              limits: { memory: 256Mi }
+        controllerPlugin: &controllerPlugin
+          # Load-bearing: the template renders hostNetwork unconditionally, so
+          # an unset value writes `false` into the Driver CR and overrides the
+          # OperatorConfig default of true. Same reason snapshotPolicy is set
+          # explicitly above -- the chart would otherwise force "none" on rbd.
+          hostNetwork: true
+          replicas: 2
+          resources:
+            attacher: &sidecarResources
+              requests: { cpu: 100m, memory: 128Mi }
+              limits: { memory: 256Mi }
+            provisioner: *sidecarResources
+            resizer: *sidecarResources
+            snapshotter: *sidecarResources
+            omapGenerator:
+              requests: { cpu: 250m, memory: 512Mi }
+              limits: { memory: 1Gi }
+            plugin:
+              requests: { cpu: 250m, memory: 512Mi }
+              limits: { memory: 1Gi }
+
+      cephfs:
+        name: rook-ceph.cephfs.csi.ceph.com
+        enabled: true
+        clusterName: *clusterName
+        imageSet: *imageSet
+        cephFsClientType: *cephFsClientType
+        fsGroupPolicy: *fsGroupPolicy
+        deployCsiAddons: *deployCsiAddons
+        generateOMapInfo: *generateOMapInfo
+        attachRequired: *attachRequired
+        enableFencing: *enableFencing
+        grpcTimeout: *grpcTimeout
+        # Live value -- the VolumeGroupSnapshot CRDs are present and served.
+        snapshotPolicy: volumeGroupSnapshot
+        log: *log
+        nodePlugin: *nodePlugin
+        controllerPlugin: *controllerPlugin
+
+      # Not in use; enabling them would create Driver CRs, DaemonSets and RBAC
+      # for storage types this cluster does not serve.
+      nvmeof:
+        enabled: false
+      nfs:
+        enabled: false
