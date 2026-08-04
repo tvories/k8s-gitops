@@ -97,6 +97,21 @@ spec:
               storageClass: ceph-block
               accessMode: ReadWriteOnce
               size: 20Gi
+      # Chart 10.x defaults global.gatewayApi.enabled to true, which renders a
+      # GatewayClass, Gateway, EnvoyProxy and 5 HTTPRoutes *in addition to* the
+      # nginx Ingress below. That Gateway gets its own LoadBalancer Service, so
+      # Cilium hands it an IP from main-pool -- an address nothing points at,
+      # since DNS sends gitlab.${SECRET_DOMAIN} to nginx-external instead.
+      #
+      # installEnvoy is deliberately left at its default (true). The
+      # envoy-gateway subchart is gated on it, and that subchart is what
+      # carries the cluster-wide Gateway API CRDs -- which the unrelated
+      # network/envoy-internal and network/envoy-external gateways depend on.
+      # Turning it off risks taking those CRDs (and every HTTPRoute in the
+      # cluster) with it. Disabling only the API surface releases the IP and
+      # leaves the CRDs alone; the cost is one idle envoy-gateway pod.
+      gatewayApi:
+        enabled: false
       ingress:
         enabled: true
         configureCertmanager: false
