@@ -42,7 +42,7 @@ spec:
     # unset (see below) — setting both is unsupported.
     cephImage:
       repository: quay.io/ceph/ceph
-      tag: v19.2.4
+      tag: v19.2.5
 
     cephClusterSpec:
       mon:
