@@ -5,3 +5,10 @@ metadata:
   name: home
   labels:
     goldilocks.fairwinds.com/enabled: "true"
+    # Workloads here mount hostPath and/or run privileged (node-exporter,
+    # prometheus-smartctl, CNI and device plugins, Ceph clients). PodSecurity
+    # "baseline" rejects those at admission. "privileged" is the unrestricted
+    # level -- it grants nothing, it only stops PSA evaluating pods here; what
+    # each pod gets is still governed by its own securityContext.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
