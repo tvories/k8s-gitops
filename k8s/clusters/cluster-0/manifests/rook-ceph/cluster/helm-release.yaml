@@ -42,16 +42,6 @@ spec:
         cpu: 50m
         memory: 128M
 
-    # Pinned deliberately. The chart default for this tag moves v19.2.4 ->
-    # v20.2.2 (Squid -> Tentacle) between chart v1.19.8 and v1.20.x, so leaving
-    # it unset would ride a Ceph *major* upgrade in on the back of a Rook chart
-    # bump. Ceph is upgraded on its own, after Rook is confirmed healthy.
-    # Note: the chart applies this only while cephClusterSpec.cephVersion stays
-    # unset (see below) — setting both is unsupported.
-    cephImage:
-      repository: quay.io/ceph/ceph
-      tag: v19.2.5
-
     cephClusterSpec:
       mon:
         count: 3
