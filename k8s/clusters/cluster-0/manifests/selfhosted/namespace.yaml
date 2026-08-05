@@ -5,3 +5,10 @@ metadata:
   name: selfhosted
   labels:
     goldilocks.fairwinds.com/enabled: "true"
+    # hashi-vault requests IPC_LOCK so it can mlock its memory and keep key
+    # material out of swap. PodSecurity "baseline" rejects the capability.
+    # "privileged" is the unrestricted level -- it grants nothing, it only
+    # stops PSA evaluating pods here; what each pod gets is still governed
+    # by its own securityContext.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest

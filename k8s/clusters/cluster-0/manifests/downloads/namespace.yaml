@@ -6,3 +6,11 @@ metadata:
   labels:
     routed-gateway: "true"
     goldilocks.fairwinds.com/enabled: "true"
+    # qbittorrent runs gluetun, which needs NET_ADMIN to manage the VPN
+    # tunnel. PodSecurity "baseline" allows only a small default capability
+    # set and rejects it at admission.
+    # "privileged" is the unrestricted level -- it grants nothing, it only
+    # stops PSA evaluating pods here; what each pod gets is still governed
+    # by its own securityContext.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
