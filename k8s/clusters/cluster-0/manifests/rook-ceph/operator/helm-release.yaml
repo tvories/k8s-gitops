@@ -9,14 +9,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph
-      # Rolled back from v1.20.3 on 2026-08-04. v1.20.x moves the CSI driver
-      # ServiceAccounts and RBAC out of this chart into the separate
-      # `ceph-csi-drivers` chart, and flips csiServiceAccountPrefix from
-      # "ceph-csi-" to "". Upgrading without also installing ceph-csi-drivers
-      # deletes the old SAs, creates none of the new ones, and every CSI plugin
-      # pod fails to start -> cluster-wide volume mount failure.
-      # Do not bump this again until ceph-csi-drivers is deployed alongside it.
-      version: v1.19.8
+      version: v1.20.3
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
