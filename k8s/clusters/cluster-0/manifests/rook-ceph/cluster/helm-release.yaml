@@ -6,6 +6,14 @@ metadata:
   namespace: rook-ceph
 spec:
   interval: 30m
+  # Flux defaults to 5m, which is not enough for this release. Helm waits for
+  # every resource in it, and a single CephCluster reconcile alone takes ~2.5min
+  # (rolling mons, rotating CSI auth keys, pruning mon config) before
+  # observedGeneration catches up to generation. Add the block pool, filesystem
+  # and object store and 5m is routinely exceeded -- the upgrade then times out
+  # and rolls back, the rollback bumps the CephCluster generation, which starts
+  # another reconcile, and the release thrashes until RetriesExceeded.
+  timeout: 20m
   chart:
     spec:
       chart: rook-ceph-cluster
