@@ -1,5 +1,21 @@
 ---
+# Which node names may have their kubelet *serving* certificates auto-approved.
+# Kubernetes auto-approves kubelet client certs but never serving certs, so
+# machine.kubelet.extraArgs.rotate-server-certificates=true in talconfig.yaml
+# depends on this controller -- a node missing from this regex has its CSRs
+# actively DENIED, and its serving cert silently stops rotating.
+#
+# Bounded to the four real nodes rather than left open-ended: this decides who
+# gets a signed serving cert, so it should not quietly accept a name that does
+# not exist yet. Previously read
+#   ^(m720q-3|physical2|m720q-1|m720q-2)$
+# which omitted m720q-4 entirely and still listed physical2, a node removed in
+# early 2025. That surfaced only when rotate-server-certificates finally
+# reached m720q-4 and 9 of its CSRs were denied in a row.
 providerRegex: |
-  ^(m720q-3|physical2|m720q-1|m720q-2)$
+  ^m720q-[1-4]$
 
+# Node hostnames are not resolvable without the search domain (talconfig sets
+# machine.network.disableSearchDomain: true), so DNS verification cannot be
+# used to validate the CSR's SANs here.
 bypassDnsResolution: true
