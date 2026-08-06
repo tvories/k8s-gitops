@@ -15,7 +15,12 @@
 providerRegex: |
   ^m720q-[1-4]$
 
-# Node hostnames are not resolvable without the search domain (talconfig sets
-# machine.network.disableSearchDomain: true), so DNS verification cannot be
-# used to validate the CSR's SANs here.
+# This controller runs as a pod with dnsPolicy: ClusterFirst, so it resolves
+# through CoreDNS -- NOT through the node resolver. It looks node names up as
+# bare short names ("m720q-4"), and CoreDNS's upstream has no such record;
+# only the FQDN m720q-4.mcbadass.local exists. So SAN-vs-DNS verification
+# cannot work here regardless of the nodes' own resolver settings.
+#
+# (Unrelated to machine.network.disableSearchDomain in talconfig -- that only
+# affects host processes on the node itself.)
 bypassDnsResolution: true

@@ -3,140 +3,113 @@
 clusterName: ${cluster_name}
 # renovate: datasource=github-releases depName=siderolabs/talos
 talosVersion: v1.13.7
-kubernetesVersion: v1.34.4
+kubernetesVersion: v1.35.6
 endpoint: https://${cluster_name}.${domain_name}:6443
-# domain: cluster.local
-# allowSchedulingOnMasters: true
+
+# Root-level key (talhelper), not a cluster patch. `allowSchedulingOnMasters`
+# is the deprecated spelling of the same thing -- do not set both.
+allowSchedulingOnControlPlanes: true
+
 clusterPodNets:
   - 10.244.0.0/16
 clusterSvcNets:
   - 10.96.0.0/12
 
 cniConfig:
-  name: none
-  # urls:
-  #   - https://raw.githubusercontent.com/tvories/k8s-gitops/main/k8s/clusters/${cluster_name}/integrations/cilium-quick-install/quick-install.yaml
+  name: none # Cilium is installed via Flux
 
+# 192.168.80.200 is the in-cluster Talos VIP.
 additionalApiServerCertSans: &san
   - &talosControlplaneVip 192.168.80.200
-  # - ${cluster_endpoint_ip}
   - ${cluster_name}.${domain_name}
   - "127.0.0.1" # KubePrism
 
 additionalMachineCertSans: *san
 
 nodes:
-  # Two virtual cpnodes and 3 physical cpnodes
-  # - hostname: talos-cp-1.${domain_name}
-  #   controlPlane: true
-  #   ipAddress: 192.168.80.91
-  #   installDisk: /dev/sda
-
-  # - hostname: talos-cp-2.${domain_name}
-  #   controlPlane: true
-  #   ipAddress: 192.168.80.92
-  #   installDisk: /dev/sda
-
-  # - hostname: talos-cp-3.${domain_name}
-  #   controlPlane: true
-  #   ipAddress: 192.168.80.93
-  #   installDisk: /dev/sda
-
-  # - hostname: physical1.${domain_name}
-  #   controlPlane: true
-  #   installDiskSelector:
-  #     busPath: /pci0000:00/0000:00:1f.2/ata5/host4/target4:0:0/4:0:0:0/
-  #   ipAddress: 192.168.80.98
-  #   networkInterfaces:
-  #     - interface: eth0
-  #       dhcp: true
-  #       mtu: 9000
-  #   installDisk: /dev/sda
-  #   # patches:
-  #   #   - |-
-  #   #     machine:
-  #   #       install:
-  #   #         extensions:
-  #   #           - image: ${gasket_image}
-  #   #       kernel:
-  #   #         modules:
-  #   #           - name: gasket
-  #   #           - name: apex
-
-  # - hostname: sff1.${domain_name}
-  #   controlPlane: true
-  #   ipAddress: 192.168.80.97
-  #   networkInterfaces:
-  #     - interface: eth0
-  #       dhcp: true
-  #       mtu: 9000
-  #   installDisk: /dev/sda
-  #   # patches:
-  #   #   - |-
-  #   #     machine:
-  #   #       install:
-  #   #         extensions:
-  #   #           - image: ${gasket_image}
-  #   #       kernel:
-  #   #         modules:
-  #   #           - name: gasket
-  #   #           - name: apex
+  # ---------------------------------------------------------------------------
+  # All four are Lenovo m720q. enp1s0 is the PCIE 10G NIC, eno1 the onboard one.
+  #
+  # VLAN 50 is the IoT network and is required on every node: the `multus-iot`
+  # NetworkAttachmentDefinition uses `master: enp1s0.50`, and home-assistant
+  # (192.168.50.10) and echomuse (192.168.50.35) attach to it. Losing it
+  # silently cuts IoT connectivity.
+  #
+  # The VIP lives on the vlan80 sub-interface, not on the parent link.
+  #
+  # ROUTE METRICS ARE LOAD-BEARING. The parent link takes DHCP so the node holds
+  # an address on the untagged LAN (192.168.1.0/24) -- Home Assistant runs with
+  # hostNetwork and needs it for mDNS. But Talos's DEFAULT DHCP route metric is
+  # 1024, which beats an unset/higher vlan80 metric and sends all egress out the
+  # LAN -- m720q-3 was silently doing exactly that (parent 1024 vs vlan80 2048).
+  # m720q-4 happened to be fine, since its vlan80 had metric 512. Relying on
+  # that accident is the problem; setting all three explicitly fixes the order:
+  #
+  #     2048  vlan80  (192.168.80.1)  <- preferred default route
+  #     4096  vlan50  (192.168.50.1)
+  #     6144  parent  (192.168.1.1)   <- reachable, but never preferred
+  #
+  # Node *identity* is a separate mechanism and is not affected by any of this:
+  # kubelet.nodeIP.validSubnets and etcd.advertisedSubnets pin both to
+  # 192.168.80.0/24, and Cilium inherits the InternalIP from the Node object.
+  #
+  # eno1 on the control-plane nodes is the unused onboard 1G NIC and stays off;
+  # on m720q-4 it IS the VLAN parent, since that box has no 10G card.
+  # ---------------------------------------------------------------------------
   - hostname: m720q-1.${domain_name}
     controlPlane: true
     ipAddress: 192.168.80.99
+    installDisk: /dev/sda
     networkInterfaces:
+      - interface: eno1
+        dhcp: false # unused onboard NIC; all traffic rides enp1s0
       - interface: enp1s0
-        dhcp: false
-        vip:
-          ip: *talosControlplaneVip
+        dhcp: true
         mtu: 9000
+        dhcpOptions:
+          routeMetric: 6144
         vlans:
-          - &vlan80
+          - &vlan80cp
             vlanId: 80
             mtu: 9000
             dhcp: true
+            vip:
+              ip: *talosControlplaneVip
             dhcpOptions:
-              routeMetric: 512
-          # - *vlan50
-    installDisk: /dev/sda
+              routeMetric: 2048
+          - &vlan50
+            vlanId: 50
+            mtu: 1500 # IoT VLAN is not jumbo-framed
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 4096
     schematic:
       customization:
         systemExtensions:
           officialExtensions: &m720q
-            - siderolabs/gasket-driver
-            - siderolabs/i915
+            - siderolabs/gasket-driver # PCIe Coral TPU (M.2 A+E), provides apex/gasket
+            - siderolabs/i915 # Intel iGPU (QuickSync transcoding)
             - siderolabs/intel-ucode
-            - siderolabs/iscsi-tools
+            - siderolabs/iscsi-tools # required by Rook Ceph
             - siderolabs/mei
             - siderolabs/nfsrahead
-    # patches:
-    #   - |-
-    #     machine:
-    #     #   install:
-    #     #     extensions:
-    #     #       - image: ${gasket_image}
-    #       kernel:
-    #         modules:
-    #           - name: gasket
-    #           - name: apex
 
   - hostname: m720q-2.${domain_name}
     controlPlane: true
+    ipAddress: 192.168.80.100
     installDiskSelector:
       busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
-    ipAddress: 192.168.80.100
     networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        # mtu: 9000
+      - interface: eno1
+        dhcp: false
       - interface: enp1s0
         dhcp: true
-        vip:
-          ip: *talosControlplaneVip
         mtu: 9000
+        dhcpOptions:
+          routeMetric: 6144
         vlans:
-          - *vlan80
-    installDisk: /dev/sda
+          - *vlan80cp
+          - *vlan50
     schematic:
       customization:
         systemExtensions:
@@ -144,164 +117,194 @@ nodes:
 
   - hostname: m720q-3.${domain_name}
     controlPlane: true
+    ipAddress: 192.168.80.101
     installDiskSelector:
       busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
-    ipAddress: 192.168.80.101
     networkInterfaces:
-      - interface: eth0
-        dhcp: true
-        # mtu: 9000
+      - interface: eno1
+        dhcp: false
       - interface: enp1s0
         dhcp: true
-        vip:
-          ip: *talosControlplaneVip
         mtu: 9000
+        dhcpOptions:
+          routeMetric: 6144
         vlans:
-          - *vlan80
-    installDisk: /dev/sda
+          - *vlan80cp
+          - *vlan50
     schematic:
       customization:
         systemExtensions:
           officialExtensions: *m720q
 
+  # m720q-4 is the only worker, and the only node whose primary NIC is eno1.
+  # Its VLAN interfaces are therefore eno1.50 / eno1.80
   - hostname: m720q-4.${domain_name}
     controlPlane: false
     ipAddress: 192.168.80.90
     installDisk: /dev/sda
-    nameservers:
-      - 192.168.1.243
-      - 192.168.1.240
     networkInterfaces:
       - interface: eno1
-        dhcp: false
+        dhcp: true
         mtu: 9000
+        dhcpOptions:
+          routeMetric: 6144
         vlans:
-          - *vlan80
+          - vlanId: 80 # no VIP: workers must not advertise the control plane VIP
+            mtu: 9000
+            dhcp: true
+            dhcpOptions:
+              routeMetric: 2048
+          - *vlan50
     schematic:
       customization:
-        extraKernelArgs:
-          - net.ifnames=0
         systemExtensions:
           officialExtensions: *m720q
 
-  # - hostname: talos-worker-1.${domain_name}
-  #   ipAddress: 192.168.80.94
-  #   installDisk: /dev/sda
+# =============================================================================
+# Patches applied to EVERY node. controlPlane/worker previously carried near
+# duplicate copies of most of this, which is how they drifted apart.
+# =============================================================================
+patches:
+  # DNS. Technitium runs at .243/.240; OPNsense is not a resolver.
+  - |-
+    machine:
+      network:
+        disableSearchDomain: true
+        nameservers:
+          - 192.168.1.243
+          - 192.168.1.240
 
-  # - hostname: talos-worker-2.${domain_name}
-  #   ipAddress: 192.168.80.95
-  #   installDisk: /dev/sda
+  # Four independent pool servers, deliberately not the router. With a single
+  # NTP source the client cannot detect a falseticker, so a misconfigured
+  # router drags the whole cluster's clock with it -- and etcd does not
+  # tolerate skew. Several sources let chrony outvote a bad one.
+  - |-
+    machine:
+      time:
+        disabled: false
+        servers:
+          - 0.us.pool.ntp.org
+          - 1.us.pool.ntp.org
+          - 2.us.pool.ntp.org
+          - 3.us.pool.ntp.org
 
-  # - hostname: talos-worker-3.${domain_name}
-  #   ipAddress: 192.168.80.96
-  #   installDisk: /dev/sda
+  - |-
+    machine:
+      features:
+        kubePrism:
+          enabled: true
+          port: 7445
+        hostDNS:
+          enabled: true
+          resolveMemberNames: true
+          forwardKubeDNSToHost: false
 
+  - |-
+    machine:
+      network:
+        extraHostEntries:
+          - ip: ${cluster_endpoint_ip}
+            aliases:
+              - ${cluster_name}.${domain_name}
+
+  # Bind to ports < 1024 without CAP_NET_BIND_SERVICE. Needs both halves: the
+  # sysctl lowers the kernel floor, the containerd flag stops the CRI from
+  # re-imposing its own limit.
+  - |-
+    machine:
+      sysctls:
+        net.ipv4.ip_unprivileged_port_start: "0"
+        # Frigate and Home Assistant both watch large directory trees; the
+        # defaults (8192 watches) are exhausted quickly and fail obscurely.
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+
+  - |-
+    machine:
+      files:
+        - op: create
+          path: /etc/cri/conf.d/20-customization.part
+          content: |
+            [plugins]
+              [plugins."io.containerd.grpc.v1.cri"]
+                enable_unprivileged_ports = true
+                enable_unprivileged_icmp = true
+            [plugins."io.containerd.grpc.v1.cri".containerd]
+              discard_unpacked_layers = false
+            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+              discard_unpacked_layers = false
+
+  - |-
+    machine:
+      files:
+        - op: overwrite
+          path: /etc/nfsmount.conf
+          permissions: 0o644
+          content: |
+            [ NFSMount_Global_Options ]
+            nfsvers=4.2
+            hard=True
+            noatime=True
+            nodiratime=True
+            rsize=131072
+            wsize=131072
+            nconnect=8
+
+  # Device permissions for the hardware these boxes actually have.
+  # NOTE: the Coral rule matches the PCIe/M.2 card, which presents as
+  # /dev/apex_N via the gasket driver. USB Coral rules (matching idVendor
+  # 1a6e/18d1) do nothing here and are deliberately omitted.
+  - |-
+    machine:
+      udev:
+        rules:
+          - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
+          - SUBSYSTEM=="apex", GROUP="44", MODE="0660"
+
+  - |-
+    machine:
+      kubelet:
+        extraArgs:
+          rotate-server-certificates: "true"
+        extraConfig:
+          maxPods: 150
+        nodeIP:
+          validSubnets:
+            - 192.168.80.0/24
+
+# =============================================================================
+# Control-plane only. Everything here is cluster-scoped and meaningless on a
+# worker, which is why it is not in the shared block above.
+# =============================================================================
 controlPlane:
-  schematic:
-    customization:
-      extraKernelArgs:
-        - net.ifnames=0
-      # systemExtensions:
-      #   officialExtensions:
-      #     - siderolabs/intel-ucode
-      #     - siderolabs/gasket-driver
   patches:
-    # Disable search domain everywhere
-    - |-
-      machine:
-        network:
-          disableSearchDomain: true
-
-    # Force nameserver
-    - |-
-      machine:
-        network:
-          nameservers:
-            - 192.168.1.243
-            - 192.168.1.240
-
-    # Configure NTP
-    - |-
-      machine:
-        time:
-          disabled: false
-          servers:
-            - 192.168.80.1
-
-    # Enable KubePrism
-    - |-
-      machine:
-        features:
-          kubePrism:
-            enabled: true
-            port: 7445
-
-    # Configure cluster loopback
-    - |-
-      machine:
-        network:
-          extraHostEntries:
-            - ip: ${cluster_endpoint_ip}
-              aliases:
-                - ${cluster_name}.${domain_name}
-
-    # Configure containerd
-    - |-
-      machine:
-        files:
-          - op: create
-            path: /etc/cri/conf.d/20-customization.part
-            content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
-
-    # Configure nfs mount options
-    - |-
-      machine:
-        files:
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 0o644
-            content: |
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nodiratime=True
-              rsize=131072
-              wsize=131072
-              nconnect=8
-
-    # Cluster configuration
     - |-
       cluster:
-        allowSchedulingOnMasters: true
-        # This must be disabled or else cilium kube-proxy will conflict
+        # Cilium replaces kube-proxy; leaving it enabled causes a conflict.
         proxy:
           disabled: true
-
-    # ETCD configuration
-    - |-
-      cluster:
         etcd:
           advertisedSubnets:
             - 192.168.80.0/24
-
-    # Enable Anonymous Auth for HAProxy health check
-    - |-
-      cluster:
+          extraArgs:
+            # Required by kube-prometheus-stack's kube-etcd ServiceMonitor.
+            # etcd only serves /metrics on this listener; without it the
+            # scrape fails and every etcd alert goes blind.
+            #
+            # 0.0.0.0 rather than the node's own IP: the live nodes each had a
+            # hardcoded http://192.168.80.<n>:2381, which cannot live in a
+            # shared controlPlane patch. m720q-1 had already lost the setting
+            # entirely, so its etcd metrics were already dark before this.
+            listen-metrics-urls: http://0.0.0.0:2381
         apiServer:
           extraArgs:
-            anonymous-auth: true
+            anonymous-auth: true # HAProxy control-plane health check
+            runtime-config: admissionregistration.k8s.io/v1beta1=true
+            feature-gates: MutatingAdmissionPolicy=true
 
-    # Disable default API server admission plugins.
-    - |-
-      cluster:
-        apiServer:
-          admissionControl: []
-
+    # Control-plane ONLY. Talos rejects this outright on a worker with
+    # "feature Kubernetes Talos API Access can only be enabled on control plane
+    # machines", so it cannot live in the shared root `patches:` block.
     - |-
       machine:
         features:
@@ -312,105 +315,5 @@ controlPlane:
             allowedKubernetesNamespaces:
               - system-upgrade
 
-    # Kubelet configuration
-    - |-
-      machine:
-        kubelet:
-          extraArgs:
-            rotate-server-certificates: "true"
-          extraConfig:
-            maxPods: 150
-          nodeIP:
-            validSubnets:
-              - 192.168.80.0/24
-
-    # Enable MutatingAdmissionPolicy
-    - |-
-      cluster:
-        apiServer:
-          extraArgs:
-            runtime-config: admissionregistration.k8s.io/v1alpha1=true
-            feature-gates: MutatingAdmissionPolicy=true
-
-    # Load i915 kernel module for Intel GPU
-    - |-
-      machine:
-        kernel:
-          modules:
-            - name: i915
-
 worker:
-  schematic:
-    customization:
-      extraKernelArgs:
-        - net.ifnames=0
-  patches:
-    # Note: disableSearchDomain removed - set via node config or causes conflict
-    # Kubelet configuration
-    - |-
-      machine:
-        kubelet:
-          nodeIP:
-            validSubnets:
-              - 192.168.80.0/24
-    # Enable host dns
-    - |-
-      machine:
-        features:
-          hostDNS:
-            enabled: true
-            resolveMemberNames: true
-            forwardKubeDNSToHost: false
-
-    # # Force nameserver
-    # - |-
-    #   machine:
-    #     network:
-    #       nameservers:
-    #         - 192.168.1.243
-    #         - 192.168.1.240
-    # Configure NTP
-    - |-
-      machine:
-        time:
-          disabled: false
-          servers:
-            - 192.168.80.1
-    # Configure containerd
-    - |-
-      machine:
-        files:
-          - op: create
-            path: /etc/cri/conf.d/20-customization.part
-            content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                discard_unpacked_layers = false
-              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                discard_unpacked_layers = false
-    # Configure nfs mount options
-    - |-
-      machine:
-        files:
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 0o644
-            content: |
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nodiratime=True
-              rsize=131072
-              wsize=131072
-              nconnect=8
-
-    # Load i915 kernel module for Intel GPU
-    - |-
-      machine:
-        kernel:
-          modules:
-            - name: i915
+  patches: []
