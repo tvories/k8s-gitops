@@ -61,7 +61,7 @@ spec:
           app:
             image:
               repository: ghcr.io/wilbowes/echomuse-controller
-              tag: 2.14.0
+              tag: 2.15.0
             env:
               TZ: "${TIMEZONE}"
               # Network — bind everywhere, advertise the macvlan address
