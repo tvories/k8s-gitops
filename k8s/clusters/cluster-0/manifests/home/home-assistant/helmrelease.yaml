@@ -27,50 +27,21 @@ spec:
         runAsGroup: 0
         fsGroup: 0
         fsGroupChangePolicy: OnRootMismatch
-      # Two macvlan attachments so Home Assistant has real layer-2 presence on
-      # both device networks. mDNS is link-local multicast (224.0.0.251, TTL 1)
-      # and does not route, so ESPHome/HomeKit/Cast/Sonos discovery only works
-      # from an interface actually ON that segment.
-      #
-      # These addresses are STATIC (the NADs use ipam type "static" with
-      # capabilities.ips), so they must be excluded from the OPNsense DHCP pools
-      # on both VLANs -- nothing reconciles multus against the DHCP server.
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |
-          [{
-            "name":"multus-legacy",
-            "namespace": "network",
-            "ips": ["192.168.1.10/24"]
-          },{
-            "name":"multus-iot",
-            "namespace": "network",
-            "ips": ["192.168.50.10/24"]
-          }]
     controllers:
       home-assistant:
         pod:
-          # hostNetwork was REMOVED here on purpose. A hostNetwork pod bypasses
-          # CNI entirely, which silently made the multus annotation above a
-          # no-op -- the pod had no k8s.v1.cni.cncf.io/network-status at all and
-          # was reaching IoT devices by routing through OPNsense, which is why
-          # broadcast-based discovery was unreliable.
+          # REVERTED to hostNetwork 2026-08-08. Putting HA on the IoT VLAN via
+          # macvlan made it UNABLE to reach IoT devices: that VLAN has client
+          # isolation, so an on-segment host can talk to the gateway but not to
+          # other devices. Verified from the pod -- 192.168.50.1:80 OK, while
+          # every ESPHome device on 192.168.50.x timed out. With hostNetwork the
+          # node sits on 192.168.80.x and reaches them by ROUTING through
+          # 192.168.50.1, which is permitted.
           #
-          # Consequence: HA's address no longer follows whichever node it lands
-          # on. It is now fixed at 192.168.1.10 / 192.168.50.10.
-          #
-          # macvlan requires the NAD's master interface to exist on the node.
-          # multus-legacy masters on enp1s0 and multus-iot on enp1s0.50; a NAD's
-          # master is static and cannot vary per node. m720q-4 has eno1/eno1.50
-          # (onboard 1G, no 10G card), so it cannot satisfy either and is
-          # excluded below. Without this the pod would simply fail to start there.
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: In
-                        values: ["m720q-1", "m720q-2", "m720q-3"]
+          # mDNS appeared to work because multicast still floods the segment;
+          # only unicast is blocked. Discovery succeeding is not evidence that
+          # connections will.
+          hostNetwork: true
         containers:
           app:
             image:
