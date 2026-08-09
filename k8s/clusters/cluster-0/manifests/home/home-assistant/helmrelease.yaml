@@ -32,32 +32,62 @@ spec:
         # dir now matches, OnRootMismatch skips the recursive chown at mount --
         # otherwise it would walk ~64k entries before the container starts.
         fsGroupChangePolicy: OnRootMismatch
-      # ONE multus attachment, IoT only.
-      #
-      # A previous attempt attached BOTH multus-legacy (192.168.1.10) and
-      # multus-iot and broke voice assist completely -- speaking produced no
-      # response while typing worked, with STT/TTS verifiably healthy in
-      # isolation. Reverting to hostNetwork fixed it immediately. Every
-      # reference implementation attaches exactly one network; none attach two.
-      #
-      # The MAC is pinned. Without it macvlan mints a fresh random MAC on every
-      # restart, so the pod looks like a brand-new device to the switch, AP
-      # client tables and any DHCP reservation each time. 02: is the
-      # locally-administered prefix; the trailing octets encode 192.168.50.10.
-      #
-      # `interface` names the in-pod NIC deterministically instead of relying
-      # on net1/net2 ordering.
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |
-          [{
-            "name": "multus-iot",
-            "namespace": "network",
-            "interface": "eth1",
-            "ips": ["192.168.50.10/24"],
-            "mac": "02:42:c0:a8:32:0a"
-          }]
+      # NO multus attachment. Removed 2026-08-09 -- see the hostNetwork note
+      # below. Rootless (568) is deliberately KEPT so that the next test changes
+      # only one variable at a time; the two were changed together on 2026-08-09
+      # and voice broke, which told us nothing about which one was responsible.
     controllers:
       home-assistant:
+        pod:
+          # hostNetwork. Attaching HA to multus-iot has now broken voice assist
+          # TWICE (2026-08-06 with two networks, 2026-08-09 with one), and both
+          # times the signature was identical: TYPING to the assistant works,
+          # SPEAKING produces no response, while STT and TTS test healthy in
+          # isolation. That signature is the tell -- the conversation/intent
+          # path is fine and only AUDIO DELIVERY fails.
+          #
+          # ROOT CAUSE, CONFIRMED 2026-08-09 -- and it is not really "multus":
+          #
+          # HA hands voice satellites an ABSOLUTE media URL to fetch TTS audio
+          # from. `internal_url` is unset (None), so HA derives one from
+          # async_get_source_ip(), which is the source address it would use
+          # toward MDNS_TARGET_IP 224.0.0.251. Measured inside the pod while
+          # attached to multus:
+          #     -> 224.0.0.251   src=10.244.4.242   (cluster pod IP)
+          #     -> 192.168.1.48  src=10.244.4.242   (the Voice PE puck)
+          # So HA advertised http://10.244.4.242:8123/api/tts_proxy/<hash>.flac,
+          # which NO satellite on 192.168.1.0/24 can route to. Under hostNetwork
+          # the same derivation yields 192.168.1.65 -- exactly what echomuse
+          # logged while voice worked:
+          #     Streaming TTS audio from
+          #     http://192.168.1.65:8123/api/tts_proxy/<hash>.flac
+          #
+          # This is why typing works and speaking does not: the conversation
+          # path is entirely in-cluster, while playback requires the satellite
+          # to reach back INTO HA over a routable address.
+          #
+          # It also retires two earlier wrong theories -- "two attachments" and
+          # "IoT VLAN client isolation". Neither mattered; ANY non-hostNetwork
+          # configuration breaks voice while internal_url is unset.
+          #
+          # THE FIX that makes multus viable: set internal_url to a stable
+          # reachable address (the LoadBalancer 192.168.83.37, or the ha.
+          # hostname) so the URL never depends on pod networking.
+          #
+          # Compounding factor: the multus-iot NAD declares a redundant route
+          # for 192.168.50.0/24 via 192.168.50.1, which outranks the kernel's
+          # connected route and sends replies to the ROUTER's MAC instead of the
+          # peer's. That breaks all INBOUND TCP to 192.168.50.10 (peers hang in
+          # SYN_RECV) and forces outbound IoT traffic through that VLAN's
+          # restrictive firewall. Proven by packet capture on the sibling
+          # multus-legacy NAD. It also explains the older, wrong "IoT client
+          # isolation" theory: the gateway answered because traffic was being
+          # sent TO the gateway, while devices behind it did not.
+          #
+          # DO NOT retry multus here until BOTH are addressed: delete the NAD's
+          # redundant route, and pin HA's internal_url/media URL to an address
+          # the satellites can actually reach.
+          hostNetwork: true
         containers:
           app:
             image:
