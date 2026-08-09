@@ -23,25 +23,41 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        # /config was chowned to 568:568 out-of-band on 2026-08-08 (it held a
+        # mix of root:root and 1000:0 from running as root). Because the root
+        # dir now matches, OnRootMismatch skips the recursive chown at mount --
+        # otherwise it would walk ~64k entries before the container starts.
         fsGroupChangePolicy: OnRootMismatch
+      # ONE multus attachment, IoT only.
+      #
+      # A previous attempt attached BOTH multus-legacy (192.168.1.10) and
+      # multus-iot and broke voice assist completely -- speaking produced no
+      # response while typing worked, with STT/TTS verifiably healthy in
+      # isolation. Reverting to hostNetwork fixed it immediately. Every
+      # reference implementation attaches exactly one network; none attach two.
+      #
+      # The MAC is pinned. Without it macvlan mints a fresh random MAC on every
+      # restart, so the pod looks like a brand-new device to the switch, AP
+      # client tables and any DHCP reservation each time. 02: is the
+      # locally-administered prefix; the trailing octets encode 192.168.50.10.
+      #
+      # `interface` names the in-pod NIC deterministically instead of relying
+      # on net1/net2 ordering.
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name": "multus-iot",
+            "namespace": "network",
+            "interface": "eth1",
+            "ips": ["192.168.50.10/24"],
+            "mac": "02:42:c0:a8:32:0a"
+          }]
     controllers:
       home-assistant:
-        pod:
-          # REVERTED to hostNetwork 2026-08-08. Putting HA on the IoT VLAN via
-          # macvlan made it UNABLE to reach IoT devices: that VLAN has client
-          # isolation, so an on-segment host can talk to the gateway but not to
-          # other devices. Verified from the pod -- 192.168.50.1:80 OK, while
-          # every ESPHome device on 192.168.50.x timed out. With hostNetwork the
-          # node sits on 192.168.80.x and reaches them by ROUTING through
-          # 192.168.50.1, which is permitted.
-          #
-          # mDNS appeared to work because multicast still floods the segment;
-          # only unicast is blocked. Discovery succeeding is not evidence that
-          # connections will.
-          hostNetwork: true
         containers:
           app:
             image:
