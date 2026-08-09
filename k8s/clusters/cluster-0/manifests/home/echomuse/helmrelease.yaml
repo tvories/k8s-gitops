@@ -199,6 +199,26 @@ spec:
           esphome-4:
             port: 16004
             protocol: TCP
+          # Each device ALSO opens a Bluetooth-proxy port at 17000+N, which HA
+          # adds as a separate device ("<name> BT Proxy"). Confirmed on the wire
+          # 2026-08-08: a single device was listening on BOTH 16002 and 17002.
+          # Harmless to expose if the BT proxy is disabled; required if it isn't.
+          #
+          # NOTE: both listeners are DYNAMIC -- they exist only while the device
+          # holds a session, so a port scan of an idle controller shows nothing.
+          # Do not conclude the port is wrong from an empty scan.
+          bt-1:
+            port: 17001
+            protocol: TCP
+          bt-2:
+            port: 17002
+            protocol: TCP
+          bt-3:
+            port: 17003
+            protocol: TCP
+          bt-4:
+            port: 17004
+            protocol: TCP
 
     # Devices reach the controller over the macvlan IP; this is only so the
     # dashboard is usable by name from a browser.
