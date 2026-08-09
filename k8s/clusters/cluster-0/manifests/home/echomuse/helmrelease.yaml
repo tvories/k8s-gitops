@@ -23,33 +23,47 @@ spec:
     defaultPodOptions:
       # Upstream ships `network_mode: host` because the controller advertises
       # itself over mDNS and opens one ESPHome TCP port per device (16001+),
-      # neither of which survives port mapping. A macvlan attachment on the IoT
-      # VLAN gives the same L2 reach plus a *stable* address, so SERVER_IP does
-      # not change when the pod reschedules.
+      # neither of which survives port mapping. A macvlan attachment gives the
+      # same L2 reach plus a *stable* address, so SERVER_IP does not change
+      # when the pod reschedules.
+      #
+      # Moved from multus-iot (192.168.50.35) to multus-legacy on 2026-08-08:
+      # this needs to be discoverable on the main LAN. mDNS is link-local
+      # multicast (224.0.0.251, TTL 1) and does not route, so an interface
+      # actually ON 192.168.1.0/24 is the requirement.
+      #
+      # MAC is pinned. Without it macvlan mints a fresh random MAC every
+      # restart, so the host looks like a new device to the switch, AP client
+      # tables and any DHCP reservation each time -- and mDNS caches keyed to
+      # the old MAC go stale. 02: is the locally-administered prefix; the
+      # trailing octets encode 192.168.1.20.
       annotations:
         k8s.v1.cni.cncf.io/networks: |
           [{
-            "name":"multus-iot",
+            "name": "multus-legacy",
             "namespace": "network",
-            "ips": ["192.168.50.35/24"]
+            "interface": "eth1",
+            "ips": ["192.168.1.20/24"],
+            "mac": "02:42:c0:a8:01:14"
           }]
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              # multus-iot is a macvlan whose master is enp1s0.50. Only these
-              # two nodes actually have that VLAN subinterface: m720q-1 has no
-              # enp1s0.50 and m720q-4's untagged NIC is eno1. Scheduling
-              # anywhere else silently comes up without the IoT interface.
+              # multus-legacy is a macvlan whose master is the untagged enp1s0.
+              # m720q-4 has no 10G card -- its primary NIC is eno1 -- so it
+              # cannot satisfy the NAD and the pod would come up without the
+              # interface. A NAD's master is a literal device name and cannot
+              # vary per node.
               - matchExpressions:
                   - key: kubernetes.io/hostname
                     operator: In
-                    values: ["m720q-2", "m720q-3"]
+                    values: ["m720q-1", "m720q-2", "m720q-3"]
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             # A macvlan child cannot talk to its own parent host. Home Assistant
             # runs hostNetwork, so if it landed on the same node it could not
-            # reach the ESPHome ports on 192.168.50.35.
+            # reach the ESPHome ports on 192.168.1.20.
             - labelSelector:
                 matchLabels:
                   app.kubernetes.io/name: home-assistant
@@ -69,7 +83,7 @@ spec:
               SERVER_PORT: &wsPort 8767
               SERVER_TLS_PORT: &wssPort 8770
               API_PORT: &apiPort 8768
-              SERVER_IP: 192.168.50.35
+              SERVER_IP: 192.168.1.20
               MDNS_NAME: echomuse
               # Leave 0 until every device reports "wss (TLS)" in the dashboard.
               # The credential push itself needs the plain shell plane.
