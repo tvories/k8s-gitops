@@ -34,3 +34,29 @@ spec:
   resources:
     requests:
       storage: 6Gi
+
+# CHIP/Matter fabric store for the matterserver sidecar, mounted at /data.
+#
+# Added 2026-08-09. Before this NOTHING was mounted at /data, so the fabric --
+# chip_factory.ini and the commissioning credentials that keep devices paired --
+# lived on the container's ephemeral filesystem and was destroyed on every
+# restart. As root that failed silently (writes succeeded, then vanished, which
+# is why the one commissioned device sat permanently unavailable); running
+# rootless turned it into a hard crash:
+#   CHIP:DL: Failed to create temp file /data/chip_factory.ini-XXXXXX:
+#            Permission denied  -> SIGSEGV (139) -> CrashLoopBackOff
+#
+# Small on purpose: this holds keys and node state, not media.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homeassistant-matter
+  namespace: home
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-block
+  resources:
+    requests:
+      storage: 1Gi

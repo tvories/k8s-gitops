@@ -269,6 +269,30 @@ spec:
         globalMounts:
           - path: /config
         # mountPath: /config
+
+      # python-matter-server keeps the CHIP/Matter fabric in /data --
+      # chip_factory.ini plus the commissioning credentials that keep devices
+      # paired. Until 2026-08-09 nothing was mounted there, so /data was the
+      # container's ephemeral filesystem and the ENTIRE FABRIC WAS DESTROYED ON
+      # EVERY RESTART. That went unnoticed while the container ran as root
+      # (writes succeeded, they were just thrown away) and is the likely reason
+      # the one commissioned device sat permanently unavailable.
+      #
+      # Running rootless turned the silent data loss into a loud crash:
+      #   CHIP:DL: Failed to create temp file /data/chip_factory.ini-XXXXXX:
+      #            Permission denied
+      #   Configuration Manager initialization failed
+      # -> SIGSEGV (exit 139), CrashLoopBackOff.
+      #
+      # advancedMounts (not globalMounts) because only this container needs it;
+      # config above is deliberately global. fsGroup 568 makes the volume
+      # writable by the non-root user without any chown dance.
+      matter-data:
+        existingClaim: homeassistant-matter
+        advancedMounts:
+          home-assistant:
+            matterserver:
+              - path: /data
       # dbus:
       #   enabled: true
       #   type: hostPath
