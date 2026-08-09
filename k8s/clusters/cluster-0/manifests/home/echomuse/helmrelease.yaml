@@ -96,7 +96,7 @@ spec:
           app:
             image:
               repository: ghcr.io/wilbowes/echomuse-controller
-              tag: 2.16.1
+              tag: 2.17.0
             env:
               TZ: "${TIMEZONE}"
               # Network — bind everywhere, advertise the LoadBalancer address.
