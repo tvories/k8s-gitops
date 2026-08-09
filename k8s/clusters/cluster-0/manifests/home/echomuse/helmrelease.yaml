@@ -27,24 +27,42 @@ spec:
       # same L2 reach plus a *stable* address, so SERVER_IP does not change
       # when the pod reschedules.
       #
-      # Moved from multus-iot (192.168.50.35) to multus-legacy on 2026-08-08:
-      # this needs to be discoverable on the main LAN. mDNS is link-local
-      # multicast (224.0.0.251, TTL 1) and does not route, so an interface
-      # actually ON 192.168.1.0/24 is the requirement.
+      # THIS ATTACHMENT EXISTS ONLY FOR mDNS. Devices no longer connect to this
+      # address -- SERVER_IP advertises the LoadBalancer IP instead (see below).
+      #
+      # It cannot be removed: mDNS is link-local multicast (224.0.0.251, TTL 1)
+      # and does not route, so advertising `_emcontroller._tcp.local` onto
+      # 192.168.1.0/24 requires an interface genuinely on that segment. A pod
+      # holding only a cluster IP can never announce itself to the Echo Dots.
+      #
+      # Inbound TCP to this address is BROKEN and is not used. The multus-legacy
+      # NAD declares a redundant route for 192.168.1.0/24 via 192.168.1.1, which
+      # outranks the kernel's connected route, so replies to hosts on this very
+      # segment are addressed to OPNsense's MAC. The router never saw the
+      # client's SYN (it arrived directly over layer 2) and drops the SYN-ACK as
+      # out-of-state -- peers hang in SYN_RECV forever. Confirmed by capture on
+      # 2026-08-08: SYN-ACK dstMAC=00:a5:69:88:2e:8b (the router) instead of the
+      # client's own MAC, reproduced identically from an Echo Dot, a cluster
+      # node and a desktop. Outbound (pod-initiated) flows work, because those
+      # build router state on the way out.
+      #
+      # Address moved off 192.168.1.20 on 2026-08-08: Technitium's DHCP scope is
+      # 192.168.1.20-210, so .20 was the FIRST address in the pool and could be
+      # leased away at any time. Statics belong above .211.
       #
       # MAC is pinned. Without it macvlan mints a fresh random MAC every
       # restart, so the host looks like a new device to the switch, AP client
       # tables and any DHCP reservation each time -- and mDNS caches keyed to
       # the old MAC go stale. 02: is the locally-administered prefix; the
-      # trailing octets encode 192.168.1.20.
+      # trailing octets encode 192.168.1.220 (0xdc = 220).
       annotations:
         k8s.v1.cni.cncf.io/networks: |
           [{
             "name": "multus-legacy",
             "namespace": "network",
             "interface": "eth1",
-            "ips": ["192.168.1.20/24"],
-            "mac": "02:42:c0:a8:01:14"
+            "ips": ["192.168.1.220/24"],
+            "mac": "02:42:c0:a8:01:dc"
           }]
       affinity:
         nodeAffinity:
@@ -62,8 +80,11 @@ spec:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             # A macvlan child cannot talk to its own parent host. Home Assistant
-            # runs hostNetwork, so if it landed on the same node it could not
-            # reach the ESPHome ports on 192.168.1.20.
+            # runs hostNetwork, so co-scheduling would make it deaf to this
+            # pod's mDNS announcements -- and mDNS is the ONLY way anything
+            # discovers the controller (upstream issue #106: no static-IP or
+            # DNS fallback exists). Service traffic now goes via the
+            # LoadBalancer and no longer depends on this, but discovery does.
             - labelSelector:
                 matchLabels:
                   app.kubernetes.io/name: home-assistant
@@ -78,12 +99,18 @@ spec:
               tag: 2.16.1
             env:
               TZ: "${TIMEZONE}"
-              # Network — bind everywhere, advertise the macvlan address
+              # Network — bind everywhere, advertise the LoadBalancer address.
+              #
+              # SERVER_IP is documented upstream as "IP address of this host on
+              # the LAN — advertised via mDNS. Devices use this to connect".
+              # It is purely the ADVERTISED address, independent of what the
+              # process binds to, which is what lets us announce over macvlan
+              # while serving traffic through the LoadBalancer.
               SERVER_HOST: 0.0.0.0
               SERVER_PORT: &wsPort 8767
               SERVER_TLS_PORT: &wssPort 8770
               API_PORT: &apiPort 8768
-              SERVER_IP: 192.168.1.20
+              SERVER_IP: &lbIP 192.168.83.56
               MDNS_NAME: echomuse
               # Leave 0 until every device reports "wss (TLS)" in the dashboard.
               # The credential push itself needs the plain shell plane.
@@ -126,9 +153,26 @@ spec:
                   failureThreshold: 30
                   periodSeconds: 5
 
+    # Devices and Home Assistant reach the controller through this LoadBalancer,
+    # NOT through the macvlan address -- inbound TCP to macvlan never completes
+    # its handshake (see the defaultPodOptions comment). mDNS still advertises
+    # from macvlan; only the advertised ADDRESS points here.
+    #
+    # Traffic path: Dot (192.168.1.x) -> OPNsense -> cluster -> pod. That is a
+    # routed hop rather than plain layer 2, so 192.168.1.0/24 must be permitted
+    # to reach 192.168.83.56 on these ports.
     service:
       app:
         controller: echomuse
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: *lbIP
+        # MUST be Cluster, never Local. `Local` preserves the client's source IP,
+        # so the pod would match 192.168.1.0/24 against its macvlan route and
+        # reply out eth1 -- reproducing exactly the asymmetric-routing failure
+        # this LoadBalancer exists to avoid. `Cluster` SNATs to the node, so
+        # replies leave via eth0 and the path stays symmetric.
+        externalTrafficPolicy: Cluster
         ports:
           http:
             port: *apiPort
@@ -137,6 +181,23 @@ spec:
             protocol: TCP
           wss:
             port: *wssPort
+            protocol: TCP
+          # One ESPHome native-API port per device, allocated from 16001 up.
+          # Home Assistant connects to these to present each Dot as a voice
+          # satellite, so they must be reachable at SERVER_IP -- a Service
+          # cannot express a range, so ADD ONE HERE per additional device.
+          # Four provisioned; one device ("Bedroom") exists today.
+          esphome-1:
+            port: 16001
+            protocol: TCP
+          esphome-2:
+            port: 16002
+            protocol: TCP
+          esphome-3:
+            port: 16003
+            protocol: TCP
+          esphome-4:
+            port: 16004
             protocol: TCP
 
     # Devices reach the controller over the macvlan IP; this is only so the
