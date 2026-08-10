@@ -113,18 +113,21 @@ spec:
               # import, so pre-installing into a writable dir and putting it on
               # PYTHONPATH sidesteps the install entirely.
               #
-              # NOTE: PYTHONPATH alone does nothing. It does not change where HA
-              # installs, only where Python looks. The package must be put there
-              # first, as uid 568 (no root needed, /config/deps is 568:568):
+              # DO NOT set PYTHONPATH=/config/deps. Tried 2026-08-10; it CRASHED
+              # Home Assistant on startup:
+              #   ImportError: cannot import name 'AddressResolver' from
+              #   'zeroconf' (/config/deps/zeroconf/__init__.py)
               #
-              #   kubectl -n home exec deploy/home-assistant -c app -- \
-              #     python3 -m uv pip install --target /config/deps \
-              #     --index-strategy unsafe-first-match "<pkg>==<version>"
+              # PYTHONPATH is inserted BEFORE site-packages in sys.path, and
+              # /config/deps still holds ~45 packages from when HA ran as root
+              # (zeroconf, certifi, idna, grpcio, cachetools, google, ...). Those
+              # stale copies shadowed the image's current versions. Any directory
+              # placed on PYTHONPATH must contain ONLY packages absent from the
+              # image, or it will silently downgrade core dependencies.
               #
-              # Repeat that for each new custom integration that has pip deps,
-              # and after an HA upgrade bumps a required version -- otherwise HA
-              # will try to install the new version system-wide and fail again.
-              PYTHONPATH: "/config/deps"
+              # The dependency is instead pre-installed into the user
+              # site-packages dir, which Python adds to sys.path automatically --
+              # no PYTHONPATH required. See HOME below.
               POSTGRES_HOST:
                 valueFrom:
                   secretKeyRef:
