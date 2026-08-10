@@ -127,7 +127,41 @@ spec:
               #
               # The dependency is instead pre-installed into the user
               # site-packages dir, which Python adds to sys.path automatically --
-              # no PYTHONPATH required. See HOME below.
+              # no PYTHONPATH required.
+              #
+              # The official image sets HOME=/ , so site.getusersitepackages()
+              # resolves to /.local/... which does not exist and is not writable.
+              # Pointing HOME at the config volume moves it to
+              # /config/.local/lib/python3.14/site-packages -- writable by 568,
+              # persistent, and added to sys.path by site.py at interpreter
+              # startup once the directory exists. The upstream rootless image
+              # (ghcr.io/home-operations/home-assistant) sets HOME=/config for
+              # the same reason.
+              #
+              # This does NOT change where HA installs. UV_SYSTEM_PYTHON=true is
+              # baked into the image, which disables HA's --target fallback
+              # (homeassistant/util/package.py), and it cannot be unset from
+              # Kubernetes -- overriding it to "" still satisfies `var in env`.
+              # HA does, however, SKIP any requirement it can already import, so
+              # pre-installing is enough.
+              #
+              # Pre-install each custom-integration dep as uid 568, ALWAYS with
+              # --no-deps so nothing shadows the image (this is what broke
+              # startup when /config/deps was used):
+              #
+              #   kubectl -n home exec deploy/home-assistant -c app -- sh -c \
+              #     'HOME=/config python3 -m uv pip install --no-deps \
+              #      --target /config/.local/lib/python3.14/site-packages \
+              #      --index-strategy unsafe-first-match "<pkg>==<version>"'
+              #
+              # Then verify nothing collides:
+              #   ls /config/.local/lib/python3.14/site-packages
+              # Every entry must be ABSENT from
+              #   /usr/local/lib/python3.14/site-packages
+              #
+              # Currently holds: hass_web_proxy_lib 0.0.8 (frigate). It declares
+              # no dependencies, so nothing else was needed.
+              HOME: "/config"
               POSTGRES_HOST:
                 valueFrom:
                   secretKeyRef:
