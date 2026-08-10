@@ -95,7 +95,36 @@ spec:
               tag: 2026.8.1
             env:
               TZ: "${TIMEZONE}"
-              # PYTHONPATH: "/config/deps"
+              # Makes pre-installed custom-integration dependencies importable.
+              # REQUIRED while running rootless (568). Verified 2026-08-10.
+              #
+              # Why: HA installs custom-integration requirements with
+              # `uv pip install`. It only passes `--target` when NOT in a
+              # container AND when neither UV_SYSTEM_PYTHON nor UV_PYTHON is
+              # set (homeassistant/util/package.py). This image bakes in
+              # UV_SYSTEM_PYTHON=true, so uv installs into
+              # /usr/local/lib/python3.14/site-packages -- which uid 568 cannot
+              # write. Result: "Setup failed for custom integration 'frigate':
+              # Requirements for frigate not found: ['hass-web-proxy-lib==0.0.8']".
+              #
+              # UV_SYSTEM_PYTHON cannot be unset from Kubernetes -- overriding
+              # it to "" still satisfies `var in env` -- so that lever is
+              # closed. But HA SKIPS installing any requirement it can already
+              # import, so pre-installing into a writable dir and putting it on
+              # PYTHONPATH sidesteps the install entirely.
+              #
+              # NOTE: PYTHONPATH alone does nothing. It does not change where HA
+              # installs, only where Python looks. The package must be put there
+              # first, as uid 568 (no root needed, /config/deps is 568:568):
+              #
+              #   kubectl -n home exec deploy/home-assistant -c app -- \
+              #     python3 -m uv pip install --target /config/deps \
+              #     --index-strategy unsafe-first-match "<pkg>==<version>"
+              #
+              # Repeat that for each new custom integration that has pip deps,
+              # and after an HA upgrade bumps a required version -- otherwise HA
+              # will try to install the new version system-wide and fail again.
+              PYTHONPATH: "/config/deps"
               POSTGRES_HOST:
                 valueFrom:
                   secretKeyRef:
