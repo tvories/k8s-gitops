@@ -26,7 +26,7 @@ services:
   # Transcription quality therefore *changes* on failover -- that is the
   # intended trade, not a bug.
   whisper:
-    image: lscr.io/linuxserver/faster-whisper:3.5.0-gpu
+    image: lscr.io/linuxserver/faster-whisper:3.6.0-gpu
     container_name: wyoming-whisper-gpu
     restart: unless-stopped
     ports:
