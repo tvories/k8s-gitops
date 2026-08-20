@@ -145,22 +145,40 @@ spec:
               # HA does, however, SKIP any requirement it can already import, so
               # pre-installing is enough.
               #
-              # Pre-install each custom-integration dep as uid 568, ALWAYS with
-              # --no-deps so nothing shadows the image (this is what broke
-              # startup when /config/deps was used):
+              # PROCEDURE for a custom integration with pip requirements.
+              # Never install straight into user-site with deps: transitive deps
+              # would land there too and shadow the image. Stage first, then
+              # copy only what the image lacks.
               #
-              #   kubectl -n home exec deploy/home-assistant -c app -- sh -c \
-              #     'HOME=/config python3 -m uv pip install --no-deps \
-              #      --target /config/.local/lib/python3.14/site-packages \
-              #      --index-strategy unsafe-first-match "<pkg>==<version>"'
+              #   S=/config/.stage
+              #   U=/config/.local/lib/python3.14/site-packages
+              #   I=/usr/local/lib/python3.14/site-packages
+              #   rm -rf $S && mkdir -p $S
+              #   HOME=/config python3 -m uv pip install --target $S \
+              #     --index-strategy unsafe-first-match "<pkg>==<ver>" ...
+              #   for d in $S/*; do b=$(basename $d)
+              #     [ -e "$I/$b" ] || cp -r "$d" "$U"/ ; done
+              #   rm -rf $S
               #
-              # Then verify nothing collides:
-              #   ls /config/.local/lib/python3.14/site-packages
-              # Every entry must be ABSENT from
-              #   /usr/local/lib/python3.14/site-packages
+              # Then import-test, do not trust metadata alone:
+              #   python3 -c "import <module>"
+              # And audit every integration at once:
+              #   for m in /config/custom_components/*/manifest.json ...
+              #   homeassistant.util.package.is_installed(req)
               #
-              # Currently holds: hass_web_proxy_lib 0.0.8 (frigate). It declares
-              # no dependencies, so nothing else was needed.
+              # Drop any staged package that shadows a STDLIB module -- the
+              # `asyncio` 3.4.3 backport gets pulled in as a transitive dep and
+              # was removed by hand on 2026-08-10.
+              #
+              # Currently holds (all absent from the image, all import-verified):
+              #   aioblescan janus            -> ble_monitor
+              #   hass_web_proxy_lib          -> frigate
+              #   alexapy authcaptureproxy dictor
+              #                               -> alexa_media
+              #   glocaltokens ghome_foyer_api gpsoauth
+              #                               -> google_home
+              #   weatherbitpypi              -> weatherbit
+              #   markdown_it mdurl           -> transitive
               HOME: "/config"
               POSTGRES_HOST:
                 valueFrom:
