@@ -56,7 +56,7 @@ services:
     # Keep this in step with home/kokoro's kokoro-fastapi-cpu tag -- the two are
     # interchangeable backends behind the same VIP, so a version skew means
     # behaviour changes on failover.
-    image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.8.0
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.8.1
     container_name: kokoro-gpu
     restart: unless-stopped
     expose:
