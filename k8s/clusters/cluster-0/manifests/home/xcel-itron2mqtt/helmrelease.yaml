@@ -25,7 +25,7 @@ spec:
               MQTT_PORT: "1883"
               MQTT_USER: "${SECRET_HA_MQTT_USER}"
               MQTT_PASSWORD: "${SECRET_HA_MQTT_PASSWORD}"
-              METER_IP: "192.168.50.73" # TODO: this may change next time dhcp runs
+              METER_IP: "192.168.50.64" # TODO: this may change next time dhcp runs
               METER_PORT: "8081"
               # LOGLEVEL: INFO
               CERT_PATH: /opt/xcel_itron2mqtt/certs/cert.pem
