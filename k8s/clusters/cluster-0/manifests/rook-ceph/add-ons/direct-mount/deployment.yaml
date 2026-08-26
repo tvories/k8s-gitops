@@ -30,11 +30,6 @@ spec:
                 secretKeyRef:
                   name: rook-ceph-mon
                   key: ceph-username
-            - name: ROOK_CEPH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: rook-ceph-mon
-                  key: ceph-secret
           securityContext:
             privileged: true
             runAsUser: 0
@@ -47,6 +42,10 @@ spec:
               name: libmodules
             - name: mon-endpoint-volume
               mountPath: /etc/rook
+            # toolbox.sh watches this path for cephx key rotation; it must exist
+            # or the script exits (rook >= v1.20)
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
             - name: direct-mount-scripts
               mountPath: /scripts
             - name: nas-backup
@@ -60,6 +59,13 @@ spec:
       # if hostNetwork: false, the "rbd map" command hangs, see https://github.com/rook/rook/issues/2021
       hostNetwork: true
       volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
         - name: dev
           hostPath:
             path: /dev

@@ -34,7 +34,12 @@ spec:
               tag: 15.4.0
 
             env:
-              DNS_SERVER_DOMAIN: "tdns2.${SECRET_DOMAIN}"
+              DNS_SERVER_DOMAIN: "tdns2.cluster.${SECRET_DOMAIN}"
+              DNS_SERVER_WEB_SERVICE_ENABLE_HTTPS: "true"
+              DNS_SERVER_WEB_SERVICE_HTTPS_PORT: "53443"
+              DNS_SERVER_WEB_SERVICE_USE_SELF_SIGNED_CERT: "true"
+              DNS_SERVER_WEB_SERVICE_HTTP_PORT: "5380"
+              DNS_SERVER_WEB_SERVICE_HTTP_TO_TLS_REDIRECT: "false"
             probes:
               liveness:
                 enabled: true
