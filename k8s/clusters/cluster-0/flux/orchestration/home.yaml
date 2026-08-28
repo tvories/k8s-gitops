@@ -231,3 +231,25 @@ spec:
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
+
+---
+# Music Assistant: unified music library (Spotify/Plex/local/radio) that plays
+# to Sonos and other LAN players, and provides the media search backing
+# HassMediaSearchAndPlay for voice. Needs hostNetwork for SSDP/mDNS discovery.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: home-music-assistant
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: home-namespace
+    - name: rook-ceph-cluster
+    - name: network-ingress-nginx
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/home/music-assistant"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops

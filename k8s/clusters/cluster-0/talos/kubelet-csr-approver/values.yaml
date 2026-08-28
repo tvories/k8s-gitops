@@ -1,0 +1,9 @@
+---
+# Bootstrap-time copy. Keep in step with
+# manifests/system-controllers/kubelet-csr-approver/values.yaml -- that one is
+# what Flux actually deploys; this is only used when standing the cluster up
+# before Flux exists. They drifted apart once already.
+providerRegex: |
+  ^m720q-[1-4]$
+
+bypassDnsResolution: true

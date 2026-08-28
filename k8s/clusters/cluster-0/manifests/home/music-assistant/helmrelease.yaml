@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: music-assistant
+  namespace: home
+spec:
+  releaseName: music-assistant
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: music-assistant
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            # Both this and Home Assistant run hostNetwork, and BOTH bind
+            # UDP 5353 for mDNS/zeroconf discovery. Co-scheduling them on one
+            # node means whichever starts second fails to bind, and the symptom
+            # is silent: discovery simply finds nothing. Keep them apart.
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: home-assistant
+              topologyKey: kubernetes.io/hostname
+
+    controllers:
+      music-assistant:
+        # Recreate, not RollingUpdate: the data PVC is ReadWriteOnce, and with
+        # hostNetwork two replicas would also collide on ports 8095/8097.
+        strategy: Recreate
+        pod:
+          # Sonos discovery is SSDP/UPnP plus mDNS -- link-local multicast that
+          # does not route. The pod must sit on the LAN itself, exactly like
+          # Home Assistant. hostNetwork rather than macvlan on purpose: the
+          # multus NADs still declare a redundant gateway route for their own
+          # /24, which breaks all inbound TCP to attached pods.
+          hostNetwork: true
+          # Required with hostNetwork, or the pod inherits the node's resolver
+          # and cannot resolve in-cluster services.
+          dnsPolicy: ClusterFirstWithHostNet
+        containers:
+          app:
+            image:
+              repository: ghcr.io/music-assistant/server
+              tag: 2.10.0
+            env:
+              TZ: "${TIMEZONE}"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512M
+              limits:
+                memory: 4Gi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &probe
+                  tcpSocket:
+                    port: &webPort 8095
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec: *probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: *webPort
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+    service:
+      app:
+        controller: music-assistant
+        ports:
+          http:
+            port: *webPort
+          # Players (including Sonos) fetch audio from this port directly, so
+          # it must stay reachable on the LAN -- hostNetwork already ensures
+          # that; this entry exists so the Service reflects reality.
+          stream:
+            port: 8097
+            protocol: TCP
+
+    # Only for reaching the web UI by name. Players talk to the node's LAN
+    # address directly, not through ingress.
+    ingress:
+      app:
+        className: nginx-internal
+        annotations:
+          nginx.org/websocket-services: music-assistant-app
+        hosts:
+          - host: &host "music.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.music-assistant
+
+    persistence:
+      data:
+        existingClaim: music-assistant-data
+        globalMounts:
+          - path: /config
+      media:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/music
+        globalMounts:
+          - path: /data

@@ -1,0 +1,123 @@
+#################################################################################################################
+# Reclaims RBD space that ext4 has freed but never discarded.
+#
+# Ceph serves an RBD image as an opaque block device -- it cannot know which blocks the filesystem considers
+# free, so deleted files stay allocated in the pool forever. Only the ext4 driver on the node where the volume
+# is mounted knows, and only FITRIM (fstrim) tells Ceph. This is why the job runs here and not as a Rook feature.
+#
+# This is a MANUAL one-off, deliberately not wired into any kustomization.yaml -- same as osd-purge.yaml.
+#
+#   # 1. set nodeSelector below to the node you want to trim, then:
+#   kubectl create -f k8s/clusters/cluster-0/manifests/rook-ceph/rbd-fstrim.yaml
+#   kubectl -n rook-ceph logs -f job/rook-ceph-rbd-fstrim
+#   kubectl -n rook-ceph delete job rook-ceph-rbd-fstrim    # required before re-running
+#
+# Repeat per node. Volumes are only trimmable on the node that currently has them mounted, so a node only
+# reclaims the PVCs whose pods are scheduled there. Unmounted PVCs (idle VolSync caches) cannot be trimmed
+# at all until something mounts them.
+#
+# Scope: it discovers targets by walking the mount table for /dev/rbd* ext4 mounts, so it can only ever touch
+# Ceph RBD volumes. Host root, NFS mounts, and local-hostpath volumes are structurally excluded -- there is no
+# path glob to typo. FITRIM only discards blocks the filesystem's own allocator already reports as free; it
+# cannot affect live data.
+#
+# Expect an I/O burst while it runs. Trimming tens of GiB issues a lot of discard ops to a 3-OSD cluster at
+# once, and a pod writing to a volume being trimmed may see added latency. Prefer off-peak.
+#################################################################################################################
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-rbd-fstrim
+  namespace: rook-ceph # namespace:cluster
+  labels:
+    app: rook-ceph-rbd-fstrim
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: rook-ceph-rbd-fstrim
+    spec:
+      restartPolicy: Never
+      # TODO: set this to the node to trim. m720q-2 currently hosts the Prometheus
+      # PVC, which holds by far the largest reclaimable amount.
+      nodeSelector:
+        kubernetes.io/hostname: m720q-1
+      containers:
+        - name: fstrim
+          # Same image as the toolbox/direct-mount, so nothing new is pulled. Provides
+          # util-linux (fstrim, findmnt); Talos hosts carry no userland to nsenter into.
+          image: rook/ceph:v1.20.6
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+
+              # A non-root uid here means no CAP_SYS_ADMIN and every fstrim will fail
+              # with EACCES, so make it the first thing in the log.
+              echo "Running as: $(id)"
+              echo
+
+              # One RBD device is mounted more than once (the CSI globalmount plus each
+              # pod's bind mount). Trimming any one of them trims the filesystem, so
+              # dedupe on the device to avoid redundant passes.
+              mapfile -t targets < <(
+                findmnt -rno SOURCE,TARGET,FSTYPE \
+                  | awk '$1 ~ /^\/dev\/rbd/ && $3 == "ext4" { print $1"\t"$2 }' \
+                  | sort -u -k1,1
+              )
+
+              if [ "${#targets[@]}" -eq 0 ]; then
+                echo "No /dev/rbd* ext4 mounts visible on $(hostname). Nothing to trim."
+                echo "If you expected some, check that mountPropagation is taking effect."
+                exit 0
+              fi
+
+              echo "Found ${#targets[@]} RBD volume(s) to trim on node ${NODE_NAME}"
+              echo
+
+              failed=0
+              for entry in "${targets[@]}"; do
+                dev="${entry%%$'\t'*}"
+                target="${entry#*$'\t'}"
+                echo "==> ${dev}"
+                echo "    ${target}"
+                # Do not let one unhealthy volume abort the rest of the run.
+                if ! fstrim -v "${target}"; then
+                  echo "    FAILED (continuing)"
+                  failed=$((failed + 1))
+                fi
+                echo
+              done
+
+              echo "Done. ${failed} of ${#targets[@]} volume(s) failed."
+              # Surface partial failure without having aborted the run.
+              [ "${failed}" -eq 0 ]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            # FITRIM requires CAP_SYS_ADMIN. Privileged also guarantees the propagated
+            # kubelet mounts are actually traversable, which capability-only setups can
+            # trip over.
+            privileged: true
+            # REQUIRED. rook/ceph:v1.20.6 declares USER 2016, and privileged does not
+            # grant capabilities to a non-root uid (no ambient caps), so without this the
+            # run has neither CAP_DAC_OVERRIDE to traverse the root-owned kubelet dirs
+            # nor CAP_SYS_ADMIN for FITRIM -- every volume fails with EACCES on stat.
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: kubelet-dir
+              mountPath: /var/lib/kubelet
+              # Without this the CSI mounts made on the host after this pod starts are
+              # invisible inside the container, and there is nothing to trim.
+              mountPropagation: HostToContainer
+      volumes:
+        - name: kubelet-dir
+          hostPath:
+            path: /var/lib/kubelet
+            type: Directory
