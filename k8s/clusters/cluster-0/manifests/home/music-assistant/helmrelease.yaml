@@ -153,4 +153,4 @@ spec:
         server: ${SECRET_NAS3}
         path: /ook/Media/music
         globalMounts:
-          - path: /data
+          - path: /media
