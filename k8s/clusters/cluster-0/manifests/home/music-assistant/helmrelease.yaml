@@ -61,6 +61,27 @@ spec:
               tag: 2.10.0
             env:
               TZ: "${TIMEZONE}"
+              # Smart Fades downloads PyTorch model checkpoints (Beat This!,
+              # skey) at provider startup. torch.hub resolves its cache to
+              # $XDG_CACHE_HOME, falling back to $HOME/.cache -- and this image
+              # sets HOME=/ , so it tried to mkdir /.cache and died as uid 568:
+              #   torch.hub.load_state_dict_from_url -> os.makedirs(model_dir)
+              #   PermissionError: [Errno 13] Permission denied: '/.cache'
+              #   -> ValueError: ('Could not load the checkpoint given the
+              #      provided name', 'small0')
+              # The UI reports only "Setup failed", which looks like a bad
+              # model name rather than a permissions problem.
+              #
+              # Pointing both at the ceph PVC makes the cache writable AND
+              # persistent, so the checkpoints survive restarts instead of
+              # being re-downloaded. Same fix as HOME=/config on Home
+              # Assistant -- any rootless image with HOME=/ hits this for
+              # libraries that cache under $HOME.
+              # MUST point at the ceph PVC (/config), NOT /data -- /data is the
+              # NFS music share (${SECRET_NAS3}:/ook/Media/music). Caching torch
+              # checkpoints there would write into the music library over NFS.
+              HOME: /config
+              XDG_CACHE_HOME: /config/.cache
             resources:
               requests:
                 cpu: 100m
