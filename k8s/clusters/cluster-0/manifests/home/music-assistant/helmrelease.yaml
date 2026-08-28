@@ -77,11 +77,11 @@ spec:
               # being re-downloaded. Same fix as HOME=/config on Home
               # Assistant -- any rootless image with HOME=/ hits this for
               # libraries that cache under $HOME.
-              # MUST point at the ceph PVC (/config), NOT /data -- /data is the
-              # NFS music share (${SECRET_NAS3}:/ook/Media/music). Caching torch
-              # checkpoints there would write into the music library over NFS.
-              HOME: /config
-              XDG_CACHE_HOME: /config/.cache
+              # Point at the ceph PVC (/data), never at the NFS music share
+              # (/media). Caching torch checkpoints over NFS would write into
+              # the music library, and is slow and lock-prone besides.
+              HOME: /data
+              XDG_CACHE_HOME: /data/.cache
             resources:
               requests:
                 cpu: 100m
@@ -144,10 +144,16 @@ spec:
             secretName: tls.music-assistant
 
     persistence:
+      # MUST be /data. music_assistant/__main__.py builds its cache_dir under
+      # /data and mkdirs it at startup, so /data has to be writable by uid 568:
+      #   PermissionError: [Errno 13] Permission denied: '/data/.cache'
+      # Mounting this at /config instead left /data pointing at whatever else
+      # was mounted there -- briefly the NFS music share, which "worked" only
+      # because MA was writing its database into the music library.
       data:
         existingClaim: music-assistant-data
         globalMounts:
-          - path: /config
+          - path: /data
       media:
         type: nfs
         server: ${SECRET_NAS3}
