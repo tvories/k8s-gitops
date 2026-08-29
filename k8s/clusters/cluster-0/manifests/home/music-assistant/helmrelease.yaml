@@ -61,6 +61,15 @@ spec:
               tag: 2.10.0
             env:
               TZ: "${TIMEZONE}"
+              # TEMPORARY (2026-08-28) while debugging YouTube Music login.
+              # music_assistant/__main__.py reads LOG_LEVEL as the default for
+              # --log-level; accepted values are critical, error, warning, info,
+              # debug, verbose. The YTM provider fails setup without logging
+              # anything at `info`, so the actual exception is invisible.
+              # Set back to info (or remove) once the provider is working --
+              # `debug` is noisy and this pod already floods the log with
+              # library-scan warnings.
+              LOG_LEVEL: debug
               # Smart Fades downloads PyTorch model checkpoints (Beat This!,
               # skey) at provider startup. torch.hub resolves its cache to
               # $XDG_CACHE_HOME, falling back to $HOME/.cache -- and this image
