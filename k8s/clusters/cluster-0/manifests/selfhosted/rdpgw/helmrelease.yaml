@@ -103,6 +103,11 @@ spec:
         className: "nginx-external"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
+          # v2.2.0 registers no handler for "/" — the web interface is a
+          # master-only addition — so the bare hostname falls through to a
+          # 404 that this cluster's custom-http-errors renders as a 500.
+          # Send it to the endpoint that actually starts the login.
+          nginx.ingress.kubernetes.io/app-root: /connect
           # The RDP tunnel is a single long-lived websocket. The default
           # 60s proxy timeouts would drop an idle desktop session, and
           # buffering would add latency to every keystroke — the legacy
