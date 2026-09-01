@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rdpgw-config
+  namespace: selfhosted
+data:
+  # rdpgw reads this file, then overlays anything set in the environment
+  # (RDPGW_<SECTION>__<KEY>). Every secret therefore lives in the
+  # ExternalSecret and is deliberately absent here — a key set in both places
+  # would land in koanf twice under two different casings, and which one wins
+  # is not defined.
+  rdpgw.yaml: |
+    Server:
+      Authentication:
+        - openid
+      # nginx-external terminates TLS with the Let's Encrypt certificate on
+      # the Ingress, so the gateway speaks plain HTTP inside the cluster.
+      # Do not set this to auto: rdpgw would try to run its own ACME
+      # listener on port 80 alongside the ingress controller.
+      Tls: disable
+      # The image runs as UID 1001 and cannot bind a privileged port.
+      Port: 9443
+      # Advertised to clients in the .rdp file (as gatewayhostname) and used
+      # to build the OIDC redirect URL, so it has to be the public name and
+      # not the Service. The scheme is required: rdpgw parses this with
+      # net/url, and a bare "host:port" is read as scheme "host".
+      GatewayAddress: https://rdpgw.${SECRET_DOMAIN}
+      # Allow-list of RDP targets. mstsc sends the host including the port
+      # and refuses bare IP addresses, so entries must be name:port. Only
+      # this pod ever resolves the name: under the gateway protocol the
+      # client passes the target across as a string and rdpgw does the
+      # lookup, so the name does not need to work from the internet.
+      # Technitium answers it from the nodes' resolvers, and the RDP host's
+      # own certificate is unrelated to the gateway's — Windows presents a
+      # self-signed one on 3389 and the client prompts about it once.
+      Hosts:
+        - deskmonster.${SECRET_INTERNAL_DOMAIN}:3389
+      # One host in the list, so "roundrobin" simply always picks it. This
+      # is the safe mode: "any"/"unsigned" would let an authenticated user
+      # name an arbitrary destination and turn the gateway into an open
+      # TCP proxy into the LAN.
+      HostSelection: roundrobin
+      # Signed cookies, so no shared session storage is needed and the
+      # Deployment stays stateless.
+      SessionStore: cookie
+    OpenId:
+      # authentik publishes a per-application issuer. The trailing slash is
+      # part of the issuer claim, and go-oidc compares it verbatim.
+      ProviderUrl: https://authentik.${SECRET_DOMAIN}/application/o/rdpgw/
+    Caps:
+      # Required for the OpenID flow: the gateway hands the client a PAA
+      # token instead of asking it for gateway credentials.
+      TokenAuth: true
+      # Minutes; 0 disables the idle disconnect. A desktop session that is
+      # left sitting idle is the normal case here.
+      IdleTimeout: 0
+      EnableClipboard: true
+      EnableDrive: false
+      EnablePrinter: false
+      EnablePort: false
+      EnablePnp: false
+    Client:
+      # Leaves the username out of the .rdp file so the client prompts for
+      # the desktop's own account. The authentik username is almost never
+      # the Windows account name, and a prefilled wrong one makes the
+      # client fail without explaining why. Drop this to prefill it.
+      NoUsername: true
+    Security:
+      # Binds the PAA token to the IP that downloaded the .rdp file. It is
+      # off because nginx-external runs with externalTrafficPolicy: Cluster,
+      # so inbound connections are SNATed to a node IP: the browser and the
+      # RDP client can arrive via different nodes and the check would reject
+      # a legitimate session. It is also why TrustedProxies is unset — the
+      # X-Forwarded-For nginx passes on is derived from CF-Connecting-IP
+      # (see the ingress-nginx config) and is not trustworthy for this.
+      VerifyClientIp: false
+      # Would replace the .rdp username with a JWT for the RDP host to
+      # verify (pam-jwt and friends). A Windows desktop wants a real
+      # username, so leave this off.
+      EnableUserToken: false

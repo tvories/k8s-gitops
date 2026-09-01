@@ -95,6 +95,18 @@ locals {
       redirect_uri  = "https://paperless.${var.CLUSTER_DOMAIN}/accounts/oidc/authentik/login/callback/"
       launch_url    = "https://paperless.${var.CLUSTER_DOMAIN}/"
     },
+    rdpgw = {
+      client_id     = var.rdpgw_client_id
+      client_secret = var.rdpgw_client_secret
+      group         = "infrastructure"
+      icon_url      = "https://raw.githubusercontent.com/bolkedebruin/rdpgw/master/assets/icon.svg"
+      # rdpgw derives this from Server.GatewayAddress: scheme + host +
+      # "/callback", with no configuration knob of its own.
+      redirect_uri = "https://rdpgw.${var.CLUSTER_DOMAIN}/callback"
+      # /connect is the endpoint that runs the login and then hands back the
+      # .rdp file; the bare host only serves the web interface.
+      launch_url = "https://rdpgw.${var.CLUSTER_DOMAIN}/connect"
+    },
     vault = {
       client_id     = var.vault_client_id
       client_secret = var.vault_client_secret

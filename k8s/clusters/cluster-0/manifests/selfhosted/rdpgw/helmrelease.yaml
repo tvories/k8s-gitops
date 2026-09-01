@@ -1,0 +1,127 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rdpgw
+  namespace: selfhosted
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: rdpgw
+  values:
+    controllers:
+      rdpgw:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        # A rolling update would leave the old pod holding live RDP tunnels
+        # while the new one takes the Service. One replica, replaced
+        # outright, keeps the failure mode obvious.
+        strategy: Recreate
+        replicas: 1
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+        containers:
+          app:
+            image:
+              # Upstream publishes only to Docker Hub, built from
+              # dev/docker/Dockerfile in the rdpgw repo.
+              repository: docker.io/bolkedebruin/rdpgw
+              tag: v2.2.0
+            # The image entrypoint is a shell wrapper that execs rdpgw with
+            # whatever args the container gets, so -c reaches the binary.
+            args:
+              - -c
+              - /etc/rdpgw/rdpgw.yaml
+            envFrom:
+              - secretRef:
+                  name: rdpgw-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    # The only route rdpgw serves without a session.
+                    path: /metrics
+                    port: 9443
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /metrics
+                    port: 9443
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              # Not read-only: the image entrypoint writes a throwaway
+              # self-signed cert into /opt/rdpgw at start even when TLS is
+              # disabled, and refusing the write kills the container.
+              readOnlyRootFilesystem: false
+            # rdpgw copies bytes between two sockets; the cost is the RDP
+            # stream itself, not the gateway. No CPU limit so a busy session
+            # is not throttled into stuttering.
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      app:
+        controller: rdpgw
+        ports:
+          http:
+            port: 9443
+
+    ingress:
+      app:
+        className: "nginx-external"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # The RDP tunnel is a single long-lived websocket. The default
+          # 60s proxy timeouts would drop an idle desktop session, and
+          # buffering would add latency to every keystroke — the legacy
+          # RDG_IN_DATA/RDG_OUT_DATA transport, which older clients use
+          # instead of a websocket, does not work at all with buffering on.
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+          nginx.ingress.kubernetes.io/proxy-buffering: "off"
+          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        hosts:
+          - host: &host "rdpgw.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: tls.rdpgw
+
+    persistence:
+      config:
+        type: configMap
+        name: rdpgw-config
+        advancedMounts:
+          rdpgw:
+            app:
+              - path: /etc/rdpgw/rdpgw.yaml
+                subPath: rdpgw.yaml
+                readOnly: true

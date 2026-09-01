@@ -108,6 +108,17 @@ variable "paperless_client_secret" {
   sensitive   = true
 }
 
+variable "rdpgw_client_id" {
+  description = "The client ID for the RDP gateway in Authentik."
+  type        = string
+}
+
+variable "rdpgw_client_secret" {
+  description = "The client secret for the RDP gateway in Authentik."
+  type        = string
+  sensitive   = true
+}
+
 variable "vault_client_id" {
   description = "The client ID for Vault in Authentik."
   type        = string
