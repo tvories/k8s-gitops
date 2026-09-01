@@ -27,15 +27,18 @@ spec:
             image:
               repository: ghcr.io/tvories/agentmemory
               tag: 0.9.29
+              # The tag tracks the agentmemory release, but the image content
+              # also depends on our Dockerfile, so a rebuild overwrites the
+              # same tag. Without Always, nodes keep serving a stale cached
+              # layer after a Dockerfile-only change.
+              pullPolicy: Always
             env:
               AGENTMEMORY_DATA_DIR: /data
               III_REST_PORT: "3111"
-              # Anthropic drives compression; OpenAI is embeddings-only.
-              # Without this flag an OPENAI_API_KEY would take over as the
-              # LLM provider too (see upstream src/config.ts).
-              OPENAI_API_KEY_FOR_LLM: "false"
-              EMBEDDING_PROVIDER: openai
-              OPENAI_EMBEDDING_MODEL: text-embedding-3-small
+              # On-device embeddings via all-MiniLM-L6-v2 (384 dims), baked
+              # into the image at build time. Nothing leaves the cluster and
+              # no embedding API key is needed.
+              EMBEDDING_PROVIDER: local
               ANTHROPIC_MODEL: claude-sonnet-5
               MAX_TOKENS: "4096"
               AGENTMEMORY_AUTO_COMPRESS: "true"
@@ -67,12 +70,15 @@ spec:
                   periodSeconds: 5
                   timeoutSeconds: 5
                   failureThreshold: 30
+            # Sized for onnxruntime holding the embedding model resident.
+            # No CPU limit: embedding is short bursts of real work, and a
+            # limit would only throttle them.
             resources:
               requests:
-                cpu: 100m
-                memory: 512Mi
+                cpu: 250m
+                memory: 1Gi
               limits:
-                memory: 2Gi
+                memory: 3Gi
 
     service:
       app:
