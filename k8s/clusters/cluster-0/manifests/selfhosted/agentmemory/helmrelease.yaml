@@ -39,6 +39,16 @@ spec:
               # into the image at build time. Nothing leaves the cluster and
               # no embedding API key is needed.
               EMBEDDING_PROVIDER: local
+              # The viewer rejects any Host header not on this list — its
+              # defence against DNS rebinding. Loopback binds get localhost
+              # seeded automatically, but nginx forwards the real hostname, so
+              # it must be named explicitly or every request is "forbidden
+              # host". This does NOT turn on the inbound bearer check: that
+              # keys off AGENTMEMORY_VIEWER_HOST, which stays unset so the
+              # viewer keeps its loopback bind.
+              VIEWER_ALLOWED_HOSTS: agentmemory-viewer.${SECRET_DOMAIN}
+              # localhost entries retained so `kubectl port-forward` still works.
+              VIEWER_ALLOWED_ORIGINS: https://agentmemory-viewer.${SECRET_DOMAIN},http://localhost:3113,http://127.0.0.1:3113
               ANTHROPIC_MODEL: claude-sonnet-5
               MAX_TOKENS: "4096"
               AGENTMEMORY_AUTO_COMPRESS: "true"
