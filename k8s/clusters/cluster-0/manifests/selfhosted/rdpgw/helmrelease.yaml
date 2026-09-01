@@ -111,9 +111,12 @@ spec:
           # The controller intercepts 5xx cluster-wide and substitutes its own
           # page. rdpgw puts the actual fault in the response body ("Failed to
           # exchange token: ...", "no oidc claim for username found"), which
-          # that substitution throws away, leaving a bare 500. Empty opts this
-          # host out of the global list so the OIDC errors stay readable.
-          nginx.ingress.kubernetes.io/custom-http-errors: ""
+          # that substitution throws away, leaving a bare 500. This annotation
+          # replaces the global list for this host, and an empty value is
+          # treated as unset (verified: the controller kept intercepting), so
+          # it names a status rdpgw never returns. Everything else then passes
+          # through with rdpgw's own body intact.
+          nginx.ingress.kubernetes.io/custom-http-errors: "418"
           # The RDP tunnel is a single long-lived websocket. The default
           # 60s proxy timeouts would drop an idle desktop session, and
           # buffering would add latency to every keystroke — the legacy
