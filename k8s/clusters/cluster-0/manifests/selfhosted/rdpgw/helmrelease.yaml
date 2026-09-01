@@ -108,6 +108,12 @@ spec:
           # 404 that this cluster's custom-http-errors renders as a 500.
           # Send it to the endpoint that actually starts the login.
           nginx.ingress.kubernetes.io/app-root: /connect
+          # The controller intercepts 5xx cluster-wide and substitutes its own
+          # page. rdpgw puts the actual fault in the response body ("Failed to
+          # exchange token: ...", "no oidc claim for username found"), which
+          # that substitution throws away, leaving a bare 500. Empty opts this
+          # host out of the global list so the OIDC errors stay readable.
+          nginx.ingress.kubernetes.io/custom-http-errors: ""
           # The RDP tunnel is a single long-lived websocket. The default
           # 60s proxy timeouts would drop an idle desktop session, and
           # buffering would add latency to every keystroke — the legacy
