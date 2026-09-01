@@ -41,9 +41,19 @@ data:
       # name an arbitrary destination and turn the gateway into an open
       # TCP proxy into the LAN.
       HostSelection: roundrobin
-      # Signed cookies, so no shared session storage is needed and the
-      # Deployment stays stateless.
-      SessionStore: cookie
+      # Not the cookie store. rdpgw puts the provider's access token in the
+      # session, and authentik's is a JWT: the encoded session came to 4544
+      # bytes against securecookie's 4096 cap, so SaveSessionIdentity failed
+      # and /callback returned 500 after a successful login. The filesystem
+      # store keeps only a session id in the cookie and writes the body to
+      # /tmp, which the image ships mode 1777 for exactly this purpose.
+      # Upstream's caveat is that clients must stay on one instance —
+      # guaranteed here by replicas: 1 with strategy Recreate. Sessions do
+      # not survive a restart, which costs a re-login and nothing else.
+      SessionStore: file
+      # Bytes. Unset would default to 8192, and the session is already over
+      # half that; this leaves room for accounts with more group claims.
+      MaxSessionLength: 16384
     OpenId:
       # authentik publishes a per-application issuer. The trailing slash is
       # part of the issuer claim, and go-oidc compares it verbatim.
