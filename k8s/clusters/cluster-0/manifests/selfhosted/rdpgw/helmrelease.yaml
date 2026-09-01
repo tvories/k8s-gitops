@@ -32,8 +32,16 @@ spec:
               # dev/docker/Dockerfile in the rdpgw repo.
               repository: docker.io/bolkedebruin/rdpgw
               tag: v2.2.0
-            # The image entrypoint is a shell wrapper that execs rdpgw with
-            # whatever args the container gets, so -c reaches the binary.
+            # Bypass the image's /run.sh entrypoint. It ships USER 0 and
+            # drops privileges itself with "su rdpgw", which fails as
+            # "su: must be suid to work properly" under the non-root
+            # securityContext below. Nothing else in that script applies
+            # here: the user-creation loop needs /root/createusers.txt, and
+            # rdpgw-auth only starts for Authentication: local. Upstream
+            # rewrote the entrypoint to run as 1001 without su, but that is
+            # unreleased as of v2.2.0 — revisit on the next tag.
+            command:
+              - /opt/rdpgw/rdpgw
             args:
               - -c
               - /etc/rdpgw/rdpgw.yaml
@@ -67,9 +75,11 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
-              # Not read-only: the image entrypoint writes a throwaway
-              # self-signed cert into /opt/rdpgw at start even when TLS is
-              # disabled, and refusing the write kills the container.
+              # Left writable deliberately. rdpgw writes nothing on this
+              # configuration — Tls is disabled so no ACME cache, and the
+              # session store is cookie-based — but later releases of the
+              # image mint a self-signed cert at start, so flipping this to
+              # true would turn a version bump into a crash loop.
               readOnlyRootFilesystem: false
             # rdpgw copies bytes between two sockets; the cost is the RDP
             # stream itself, not the gateway. No CPU limit so a busy session
