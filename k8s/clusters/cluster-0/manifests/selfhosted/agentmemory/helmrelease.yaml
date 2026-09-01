@@ -79,6 +79,37 @@ spec:
                 memory: 1Gi
               limits:
                 memory: 3Gi
+          # The viewer binds 127.0.0.1 inside the pod. Kept that way on
+          # purpose: a non-loopback bind makes agentmemory demand an inbound
+          # `Authorization: Bearer` on every request, which a browser cannot
+          # send, and satisfying it would mean rendering AGENTMEMORY_SECRET
+          # into an Ingress annotation. This sidecar shares the pod network
+          # namespace, so it can reach that loopback listener and expose it to
+          # the Service. authentik forward-auth on the Ingress is what actually
+          # gates access.
+          viewer-proxy:
+            image:
+              repository: docker.io/alpine/socat
+              tag: 1.8.1.3
+            args:
+              - TCP-LISTEN:8080,fork,reuseaddr
+              - TCP:127.0.0.1:3113
+            # Unlike the app container, this one never needs root: the main
+            # entrypoint starts privileged only to chown /data and drop via
+            # gosu, whereas socat just binds an unprivileged port.
+            securityContext:
+              runAsUser: 65534
+              runAsGroup: 65534
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
 
     service:
       app:
@@ -88,8 +119,13 @@ spec:
             port: 3111
           streams:
             port: 3112
+          viewer:
+            port: 8080
 
     ingress:
+      # REST API. Guarded by AGENTMEMORY_SECRET as a bearer token, which is
+      # what the MCP client sends — no authentik in front, since an OIDC
+      # redirect would break a non-browser client.
       app:
         className: "nginx-internal"
         hosts:
@@ -99,6 +135,30 @@ spec:
                 service:
                   identifier: app
                   port: http
+      # Web viewer, behind authentik forward-auth. The matching provider,
+      # application and outpost live in
+      # manifests/security/authentik/config/agentmemory.tf. The companion
+      # /outpost.goauthentik.io route on this same host is in
+      # viewer-outpost-ingress.yaml — forward_single mode requires it to be
+      # served from the same origin for the sign-in redirect to complete.
+      viewer:
+        className: "nginx-internal"
+        annotations:
+          nginx.ingress.kubernetes.io/auth-url: |-
+            http://ak-outpost-tvo-proxy.security.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+          nginx.ingress.kubernetes.io/auth-signin: |-
+            https://{{ .Release.Name }}-viewer.${SECRET_DOMAIN}/outpost.goauthentik.io/start?rd=$escaped_request_uri
+          nginx.ingress.kubernetes.io/auth-response-headers: |-
+            Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+          nginx.ingress.kubernetes.io/auth-snippet: |
+            proxy_set_header X-Forwarded-Host $http_host;
+        hosts:
+          - host: "{{ .Release.Name }}-viewer.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: viewer
 
     persistence:
       data:

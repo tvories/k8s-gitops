@@ -1,0 +1,44 @@
+---
+# authentik forward-auth in forward_single mode requires the outpost's
+# /outpost.goauthentik.io endpoints to be served from the SAME origin as the
+# application, or the sign-in redirect cannot complete and the browser loops
+# between the app and authentik. This routes that path on the viewer host to
+# the proxy outpost, which lives in the security namespace.
+#
+# Kept as a plain Ingress rather than a path on the app-template ingress
+# because the backend is a Service in another namespace, which app-template's
+# service.identifier cannot reference.
+#
+# ExternalName is required: Ingress backends must resolve within the Ingress's
+# own namespace, so this aliases the outpost Service into selfhosted.
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-proxy-outpost
+  namespace: selfhosted
+spec:
+  type: ExternalName
+  externalName: ak-outpost-tvo-proxy.security.svc.cluster.local
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agentmemory-viewer-outpost
+  namespace: selfhosted
+spec:
+  ingressClassName: nginx-internal
+  rules:
+    - host: "agentmemory-viewer.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-proxy-outpost
+                port:
+                  name: http
