@@ -48,7 +48,7 @@ spec:
         - name: fstrim
           # Same image as the toolbox/direct-mount, so nothing new is pulled. Provides
           # util-linux (fstrim, findmnt); Talos hosts carry no userland to nsenter into.
-          image: rook/ceph:v1.20.6
+          image: rook/ceph:v1.20.7
           command: ["/bin/bash", "-c"]
           args:
             - |
