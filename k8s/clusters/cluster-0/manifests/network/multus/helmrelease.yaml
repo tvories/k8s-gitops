@@ -98,3 +98,9 @@ spec:
         enabled: true
     defaultPodOptions:
       hostNetwork: true
+      # app-template v5 writes automountServiceAccountToken: false into every
+      # pod spec by default, and the pod-level value overrides whatever the
+      # ServiceAccount says. multus builds its kubeconfig from the projected
+      # token, so leaving this off costs it API access and breaks CNI for
+      # every macvlan pod on the node.
+      automountServiceAccountToken: true
