@@ -92,7 +92,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-assistant/home-assistant
-              tag: 2026.8.3
+              tag: 2026.9.1
             env:
               TZ: "${TIMEZONE}"
               # Makes pre-installed custom-integration dependencies importable.
