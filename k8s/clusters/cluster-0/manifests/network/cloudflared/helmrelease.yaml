@@ -1,0 +1,104 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.1.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudflared
+  namespace: network
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: cloudflared
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      cloudflared:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        # Two connectors so a node reboot never drops the tunnel. Cloudflare
+        # load-balances across every connector registered to the tunnel, so
+        # replicas are active/active with no coordination needed.
+        replicas: 2
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: docker.io/cloudflare/cloudflared
+              tag: 2026.8.3@sha256:51c9cefcb4569df44e1ad403ab1d3d8065aa8e84339bcfc6aee75502e1140339
+            # The image entrypoint is already `cloudflared --no-autoupdate`,
+            # so these are appended to it.
+            args:
+              - tunnel
+              - --config
+              - /etc/cloudflared/config.yaml
+              - run
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ready
+                    port: 2000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+        pod:
+          securityContext:
+            # Matches the image's own USER 65532:65532.
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: cloudflared
+
+    # No Service and no Ingress: cloudflared only ever makes outbound
+    # connections to Cloudflare's edge. That is the entire point — there is no
+    # inbound listener anywhere for a firewall or a VPN client to interfere
+    # with, which is what makes this immune to the GlobalProtect routing
+    # problem. Probes reach :2000 on the pod IP directly.
+
+    persistence:
+      config:
+        type: configMap
+        name: cloudflared-config
+        advancedMounts:
+          cloudflared:
+            app:
+              - path: /etc/cloudflared/config.yaml
+                subPath: config.yaml
+                readOnly: true
+      creds:
+        type: secret
+        name: cloudflared-secret
+        advancedMounts:
+          cloudflared:
+            app:
+              - path: /etc/cloudflared/creds
+                readOnly: true

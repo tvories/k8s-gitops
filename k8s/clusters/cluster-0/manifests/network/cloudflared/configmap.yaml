@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: network
+data:
+  config.yaml: |
+    # Locally-managed tunnel: the hostname -> service routing lives here in git
+    # rather than in the Cloudflare dashboard, so changing what the tunnel
+    # exposes is a pull request. A dashboard-managed ("token") tunnel cannot
+    # mix with a local ingress block — it is one or the other.
+    #
+    # The tunnel UUID. NOT a secret: it is the public CNAME target
+    # (<uuid>.cfargotunnel.com), visible in DNS to anyone. `terraform output
+    # tunnel_id` prints it.
+    #
+    # cloudflared will not infer this from credentials.json even though that
+    # file contains TunnelID -- `cloudflared tunnel run --help` states it must
+    # come from `tunnel:` here or from the last CLI argument.
+    #
+    # DUPLICATED, deliberately: the same UUID is also a field on the 1Password
+    # `cloudflared` item, because ../externalsecret.yaml needs it to assemble
+    # credentials.json. Duplicating a public identifier is the price of NOT
+    # duplicating the secret one -- tunnel_secret exists only in 1Password.
+    # If the tunnel is ever recreated, the UUID changes and BOTH must be
+    # updated or the connector will fail to register.
+    tunnel: 7f7a69d8-162d-420e-8f93-a40824e6007c
+    credentials-file: /etc/cloudflared/creds/credentials.json
+
+    # Served on the pod IP; used by the readiness/liveness probes.
+    metrics: 0.0.0.0:2000
+
+    ingress:
+      # Straight to the ClusterIP Service. TLS terminates at Cloudflare's edge,
+      # so routing back through ingress-nginx would only add a hop and a second
+      # certificate to keep valid. agentmemory's own bearer check still applies
+      # on :3111 — this bypasses the ingress, not the application's auth.
+      - hostname: am.${SECRET_DOMAIN}
+        service: http://agentmemory.selfhosted.svc.cluster.local:3111
+
+      # cloudflared requires a catch-all as the final rule, and refuses to start
+      # without one. Anything not matched above is refused rather than routed.
+      - service: http_status:404
