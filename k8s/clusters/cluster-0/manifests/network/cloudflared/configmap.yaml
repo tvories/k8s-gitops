@@ -36,8 +36,21 @@ data:
       # so routing back through ingress-nginx would only add a hop and a second
       # certificate to keep valid. agentmemory's own bearer check still applies
       # on :3111 — this bypasses the ingress, not the application's auth.
+      #
+      # tcp:// NOT http://. The consumer is the agentmemory MCP client, which
+      # cannot send the CF-Access-Client-Id/Secret headers Access requires (its
+      # only outbound header is `authorization: Bearer $AGENTMEMORY_SECRET` —
+      # there is no env var to inject others). So the client reaches this
+      # through `cloudflared access tcp`, which tunnels raw TCP over a
+      # WebSocket and therefore needs a TCP origin. With http:// here, the
+      # WebSocket upgrade is proxied to agentmemory's HTTP server, which does
+      # not speak WebSocket, and the client fails with "bad handshake".
+      #
+      # Consequence: https://am.<domain> is no longer a plain HTTP endpoint, so
+      # curl against it directly will not work. Test through the local
+      # listener instead — that exercises the real client path anyway.
       - hostname: am.${SECRET_DOMAIN}
-        service: http://agentmemory.selfhosted.svc.cluster.local:3111
+        service: tcp://agentmemory.selfhosted.svc.cluster.local:3111
 
       # cloudflared requires a catch-all as the final rule, and refuses to start
       # without one. Anything not matched above is refused rather than routed.
