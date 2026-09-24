@@ -59,7 +59,8 @@ spec:
                 cpu: 5m
                 memory: 470M
               limits:
-                memory: 470M
+                # kepubify + serving large (~250MB) epubs to Kobo OOMs at 470M
+                memory: 2Gi
 
     service:
       app:
