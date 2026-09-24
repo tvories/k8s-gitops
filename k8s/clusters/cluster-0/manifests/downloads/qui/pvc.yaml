@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qui-config
+  namespace: downloads
+  labels:
+    app.kubernetes.io/name: qui
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-block
+  resources:
+    requests:
+      storage: 1Gi

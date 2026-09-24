@@ -104,6 +104,25 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: downloads-qui
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: downloads-namespace
+    - name: downloads-pvc
+    - name: rook-ceph-cluster
+    - name: network-ingress-nginx
+  interval: 5m
+  path: "./k8s/clusters/cluster-0/manifests/downloads/qui"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: downloads-radarr
   namespace: flux-system
 spec:
