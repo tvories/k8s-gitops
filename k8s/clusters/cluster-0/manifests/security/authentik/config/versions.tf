@@ -10,7 +10,7 @@ terraform {
     }
     google = {
       source  = "hashicorp/google"
-      version = "8.3.0"
+      version = "8.4.0"
     }
   }
   backend "gcs" {
