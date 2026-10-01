@@ -1,0 +1,88 @@
+---
+# Calibre's built-in "Automatic adding" only watches its folder from GUI startup
+# and has not been reliable here, so poll the uploads folder on a schedule and
+# push books through the running content server (never touch metadata.db directly).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: calibre-auto-add
+  namespace: media
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 65539
+            fsGroup: 65539
+            fsGroupChangePolicy: OnRootMismatch
+          containers:
+            - name: add
+              image: ghcr.io/linuxserver/calibre:version-v9.15.0
+              command: ["/bin/bash", "-c"]
+              args:
+                - |
+                  set -u
+                  cd /uploads
+                  # -mmin +1: skip files still being copied in
+                  CDB=/app/calibre/calibredb
+                  work=$(mktemp -d)
+                  find . -maxdepth 1 -type f -mmin +1 ! -name '.*' -print0 | while IFS= read -r -d '' f; do
+                    echo "adding $f"
+
+                    # ISBN embedded in the file itself (read before the file is deleted)
+                    isbn=$(/app/calibre/ebook-meta "$f" 2>/dev/null \
+                      | sed -n 's/^Identifiers *:.*isbn:\([0-9Xx]\{10,13\}\).*/\1/p' | head -n1)
+
+                    out=$($CDB add --with-library "${LIBRARY_URL}" "$f" 2>&1) || {
+                      echo "$out" >&2
+                      echo "FAILED to add $f (left in place)" >&2
+                      continue
+                    }
+                    echo "$out"
+                    id=$(echo "$out" | sed -n 's/^Added book ids: *\([0-9]\+\).*/\1/p')
+                    rm -f -- "$f"
+
+                    # Best-effort metadata: only when we have an ISBN and the fetched record has that same ISBN
+                    if [ -z "$isbn" ] || [ -z "$id" ]; then
+                      echo "no ISBN/id for $f, keeping embedded metadata"
+                      continue
+                    fi
+                    rm -f "$work"/*
+                    if /app/calibre/fetch-ebook-metadata --isbn "$isbn" -o -c "$work/cover.jpg" > "$work/meta.opf" 2>"$work/err" \
+                       && grep -qi "$isbn" "$work/meta.opf"; then
+                      $CDB set_metadata --with-library "${LIBRARY_URL}" "$id" "$work/meta.opf" \
+                        && echo "book $id: metadata applied from isbn $isbn" \
+                        || echo "book $id: set_metadata failed" >&2
+                    else
+                      echo "book $id: no confident match for isbn $isbn, keeping embedded metadata"
+                      cat "$work/err" >&2
+                    fi
+                  done
+              env:
+                - name: LIBRARY_URL
+                  value: http://calibre-webserver.media.svc.cluster.local:8081/#books
+                - name: HOME
+                  value: /tmp
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+              volumeMounts:
+                - name: uploads
+                  mountPath: /uploads
+          volumes:
+            - name: uploads
+              nfs:
+                server: ${SECRET_NAS3}
+                path: /ook/Media/ebooks/uploads

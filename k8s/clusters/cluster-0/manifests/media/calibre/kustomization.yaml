@@ -7,3 +7,4 @@ resources:
   - ./pvc.yaml
   - ./volsync.yaml
   - ./helmrelease.yaml
+  - ./auto-add.yaml
