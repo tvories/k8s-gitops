@@ -76,7 +76,7 @@ spec:
                     name: calibre-content-server
               env:
                 - name: LIBRARY_URL
-                  value: http://calibre-webserver.media.svc.cluster.local:8081/#CalibreLibrary
+                  value: http://calibre-webserver.media.svc.cluster.local:8081/#Calibre_Library
                 - name: HOME
                   value: /tmp
               resources:
