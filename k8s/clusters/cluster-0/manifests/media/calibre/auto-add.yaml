@@ -42,7 +42,7 @@ spec:
                     isbn=$(/app/calibre/ebook-meta "$f" 2>/dev/null \
                       | sed -n 's/^Identifiers *:.*isbn:\([0-9Xx]\{10,13\}\).*/\1/p' | head -n1)
 
-                    out=$($CDB add --with-library "${LIBRARY_URL}" "$f" 2>&1) || {
+                    out=$($CDB add --with-library "$LIBRARY_URL" "$f" 2>&1) || {
                       echo "$out" >&2
                       echo "FAILED to add $f (left in place)" >&2
                       continue
@@ -59,7 +59,7 @@ spec:
                     rm -f "$work"/*
                     if /app/calibre/fetch-ebook-metadata --isbn "$isbn" -o -c "$work/cover.jpg" > "$work/meta.opf" 2>"$work/err" \
                        && grep -qi "$isbn" "$work/meta.opf"; then
-                      $CDB set_metadata --with-library "${LIBRARY_URL}" "$id" "$work/meta.opf" \
+                      $CDB set_metadata --with-library "$LIBRARY_URL" "$id" "$work/meta.opf" \
                         && echo "book $id: metadata applied from isbn $isbn" \
                         || echo "book $id: set_metadata failed" >&2
                     else
