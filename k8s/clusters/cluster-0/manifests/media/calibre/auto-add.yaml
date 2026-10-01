@@ -33,13 +33,17 @@ spec:
                   set -u
                   cd /uploads
                   # -mmin +1: skip files still being copied in
-                  CDB=/app/calibre/calibredb
+                  # locate the calibre CLI tools rather than hardcoding the image layout
+                  CDB=$(command -v calibredb || ls /opt/calibre/calibredb /app/calibre/calibredb 2>/dev/null | head -n1)
+                  if [ -z "$CDB" ]; then echo "calibredb not found in image" >&2; exit 1; fi
+                  BIN=$(dirname "$CDB")
+                  echo "using calibre tools in $BIN"
                   work=$(mktemp -d)
                   find . -maxdepth 1 -type f -mmin +1 ! -name '.*' -print0 | while IFS= read -r -d '' f; do
                     echo "adding $f"
 
                     # ISBN embedded in the file itself (read before the file is deleted)
-                    isbn=$(/app/calibre/ebook-meta "$f" 2>/dev/null \
+                    isbn=$("$BIN/ebook-meta" "$f" 2>/dev/null \
                       | sed -n 's/^Identifiers *:.*isbn:\([0-9Xx]\{10,13\}\).*/\1/p' | head -n1)
 
                     out=$($CDB add --with-library "$LIBRARY_URL" "$f" 2>&1) || {
@@ -57,7 +61,7 @@ spec:
                       continue
                     fi
                     rm -f "$work"/*
-                    if /app/calibre/fetch-ebook-metadata --isbn "$isbn" -o -c "$work/cover.jpg" > "$work/meta.opf" 2>"$work/err" \
+                    if "$BIN/fetch-ebook-metadata" --isbn "$isbn" -o -c "$work/cover.jpg" > "$work/meta.opf" 2>"$work/err" \
                        && grep -qi "$isbn" "$work/meta.opf"; then
                       $CDB set_metadata --with-library "$LIBRARY_URL" "$id" "$work/meta.opf" \
                         && echo "book $id: metadata applied from isbn $isbn" \
@@ -69,7 +73,7 @@ spec:
                   done
               env:
                 - name: LIBRARY_URL
-                  value: http://calibre-webserver.media.svc.cluster.local:8081/#books
+                  value: http://calibre-webserver.media.svc.cluster.local:8081/#CalibreLibrary
                 - name: HOME
                   value: /tmp
               resources:
