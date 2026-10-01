@@ -53,11 +53,16 @@ spec:
                     }
                     echo "$out"
                     id=$(echo "$out" | sed -n 's/^Added book ids: *\([0-9]\+\).*/\1/p')
+                    # calibredb exits 0 when it skips a duplicate; only delete files that were really added
+                    if [ -z "$id" ]; then
+                      echo "NOT added (duplicate or unknown reason), leaving $f in place" >&2
+                      continue
+                    fi
                     rm -f -- "$f"
 
                     # Best-effort metadata: only when we have an ISBN and the fetched record has that same ISBN
-                    if [ -z "$isbn" ] || [ -z "$id" ]; then
-                      echo "no ISBN/id for $f, keeping embedded metadata"
+                    if [ -z "$isbn" ]; then
+                      echo "book $id: no ISBN in file, keeping embedded metadata"
                       continue
                     fi
                     rm -f "$work"/*
