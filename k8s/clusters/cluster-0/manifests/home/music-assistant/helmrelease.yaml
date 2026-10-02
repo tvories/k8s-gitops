@@ -138,7 +138,7 @@ spec:
           pot-provider:
             image:
               repository: brainicism/bgutil-ytdlp-pot-provider
-              tag: 2.0.0
+              tag: 2.0.1
             env:
               TZ: "${TIMEZONE}"
             resources:
