@@ -39,7 +39,13 @@ spec:
                   BIN=$(dirname "$CDB")
                   echo "using calibre tools in $BIN"
                   work=$(mktemp -d)
-                  find . -maxdepth 1 -type f -mmin +1 ! -name '.*' -print0 | while IFS= read -r -d '' f; do
+                  # recurse: chaptarr files books under <Author>/<Book>/; only pick up ebook
+                  # formats so sidecar files (cover.jpg, metadata.opf) are not imported as books
+                  find . -mindepth 1 -type f -mmin +1 ! -name '.*' \
+                    \( -iname '*.epub' -o -iname '*.kepub' -o -iname '*.azw' -o -iname '*.azw3' \
+                       -o -iname '*.mobi' -o -iname '*.pdf' -o -iname '*.fb2' -o -iname '*.lit' \
+                       -o -iname '*.cbz' -o -iname '*.cbr' -o -iname '*.djvu' \) \
+                    -print0 | while IFS= read -r -d '' f; do
                     echo "adding $f"
 
                     # ISBN embedded in the file itself (read before the file is deleted)
@@ -76,6 +82,8 @@ spec:
                       cat "$work/err" >&2
                     fi
                   done
+                  # drop <Author>/<Book>/ folders emptied by the adds above
+                  find . -mindepth 1 -type d -empty -delete
               envFrom:
                 - secretRef:
                     name: calibre-content-server
