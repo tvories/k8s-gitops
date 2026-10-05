@@ -52,6 +52,15 @@ spec:
                     isbn=$("$BIN/ebook-meta" "$f" 2>/dev/null \
                       | sed -n 's/^Identifiers *:.*isbn:\([0-9Xx]\{10,13\}\).*/\1/p' | head -n1)
 
+                    # calibredb's own duplicate check is title+author only, and the metadata step
+                    # below rewrites those, so also match on ISBN (which survives the rewrite)
+                    if [ -n "$isbn" ] && existing=$($CDB search --with-library "$LIBRARY_URL" --username "$CALIBRE_USER" --password "$CALIBRE_PASS" \
+                         --limit 1 "identifiers:isbn:$isbn" 2>/dev/null) && [ -n "$existing" ]; then
+                      echo "DUPLICATE: isbn $isbn already in library as book $existing, removing $f" >&2
+                      rm -f -- "$f"
+                      continue
+                    fi
+
                     out=$($CDB add --with-library "$LIBRARY_URL" --username "$CALIBRE_USER" --password "$CALIBRE_PASS" "$f" 2>&1) || {
                       echo "$out" >&2
                       echo "FAILED to add $f (left in place)" >&2
@@ -59,9 +68,15 @@ spec:
                     }
                     echo "$out"
                     id=$(echo "$out" | sed -n 's/^Added book ids: *\([0-9]\+\).*/\1/p')
-                    # calibredb exits 0 when it skips a duplicate; only delete files that were really added
+                    # calibredb exits 0 when it skips a title+author duplicate: the library already
+                    # has it, so drop the file; anything else unexplained stays for the next run
                     if [ -z "$id" ]; then
-                      echo "NOT added (duplicate or unknown reason), leaving $f in place" >&2
+                      if echo "$out" | grep -qi "already exist"; then
+                        echo "DUPLICATE: title+author already in library, removing $f" >&2
+                        rm -f -- "$f"
+                      else
+                        echo "NOT added (unknown reason), leaving $f in place" >&2
+                      fi
                       continue
                     fi
                     rm -f -- "$f"
