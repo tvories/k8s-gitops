@@ -16,5 +16,11 @@
       versioning: "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z(-(?<compatibility>.*))?$",
       matchPackageNames: ["quay.io/minio/minio"],
     },
+    {
+      description: "Custom versioning for SearXNG - the git hash suffix is otherwise read as an immutable compatibility tag",
+      matchDatasources: ["docker"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>[0-9a-f]+)$",
+      matchPackageNames: ["ghcr.io/searxng/searxng"],
+    },
   ],
 }

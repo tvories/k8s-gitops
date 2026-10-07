@@ -9,3 +9,15 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
+configMapGenerator:
+  - name: network-health-dashboard
+    files:
+      - network-health.json=./dashboards/network-health.json
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    # ${datasource} / $wan are Grafana variables, not Flux ones.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+    grafana_folder: Networking
+  labels:
+    grafana_dashboard: "true"

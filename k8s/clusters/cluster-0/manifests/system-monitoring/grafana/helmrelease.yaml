@@ -315,13 +315,6 @@ spec:
           gnetId: 11312
           revision: 8
           datasource: Prometheus
-        speedtest-exporter:
-          # renovate: depName="Speedtest-Exporter Dashboard"
-          gnetId: 13665
-          revision: 4
-          datasource:
-            - name: DS_PROMETHEUS
-              value: Prometheus
         nginx-dashboard:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus

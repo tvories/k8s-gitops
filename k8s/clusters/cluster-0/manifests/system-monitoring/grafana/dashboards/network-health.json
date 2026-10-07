@@ -1,0 +1,746 @@
+{
+  "title": "Network Health",
+  "uid": "network-health",
+  "description": "WAN, top talkers, wireless health (Omada) and DNS (Technitium) on one page.",
+  "tags": ["network", "omada", "opnsense", "technitium"],
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "links": [
+    { "title": "Omada Overview", "type": "link", "url": "/d/omada-overview" }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0
+      },
+      {
+        "name": "wan",
+        "label": "WAN interface",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(opnsense_interfaces_received_bytes_total, interface)", "refId": "wan" },
+        "definition": "label_values(opnsense_interfaces_received_bytes_total, interface)",
+        "regex": "/wan/i",
+        "refresh": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0
+      }
+    ]
+  },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Overview",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Firewall exporter",
+      "description": "0 means the OPNsense exporter cannot reach the firewall API (check its logs: an expired opnsense TLS cert causes this).",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "noValue": "no data",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "min(opnsense_up)" }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Gateway RTT",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 30 }, { "color": "red", "value": 80 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max(opnsense_gateways_rtt_milliseconds)" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Gateway loss",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max(opnsense_gateways_loss_percentage)" }]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "WAN download",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "bps", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(rate(opnsense_interfaces_received_bytes_total{interface=~\"$wan\"}[5m])) * 8" }]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "WAN upload",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "bps", "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(rate(opnsense_interfaces_transmitted_bytes_total{interface=~\"$wan\"}[5m])) * 8" }]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Wireless clients",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(omada_client_connected_total{connection_mode=\"wireless\"})" }]
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Wired clients",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(omada_client_connected_total{connection_mode=\"wired\"})" }]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "DNS blocked (1h)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * sum(increase(technitium_dns_realtime_queries_total{category=\"blocked\"}[1h])) / sum(increase(technitium_dns_realtime_queries_total{category=\"all\"}[1h]))"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "Speedtest down",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "bps", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "max(last_over_time(speedtest_download_bandwidth_bytes[2h])) * 8" }]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Speedtest up",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "bps", "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "max(last_over_time(speedtest_upload_bandwidth_bytes[2h])) * 8" }]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Speedtest ping",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.03 }, { "color": "red", "value": 0.08 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max(last_over_time(speedtest_ping_latency_seconds[2h]))" }]
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "DNS queries/s",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(rate(technitium_dns_realtime_queries_total{category=\"all\"}[5m]))" }]
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "DNS nodes healthy",
+      "description": "Per Technitium node: the exporter resolves a test name through it.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 5 },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "OK", "color": "green" } } }
+          ],
+          "noValue": "no data",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max by (server) (technitium_health)", "legendFormat": "{{server}}" }]
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "Firmware updates",
+      "description": "Omada devices with a firmware upgrade available.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "sum(omada_device_need_upgrade)" }]
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Ports below 1 Gbps",
+      "description": "Linked switch ports that negotiated 10 or 100 Mbps. Some are expected (IoT hubs); a new one usually means a bad cable.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "count((max by (device, switch_port) (omada_port_link_speed_mbps) > 0) < 1000) or vector(0)" }]
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "PoE draw",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 5 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "watt", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "expr": "sum(max by (device, switch_port) (omada_port_power_watts))" }]
+    },
+
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Bandwidth",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "WAN throughput",
+      "description": "Download above the axis, upload below.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 10 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 15, "lineWidth": 1, "showPoints": "never" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Download" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          {
+            "matcher": { "id": "byName", "options": "Upload" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "purple" } },
+              { "id": "custom.transform", "value": "negative-Y" }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(opnsense_interfaces_received_bytes_total{interface=~\"$wan\"}[$__rate_interval])) * 8", "legendFormat": "Download" },
+        { "refId": "B", "expr": "sum(rate(opnsense_interfaces_transmitted_bytes_total{interface=~\"$wan\"}[$__rate_interval])) * 8", "legendFormat": "Upload" }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Traffic into each network (firewall interfaces)",
+      "description": "Bytes the firewall sent out each internal interface, i.e. what each VLAN downloaded through the router. Inter-VLAN traffic counts too.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 10 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"], "sortBy": "Mean", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 10, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (interface) (rate(opnsense_interfaces_transmitted_bytes_total{interface!~\"$wan\"}[$__rate_interval])) * 8 > 0",
+          "legendFormat": "{{interface}}"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Top talkers (download, now)",
+      "description": "Omada's per-client download activity, wired and wireless. Covers who, not which websites.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 19 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"], "sortBy": "Mean", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, sum by (client) (omada_client_download_activity_bytes) * 8)",
+          "legendFormat": "{{client}}"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "bargauge",
+      "title": "Top downloaders (selected range, approx.)",
+      "description": "Integrates Omada's per-minute download activity over the dashboard time range.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 19 },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "left",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": { "defaults": { "unit": "decbytes", "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(15, sum by (client) (sum_over_time(omada_client_download_activity_bytes[$__range:1m])) * 60)",
+          "legendFormat": "{{client}}"
+        }
+      ]
+    },
+
+    {
+      "id": 25,
+      "type": "row",
+      "title": "Internet speed (speedtest, last 7 days)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+      "panels": []
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "Speedtest throughput",
+      "description": "One test per hour. Download above the axis, upload below.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "timeFrom": "7d",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "min", "mean"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 15, "lineWidth": 1, "showPoints": "always", "pointSize": 3, "spanNulls": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Download" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          {
+            "matcher": { "id": "byName", "options": "Upload" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "purple" } },
+              { "id": "custom.transform", "value": "negative-Y" }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "interval": "1h", "expr": "max(max_over_time(speedtest_download_bandwidth_bytes[$__interval])) * 8", "legendFormat": "Download" },
+        { "refId": "B", "interval": "1h", "expr": "max(max_over_time(speedtest_upload_bandwidth_bytes[$__interval])) * 8", "legendFormat": "Upload" }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Speedtest latency (idle vs. loaded)",
+      "description": "Idle ping versus latency while the link is saturated. A large gap between idle and loaded is bufferbloat.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "timeFrom": "7d",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "mean", "max"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "always", "pointSize": 3, "spanNulls": true } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "interval": "1h", "expr": "max(max_over_time(speedtest_ping_latency_seconds[$__interval]))", "legendFormat": "Idle ping" },
+        { "refId": "B", "interval": "1h", "expr": "max(max_over_time(speedtest_download_latency_iqm_seconds[$__interval]))", "legendFormat": "Loaded (download)" },
+        { "refId": "C", "interval": "1h", "expr": "max(max_over_time(speedtest_upload_latency_iqm_seconds[$__interval]))", "legendFormat": "Loaded (upload)" }
+      ]
+    },
+
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Wireless",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 38 },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "bargauge",
+      "title": "Clients per AP",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 39 },
+      "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "instant": true, "range": false, "expr": "count by (ap_name) (omada_client_rssi_dbm)", "legendFormat": "{{ap_name}}" }]
+    },
+    {
+      "id": 32,
+      "type": "piechart",
+      "title": "Clients by Wi-Fi mode",
+      "description": "802.11ng = 2.4 GHz; ac / axa = 5 GHz; axg = 2.4 GHz Wi-Fi 6.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 39 },
+      "options": { "pieType": "donut", "legend": { "displayMode": "table", "placement": "right", "values": ["value"] }, "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "sum by (wifi_mode) (omada_client_connected_total{connection_mode=\"wireless\"})",
+          "legendFormat": "{{wifi_mode}}"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "type": "stat",
+      "title": "Signal quality",
+      "description": "Good: RSSI above -67 dBm. Fair: -67 to -75. Poor: below -75.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 4, "x": 12, "y": 39 },
+      "options": { "colorMode": "value", "graphMode": "none", "orientation": "vertical", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Good" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }] },
+          { "matcher": { "id": "byName", "options": "Fair" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "yellow" } }] },
+          { "matcher": { "id": "byName", "options": "Poor" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "expr": "count(omada_client_rssi_dbm >= -67) or vector(0)", "legendFormat": "Good" },
+        { "refId": "B", "expr": "count(omada_client_rssi_dbm < -67 and omada_client_rssi_dbm >= -75) or vector(0)", "legendFormat": "Fair" },
+        { "refId": "C", "expr": "count(omada_client_rssi_dbm < -75) or vector(0)", "legendFormat": "Poor" }
+      ]
+    },
+    {
+      "id": 34,
+      "type": "bargauge",
+      "title": "AP CPU / memory",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 39 },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "valueMode": "color", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        { "refId": "A", "instant": true, "range": false, "expr": "omada_device_cpu_percentage{device_type=\"ap\"}", "legendFormat": "{{device}} CPU" },
+        { "refId": "B", "instant": true, "range": false, "expr": "omada_device_mem_percentage{device_type=\"ap\"}", "legendFormat": "{{device}} mem" }
+      ]
+    },
+    {
+      "id": 35,
+      "type": "table",
+      "title": "Wireless clients (worst signal first)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 14, "x": 0, "y": 47 },
+      "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{ "displayName": "RSSI", "desc": false }] },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "RSSI" },
+            "properties": [
+              { "id": "unit", "value": "dBm" },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "mode": "thresholds" } },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": -75 }, { "color": "green", "value": -67 }] } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "SNR" },
+            "properties": [
+              { "id": "unit", "value": "dB" },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "mode": "thresholds" } },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 20 }, { "color": "green", "value": 25 }] } }
+            ]
+          },
+          { "matcher": { "id": "byName", "options": "TX rate" }, "properties": [{ "id": "unit", "value": "Kbits" }] },
+          { "matcher": { "id": "byName", "options": "RX rate" }, "properties": [{ "id": "unit", "value": "Kbits" }] }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "instant": true, "range": false, "format": "table", "expr": "max by (mac, client, ap_name, ssid, wifi_mode) (omada_client_rssi_dbm)" },
+        { "refId": "B", "instant": true, "range": false, "format": "table", "expr": "max by (mac) (omada_client_snr_dbm)" },
+        { "refId": "C", "instant": true, "range": false, "format": "table", "expr": "max by (mac) (omada_client_tx_rate)" },
+        { "refId": "D", "instant": true, "range": false, "format": "table", "expr": "max by (mac) (omada_client_rx_rate)" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true, "mac": true },
+            "indexByName": { "client": 0, "ap_name": 1, "ssid": 2, "wifi_mode": 3, "Value #A": 4, "Value #B": 5, "Value #C": 6, "Value #D": 7 },
+            "renameByName": {
+              "client": "Client",
+              "ap_name": "AP",
+              "ssid": "SSID",
+              "wifi_mode": "Mode",
+              "Value #A": "RSSI",
+              "Value #B": "SNR",
+              "Value #C": "TX rate",
+              "Value #D": "RX rate"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "type": "timeseries",
+      "title": "Client RSSI",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 10, "x": 14, "y": 47 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["min", "mean"], "sortBy": "Mean", "sortDesc": false }, "tooltip": { "mode": "multi", "sort": "asc" } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dBm",
+          "custom": { "lineWidth": 1, "showPoints": "never", "thresholdsStyle": { "mode": "dashed" } },
+          "color": { "mode": "palette-classic" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": -75 }, { "color": "green", "value": -67 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max by (client) (omada_client_rssi_dbm)", "legendFormat": "{{client}}" }]
+    },
+    {
+      "id": 37,
+      "type": "timeseries",
+      "title": "AP throughput",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 59 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 10, "lineWidth": 1, "showPoints": "never" } },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".* up$" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "expr": "rate(omada_device_download{device_type=\"ap\"}[$__rate_interval]) * 8", "legendFormat": "{{device}} down" },
+        { "refId": "B", "expr": "rate(omada_device_upload{device_type=\"ap\"}[$__rate_interval]) * 8", "legendFormat": "{{device}} up" }
+      ]
+    },
+    {
+      "id": 38,
+      "type": "timeseries",
+      "title": "Wireless download by SSID",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 59 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 25, "lineWidth": 1, "showPoints": "never", "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum by (ssid) (rate(omada_client_traffic_down_bytes[$__rate_interval])) * 8", "legendFormat": "{{ssid}}" }
+      ]
+    },
+
+    {
+      "id": 40,
+      "type": "row",
+      "title": "DNS (Technitium)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 67 },
+      "panels": []
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Queries by result",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 68 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 10, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (category) (rate(technitium_dns_realtime_queries_total{category=~\"cached|recursive|authoritative|blocked|nxdomain|servfail|refused|dropped\"}[$__rate_interval]))",
+          "legendFormat": "{{category}}"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "Queries by node",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 68 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 25, "lineWidth": 1, "showPoints": "never", "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum by (server) (rate(technitium_dns_realtime_queries_total{category=\"all\"}[$__rate_interval]))", "legendFormat": "{{server}}" }
+      ]
+    },
+    {
+      "id": 43,
+      "type": "bargauge",
+      "title": "Top blocked domains (last hour)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 8, "x": 0, "y": 76 },
+      "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "instant": true, "range": false, "expr": "topk(15, sum by (domain) (technitium_dns_top_blocked_domain_hits))", "legendFormat": "{{domain}}" }
+      ]
+    },
+    {
+      "id": 44,
+      "type": "bargauge",
+      "title": "Top queried domains (last hour)",
+      "description": "Best available proxy for 'which sites' — counts lookups, not bytes.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 8, "x": 8, "y": 76 },
+      "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "instant": true, "range": false, "expr": "topk(15, sum by (domain) (technitium_dns_top_domain_hits))", "legendFormat": "{{domain}}" }
+      ]
+    },
+    {
+      "id": 45,
+      "type": "bargauge",
+      "title": "Top DNS clients (last hour)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 8, "x": 16, "y": 76 },
+      "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(15, sum by (client_ip, client_name) (technitium_dns_top_client_hits))",
+          "legendFormat": "{{client_name}} ({{client_ip}})"
+        }
+      ]
+    },
+
+    {
+      "id": 50,
+      "type": "row",
+      "title": "Switching",
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 88 },
+      "panels": [
+        {
+          "id": 51,
+          "type": "table",
+          "title": "Ports linked below 1 Gbps",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 9, "w": 12, "x": 0, "y": 89 },
+          "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{ "displayName": "Speed", "desc": false }] },
+          "fieldConfig": {
+            "defaults": { "custom": { "align": "auto" } },
+            "overrides": [{ "matcher": { "id": "byName", "options": "Speed" }, "properties": [{ "id": "unit", "value": "Mbits" }] }]
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "expr": "(max by (device, switch_port, name) (omada_port_link_speed_mbps) > 0) < 1000"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "indexByName": { "device": 0, "switch_port": 1, "name": 2, "Value": 3 },
+                "renameByName": { "device": "Switch", "switch_port": "Port", "name": "Port name", "Value": "Speed" }
+              }
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "type": "bargauge",
+          "title": "PoE draw by port",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "gridPos": { "h": 9, "w": 12, "x": 12, "y": 89 },
+          "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "reduceOptions": { "calcs": ["lastNotNull"] } },
+          "fieldConfig": { "defaults": { "unit": "watt", "min": 0, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "expr": "topk(12, max by (device, name) (omada_port_power_watts) > 0)",
+              "legendFormat": "{{device}} / {{name}}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

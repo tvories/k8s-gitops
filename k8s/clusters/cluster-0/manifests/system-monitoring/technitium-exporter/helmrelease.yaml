@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: technitium-exporter
+  namespace: system-monitoring
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: technitium-exporter
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      technitium-exporter:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter
+              tag: v2.2.0@sha256:9710086ee9c508291c88572bfad455f34100d9e978ad435cd55a5e4f6e07eea2
+            env:
+              TZ: "${TIMEZONE}"
+              # The k8s node (tdns2) proxies stats requests for every node in
+              # TECHNITIUM_NODES, so one token covers the whole cluster. Each
+              # node's metrics get server="<node name>".
+              TECHNITIUM_BASE_URL: http://technitium-app.network.svc.cluster.local:5380
+              TECHNITIUM_NODES: "tdns.cluster.${SECRET_DOMAIN},tdns2.cluster.${SECRET_DOMAIN}"
+              TECHNITIUM_STATS_RANGE: LastHour
+              TECHNITIUM_TOP_LIMIT: "25"
+              EXPORTER_PORT: "9105"
+            envFrom:
+              - secretRef:
+                  name: technitium-exporter-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+        pod:
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+            fsGroup: 65534
+            fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: technitium-exporter
+        ports:
+          http:
+            port: 9105
+    serviceMonitor:
+      app:
+        serviceName: technitium-exporter
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 30s
