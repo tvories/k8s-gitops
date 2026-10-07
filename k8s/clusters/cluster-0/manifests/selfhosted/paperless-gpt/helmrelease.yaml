@@ -35,7 +35,12 @@ spec:
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LLM_PROVIDER: anthropic
               LLM_MODEL: claude-haiku-4-5-20251001
-              TOKEN_LIMIT: 4000
+              # Caps prompt + content. 4000 was too small: the correspondent prompt
+              # embeds every existing correspondent and failed the whole job.
+              TOKEN_LIMIT: 16000
+              # Only embed the 100 most relevant correspondents (names found in
+              # the document first) instead of the full list.
+              CORRESPONDENT_PROMPT_LIMIT: "100"
               LLM_REQUESTS_PER_MINUTE: "10"
               VISION_LLM_PROVIDER: anthropic
               VISION_LLM_MODEL: claude-haiku-4-5-20251001
