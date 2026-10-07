@@ -41,6 +41,9 @@ spec:
               VISION_LLM_MODEL: claude-haiku-4-5-20251001
               VISION_LLM_REQUESTS_PER_MINUTE: "4"
               OCR_LIMIT_PAGES: "5"
+              # Default render is up to 600 DPI / 40MP per page, which OOMs the
+              # pod; Claude downscales to ~1568px long edge anyway.
+              IMAGE_MAX_RENDER_DPI: "200"
               # AUTO_GENERATE_TAGS: "false"
               OCR_PROVIDER: llm
               AUTO_GENERATE_CORRESPONDENTS: "false"
@@ -61,7 +64,7 @@ spec:
                 cpu: 10m
                 memory: 256Mi
               limits:
-                memory: 1Gi
+                memory: 2Gi
     service:
       app:
         controller: paperless-gpt
