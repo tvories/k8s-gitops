@@ -97,6 +97,10 @@ spec:
               PAPERLESS_AI_ENABLED: "true"
               PAPERLESS_AI_LLM_BACKEND: openai-like
               PAPERLESS_AI_LLM_ENDPOINT: "https://api.anthropic.com/v1/"
+              # Pinned to Haiku 4.5: llama-index always sends temperature=0.1
+              # and paperless-ngx can't override it. Haiku 5.5 (and other 5.x
+              # models) reject any non-default temperature with a 400
+              # ("`temperature` is deprecated for this model").
               PAPERLESS_AI_LLM_MODEL: claude-haiku-4-5-20251001
               # PAPERLESS_AI_LLM_API_KEY comes from paperless-secret.
 
