@@ -168,6 +168,11 @@ spec:
             url: http://thanos-query.system-monitoring:10902/
             access: proxy
             isDefault: true
+            jsonData:
+              # Most exporters here scrape every 1m. Without this Grafana assumes
+              # 15s, so $__rate_interval can drop below two samples and rate()
+              # panels show "No data" (seen on 24h ranges).
+              timeInterval: 1m
           - name: Loki
             type: loki
             access: proxy
