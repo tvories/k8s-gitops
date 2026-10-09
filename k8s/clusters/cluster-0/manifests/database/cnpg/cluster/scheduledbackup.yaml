@@ -1,15 +1,6 @@
----
-apiVersion: postgresql.cnpg.io/v1
-kind: ScheduledBackup
-metadata:
-  name: postgres
-  namespace: database
-spec:
-  schedule: "@daily"
-  immediate: true
-  backupOwnerReference: self
-  cluster:
-    name: postgres5
+# One ScheduledBackup per cluster, named after it. Don't repoint an existing
+# schedule at a new cluster: it owns every Backup it created, and stale pending
+# Backups from the old cluster block it ("already taking a backup").
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup

@@ -33,6 +33,9 @@ metadata:
   namespace: system-monitoring
 spec:
   jobName: smartctl-exporter
+  # Kept at 5m (SMART data changes slowly). That is AT Prometheus' 5m lookback,
+  # so instant queries on smartctl_* must wrap in last_over_time(...[15m]) or
+  # they intermittently return nothing — see the NAS Grafana dashboard.
   scrapeInterval: 5m
   staticConfigs:
     - targets: ["nas3-80.${SECRET_DOMAIN}:9633"]
@@ -46,7 +49,9 @@ metadata:
   namespace: system-monitoring
 spec:
   jobName: zrepl-exporter
-  scrapeInterval: 5m
+  # 1m, not 5m: at a 5m interval the newest sample regularly ages past
+  # Prometheus' 5m lookback, so instant queries (Grafana stats) blink to "no data".
+  scrapeInterval: 1m
   staticConfigs:
     - targets: ["nas3-80.${SECRET_DOMAIN}:9811"]
   metricsPath: /metrics
@@ -60,7 +65,8 @@ metadata:
 spec:
   # modules.services.zfs-exporter defaults to 9901 (not the nixpkgs 9134).
   jobName: zfs-exporter
-  scrapeInterval: 5m
+  # 1m for the same lookback reason as zrepl above; a scrape takes ~0.05s.
+  scrapeInterval: 1m
   staticConfigs:
     - targets: ["nas3-80.${SECRET_DOMAIN}:9901"]
   metricsPath: /metrics

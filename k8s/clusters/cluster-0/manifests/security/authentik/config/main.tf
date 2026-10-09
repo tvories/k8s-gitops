@@ -100,6 +100,9 @@ locals {
       client_secret = var.rdpgw_client_secret
       group         = "infrastructure"
       icon_url      = "https://raw.githubusercontent.com/bolkedebruin/rdpgw/master/assets/icon.svg"
+      # rdpgw only ever runs the authorization code flow, so it does not need
+      # the full default grant set the older applications carry.
+      grant_types = ["authorization_code", "refresh_token"]
       # rdpgw derives this from Server.GatewayAddress: scheme + host +
       # "/callback", with no configuration knob of its own.
       redirect_uri = "https://rdpgw.${var.CLUSTER_DOMAIN}/callback"
@@ -163,6 +166,22 @@ resource "authentik_provider_oauth2" "oauth2" {
     data.authentik_property_mapping_provider_scope.scope-openid.id,
   ]
   access_token_validity = "hours=4"
+  # authentik grants every type when a provider is created without an explicit
+  # list, which is how the apps above were made. Recent versions of the
+  # terraform provider send an empty list instead, and a provider with no
+  # permitted grants rejects every authorization request as invalid_request
+  # ("The request is otherwise malformed") — so this has to be stated. The
+  # default reproduces what the existing providers already hold, making a
+  # re-apply a no-op for them; per-app entries can narrow it.
+  grant_types = try(each.value.grant_types, [
+    "authorization_code",
+    "hybrid",
+    "implicit",
+    "client_credentials",
+    "password",
+    "urn:ietf:params:oauth:grant-type:device_code",
+    "refresh_token",
+  ])
   allowed_redirect_uris = [
     for uri in try(each.value.redirect_uris, [each.value.redirect_uri]) : {
       matching_mode = "strict",

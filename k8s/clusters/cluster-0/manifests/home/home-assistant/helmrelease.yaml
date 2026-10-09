@@ -180,16 +180,19 @@ spec:
               #   weatherbitpypi              -> weatherbit
               #   markdown_it mdurl           -> transitive
               HOME: "/config"
-              POSTGRES_HOST:
-                valueFrom:
-                  secretKeyRef:
-                    name: home-assistant-secret
-                    key: INIT_POSTGRES_HOST
-              POSTGRES_DB:
-                valueFrom:
-                  secretKeyRef:
-                    name: home-assistant-secret
-                    key: INIT_POSTGRES_DBNAME
+              # Postgres recorder removed on purpose: HA must not depend on
+              # another service (a Postgres outage used to take HA down).
+              # History stays on HA's local SQLite.
+              # POSTGRES_HOST:
+              #   valueFrom:
+              #     secretKeyRef:
+              #       name: home-assistant-secret
+              #       key: INIT_POSTGRES_HOST
+              # POSTGRES_DB:
+              #   valueFrom:
+              #     secretKeyRef:
+              #       name: home-assistant-secret
+              #       key: INIT_POSTGRES_DBNAME
             envFrom:
               - secretRef:
                   name: home-assistant-secret

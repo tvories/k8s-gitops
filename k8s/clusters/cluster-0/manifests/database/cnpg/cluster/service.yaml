@@ -15,7 +15,7 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgres5
+    cnpg.io/cluster: postgres6
     role: primary
 ---
 apiVersion: v1
@@ -30,5 +30,8 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgres5 #! This needs to change whenever the cluster name changes
+    # Stable aliases for the current primary: on the next cluster migration,
+    # repoint both Services here instead of every app. (Apps currently target
+    # postgres6-rw directly; moving them to postgres.database.svc is optional.)
+    cnpg.io/cluster: postgres6
     role: primary
