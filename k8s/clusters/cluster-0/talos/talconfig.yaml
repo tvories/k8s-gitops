@@ -316,6 +316,13 @@ controlPlane:
     # Control-plane ONLY. Talos rejects this outright on a worker with
     # "feature Kubernetes Talos API Access can only be enabled on control plane
     # machines", so it cannot live in the shared root `patches:` block.
+    #
+    # Roles and namespaces are NOT paired: any talos.dev ServiceAccount in any
+    # listed namespace may request any listed role. Creating those objects is
+    # cluster-admin-only via RBAC, which is what actually gates this.
+    #   os:admin    / system-upgrade  - tuppr (namespace not deployed yet)
+    #   os:operator / kube-system     - etcd-defrag CronJob
+    #                                   (manifests/kube-system/etcd-defrag)
     - |-
       machine:
         features:
@@ -323,8 +330,10 @@ controlPlane:
             enabled: true
             allowedRoles:
               - os:admin
+              - os:operator
             allowedKubernetesNamespaces:
               - system-upgrade
+              - kube-system
 
 worker:
   patches: []

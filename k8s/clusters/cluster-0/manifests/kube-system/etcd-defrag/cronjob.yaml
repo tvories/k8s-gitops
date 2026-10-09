@@ -1,0 +1,87 @@
+# Weekly etcd defrag. etcd never returns space freed by deleted keys to disk,
+# so the DB file grows while "in use" stays flat; kube-prometheus-stack fires
+# etcdDatabaseHighFragmentationRatio once in-use drops below 50% (and is over
+# 100 MB). Defrag rewrites the file to reclaim it.
+#
+# The talosctl image is FROM scratch (no shell), so the members are defragged
+# by init containers: they run strictly in order and the first failure stops
+# the rest, so at most one member is ever mid-defrag and quorum is kept.
+# A defrag blocks that one member for ~1-2 s at the current ~400 MB.
+#
+# Order is fixed rather than leader-last. A defrag doesn't trigger an
+# election, and at this DB size the leader's pause is shorter than etcd's
+# election timeout, so detecting the leader isn't worth a shell image.
+#
+# Node IPs are the control-plane etcd members (talos/talconfig.yaml). Update
+# them here if a control-plane node is replaced.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-defrag
+  namespace: kube-system
+spec:
+  schedule: "0 4 * * 0" # Sundays 04:00, after the 03:00 nas3 zrepl snapshot
+  timeZone: America/Denver
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      # A failed defrag should be looked at, not retried blindly.
+      backoffLimit: 0
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: etcd-defrag
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: defrag-m720q-1
+              image: &image ghcr.io/siderolabs/talosctl:v1.14.2@sha256:b655ae1c73789c4789fcf6fbd61c8f45400ed4b3bd9892a26092fcd4d8d95d86
+              args: ["--nodes", "192.168.80.99", "etcd", "defrag"]
+              env: &env
+                - name: TALOSCONFIG
+                  value: /var/run/secrets/talos.dev/config
+              volumeMounts: &mounts
+                - name: talos-secrets
+                  mountPath: /var/run/secrets/talos.dev
+                  readOnly: true
+              securityContext: &containerSecurity
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+            - name: defrag-m720q-2
+              image: *image
+              args: ["--nodes", "192.168.80.100", "etcd", "defrag"]
+              env: *env
+              volumeMounts: *mounts
+              securityContext: *containerSecurity
+            - name: defrag-m720q-3
+              image: *image
+              args: ["--nodes", "192.168.80.101", "etcd", "defrag"]
+              env: *env
+              volumeMounts: *mounts
+              securityContext: *containerSecurity
+          containers:
+            # Logs the post-defrag sizes so `kubectl logs` shows the result.
+            - name: status
+              image: *image
+              args: ["--nodes", "192.168.80.99,192.168.80.100,192.168.80.101", "etcd", "status"]
+              env: *env
+              volumeMounts: *mounts
+              securityContext: *containerSecurity
+          volumes:
+            - name: talos-secrets
+              secret:
+                # Created by Talos from the talos.dev ServiceAccount.
+                secretName: etcd-defrag
