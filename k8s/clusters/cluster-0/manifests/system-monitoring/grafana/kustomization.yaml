@@ -21,6 +21,16 @@ configMapGenerator:
       # folder changes; the label and substitute-disabled annotation still apply.
       annotations:
         grafana_folder: Storage
+  - name: tback-dashboard
+    files:
+      - tback.json=./dashboards/tback.json
+    options:
+      annotations:
+        grafana_folder: Storage
+  # Mostly DNS/DHCP, so it stays in the default Networking folder.
+  - name: homebox-dashboard
+    files:
+      - homebox.json=./dashboards/homebox.json
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

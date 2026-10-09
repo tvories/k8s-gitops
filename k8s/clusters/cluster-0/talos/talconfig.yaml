@@ -177,8 +177,13 @@ patches:
       network:
         disableSearchDomain: true
         nameservers:
+          # .243 and .240 are both homebox (primary Technitium node).
+          # 192.168.83.241 is tdns2, the in-cluster Technitium LB VIP: a fallback
+          # for when homebox is down. Keep it last, since it depends on the
+          # cluster itself (Cilium/BGP) being up.
           - 192.168.1.243
           - 192.168.1.240
+          - 192.168.83.241
 
   # Four independent pool servers, deliberately not the router. With a single
   # NTP source the client cannot detect a falseticker, so a misconfigured

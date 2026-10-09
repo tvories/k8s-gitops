@@ -1,0 +1,493 @@
+{
+  "title": "homebox",
+  "uid": "homebox",
+  "description": "homebox: primary Technitium DNS + DHCP (tdns.cluster.t-vo.us; the k8s pod is the secondary, tdns2) and Traefik. Sources: node-exporter :9100 and smartctl-exporter :9633 (scrapeconfigs/homebox.yaml), technitium-exporter in-cluster (reads both cluster nodes).",
+  "tags": ["homebox", "dns", "technitium", "dhcp"],
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 41,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource", "label": "Data source", "type": "datasource", "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" }, "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    { "type": "row", "id": 1, "title": "Overview", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "panels": [] },
+    {
+      "type": "stat", "id": 2, "title": "Host",
+      "description": "node-exporter scrape. DOWN while homebox's firewall blocks 9100 (nix-config change).",
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "up{job=\"node-exporter\",instance=~\"homebox.*\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "not scraped",
+          "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 3, "title": "DNS (primary)",
+      "description": "Technitium on homebox, as reported by the in-cluster exporter via the Technitium cluster API.",
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "min(technitium_up{server=\"tdns.cluster.t-vo.us\"} * technitium_health{server=\"tdns.cluster.t-vo.us\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "no data",
+          "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 4, "title": "Queries (last hour)",
+      "description": "Technitium's own rolling last-hour count for the primary.",
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "technitium_dns_queries_window{server=\"tdns.cluster.t-vo.us\",category=\"all\"}" }],
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 5, "title": "Blocked",
+      "description": "Share of last-hour queries answered by the blocklists.",
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A",
+        "expr": "technitium_dns_queries_window{server=\"tdns.cluster.t-vo.us\",category=\"blocked\"} / ignoring(category) technitium_dns_queries_window{server=\"tdns.cluster.t-vo.us\",category=\"all\"}" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 6, "title": "SERVFAIL (last hour)",
+      "description": "Failed recursive lookups. A burst usually means an upstream resolver or the WAN is down.",
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "technitium_dns_queries_window{server=\"tdns.cluster.t-vo.us\",category=\"servfail\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 10 }, { "color": "red", "value": 100 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 7, "title": "DHCP leases",
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "sum(technitium_dhcp_leases_total{server=\"tdns.cluster.t-vo.us\"})" }],
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "gauge", "id": 8, "title": "Root disk used",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "1 - node_filesystem_avail_bytes{instance=~\"homebox.*\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=~\"homebox.*\",mountpoint=\"/\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 0, "noValue": "no data",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.9 }] }
+        },
+        "overrides": []
+      },
+      "options": { "showThresholdMarkers": true, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "gauge", "id": 9, "title": "/boot used",
+      "description": "The boot partition is undersized (expansion pending). Each NixOS generation keeps a kernel + initrd here; if it fills, nixos-rebuild fails to install the bootloader. Free space with `sudo nix-collect-garbage -d` then rebuild.",
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "1 - node_filesystem_avail_bytes{instance=~\"homebox.*\",mountpoint=\"/boot\"} / node_filesystem_size_bytes{instance=~\"homebox.*\",mountpoint=\"/boot\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 0, "noValue": "no data",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.7 }, { "color": "red", "value": 0.85 }] }
+        },
+        "overrides": []
+      },
+      "options": { "showThresholdMarkers": true, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    { "type": "row", "id": 10, "title": "DNS", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "panels": [] },
+    {
+      "type": "timeseries", "id": 11, "title": "Primary: queries by result (rolling last hour)",
+      "description": "Each point is Technitium's last-hour total at that moment, so curves are smooth and lag real changes by up to an hour.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "legendFormat": "{{category}}",
+        "expr": "technitium_dns_queries_window{server=\"tdns.cluster.t-vo.us\",category=~\"no_error|nxdomain|servfail|refused|blocked|dropped\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short", "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "servfail" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] },
+          { "matcher": { "id": "byName", "options": "blocked" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "purple" } }] },
+          { "matcher": { "id": "byName", "options": "no_error" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "timeseries", "id": 12, "title": "Primary vs secondary load",
+      "description": "Clients send most queries to whichever server is first in their resolver list, so the primary carrying the bulk is normal. The secondary dropping to zero while the primary is up is worth a look.",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "legendFormat": "{{server}}", "expr": "technitium_dns_queries_window{category=\"all\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short", "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true, "stacking": { "mode": "normal" } },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "piechart", "id": 13, "title": "How answers were served",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{type}}",
+        "expr": "technitium_dns_response_type_total{server=\"tdns.cluster.t-vo.us\"} > 0" }],
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } }, "overrides": [] },
+      "options": { "pieType": "donut", "legend": { "displayMode": "table", "placement": "right", "values": ["percent"] }, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "table", "id": 14, "title": "Top clients (last hour)",
+      "description": "10.0.55.7 is tback over WireGuard — its Uptime Kuma monitors resolve hostnames on every check.",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "format": "table",
+        "expr": "topk(15, technitium_dns_top_client_hits{server=\"tdns.cluster.t-vo.us\"})" }],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "endpoint": true, "instance": true, "job": true, "namespace": true, "pod": true, "service": true, "server": true },
+          "renameByName": { "client_name": "Client", "client_ip": "IP", "Value": "Queries" },
+          "indexByName": { "client_name": 0, "client_ip": 1, "Value": 2 }
+        } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Queries", "desc": true }] } }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [{ "matcher": { "id": "byName", "options": "Queries" }, "properties": [
+          { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "basic", "valueDisplayMode": "text" } }, { "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } } ] }]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+    {
+      "type": "table", "id": 15, "title": "Top domains (last hour)",
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "format": "table",
+        "expr": "topk(15, technitium_dns_top_domain_hits{server=\"tdns.cluster.t-vo.us\"})" }],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "endpoint": true, "instance": true, "job": true, "namespace": true, "pod": true, "service": true, "server": true },
+          "renameByName": { "domain": "Domain", "Value": "Queries" }
+        } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Queries", "desc": true }] } }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [{ "matcher": { "id": "byName", "options": "Queries" }, "properties": [
+          { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "basic", "valueDisplayMode": "text" } }, { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } } ] }]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+    {
+      "type": "table", "id": 16, "title": "Top blocked domains (last hour)",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "format": "table",
+        "expr": "topk(15, technitium_dns_top_blocked_domain_hits{server=\"tdns.cluster.t-vo.us\"})" }],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "endpoint": true, "instance": true, "job": true, "namespace": true, "pod": true, "service": true, "server": true },
+          "renameByName": { "domain": "Domain", "Value": "Blocked" }
+        } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Blocked", "desc": true }] } }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [{ "matcher": { "id": "byName", "options": "Blocked" }, "properties": [
+          { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "basic", "valueDisplayMode": "text" } }, { "id": "color", "value": { "mode": "fixed", "fixedColor": "purple" } } ] }]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+    {
+      "type": "bargauge", "id": 17, "title": "DHCP leases by scope",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{scope}}",
+        "expr": "sort_desc(sum by (scope) (technitium_dhcp_leases_total{server=\"tdns.cluster.t-vo.us\"}))" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "continuous-GrYlRd" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "sizing": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "bargauge", "id": 18, "title": "Query types (last hour)",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{qtype}}",
+        "expr": "sort_desc(technitium_dns_query_type_total{server=\"tdns.cluster.t-vo.us\"})" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "color": { "mode": "continuous-BlPu" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "sizing": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 19, "title": "Clients (last hour)",
+      "gridPos": { "h": 3, "w": 4, "x": 16, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "technitium_dns_clients_window{server=\"tdns.cluster.t-vo.us\"}" }],
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 20, "title": "DNS uptime",
+      "description": "Since the Technitium container on homebox last started.",
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "technitium_realtime_uptime_seconds{server=\"tdns.cluster.t-vo.us\"}" }],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 21, "title": "Technitium version",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{version}}", "expr": "technitium_server_info" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "name", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 22, "title": "Over TCP",
+      "description": "Share of queries over TCP rather than UDP. Usually small; growth can mean truncated (oversized) answers or a client that prefers TCP.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A",
+        "expr": "sum(technitium_dns_protocol_queries{server=\"tdns.cluster.t-vo.us\",protocol=\"Tcp\"}) / sum(technitium_dns_protocol_queries{server=\"tdns.cluster.t-vo.us\"})" }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "decimals": 1, "noValue": "0%", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    { "type": "row", "id": 23, "title": "System", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 }, "panels": [] },
+    {
+      "type": "timeseries", "id": 24, "title": "CPU",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 31 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Busy", "expr": "1 - avg(rate(node_cpu_seconds_total{instance=~\"homebox.*\",mode=\"idle\"}[5m]))" },
+        { "refId": "B", "legendFormat": "iowait", "expr": "avg(rate(node_cpu_seconds_total{instance=~\"homebox.*\",mode=\"iowait\"}[5m]))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 25, "title": "Memory",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 31 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Used", "expr": "node_memory_MemTotal_bytes{instance=~\"homebox.*\"} - node_memory_MemAvailable_bytes{instance=~\"homebox.*\"}" },
+        { "refId": "B", "legendFormat": "Swap used", "expr": "node_memory_SwapTotal_bytes{instance=~\"homebox.*\"} - node_memory_SwapFree_bytes{instance=~\"homebox.*\"}" },
+        { "refId": "C", "legendFormat": "Total", "expr": "node_memory_MemTotal_bytes{instance=~\"homebox.*\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes", "decimals": 1, "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Total" }, "properties": [
+            { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+            { "id": "color", "value": { "mode": "fixed", "fixedColor": "text" } } ] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 26, "title": "Temperatures",
+      "description": "Hottest sensor per hwmon chip (CPU package, NVMe, etc.).",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 31 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "legendFormat": "{{chip}}", "expr": "max by (chip) (node_hwmon_temp_celsius{instance=~\"homebox.*\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius", "decimals": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "timeseries", "id": 27, "title": "Network enp2s0 (receive up / transmit down)",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 39 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "rx", "expr": "rate(node_network_receive_bytes_total{instance=~\"homebox.*\",device=\"enp2s0\"}[5m]) * 8" },
+        { "refId": "B", "legendFormat": "tx", "expr": "rate(node_network_transmit_bytes_total{instance=~\"homebox.*\",device=\"enp2s0\"}[5m]) * 8" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [{ "matcher": { "id": "byName", "options": "tx" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 28, "title": "Disk I/O (read up / write down)",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 39 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "{{device}} read", "expr": "rate(node_disk_read_bytes_total{instance=~\"homebox.*\",device=~\"sd[a-z]|nvme[0-9]+n[0-9]+\"}[5m])" },
+        { "refId": "B", "legendFormat": "{{device}} write", "expr": "rate(node_disk_written_bytes_total{instance=~\"homebox.*\",device=~\"sd[a-z]|nvme[0-9]+n[0-9]+\"}[5m])" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [{ "matcher": { "id": "byRegexp", "options": ".* write" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "bargauge", "id": 29, "title": "Filesystems",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 39 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{mountpoint}}",
+        "expr": "1 - node_filesystem_avail_bytes{instance=~\"homebox.*\",fstype!~\"tmpfs|ramfs|overlay|nsfs|squashfs|devtmpfs\",mountpoint!~\"/nix/store|/var/lib/docker.*|/run.*\"} / node_filesystem_size_bytes{instance=~\"homebox.*\",fstype!~\"tmpfs|ramfs|overlay|nsfs|squashfs|devtmpfs\",mountpoint!~\"/nix/store|/var/lib/docker.*|/run.*\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 0, "noValue": "no data",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.9 }] }
+        },
+        "overrides": []
+      },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "sizing": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    { "type": "row", "id": 30, "title": "Disk health", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 47 }, "panels": [] },
+    {
+      "type": "table", "id": 31, "title": "SMART",
+      "description": "Empty until homebox's firewall allows 9633. Any non-zero Reallocated / Pending / Uncorrectable / media errors means the disk is wearing out.",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 48 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "instant": true, "format": "table", "expr": "max by (device, model_name, serial_number) (last_over_time(smartctl_device{instance=~\"homebox.*\"}[15m]))" },
+        { "refId": "B", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_temperature{instance=~\"homebox.*\",temperature_type=\"current\"}[15m]))" },
+        { "refId": "C", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_smart_status{instance=~\"homebox.*\"}[15m]))" },
+        { "refId": "D", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_power_on_seconds{instance=~\"homebox.*\"}[15m]))" },
+        { "refId": "E", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"homebox.*\",attribute_value_type=\"raw\",attribute_name=\"Reallocated_Sector_Ct\"}[15m]))" },
+        { "refId": "F", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"homebox.*\",attribute_value_type=\"raw\",attribute_name=\"Current_Pending_Sector\"}[15m]))" },
+        { "refId": "G", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_media_errors{instance=~\"homebox.*\"}[15m]))" },
+        { "refId": "H", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_percentage_used{instance=~\"homebox.*\"}[15m]))" }
+      ],
+      "transformations": [
+        { "id": "joinByField", "options": { "byField": "device", "mode": "outer" } },
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "Time 5": true, "Time 6": true, "Time 7": true, "Time 8": true, "Value #A": true },
+          "renameByName": {
+            "device": "Device", "model_name": "Model", "serial_number": "Serial",
+            "Value #B": "Temp", "Value #C": "SMART", "Value #D": "Powered on",
+            "Value #E": "Reallocated", "Value #F": "Pending", "Value #G": "NVMe media errors", "Value #H": "SSD wear"
+          },
+          "indexByName": { "device": 0, "model_name": 1, "serial_number": 2, "Value #C": 3, "Value #B": 4, "Value #D": 5, "Value #E": 6, "Value #F": 7, "Value #G": 8, "Value #H": 9 }
+        } }
+      ],
+      "fieldConfig": {
+        "defaults": { "noValue": "—", "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "SMART" }, "properties": [
+            { "id": "mappings", "value": [{ "type": "value", "options": { "1": { "text": "PASSED", "color": "green" }, "0": { "text": "FAILED", "color": "red" } } }] },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } } ] },
+          { "matcher": { "id": "byName", "options": "Temp" }, "properties": [
+            { "id": "unit", "value": "celsius" },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 55 }, { "color": "red", "value": 65 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-text" } } ] },
+          { "matcher": { "id": "byName", "options": "Powered on" }, "properties": [{ "id": "unit", "value": "s" }, { "id": "decimals", "value": 1 }] },
+          { "matcher": { "id": "byRegexp", "options": "Reallocated|Pending|NVMe media errors" }, "properties": [
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } } ] },
+          { "matcher": { "id": "byName", "options": "SSD wear" }, "properties": [
+            { "id": "unit", "value": "percent" },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 80 }, { "color": "red", "value": 95 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-text" } } ] }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+
+    { "type": "row", "id": 32, "title": "Services", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 52 }, "panels": [] },
+    {
+      "type": "stat", "id": 33, "title": "Services",
+      "description": "systemd unit state. Needs node-exporter's systemd collector on homebox (nix-config change). Technitium runs as docker-technitium.service.",
+      "gridPos": { "h": 4, "w": 20, "x": 0, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{name}}",
+        "expr": "label_replace(node_systemd_unit_state{instance=~\"homebox.*\",state=\"active\",name=~\"(docker-technitium|traefik|docker|sshd|smartd)\\\\.service\"}, \"name\", \"$1\", \"name\", \"(?:docker-)?(.*)\\\\.service\")" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Enable the node-exporter systemd collector on homebox",
+          "mappings": [{ "type": "value", "options": { "1": { "text": "running", "color": "green" }, "0": { "text": "stopped", "color": "red" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name", "orientation": "vertical", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 34, "title": "Exporters up",
+      "description": "node-exporter and smartctl-exporter on homebox.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "sum(up{instance=~\"homebox.*\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none", "max": 2, "noValue": "not scraped",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 1 }, { "color": "green", "value": 2 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    }
+  ]
+}

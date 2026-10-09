@@ -68,6 +68,14 @@ spec:
             # Only warning/critical reach Discord.
             - receiver: "null"
               matchers: ['severity =~ "info|none|"']
+            # Warnings are allowlisted: only these reach Discord. Every critical
+            # still does. Anything else stays visible in the Alertmanager UI.
+            # To promote a warning, add its alertname (regex) to this list.
+            - receiver: "null"
+              matchers:
+                - 'severity = "warning"'
+                - >-
+                  alertname !~ "Technitium.*|Opnsense.*|Speedtest.*|VolSync.*|Ceph.*|LastFailedArchiveTime|KubeJobFailed|KubePodCrashLooping|KubeNodeNotReady|KubeNodeUnreachable|KubePersistentVolumeFillingUp|NodeFilesystem.*|TargetDown"
         inhibit_rules:
           - source_matchers: ['severity = "critical"']
             target_matchers: ['severity = "warning"']

@@ -1,0 +1,34 @@
+# homebox exporters, defined in tvories/nix-config hosts/homebox. Job names
+# match the other hosts so dashboards and alerts treat it the same way.
+#
+# homebox runs with networking.firewall.enable = true, and the exporter
+# modules don't open their ports, so these targets stay DOWN until 9100 and
+# 9633 are allowed in nix-config (see the homebox Grafana dashboard).
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: homebox-node-exporter
+  namespace: system-monitoring
+spec:
+  jobName: node-exporter
+  scrapeInterval: 1m
+  staticConfigs:
+    - targets: ["homebox.${SECRET_INTERNAL_DOMAIN}:9100"]
+  metricsPath: /metrics
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: homebox-smartctl-exporter
+  namespace: system-monitoring
+spec:
+  jobName: smartctl-exporter
+  # 5m sits on Prometheus' 5m lookback; dashboards wrap smartctl instant
+  # queries in last_over_time(...[15m]). See scrapeconfigs/nas.yaml.
+  scrapeInterval: 5m
+  staticConfigs:
+    - targets: ["homebox.${SECRET_INTERNAL_DOMAIN}:9633"]
+  metricsPath: /metrics

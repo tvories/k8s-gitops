@@ -1,0 +1,334 @@
+{
+  "title": "Backup server (tback)",
+  "uid": "tback",
+  "description": "tback: Raspberry Pi 4 off-site backup target. restic REST server writing to a 12TB USB disk at /backup, Uptime Kuma, WireGuard back home. Sources: node-exporter :9100, smartctl-exporter :9633 (kube-prometheus-stack helm-release + scrapeconfigs/pi-backup.yaml).",
+  "tags": ["tback", "backup", "restic", "storage"],
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 41,
+  "refresh": "1m",
+  "time": { "from": "now-7d", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource", "label": "Data source", "type": "datasource", "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" }, "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    { "type": "row", "id": 1, "title": "Overview", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "panels": [] },
+    {
+      "type": "stat", "id": 2, "title": "Host",
+      "description": "node-exporter scrape over WireGuard. DOWN means tback is off, or the tunnel is.",
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "up{job=\"node-exporter\",instance=~\"tback.*\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "not scraped",
+          "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "gauge", "id": 3, "title": "Backup disk used",
+      "description": "/backup — the 12TB USB disk restic writes to.",
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "1 - node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"} / node_filesystem_size_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.9 }] }
+        },
+        "overrides": []
+      },
+      "options": { "showThresholdMarkers": true, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 4, "title": "Backup free",
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"}" }],
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 5, "title": "Time until full",
+      "description": "Free space ÷ the 7-day rate /backup is shrinking at. restic prune frees space, so this swings; read it as a rough horizon.",
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"} / (-deriv(node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"}[7d]) > 0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s", "decimals": 0, "noValue": "not filling",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 2592000 }, { "color": "green", "value": 15552000 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "gauge", "id": 6, "title": "SD card used",
+      "description": "The root filesystem (OS + /nix/store) lives on the Pi's SD card.",
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "1 - node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=~\"tback.*\",mountpoint=\"/\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.9 }] }
+        },
+        "overrides": []
+      },
+      "options": { "showThresholdMarkers": true, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 7, "title": "VPN traffic (wg0)",
+      "description": "Bytes in + out over the WireGuard tunnel home (10-minute average). Zero means the tunnel is idle or broken; wg-connectivity-check restarts it every 5 minutes if 10.0.55.1 stops answering.",
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A",
+        "expr": "rate(node_network_receive_bytes_total{instance=~\"tback.*\",device=\"wg0\"}[10m]) + rate(node_network_transmit_bytes_total{instance=~\"tback.*\",device=\"wg0\"}[10m])" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps", "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 8, "title": "Memory used",
+      "description": "The Pi has ~1 GB RAM, so this runs warmer than the other hosts.",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A",
+        "expr": "1 - node_memory_MemAvailable_bytes{instance=~\"tback.*\"} / node_memory_MemTotal_bytes{instance=~\"tback.*\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.92 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 9, "title": "Uptime",
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "time() - node_boot_time_seconds{instance=~\"tback.*\"}" }],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    { "type": "row", "id": 10, "title": "Backup storage", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "panels": [] },
+    {
+      "type": "timeseries", "id": 11, "title": "/backup capacity",
+      "description": "Steps up are new backups landing; steps down are restic prune runs.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Used",
+          "expr": "node_filesystem_size_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"} - node_filesystem_avail_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"}" },
+        { "refId": "B", "legendFormat": "Size", "expr": "node_filesystem_size_bytes{instance=~\"tback.*\",mountpoint=\"/backup\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes", "decimals": 1, "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Size" }, "properties": [
+            { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+            { "id": "color", "value": { "mode": "fixed", "fixedColor": "text" } } ] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 12, "title": "Backup disk I/O (read up / write down)",
+      "description": "Write bursts are incoming backups; long read bursts are usually restic check or prune.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Read", "expr": "rate(node_disk_read_bytes_total{instance=~\"tback.*\",device=\"sda\"}[5m])" },
+        { "refId": "B", "legendFormat": "Write", "expr": "rate(node_disk_written_bytes_total{instance=~\"tback.*\",device=\"sda\"}[5m])" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [{ "matcher": { "id": "byName", "options": "Write" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+
+    { "type": "row", "id": 13, "title": "Backup disk health", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }, "panels": [] },
+    {
+      "type": "table", "id": 14, "title": "SMART",
+      "description": "Empty until smartctl-exporter can read through the USB enclosure (needs the SAT device type — nix-config change). Any non-zero Reallocated / Pending / Uncorrectable means the disk is wearing out.",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "instant": true, "format": "table", "expr": "max by (device, model_name, serial_number) (last_over_time(smartctl_device{instance=~\"tback.*\"}[15m]))" },
+        { "refId": "B", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_temperature{instance=~\"tback.*\",temperature_type=\"current\"}[15m]))" },
+        { "refId": "C", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_smart_status{instance=~\"tback.*\"}[15m]))" },
+        { "refId": "D", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_power_on_seconds{instance=~\"tback.*\"}[15m]))" },
+        { "refId": "E", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"tback.*\",attribute_value_type=\"raw\",attribute_name=\"Reallocated_Sector_Ct\"}[15m]))" },
+        { "refId": "F", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"tback.*\",attribute_value_type=\"raw\",attribute_name=\"Current_Pending_Sector\"}[15m]))" },
+        { "refId": "G", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"tback.*\",attribute_value_type=\"raw\",attribute_name=\"Offline_Uncorrectable\"}[15m]))" },
+        { "refId": "H", "instant": true, "format": "table", "expr": "max by (device) (last_over_time(smartctl_device_attribute{instance=~\"tback.*\",attribute_value_type=\"raw\",attribute_name=\"UDMA_CRC_Error_Count\"}[15m]))" }
+      ],
+      "transformations": [
+        { "id": "joinByField", "options": { "byField": "device", "mode": "outer" } },
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "Time 5": true, "Time 6": true, "Time 7": true, "Time 8": true, "Value #A": true },
+          "renameByName": {
+            "device": "Device", "model_name": "Model", "serial_number": "Serial",
+            "Value #B": "Temp", "Value #C": "SMART", "Value #D": "Powered on",
+            "Value #E": "Reallocated", "Value #F": "Pending", "Value #G": "Uncorrectable", "Value #H": "CRC errors"
+          },
+          "indexByName": { "device": 0, "model_name": 1, "serial_number": 2, "Value #C": 3, "Value #B": 4, "Value #D": 5, "Value #E": 6, "Value #F": 7, "Value #G": 8, "Value #H": 9 }
+        } }
+      ],
+      "fieldConfig": {
+        "defaults": { "noValue": "No SMART data from the USB disk yet", "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "SMART" }, "properties": [
+            { "id": "mappings", "value": [{ "type": "value", "options": { "1": { "text": "PASSED", "color": "green" }, "0": { "text": "FAILED", "color": "red" } } }] },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } } ] },
+          { "matcher": { "id": "byName", "options": "Temp" }, "properties": [
+            { "id": "unit", "value": "celsius" },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 45 }, { "color": "red", "value": 50 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-text" } } ] },
+          { "matcher": { "id": "byName", "options": "Powered on" }, "properties": [{ "id": "unit", "value": "s" }, { "id": "decimals", "value": 1 }] },
+          { "matcher": { "id": "byRegexp", "options": "Reallocated|Pending|Uncorrectable" }, "properties": [
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } } ] },
+          { "matcher": { "id": "byName", "options": "CRC errors" }, "properties": [
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } } ] }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+
+    { "type": "row", "id": 15, "title": "System", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 19 }, "panels": [] },
+    {
+      "type": "timeseries", "id": 16, "title": "CPU",
+      "description": "iowait spikes line up with backups: the USB disk is the bottleneck, not the Pi's CPU.",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Busy", "expr": "1 - avg(rate(node_cpu_seconds_total{instance=~\"tback.*\",mode=\"idle\"}[5m]))" },
+        { "refId": "B", "legendFormat": "iowait", "expr": "avg(rate(node_cpu_seconds_total{instance=~\"tback.*\",mode=\"iowait\"}[5m]))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 17, "title": "Memory",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Used", "expr": "node_memory_MemTotal_bytes{instance=~\"tback.*\"} - node_memory_MemAvailable_bytes{instance=~\"tback.*\"}" },
+        { "refId": "B", "legendFormat": "Swap used", "expr": "node_memory_SwapTotal_bytes{instance=~\"tback.*\"} - node_memory_SwapFree_bytes{instance=~\"tback.*\"}" },
+        { "refId": "C", "legendFormat": "Total", "expr": "node_memory_MemTotal_bytes{instance=~\"tback.*\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes", "decimals": 0, "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Total" }, "properties": [
+            { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+            { "id": "color", "value": { "mode": "fixed", "fixedColor": "text" } } ] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 18, "title": "Network (receive up / transmit down)",
+      "description": "end0 is the LAN at the remote site; wg0 is the tunnel home that backups arrive over.",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "{{device}} rx", "expr": "rate(node_network_receive_bytes_total{instance=~\"tback.*\",device=~\"end0|wg0\"}[5m]) * 8" },
+        { "refId": "B", "legendFormat": "{{device}} tx", "expr": "rate(node_network_transmit_bytes_total{instance=~\"tback.*\",device=~\"end0|wg0\"}[5m]) * 8" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [{ "matcher": { "id": "byRegexp", "options": ".* tx" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+
+    { "type": "row", "id": 19, "title": "Services", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 }, "panels": [] },
+    {
+      "type": "stat", "id": 20, "title": "Services",
+      "description": "systemd unit state. Needs node-exporter's systemd collector on tback (nix-config change).",
+      "gridPos": { "h": 4, "w": 20, "x": 0, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{name}}",
+        "expr": "label_replace(node_systemd_unit_state{instance=~\"tback.*\",state=\"active\",name=~\"(rest-server|uptime-kuma|wireguard-wg0|traefik|docker|sshd)\\\\.service\"}, \"name\", \"$1\", \"name\", \"(.*)\\\\.service\")" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Enable the node-exporter systemd collector on tback",
+          "mappings": [{ "type": "value", "options": { "1": { "text": "running", "color": "green" }, "0": { "text": "stopped", "color": "red" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name", "orientation": "vertical", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 21, "title": "Exporters up",
+      "description": "node-exporter and smartctl-exporter on tback.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "sum(up{instance=~\"tback.*\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none", "max": 2,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 1 }, { "color": "green", "value": 2 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    }
+  ]
+}
