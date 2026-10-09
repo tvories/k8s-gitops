@@ -43,7 +43,7 @@ spec:
       # TODO: set this to the node to trim. m720q-2 currently hosts the Prometheus
       # PVC, which holds by far the largest reclaimable amount.
       nodeSelector:
-        kubernetes.io/hostname: m720q-1
+        kubernetes.io/hostname: m720q-4
       containers:
         - name: fstrim
           # Same image as the toolbox/direct-mount, so nothing new is pulled. Provides

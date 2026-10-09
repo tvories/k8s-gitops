@@ -184,6 +184,28 @@ spec:
       crashCollector:
         disable: false
 
+      # CVE-2025-30156: Tentacle raises HEALTH_ERR (AUTH_INSECURE_SERVICE_KEY_TYPE)
+      # until daemon keys move to aes256k. Generation 2 rotates mon/mgr/osd/mds/
+      # crash/exporter keys; daemons restart once to pick them up.
+      # https://rook.io/docs/rook/latest/Storage-Configuration/Advanced/cephx-key-rotation/
+      security:
+        cephx:
+          daemon:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+
+      # CSI client keys must stay "aes": kernel RBD/CephFS clients need Linux 7.0+
+      # for aes256k (Talos is on 6.18). Unmute these once nodes run 7.0+ and the
+      # csi keys are rotated.
+      healthCheck:
+        muteHealthWarning:
+          AUTH_INSECURE_CLIENT_KEY_TYPE:
+            policy: mute
+          AUTH_INSECURE_KEYS_ALLOWED:
+            policy: mute
+          AUTH_INSECURE_KEYS_CREATABLE:
+            policy: mute
+
       dashboard:
         enabled: true
         urlPrefix: /

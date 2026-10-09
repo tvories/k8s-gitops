@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: opnsense-exporter-rules
+  namespace: system-monitoring
+  annotations:
+    # {{ $labels }} / $value are Prometheus templates, not Flux variables.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+spec:
+  groups:
+    - name: opnsense.rules
+      rules:
+        - alert: OpnsenseExporterAbsent
+          annotations:
+            summary: OPNsense exporter is down.
+            description: OPNsense exporter has disappeared from Prometheus target discovery.
+          expr: |
+            absent(up{job=~".*opnsense-exporter.*"} == 1)
+          for: 15m
+          labels:
+            severity: warning
+        - alert: OpnsenseApiUnreachable
+          annotations:
+            summary: OPNsense exporter can't reach the firewall API.
+            description: >-
+              opnsense_up has been 0 for 15m. Check the exporter logs; last time
+              (Aug-Oct 2026) the opnsense TLS cert had expired because the ACME
+              client lost its state.
+          expr: |
+            min(opnsense_up) == 0
+          for: 15m
+          labels:
+            severity: critical
+        - alert: OpnsenseServiceStopped
+          annotations:
+            summary: OPNsense service {{ $labels.name }} is not running.
+            description: "{{ $labels.description }} ({{ $labels.name }}) has been stopped for 15m."
+          expr: |
+            opnsense_services_status == 0
+          for: 15m
+          labels:
+            severity: warning

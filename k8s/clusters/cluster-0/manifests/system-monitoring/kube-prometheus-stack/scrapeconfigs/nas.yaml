@@ -20,36 +20,47 @@
 #   staticConfigs:
 #     - targets: ["192.168.80.24:9000"]
 #   metricsPath: /minio/v2/metrics/cluster
+# nas3 exporters, defined in tvories/nix-config hosts/nas3. These are the only
+# definitions; the matching additionalScrapeConfigs jobs in the
+# kube-prometheus-stack HelmRelease were removed because they double-scraped.
+# jobName keeps the job label stable regardless of the CR name.
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
   name: nas3-smartctl-exporter
   namespace: system-monitoring
 spec:
+  jobName: smartctl-exporter
+  scrapeInterval: 5m
   staticConfigs:
-    - targets: ["192.168.80.24:9633"]
+    - targets: ["nas3-80.${SECRET_DOMAIN}:9633"]
   metricsPath: /metrics
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
   name: nas3-zrepl
   namespace: system-monitoring
 spec:
+  jobName: zrepl-exporter
+  scrapeInterval: 5m
   staticConfigs:
-    - targets: ["192.168.80.24:9811"]
+    - targets: ["nas3-80.${SECRET_DOMAIN}:9811"]
   metricsPath: /metrics
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
   name: nas3-zfs
   namespace: system-monitoring
 spec:
+  # modules.services.zfs-exporter defaults to 9901 (not the nixpkgs 9134).
+  jobName: zfs-exporter
+  scrapeInterval: 5m
   staticConfigs:
-    - targets: ["192.168.80.24:9134"]
+    - targets: ["nas3-80.${SECRET_DOMAIN}:9901"]
   metricsPath: /metrics

@@ -28,7 +28,9 @@ metadata:
   name: tautilli
   namespace: media
 spec:
-  sourcePVC: tautilli
+  # The ReplicationSource/restic repo keep the old "tautilli" spelling so the
+  # existing backup history is reused; only the PVC was renamed.
+  sourcePVC: tautulli
   trigger:
     schedule: "0 7 * * *"
   restic:

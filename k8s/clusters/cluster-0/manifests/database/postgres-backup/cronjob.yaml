@@ -40,7 +40,9 @@ spec:
                       name: postgres.postgres.credentials.postgresql.acid.zalan.do
                       key: password
                 - name: POSTGRES_DB
-                  value: "atuin,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,sonarr_main,sonarr_log,radarr_main,radarr_log,readarr_log,readarr_main,readarr_cache,vaultwarden,speakarr_main,speakarr_log,speakarr_cache,lubelog"
+                  # Every name must exist on postgres6: one missing database fails
+                  # the whole job (readarr_*/speakarr_* broke it from Feb-Oct 2026).
+                  value: "atuin,paperless,immich,nextcloud,postgres,tandoor,authentik,prowlarr_main,prowlarr_log,sonarr_main,sonarr_log,radarr_main,radarr_log,vaultwarden,lubelog,gitlabhq_production,praefect_production"
               volumeMounts:
                 - name: nas-backups
                   mountPath: /backups

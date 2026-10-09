@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: technitium-exporter-rules
+  namespace: system-monitoring
+  annotations:
+    # {{ $labels }} / $value are Prometheus templates, not Flux variables.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+spec:
+  groups:
+    - name: technitium.rules
+      rules:
+        - alert: TechnitiumExporterAbsent
+          annotations:
+            summary: Technitium exporter is down.
+            description: Technitium exporter has disappeared from Prometheus target discovery.
+          expr: |
+            absent(up{job=~".*technitium-exporter.*"} == 1)
+          for: 15m
+          labels:
+            severity: warning
+        # The exporter reaches every node by proxying through tdns2, so this
+        # also fires when tdns2 can't DANE-verify the primary (cluster deadlock).
+        - alert: TechnitiumNodeUnhealthy
+          annotations:
+            summary: Technitium node {{ $labels.server }} is unhealthy.
+            description: >-
+              {{ $labels.server }} failed its API or DNS resolution check for 10m.
+              If it is the primary, check tdns2's logs for "could not resolve DANE TLSA"
+              and the cluster-catalog zone transfer ACL.
+          expr: |
+            min by (server) (technitium_health) == 0
+              or
+            min by (server) (technitium_up) == 0
+          for: 10m
+          labels:
+            severity: critical
+        # Both nodes must hold the cluster zone; without it tdns2 can't verify
+        # the primary and never recovers on its own.
+        - alert: TechnitiumClusterZoneMissing
+          annotations:
+            summary: A Technitium node is missing the cluster zone.
+            description: >-
+              Only {{ $value }} node(s) hold the cluster zone. The secondary is likely
+              being refused zone transfers; check that the cluster-catalog zone's
+              Zone Transfer ACL still includes 192.168.1.0/24.
+          expr: |
+            (count(technitium_zone_info{zone=~"cluster\\..+"}) or vector(0)) < 2
+          for: 10m
+          labels:
+            severity: critical
+        - alert: TechnitiumZoneSerialMismatch
+          annotations:
+            summary: Technitium zone {{ $labels.zone }} is out of sync.
+            description: Nodes have reported different SOA serials for {{ $labels.zone }} for 30m.
+          expr: |
+            count by (zone) (count by (zone, serial) (technitium_zone_info)) > 1
+          for: 30m
+          labels:
+            severity: warning
