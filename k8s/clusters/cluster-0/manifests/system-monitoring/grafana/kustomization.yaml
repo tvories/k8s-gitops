@@ -13,6 +13,9 @@ configMapGenerator:
   - name: network-health-dashboard
     files:
       - network-health.json=./dashboards/network-health.json
+  - name: network-ports-dashboard
+    files:
+      - network-ports.json=./dashboards/network-ports.json
   - name: nas-dashboard
     files:
       - nas.json=./dashboards/nas.json

@@ -16,6 +16,22 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: kube-system-etcd-defrag
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: "./k8s/clusters/cluster-0/manifests/kube-system/etcd-defrag"
+  prune: true
+  # No wait: the CronJob is "ready" on creation, and the Talos Secret it mounts
+  # only exists once the control-plane nodes allow os:operator for kube-system.
+  wait: false
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: kube-system-cilium
   namespace: flux-system
 spec:

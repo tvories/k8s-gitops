@@ -1,0 +1,384 @@
+{
+  "title": "Network Ports",
+  "uid": "network-ports",
+  "description": "Bandwidth by WireGuard peer, firewall interface, switch port and backup host. Use the time picker to inspect specific windows (e.g. backups 07:00-10:00 UTC).",
+  "tags": ["network", "omada", "opnsense", "wireguard"],
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "links": [
+    { "title": "Network Health", "type": "link", "url": "/d/network-health" }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0
+      },
+      {
+        "name": "peer",
+        "label": "WireGuard peer",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(opnsense_wireguard_peer_status, peer_name)", "refId": "peer" },
+        "definition": "label_values(opnsense_wireguard_peer_status, peer_name)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": { "text": "TbackRaspberryPi", "value": "TbackRaspberryPi" },
+        "hide": 0
+      },
+      {
+        "name": "fwif",
+        "label": "Firewall interface",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(opnsense_interfaces_received_bytes_total, interface)", "refId": "fwif" },
+        "definition": "label_values(opnsense_interfaces_received_bytes_total, interface)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "hide": 0
+      },
+      {
+        "name": "switch",
+        "label": "Switch",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(omada_port_link_speed_mbps, device)", "refId": "switch" },
+        "definition": "label_values(omada_port_link_speed_mbps, device)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "hide": 0
+      },
+      {
+        "name": "port",
+        "label": "Port name",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(omada_port_link_speed_mbps{device=~\"$switch\"}, name)", "refId": "port" },
+        "definition": "label_values(omada_port_link_speed_mbps{device=~\"$switch\"}, name)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "hide": 0
+      }
+    ]
+  },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "WireGuard (offsite backup to tback)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "WireGuard peer throughput",
+      "description": "From OPNsense's wg0. Above the axis: sent to the peer (e.g. backups pushed to tback). Below: received from the peer.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 1 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 15, "lineWidth": 1, "showPoints": "never" } },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*received$" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (peer_name) (rate(opnsense_wireguard_peer_transmitted_bytes_total{peer_name=~\"$peer\"}[$__rate_interval])) * 8",
+          "legendFormat": "{{peer_name}} sent"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (peer_name) (rate(opnsense_wireguard_peer_received_bytes_total{peer_name=~\"$peer\"}[$__rate_interval])) * 8",
+          "legendFormat": "{{peer_name}} received"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Sent to peer (selected range)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 3, "w": 4, "x": 16, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "instant": true, "range": false, "expr": "sum(increase(opnsense_wireguard_peer_transmitted_bytes_total{peer_name=~\"$peer\"}[$__range]))" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Received from peer (selected range)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 1 },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "decbytes", "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "targets": [{ "refId": "A", "instant": true, "range": false, "expr": "sum(increase(opnsense_wireguard_peer_received_bytes_total{peer_name=~\"$peer\"}[$__range]))" }]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Peer status",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 4 },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [{ "type": "value", "options": { "0": { "text": "down", "color": "red" }, "1": { "text": "up", "color": "green" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [{ "refId": "A", "expr": "max by (peer_name) (opnsense_wireguard_peer_status{peer_name=~\"$peer\"})", "legendFormat": "{{peer_name}}" }]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Daily volume per peer",
+      "description": "Bytes per day each way. Useful for spotting a backup that suddenly sends far more (or nothing).",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "timeFrom": "14d",
+      "interval": "1d",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 10 },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "decbytes", "custom": { "drawStyle": "bars", "fillOpacity": 70, "lineWidth": 1, "showPoints": "never", "barAlignment": -1 } },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*received$" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "interval": "1d", "expr": "sum by (peer_name) (increase(opnsense_wireguard_peer_transmitted_bytes_total{peer_name=~\"$peer\"}[1d]))", "legendFormat": "{{peer_name}} sent" },
+        { "refId": "B", "interval": "1d", "expr": "sum by (peer_name) (increase(opnsense_wireguard_peer_received_bytes_total{peer_name=~\"$peer\"}[1d]))", "legendFormat": "{{peer_name}} received" }
+      ]
+    },
+
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Firewall interfaces (OPNsense)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Into each interface (from that network)",
+      "description": "Bytes the firewall received on each interface: for WAN that's internet download; for a VLAN it's what that VLAN sent through the router.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 19 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum by (interface) (rate(opnsense_interfaces_received_bytes_total{interface=~\"$fwif\"}[$__rate_interval])) * 8", "legendFormat": "{{interface}}" }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Out of each interface (to that network)",
+      "description": "Bytes the firewall sent out each interface: for WAN that's internet upload (includes encrypted WireGuard traffic to tback).",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 19 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "sum by (interface) (rate(opnsense_interfaces_transmitted_bytes_total{interface=~\"$fwif\"}[$__rate_interval])) * 8", "legendFormat": "{{interface}}" }
+      ]
+    },
+
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Switch ports (Omada)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "bargauge",
+      "title": "Busiest ports (now, both directions)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 8, "x": 0, "y": 29 },
+      "options": { "orientation": "horizontal", "displayMode": "basic", "showUnfilled": true, "valueMode": "color", "namePlacement": "left", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "bps", "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(15, (max by (device, name) (rate(omada_port_link_tx{device=~\"$switch\"}[5m])) + max by (device, name) (rate(omada_port_link_rx{device=~\"$switch\"}[5m]))) * 8)",
+          "legendFormat": "{{device}} / {{name}}"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Uplink utilization (% of link speed, each direction)",
+      "description": "Inter-switch and router links as a percentage of negotiated speed. TP8port10g 'up-to-24' <-> 24-PoE 'TL-SG3008F' is only 1 Gbps.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 16, "x": 8, "y": 29 },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never", "thresholdsStyle": { "mode": "dashed" } },
+          "color": { "mode": "palette-classic" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * 8 * max by (device, name) (rate(omada_port_link_tx{name=~\"(?i).*(uplink|trunk|up-to|opnsense|TL-SG3008F|mechanical-closet).*\"}[$__rate_interval])) / on (device, name) max by (device, name) (omada_port_link_speed_mbps * 1e6 > 0)",
+          "legendFormat": "{{device}} / {{name}} out"
+        },
+        {
+          "refId": "B",
+          "expr": "100 * 8 * max by (device, name) (rate(omada_port_link_rx{name=~\"(?i).*(uplink|trunk|up-to|opnsense|TL-SG3008F|mechanical-closet).*\"}[$__rate_interval])) / on (device, name) max by (device, name) (omada_port_link_speed_mbps * 1e6 > 0)",
+          "legendFormat": "{{device}} / {{name}} in"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Port traffic to device (switch → device)",
+      "description": "Filter with the Switch / Port name variables. Omada's per-port counters refresh about once a minute, so short bursts are smoothed.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 39 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (device, name) (rate(omada_port_link_tx{device=~\"$switch\", name=~\"$port\"}[$__rate_interval])) * 8 > 0",
+          "legendFormat": "{{device}} / {{name}}"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Port traffic from device (device → switch)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 39 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "fieldConfig": { "defaults": { "unit": "bps", "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (device, name) (rate(omada_port_link_rx{device=~\"$switch\", name=~\"$port\"}[$__rate_interval])) * 8 > 0",
+          "legendFormat": "{{device}} / {{name}}"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "type": "table",
+      "title": "Port inventory",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 49 },
+      "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{ "displayName": "To device", "desc": true }] },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Speed" }, "properties": [{ "id": "unit", "value": "Mbits" }] },
+          { "matcher": { "id": "byName", "options": "To device" }, "properties": [{ "id": "unit", "value": "bps" }, { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "basic" } }] },
+          { "matcher": { "id": "byName", "options": "From device" }, "properties": [{ "id": "unit", "value": "bps" }, { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "basic" } }] },
+          { "matcher": { "id": "byName", "options": "PoE" }, "properties": [{ "id": "unit", "value": "watt" }, { "id": "decimals", "value": 1 }] }
+        ]
+      },
+      "targets": [
+        { "refId": "A", "instant": true, "range": false, "format": "table", "expr": "max by (device, switch_port, name) (omada_port_link_speed_mbps{device=~\"$switch\", name=~\"$port\"})" },
+        { "refId": "B", "instant": true, "range": false, "format": "table", "expr": "max by (device, switch_port, name) (rate(omada_port_link_tx{device=~\"$switch\", name=~\"$port\"}[5m])) * 8" },
+        { "refId": "C", "instant": true, "range": false, "format": "table", "expr": "max by (device, switch_port, name) (rate(omada_port_link_rx{device=~\"$switch\", name=~\"$port\"}[5m])) * 8" },
+        { "refId": "D", "instant": true, "range": false, "format": "table", "expr": "max by (device, switch_port, name) (omada_port_power_watts{device=~\"$switch\", name=~\"$port\"})" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "indexByName": { "device": 0, "switch_port": 1, "name": 2, "Value #A": 3, "Value #B": 4, "Value #C": 5, "Value #D": 6 },
+            "renameByName": { "device": "Switch", "switch_port": "Port", "name": "Name", "Value #A": "Speed", "Value #B": "To device", "Value #C": "From device", "Value #D": "PoE" }
+          }
+        }
+      ]
+    },
+
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Backup hosts (nas3, tback)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 61 },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "timeseries",
+      "title": "nas3 NIC throughput",
+      "description": "From nas3's own node-exporter. Transmit above the axis, receive below. Includes local VolSync uploads (k8s -> NAS S3) and the WireGuard push to tback.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 62 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 10, "lineWidth": 1, "showPoints": "never" } },
+        "overrides": [{ "matcher": { "id": "byRegexp", "options": ".* rx$" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "targets": [
+        { "refId": "A", "expr": "rate(node_network_transmit_bytes_total{instance=~\"nas3.*\", device=\"enp1s0\"}[$__rate_interval]) * 8", "legendFormat": "nas3 {{device}} tx" },
+        { "refId": "B", "expr": "rate(node_network_receive_bytes_total{instance=~\"nas3.*\", device=\"enp1s0\"}[$__rate_interval]) * 8", "legendFormat": "nas3 {{device}} rx" }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "timeseries",
+      "title": "tback NIC throughput",
+      "description": "From tback's node-exporter (scraped over the tunnel). Receive below the axis = backup data arriving.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 62 },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bps", "custom": { "fillOpacity": 10, "lineWidth": 1, "showPoints": "never" } },
+        "overrides": [{ "matcher": { "id": "byRegexp", "options": ".* rx$" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }]
+      },
+      "targets": [
+        { "refId": "A", "expr": "rate(node_network_transmit_bytes_total{instance=~\"tback.*\", device=\"end0\"}[$__rate_interval]) * 8", "legendFormat": "tback {{device}} tx" },
+        { "refId": "B", "expr": "rate(node_network_receive_bytes_total{instance=~\"tback.*\", device=\"end0\"}[$__rate_interval]) * 8", "legendFormat": "tback {{device}} rx" }
+      ]
+    }
+  ]
+}
