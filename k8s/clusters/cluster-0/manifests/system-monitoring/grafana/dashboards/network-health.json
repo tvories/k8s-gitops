@@ -72,38 +72,38 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Gateway RTT",
+      "title": "Firewall services down",
+      "description": "OPNsense services that are enabled but not running.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
-      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
-          "decimals": 1,
+          "unit": "short",
           "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 30 }, { "color": "red", "value": 80 }] }
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
         },
         "overrides": []
       },
-      "targets": [{ "refId": "A", "expr": "max(opnsense_gateways_rtt_milliseconds)" }]
+      "targets": [{ "refId": "A", "expr": "count(opnsense_services_status == 0) or vector(0)" }]
     },
     {
       "id": 4,
       "type": "stat",
-      "title": "Gateway loss",
+      "title": "Firewall temp",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
       "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "decimals": 1,
+          "unit": "celsius",
+          "decimals": 0,
           "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] }
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 85 }] }
         },
         "overrides": []
       },
-      "targets": [{ "refId": "A", "expr": "max(opnsense_gateways_loss_percentage)" }]
+      "targets": [{ "refId": "A", "expr": "max(opnsense_temperature_celsius)" }]
     },
     {
       "id": 5,

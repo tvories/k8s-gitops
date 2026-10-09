@@ -51,7 +51,48 @@ spec:
         tls:
           - hosts:
               - *host-alert-manager
+      # Replaces the chart's default (null-receiver) config.
+      config:
+        global:
+          resolve_timeout: 5m
+        route:
+          receiver: discord
+          group_by: ["alertname", "namespace"]
+          group_wait: 1m
+          group_interval: 5m
+          repeat_interval: 12h
+          routes:
+            # Watchdog always fires by design; InfoInhibitor is plumbing.
+            - receiver: "null"
+              matchers: ['alertname =~ "Watchdog|InfoInhibitor"']
+            # Only warning/critical reach Discord.
+            - receiver: "null"
+              matchers: ['severity =~ "info|none|"']
+        inhibit_rules:
+          - source_matchers: ['severity = "critical"']
+            target_matchers: ['severity = "warning"']
+            equal: ["alertname", "namespace"]
+          - source_matchers: ['alertname = "InfoInhibitor"']
+            target_matchers: ['severity = "info"']
+            equal: ["namespace"]
+        receivers:
+          - name: "null"
+          - name: discord
+            discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/alertmanager-discord/DISCORD_WEBHOOK_URL
+                send_resolved: true
+                title: >-
+                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}]
+                  {{ .CommonLabels.alertname }}{{ with .CommonLabels.namespace }} ({{ . }}){{ end }}
+                message: |-
+                  {{ range .Alerts -}}
+                  {{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }} **{{ .Labels.severity | toUpper }}** {{ if .Annotations.summary }}{{ .Annotations.summary }}{{ else }}{{ .Labels.alertname }}{{ end }}
+                  {{ with .Annotations.description }}{{ . }}{{ end }}
+                  {{ end }}
       alertmanagerSpec:
+        externalUrl: https://alert-manager.${CLUSTER_NAME}.${SECRET_DOMAIN}
+        secrets:
+          - alertmanager-discord
         storage:
           volumeClaimTemplate:
             spec:

@@ -1,0 +1,544 @@
+{
+  "title": "NAS (nas3)",
+  "uid": "nas3",
+  "description": "nas3 storage health: ZFS pool ook, per-disk SMART, temperatures, and host vitals. Sources: node-exporter :9100, smartctl-exporter :9633, zfs-exporter :9901, zrepl :9811 (scrape configs in kube-prometheus-stack/scrapeconfigs/nas.yaml).",
+  "tags": ["nas", "zfs", "smart", "storage"],
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 41,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "Data source",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row", "id": 1, "title": "Overview", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "panels": []
+    },
+    {
+      "type": "stat", "id": 2, "title": "Pool health",
+      "description": "zpool state of ook. Anything but ONLINE means a vdev is degraded or missing — run `zpool status ook`.",
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "zfs_pool_health{pool=\"ook\"}", "instant": true }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "no data",
+          "mappings": [
+            { "type": "value", "options": {
+              "0": { "text": "ONLINE", "color": "green" },
+              "1": { "text": "DEGRADED", "color": "orange" },
+              "2": { "text": "FAULTED", "color": "red" },
+              "3": { "text": "OFFLINE", "color": "red" },
+              "4": { "text": "UNAVAIL", "color": "red" },
+              "5": { "text": "REMOVED", "color": "red" },
+              "6": { "text": "SUSPENDED", "color": "red" }
+            } }
+          ],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "gauge", "id": 3, "title": "Pool used",
+      "description": "Used / (used + available) on the root dataset — usable capacity after redundancy, not raw disk size. ZFS slows down noticeably past ~80%.",
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "zfs_dataset_used_bytes{name=\"ook\"} / (zfs_dataset_used_bytes{name=\"ook\"} + zfs_dataset_available_bytes{name=\"ook\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1, "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null }, { "color": "orange", "value": 0.8 }, { "color": "red", "value": 0.9 } ] }
+        },
+        "overrides": []
+      },
+      "options": { "showThresholdMarkers": true, "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 4, "title": "Free space",
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "zfs_dataset_available_bytes{name=\"ook\"}" }],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "blue" } },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 5, "title": "Time until full",
+      "description": "Free space ÷ the 7-day rate it's shrinking at. Blank when the pool isn't filling.",
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "zfs_dataset_available_bytes{name=\"ook\"} / (-deriv(zfs_dataset_available_bytes{name=\"ook\"}[7d]) > 0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s", "decimals": 0, "noValue": "not filling",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "red", "value": null }, { "color": "orange", "value": 2592000 }, { "color": "green", "value": 15552000 } ] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 6, "title": "Disks with bad sectors",
+      "description": "Disks with any reallocated, pending, or offline-uncorrectable sectors. SMART's overall PASSED/FAILED flag stays PASSED long after these start climbing, so this is the early warning. See the Disk health table for which disk.",
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "count(sum by (device) (smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=~\"Reallocated_Sector_Ct|Current_Pending_Sector|Offline_Uncorrectable\"}) > 0) or vector(0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 7, "title": "SMART failed",
+      "description": "Disks whose overall SMART self-assessment is FAILED. At this point the drive should be replaced now.",
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "count(smartctl_device_smart_status == 0) or vector(0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 8, "title": "Hottest disk",
+      "description": "Highest current drive temperature. HDDs are happiest under ~45 °C.",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "max(smartctl_device_temperature{temperature_type=\"current\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius", "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null }, { "color": "orange", "value": 45 }, { "color": "red", "value": 50 } ] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 9, "title": "Snapshots (25h)",
+      "description": "zrepl snapshots taken of ook in the last 25 hours. The `daily` job runs at 03:00, so this should be at least 1.",
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true,
+        "expr": "round(sum(increase(zrepl_zfs_snapshot_duration_count{filesystem=\"ook\"}[25h])))" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none", "noValue": "zrepl down",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "type": "row", "id": 10, "title": "Disk health", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "panels": []
+    },
+    {
+      "type": "table", "id": 11, "title": "Disks",
+      "description": "Any non-zero Reallocated / Pending / Uncorrectable count means the platter is wearing out; a rising count means replace it. CRC errors usually point at the cable or backplane, not the disk. Device names (sda…) can shuffle across reboots — the serial is the stable identity.",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "instant": true, "format": "table", "expr": "max by (device, model_name, serial_number) (smartctl_device)" },
+        { "refId": "B", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_temperature{temperature_type=\"current\"})" },
+        { "refId": "C", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_smart_status)" },
+        { "refId": "D", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_power_on_seconds)" },
+        { "refId": "E", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=\"Reallocated_Sector_Ct\"})" },
+        { "refId": "F", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=\"Current_Pending_Sector\"})" },
+        { "refId": "G", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=\"Offline_Uncorrectable\"})" },
+        { "refId": "H", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=\"UDMA_CRC_Error_Count\"})" },
+        { "refId": "I", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_media_errors)" },
+        { "refId": "J", "instant": true, "format": "table", "expr": "max by (device) (smartctl_device_percentage_used)" }
+      ],
+      "transformations": [
+        { "id": "joinByField", "options": { "byField": "device", "mode": "outer" } },
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "Time 5": true,
+            "Time 6": true, "Time 7": true, "Time 8": true, "Time 9": true, "Time 10": true, "Value #A": true },
+          "renameByName": {
+            "device": "Device", "model_name": "Model", "serial_number": "Serial",
+            "Value #B": "Temp", "Value #C": "SMART", "Value #D": "Powered on",
+            "Value #E": "Reallocated", "Value #F": "Pending", "Value #G": "Uncorrectable",
+            "Value #H": "CRC errors", "Value #I": "NVMe media errors", "Value #J": "NVMe wear"
+          },
+          "indexByName": {
+            "device": 0, "model_name": 1, "serial_number": 2, "Value #C": 3, "Value #B": 4, "Value #D": 5,
+            "Value #E": 6, "Value #F": 7, "Value #G": 8, "Value #H": 9, "Value #I": 10, "Value #J": 11
+          }
+        } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Device" }] } }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "SMART" }, "properties": [
+            { "id": "mappings", "value": [{ "type": "value", "options": {
+              "1": { "text": "PASSED", "color": "green" }, "0": { "text": "FAILED", "color": "red" } } }] },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } },
+            { "id": "custom.width", "value": 90 } ] },
+          { "matcher": { "id": "byName", "options": "Temp" }, "properties": [
+            { "id": "unit", "value": "celsius" },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+              { "color": "green", "value": null }, { "color": "orange", "value": 45 }, { "color": "red", "value": 50 } ] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+            { "id": "custom.width", "value": 80 } ] },
+          { "matcher": { "id": "byName", "options": "Powered on" }, "properties": [
+            { "id": "unit", "value": "s" }, { "id": "decimals", "value": 1 } ] },
+          { "matcher": { "id": "byRegexp", "options": "Reallocated|Pending|Uncorrectable|NVMe media errors" }, "properties": [
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } },
+            { "id": "noValue", "value": "—" } ] },
+          { "matcher": { "id": "byName", "options": "CRC errors" }, "properties": [
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "basic" } },
+            { "id": "noValue", "value": "—" } ] },
+          { "matcher": { "id": "byName", "options": "NVMe wear" }, "properties": [
+            { "id": "unit", "value": "percent" },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+              { "color": "green", "value": null }, { "color": "orange", "value": 80 }, { "color": "red", "value": 95 } ] } },
+            { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+            { "id": "noValue", "value": "—" } ] }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm", "footer": { "show": false } }
+    },
+    {
+      "type": "timeseries", "id": 12, "title": "Disk temperatures",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "smartctl_device_temperature{temperature_type=\"current\"}", "legendFormat": "{{device}}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius", "decimals": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0, "showPoints": "never", "spanNulls": true,
+            "thresholdsStyle": { "mode": "dashed" } },
+          "color": { "mode": "palette-classic" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "transparent", "value": null }, { "color": "orange", "value": 45 }, { "color": "red", "value": 50 }] }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "timeseries", "id": 13, "title": "Bad sector counters",
+      "description": "Only disks with a non-zero counter are drawn. A flat line is a stable, already-degraded disk; a climbing line is a disk that is actively failing.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "legendFormat": "{{device}} {{attribute_name}}",
+        "expr": "smartctl_device_attribute{attribute_value_type=\"raw\",attribute_name=~\"Reallocated_Sector_Ct|Current_Pending_Sector|Offline_Uncorrectable\"} > 0" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none", "noValue": "No bad sectors on any disk",
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0, "showPoints": "never", "spanNulls": true, "lineInterpolation": "stepAfter" },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "delta"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+
+    {
+      "type": "row", "id": 14, "title": "ZFS", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 }, "panels": []
+    },
+    {
+      "type": "bargauge", "id": 15, "title": "Dataset usage",
+      "description": "Top-level datasets of ook (children such as TimeMachine/work are included in their parent).",
+      "gridPos": { "h": 9, "w": 10, "x": 0, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{name}}",
+        "expr": "sort_desc(zfs_dataset_used_bytes{type=\"filesystem\",name=~\"ook/[^/]+\"})" }],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "decimals": 1, "min": 0, "color": { "mode": "continuous-BlYlRd" } },
+        "overrides": []
+      },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "valueMode": "color",
+        "namePlacement": "left", "sizing": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "timeseries", "id": 16, "title": "Pool capacity",
+      "gridPos": { "h": 9, "w": 8, "x": 10, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Used", "expr": "zfs_dataset_used_bytes{name=\"ook\"}" },
+        { "refId": "B", "legendFormat": "Usable", "expr": "zfs_dataset_used_bytes{name=\"ook\"} + zfs_dataset_available_bytes{name=\"ook\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes", "decimals": 1, "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Usable" }, "properties": [
+            { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+            { "id": "color", "value": { "mode": "fixed", "fixedColor": "text" } } ] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "stat", "id": 17, "title": "Fragmentation",
+      "description": "Free-space fragmentation. High values slow writes once the pool is also full.",
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "expr": "zfs_pool_fragmentation_ratio{pool=\"ook\"}" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 0.5 }, { "color": "red", "value": 0.7 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 18, "title": "ARC hit ratio",
+      "description": "Share of reads served from RAM (ZFS ARC) instead of disk.",
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A",
+        "expr": "sum(rate(node_zfs_arc_hits{instance=~\"nas3-.*\"}[5m])) / (sum(rate(node_zfs_arc_hits{instance=~\"nas3-.*\"}[5m])) + sum(rate(node_zfs_arc_misses{instance=~\"nas3-.*\"}[5m])))" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "green", "value": 0.9 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 19, "title": "ARC size / max",
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Size", "expr": "node_zfs_arc_size{instance=~\"nas3-.*\"}" },
+        { "refId": "B", "legendFormat": "Max", "expr": "node_zfs_arc_c_max{instance=~\"nas3-.*\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "decimals": 1, "color": { "mode": "fixed", "fixedColor": "purple" } },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "type": "row", "id": 20, "title": "System", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 }, "panels": []
+    },
+    {
+      "type": "timeseries", "id": 21, "title": "CPU",
+      "description": "iowait climbing while busy usually means the disks are the bottleneck (scrub, resilver, heavy backup).",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Busy", "expr": "1 - avg(rate(node_cpu_seconds_total{instance=~\"nas3-.*\",mode=\"idle\"}[5m]))" },
+        { "refId": "B", "legendFormat": "iowait", "expr": "avg(rate(node_cpu_seconds_total{instance=~\"nas3-.*\",mode=\"iowait\"}[5m]))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "min": 0, "max": 1,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 22, "title": "Memory",
+      "description": "ZFS ARC deliberately fills spare RAM and gives it back under pressure, so high 'used' is normal here.",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Used", "expr": "node_memory_MemTotal_bytes{instance=~\"nas3-.*\"} - node_memory_MemAvailable_bytes{instance=~\"nas3-.*\"}" },
+        { "refId": "B", "legendFormat": "ZFS ARC", "expr": "node_zfs_arc_size{instance=~\"nas3-.*\"}" },
+        { "refId": "C", "legendFormat": "Total", "expr": "node_memory_MemTotal_bytes{instance=~\"nas3-.*\"}" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes", "decimals": 1, "min": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Total" }, "properties": [
+            { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+            { "id": "color", "value": { "mode": "fixed", "fixedColor": "text" } } ] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 23, "title": "CPU & NVMe temperature",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "CPU (hottest core)", "expr": "max(node_hwmon_temp_celsius{instance=~\"nas3-.*\",chip=~\"platform_coretemp.*\"})" },
+        { "refId": "B", "legendFormat": "NVMe", "expr": "max(node_hwmon_temp_celsius{instance=~\"nas3-.*\",chip=~\"nvme.*\"})" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius", "decimals": 0,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "type": "timeseries", "id": 24, "title": "Network (receive up / transmit down)",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 41 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "{{device}} rx", "expr": "rate(node_network_receive_bytes_total{instance=~\"nas3-.*\",device=~\"enp1s0|vlan.*\"}[5m]) * 8" },
+        { "refId": "B", "legendFormat": "{{device}} tx", "expr": "rate(node_network_transmit_bytes_total{instance=~\"nas3-.*\",device=~\"enp1s0|vlan.*\"}[5m]) * 8" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".* tx" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "timeseries", "id": 25, "title": "Disk throughput (read up / write down)",
+      "description": "One idle disk while its siblings are busy can mean ZFS has stopped using it (faulted, or a hot spare).",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 41 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "{{device}} read", "expr": "rate(node_disk_read_bytes_total{instance=~\"nas3-.*\",device=~\"sd.*\"}[5m])" },
+        { "refId": "B", "legendFormat": "{{device}} write", "expr": "rate(node_disk_written_bytes_total{instance=~\"nas3-.*\",device=~\"sd.*\"}[5m])" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".* write" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "type": "timeseries", "id": 26, "title": "NFS server I/O (read up / write down)",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 41 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "legendFormat": "Read", "expr": "rate(node_nfsd_disk_bytes_read_total{instance=~\"nas3-.*\"}[5m])" },
+        { "refId": "B", "legendFormat": "Write", "expr": "rate(node_nfsd_disk_bytes_written_total{instance=~\"nas3-.*\"}[5m])" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15, "showPoints": "never", "spanNulls": true },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Write" }, "properties": [{ "id": "custom.transform", "value": "negative-Y" }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+
+    {
+      "type": "row", "id": 27, "title": "Services", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 49 }, "panels": []
+    },
+    {
+      "type": "stat", "id": 28, "title": "Services",
+      "description": "systemd unit state. Needs node-exporter's systemd collector on nas3 (not enabled yet), e.g. services.prometheus.exporters.node.enabledCollectors = [ \"systemd\" ]. Zerobyte and RustFS run as docker-<name>.service units, so they show up here too.",
+      "gridPos": { "h": 4, "w": 16, "x": 0, "y": 50 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{name}}",
+        "expr": "label_replace(node_systemd_unit_state{instance=~\"nas3-.*\",state=\"active\",name=~\"(docker-zerobyte|docker-rustfs|zrepl|samba-smbd|nfs-server|traefik|smartd|sshd)\\\\.service\"}, \"name\", \"$1\", \"name\", \"(?:docker-)?(.*)\\\\.service\")" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Enable the node-exporter systemd collector on nas3",
+          "mappings": [{ "type": "value", "options": {
+            "1": { "text": "running", "color": "green" }, "0": { "text": "stopped", "color": "red" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name", "orientation": "vertical", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 29, "title": "Uptime",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 50 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "time() - node_boot_time_seconds{instance=~\"nas3-.*\"}" }],
+      "fieldConfig": {
+        "defaults": { "unit": "s", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "text" } },
+        "overrides": []
+      },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 30, "title": "Exporters up",
+      "description": "Scrape targets on nas3 that answered: node, smartctl, zfs, zrepl. If any is down, its panels above go blank.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 50 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "sum(up{instance=~\"nas3-.*\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none", "max": 4,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 1 }, { "color": "green", "value": 4 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    }
+  ]
+}

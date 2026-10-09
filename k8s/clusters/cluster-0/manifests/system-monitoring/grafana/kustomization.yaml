@@ -13,6 +13,14 @@ configMapGenerator:
   - name: network-health-dashboard
     files:
       - network-health.json=./dashboards/network-health.json
+  - name: nas-dashboard
+    files:
+      - nas.json=./dashboards/nas.json
+    options:
+      # Per-generator options merge over generatorOptions below, so only the
+      # folder changes; the label and substitute-disabled annotation still apply.
+      annotations:
+        grafana_folder: Storage
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

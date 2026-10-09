@@ -13,9 +13,14 @@ spec:
           annotations:
             summary: Speedtest Exporter is down.
             description: Speedtest Exporter has disappeared from Prometheus target discovery.
+          # Scraped hourly, so `up` is stale ~55m of every hour and a plain
+          # absent(up == 1) flapped pending forever without ever firing.
+          # Fire when there was no successful scrape in the last 2h.
           expr: |
-            absent(up{job=~".*speedtest-exporter.*"} == 1)
-          for: 75m
+            max_over_time(up{job=~".*speedtest-exporter.*"}[2h]) < 1
+              or
+            absent_over_time(up{job=~".*speedtest-exporter.*"}[2h])
+          for: 0m
           labels:
             severity: critical
         - alert: SpeedtestSlowInternetDownload

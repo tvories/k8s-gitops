@@ -53,8 +53,11 @@ nodes:
   # kubelet.nodeIP.validSubnets and etcd.advertisedSubnets pin both to
   # 192.168.80.0/24, and Cilium inherits the InternalIP from the Node object.
   #
-  # eno1 on the control-plane nodes is the unused onboard 1G NIC and stays off;
-  # on m720q-4 it IS the VLAN parent, since that box has no 10G card.
+  # eno1 on the control-plane nodes is the unused onboard 1G NIC (no address).
+  # It may be cabled for PXE/netboot.xyz re-imaging, which runs in firmware/iPXE
+  # and ignores this config. mtu 9000 matches m720q-4's eno1 so Ceph's
+  # CephNodeInconsistentMTU alert (compares MTU per device name) stays quiet.
+  # On m720q-4 eno1 IS the VLAN parent, since that box has no 10G card.
   # ---------------------------------------------------------------------------
   - hostname: m720q-1.${domain_name}
     controlPlane: true
@@ -63,6 +66,7 @@ nodes:
     networkInterfaces:
       - interface: eno1
         dhcp: false # unused onboard NIC; all traffic rides enp1s0
+        mtu: 9000
       - interface: enp1s0
         dhcp: true
         mtu: 9000
@@ -102,6 +106,7 @@ nodes:
     networkInterfaces:
       - interface: eno1
         dhcp: false
+        mtu: 9000
       - interface: enp1s0
         dhcp: true
         mtu: 9000
@@ -123,6 +128,7 @@ nodes:
     networkInterfaces:
       - interface: eno1
         dhcp: false
+        mtu: 9000
       - interface: enp1s0
         dhcp: true
         mtu: 9000
