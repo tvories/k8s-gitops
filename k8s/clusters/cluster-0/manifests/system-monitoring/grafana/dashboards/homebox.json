@@ -488,6 +488,32 @@
         "overrides": []
       },
       "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 35, "title": "Reboot",
+      "description": "1 when the running kernel/initrd/kernel-modules/systemd is older than the current NixOS generation: an update was switched to but not rebooted into. From node-exporter's textfile collector (refreshed every 15 min). Alert: NodeRebootRequired.",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 57 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "expr": "max(node_reboot_required{instance=~\"homebox.*\"})" }],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "not reporting",
+          "mappings": [{ "type": "value", "options": { "0": { "text": "OK", "color": "green" }, "1": { "text": "Reboot needed", "color": "orange" } } }],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "stat", "id": 36, "title": "Outdated since last reboot",
+      "description": "Which parts of the running system are older than the current NixOS generation.",
+      "gridPos": { "h": 4, "w": 8, "x": 4, "y": 57 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [{ "refId": "A", "instant": true, "legendFormat": "{{component}}", "expr": "node_reboot_required_component{instance=~\"homebox.*\"} == 1" }],
+      "fieldConfig": { "defaults": { "noValue": "nothing", "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "name", "orientation": "vertical", "reduceOptions": { "calcs": ["lastNotNull"] } }
     }
   ]
 }

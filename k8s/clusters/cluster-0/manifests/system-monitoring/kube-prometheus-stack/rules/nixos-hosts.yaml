@@ -1,0 +1,36 @@
+---
+# NixOS hosts outside the cluster (nas3, homebox, tback). node_reboot_required*
+# come from node-exporter's textfile collector, written every 15 min by a
+# tvories/nix-config module: 1 when the running kernel / initrd / kernel
+# modules / systemd are older than the current NixOS generation, i.e. an
+# update was switched to but not rebooted into.
+#
+# Hosts that haven't been redeployed with that module export nothing; the
+# expression simply has no series for them, so it never fires on missing data.
+#
+# ROUTING: severity "info" goes to the null receiver in Alertmanager
+# (helm-release.yaml), so this shows in the Alertmanager UI and Grafana but
+# NOT on Discord. To get a Discord reminder, change it to "warning" and add
+# NodeRebootRequired to the warning allowlist regex there.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: nixos-hosts
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+    - name: nixos-hosts
+      rules:
+        - alert: NodeRebootRequired
+          expr: max by (instance) (node_reboot_required) == 1
+          # Don't fire during a deploy that's about to be followed by a reboot.
+          for: 1h
+          labels:
+            severity: info
+          annotations:
+            summary: "{{ $labels.instance }} needs a reboot"
+            description: >-
+              Running system is older than the current NixOS generation. Outdated:
+              {{ range query (printf "node_reboot_required_component{instance='%s'} == 1" $labels.instance) }}{{ .Labels.component }} {{ end }}
