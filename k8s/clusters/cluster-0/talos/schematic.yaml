@@ -1,0 +1,14 @@
+---
+# Image Factory schematic shared by all four m720q nodes. POSTing this to
+# factory.talos.dev/schematics yields 5a03d51f…aaefe, the exact schematic the
+# nodes were installed from — change it and every node needs an upgrade to
+# pick up the new extensions.
+customization:
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/gasket-driver # PCIe Coral TPU (M.2 A+E), provides apex/gasket
+      - siderolabs/i915 # Intel iGPU (QuickSync transcoding)
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools # required by Rook Ceph
+      - siderolabs/mei
+      - siderolabs/nfsrahead

@@ -1,0 +1,44 @@
+---
+# authentik forward-auth for the admin UI — the Gateway API equivalent of the
+# nginx auth-url/auth-signin/auth-response-headers annotations. Envoy asks the
+# proxy outpost whether the caller is signed in; on deny, authentik's own 302 to
+# its sign-in page is returned to the browser unchanged.
+#
+# The matching provider and application are in
+# security/authentik/config/bookbridge.tf.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: bookbridge
+  namespace: media
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bookbridge
+  extAuth:
+    # REQUIRED. Envoy's HTTP ext-auth forwards only Host, Method, Path,
+    # Content-Length and Authorization by default — no cookies. Without this,
+    # authentik never sees the session cookie and every request is "signed out":
+    # an endless redirect loop through the sign-in page.
+    headersToExtAuth:
+      - cookie
+    http:
+      backendRefs:
+        - name: ak-outpost-tvo-proxy
+          namespace: security
+          port: 9000
+      # `path`, not `pathOverride`: Envoy appends the original request path,
+      # which is what authentik's envoy endpoint expects to receive.
+      path: /outpost.goauthentik.io/auth/envoy
+      # Identity headers passed on to BookBridge. Its Reverse Proxy Auto-Login
+      # (Settings -> System) must be pointed at X-authentik-username — authentik
+      # does not send Remote-User, BookBridge's default. Envoy overwrites any
+      # client-supplied copy of these, so they cannot be spoofed through this
+      # route. Listed explicitly: this field takes no wildcards.
+      headersToBackend:
+        - x-authentik-username
+        - x-authentik-groups
+        - x-authentik-email
+        - x-authentik-name
+        - x-authentik-uid

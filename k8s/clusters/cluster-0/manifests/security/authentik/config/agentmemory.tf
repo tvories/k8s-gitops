@@ -59,7 +59,8 @@ resource "authentik_outpost" "proxy" {
   service_connection = authentik_service_connection_kubernetes.local.id
 
   protocol_providers = [
-    authentik_provider_proxy.agentmemory.id
+    authentik_provider_proxy.agentmemory.id,
+    authentik_provider_proxy.bookbridge.id,
   ]
 
   config = jsonencode({

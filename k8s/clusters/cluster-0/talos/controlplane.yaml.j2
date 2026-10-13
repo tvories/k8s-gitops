@@ -1,0 +1,99 @@
+---
+# Control-plane nodes only (m720q-1/2/3). Layered over cluster.yaml.j2.
+# Everything cluster-scoped, plus the CA private keys, lives here so workers
+# never receive them.
+#
+# CAs merge as ONE value, not field by field: a layer that sets only `ca.key`
+# replaces the whole CA from cluster.yaml.j2 and drops `crt`. So every CA here
+# repeats its crt alongside the key.
+machine:
+  type: controlplane
+  ca:
+    crt: op://k8s/talos/MACHINE_CA_CRT
+    key: op://k8s/talos/MACHINE_CA_KEY
+  features:
+    # Lets pods hold a scoped talosconfig via talos.dev ServiceAccounts. Talos
+    # rejects this on a worker, hence control-plane only.
+    #
+    # Roles and namespaces are NOT paired: any talos.dev ServiceAccount in any
+    # listed namespace may request any listed role. Creating those objects is
+    # cluster-admin-only via RBAC, which is what actually gates this.
+    #   os:admin    / system-upgrade  - tuppr (namespace not deployed yet)
+    #   os:operator / kube-system     - etcd-defrag CronJob
+    #                                   (manifests/kube-system/etcd-defrag)
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - os:admin
+        - os:operator
+      allowedKubernetesNamespaces:
+        - system-upgrade
+        - kube-system
+  nodeLabels:
+    node.kubernetes.io/exclude-from-external-load-balancers: ""
+cluster:
+  # Workloads run on all four nodes; without this Talos taints the control
+  # plane NoSchedule and 3 of 4 nodes stop accepting pods.
+  allowSchedulingOnControlPlanes: true
+  ca:
+    crt: op://k8s/talos/CLUSTER_CA_CRT
+    key: op://k8s/talos/CLUSTER_CA_KEY
+  aggregatorCA:
+    crt: op://k8s/talos/CLUSTER_AGGREGATORCA_CRT
+    key: op://k8s/talos/CLUSTER_AGGREGATORCA_KEY
+  serviceAccount:
+    key: op://k8s/talos/CLUSTER_SERVICEACCOUNT_KEY
+  apiServer:
+    image: registry.k8s.io/kube-apiserver:{{ k8s_version }}
+    extraArgs:
+      anonymous-auth: "true" # HAProxy control-plane health check
+      runtime-config: admissionregistration.k8s.io/v1beta1=true
+      feature-gates: MutatingAdmissionPolicy=true
+    certSANs:
+      - 192.168.80.200
+      - cluster-0.mcbadass.local
+      - 127.0.0.1 # KubePrism
+    # Pod Security Admission: baseline enforced cluster-wide, kube-system
+    # exempt. Namespaces that need privileged pods opt out with
+    # pod-security.kubernetes.io/enforce labels. Do NOT remove this block to
+    # "fix" a blocked pod — that is a cluster-wide bypass.
+    admissionControl:
+      - name: PodSecurity
+        configuration:
+          apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+          kind: PodSecurityConfiguration
+          defaults:
+            audit: restricted
+            audit-version: latest
+            enforce: baseline
+            enforce-version: latest
+            warn: restricted
+            warn-version: latest
+          exemptions:
+            namespaces:
+              - kube-system
+            runtimeClasses: []
+            usernames: []
+    auditPolicy:
+      apiVersion: audit.k8s.io/v1
+      kind: Policy
+      rules:
+        - level: Metadata
+  controllerManager:
+    image: registry.k8s.io/kube-controller-manager:{{ k8s_version }}
+  # Cilium replaces kube-proxy; leaving it enabled causes a conflict.
+  proxy:
+    disabled: true
+    image: registry.k8s.io/kube-proxy:{{ k8s_version }}
+  scheduler:
+    image: registry.k8s.io/kube-scheduler:{{ k8s_version }}
+  etcd:
+    ca:
+      crt: op://k8s/talos/CLUSTER_ETCD_CA_CRT
+      key: op://k8s/talos/CLUSTER_ETCD_CA_KEY
+    advertisedSubnets:
+      - 192.168.80.0/24
+    extraArgs:
+      # Required by kube-prometheus-stack's kube-etcd ServiceMonitor; etcd only
+      # serves /metrics on this listener.
+      listen-metrics-urls: http://0.0.0.0:2381

@@ -1,0 +1,151 @@
+---
+# Shared by EVERY node. Rendered by `just talos render-config <node>`:
+#   cluster.yaml.j2  ->  controlplane|worker.yaml.j2  ->  nodes/<role>/<node>.yaml.j2
+# merged with `talosctl machineconfig patch`; each layer first goes through
+# `op inject`, which resolves the 1Password references (vault k8s, item talos).
+#
+# NEVER write a partial reference (vault/item with no field) anywhere in these
+# files, comments included: op inject scans raw text and fails on it.
+#
+# This is a no-behaviour-change port of what talhelper generated for Talos
+# v1.13. Talos 1.13 has no typed documents for kubelet, sysctls, files, etc.
+# (those arrived in 1.14), so most settings still live in this v1alpha1 doc.
+version: v1alpha1
+debug: false
+persist: true
+machine:
+  token: op://k8s/talos/MACHINE_TOKEN
+  ca:
+    crt: op://k8s/talos/MACHINE_CA_CRT
+  # 192.168.80.200 is the in-cluster Talos VIP.
+  certSANs:
+    - 192.168.80.200
+    - cluster-0.mcbadass.local
+    - 127.0.0.1 # KubePrism
+  kubelet:
+    image: ghcr.io/siderolabs/kubelet:{{ k8s_version }}
+    extraArgs:
+      rotate-server-certificates: "true"
+    extraConfig:
+      maxPods: 150
+      # Image GC. Defaults only prune once the disk is 85% full, so every old
+      # image version Renovate leaves behind piles up on EPHEMERAL — 327 GB of
+      # m720q-4's 352 GB used was image cache (2026-10-12). Ceph mons keep their
+      # store on the same partition (/var/lib/rook) and raise MON_DISK_LOW below
+      # 30% free, i.e. at 70% used, long before kubelet's 85% kicks in.
+      #   imageMaximumGCAge: drop any image unused for 7 days, regardless of
+      #     disk usage (what actually keeps the cache small).
+      #   High/Low 60/50: if the disk does fill, start pruning at 60% and stop
+      #     at 50% — comfortably under the mon's 70% warning line.
+      imageMaximumGCAge: 168h
+      imageGCHighThresholdPercent: 60
+      imageGCLowThresholdPercent: 50
+    defaultRuntimeSeccompProfileEnabled: true
+    # Pins the node IP (and so Cilium's InternalIP) to vlan80, regardless of
+    # which interface has the lowest-metric default route.
+    nodeIP:
+      validSubnets:
+        - 192.168.80.0/24
+    disableManifestsDirectory: true
+  network:
+    # DNS. Technitium runs at .243/.240 (both homebox); OPNsense is not a
+    # resolver. 192.168.83.241 is tdns2, the in-cluster Technitium LB VIP: a
+    # fallback for when homebox is down. Keep it last, since it depends on the
+    # cluster itself (Cilium/BGP) being up.
+    nameservers:
+      - 192.168.1.243
+      - 192.168.1.240
+      - 192.168.83.241
+    extraHostEntries:
+      - ip: 192.168.80.200
+        aliases:
+          - cluster-0.mcbadass.local
+    disableSearchDomain: true
+  install:
+    image: factory.talos.dev/metal-installer/{{ schematic }}:{{ talos_version }}
+    wipe: false
+    grubUseUKICmdline: true
+  files:
+    # Bind to ports < 1024 without CAP_NET_BIND_SERVICE. Needs both halves: the
+    # sysctl below lowers the kernel floor, this stops the CRI re-imposing it.
+    - op: create
+      path: /etc/cri/conf.d/20-customization.part
+      content: |-
+        [plugins]
+          [plugins."io.containerd.grpc.v1.cri"]
+            enable_unprivileged_ports = true
+            enable_unprivileged_icmp = true
+        [plugins."io.containerd.grpc.v1.cri".containerd]
+          discard_unpacked_layers = false
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          discard_unpacked_layers = false
+    - op: overwrite
+      path: /etc/nfsmount.conf
+      permissions: 0o644
+      content: |-
+        [ NFSMount_Global_Options ]
+        nfsvers=4.2
+        hard=True
+        noatime=True
+        nodiratime=True
+        rsize=131072
+        wsize=131072
+        nconnect=8
+  # Four independent pool servers, deliberately not the router. With a single
+  # NTP source chrony cannot detect a falseticker, and etcd does not tolerate
+  # clock skew.
+  time:
+    disabled: false
+    servers:
+      - 0.us.pool.ntp.org
+      - 1.us.pool.ntp.org
+      - 2.us.pool.ntp.org
+      - 3.us.pool.ntp.org
+  sysctls:
+    net.ipv4.ip_unprivileged_port_start: "0"
+    # Frigate and Home Assistant both watch large directory trees; the
+    # defaults (8192 watches) are exhausted quickly and fail obscurely.
+    fs.inotify.max_user_watches: "1048576"
+    fs.inotify.max_user_instances: "8192"
+  features:
+    diskQuotaSupport: true
+    kubePrism:
+      enabled: true
+      port: 7445
+    hostDNS:
+      enabled: true
+      forwardKubeDNSToHost: false
+      resolveMemberNames: true
+  # The Coral rule matches the PCIe/M.2 card (/dev/apex_N via the gasket
+  # driver). USB Coral rules (idVendor 1a6e/18d1) would do nothing here.
+  udev:
+    rules:
+      - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
+      - SUBSYSTEM=="apex", GROUP="44", MODE="0660"
+cluster:
+  id: op://k8s/talos/CLUSTER_ID
+  secret: op://k8s/talos/CLUSTER_SECRET
+  token: op://k8s/talos/CLUSTER_TOKEN
+  # Encrypts Kubernetes Secrets at rest in etcd. MUST stay this exact value
+  # and provider (aescbc): changing either makes every existing Secret
+  # unreadable. Talos 1.14's default is secretbox — do not adopt it.
+  aescbcEncryptionSecret: op://k8s/talos/CLUSTER_AESCBC_ENCRYPTION_SECRET
+  ca:
+    crt: op://k8s/talos/CLUSTER_CA_CRT
+  controlPlane:
+    endpoint: https://cluster-0.mcbadass.local:6443
+  clusterName: cluster-0
+  network:
+    cni:
+      name: none # Cilium is installed via Flux
+    dnsDomain: cluster.local
+    podSubnets:
+      - 10.244.0.0/16
+    serviceSubnets:
+      - 10.96.0.0/12
+  discovery:
+    enabled: true
+    registries:
+      kubernetes:
+        disabled: true
+      service: {}

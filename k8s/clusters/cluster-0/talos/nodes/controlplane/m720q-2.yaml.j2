@@ -1,0 +1,58 @@
+---
+# m720q-2 — control plane, 192.168.80.100. Same layout as m720q-1; see that
+# file for the reasoning behind the eno1, route-metric and VLAN settings.
+machine:
+  install:
+    diskSelector:
+      busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0/
+  network:
+    # NOTE: the live node (pre-migration) lacked this eno1 entry even though
+    # talconfig declared it, so the first apply sets eno1 MTU 9000 here.
+    interfaces:
+      - interface: eno1
+        dhcp: false
+        mtu: 9000
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: "off"
+hostname: m720q-2.mcbadass.local
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: enp1s0
+routeMetric: 6144
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: enp1s0
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: enp1s0.80
+vlanID: 80
+parent: enp1s0
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: enp1s0.80
+routeMetric: 2048
+---
+apiVersion: v1alpha1
+kind: Layer2VIPConfig
+name: 192.168.80.200
+link: enp1s0.80
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: enp1s0.50
+vlanID: 50
+parent: enp1s0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: enp1s0.50
+routeMetric: 4096

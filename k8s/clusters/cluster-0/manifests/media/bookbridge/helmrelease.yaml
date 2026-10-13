@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.1.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app bookbridge
+  namespace: media
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: bookbridge
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      bookbridge:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 65539
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+        containers:
+          app:
+            image:
+              repository: ghcr.io/cporcellijr/bookbridge
+              tag: v7.9.0
+            env:
+              TZ: "${TIMEZONE}"
+              LOG_LEVEL: INFO
+              # Audiobookshelf: server URL seeds first boot; the API key and library id
+              # are per-user and set in the UI under Account -> My Integrations.
+              ABS_SERVER: http://audiobookshelf.media.svc.cluster.local
+              # Alignment defaults to CPU forced alignment (quartznet, English).
+              # ~7.5 min per 22h audiobook on 8 threads; whisper is the fallback.
+              CTC_ENABLED: "true"
+              WHISPER_DEVICE: cpu
+              # Split-port mode: KOSync routes answer on their own port so the
+              # Kobo can reach them WITHOUT authentik. KOReader cannot complete a
+              # browser sign-in, so forward-auth on the sync path would break it.
+              # The admin UI on 5757 stays behind authentik.
+              KOSYNC_PORT: "5758"
+            envFrom:
+              - secretRef:
+                  name: bookbridge-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                # alignment is CPU-bound and bursty; it idles between books
+                cpu: "4"
+                memory: 6Gi
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 5757
+          kosync:
+            port: 5758
+
+    # Internal routing is Gateway API: the admin UI is an HTTPRoute on
+    # envoy-internal (httproute.yaml) guarded by authentik (securitypolicy.yaml).
+    #
+    # External stays on nginx until the whole external side moves to Gateway
+    # API at once: OPNsense forwards 443 to ONE address (nginx-external), so
+    # envoy-external is unreachable from the internet until that cutover. When
+    # it happens, this becomes an HTTPRoute on envoy-external plus a
+    # BackendTrafficPolicy for the rate limit.
+    ingress:
+      # KOSync only, internet-facing. No authentik: KOReader cannot complete a
+      # browser sign-in, so it authenticates with the per-reader KOSync
+      # username/password set under Account -> My Integrations. Port 5758 is
+      # BookBridge's split-port KOSync listener — sync routes only, no
+      # dashboard, settings or API — so a stolen KOSync credential can only
+      # read/write book positions.
+      sync:
+        enabled: true
+        className: "nginx-external"
+        annotations:
+          # credential-only endpoint: blunt brute force. A Kobo makes a handful
+          # of requests per reading session, so this is far above real usage.
+          nginx.ingress.kubernetes.io/limit-rps: "5"
+          nginx.ingress.kubernetes.io/limit-connections: "10"
+        hosts:
+          - host: &syncHost "bsync.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: kosync
+        tls:
+          - secretName: tls.bookbridge-sync
+            hosts:
+              - *syncHost
+
+    persistence:
+      data:
+        enabled: true
+        existingClaim: bookbridge-data
+        globalMounts:
+          - path: /data
+
+      # ebook text is required for audio <-> ebook alignment
+      books:
+        enabled: true
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks
+        globalMounts:
+          - path: /books
+            readOnly: true

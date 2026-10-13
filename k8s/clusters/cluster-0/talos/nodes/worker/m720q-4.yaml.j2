@@ -1,0 +1,47 @@
+---
+# m720q-4 — the only worker, 192.168.80.90, and the only node with no 10G card:
+# eno1 IS the VLAN parent here, so its VLANs are eno1.80 / eno1.50. Route
+# metrics and VLAN reasoning: see nodes/controlplane/m720q-1.yaml.j2.
+machine:
+  install:
+    disk: /dev/sda
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: "off"
+hostname: m720q-4.mcbadass.local
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: eno1
+routeMetric: 6144
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: eno1
+mtu: 9000
+---
+# No Layer2VIPConfig: workers must not advertise the control-plane VIP.
+apiVersion: v1alpha1
+kind: VLANConfig
+name: eno1.80
+vlanID: 80
+parent: eno1
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: eno1.80
+routeMetric: 2048
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: eno1.50
+vlanID: 50
+parent: eno1
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: eno1.50
+routeMetric: 4096

@@ -1,0 +1,55 @@
+---
+# Admin UI: dashboard, settings, logs, book mappings, alignment runs.
+# LAN-only (envoy-internal) — only the Kobo's KOSync traffic has to reach the
+# cluster from elsewhere. authentik guards it via securitypolicy.yaml.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bookbridge
+  namespace: media
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+      sectionName: https
+  hostnames:
+    - "bookbridge.${SECRET_DOMAIN}"
+  rules:
+    - backendRefs:
+        - name: bookbridge
+          port: 5757
+---
+# authentik forward_single mode requires the outpost's /outpost.goauthentik.io
+# endpoints (sign-in start, callback) on the SAME origin as the app, or the
+# sign-in redirect cannot complete and the browser loops.
+#
+# A separate route rather than a rule on the one above, so the SecurityPolicy
+# (which targets that route) does not also gate the sign-in endpoints — gating
+# the callback behind auth would be a loop of its own. Same hostname, so Envoy
+# merges them and the longer path prefix wins.
+#
+# Cross-namespace backend: permitted by the ReferenceGrant in
+# security/authentik/referencegrant.yaml.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bookbridge-outpost
+  namespace: media
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+      sectionName: https
+  hostnames:
+    - "bookbridge.${SECRET_DOMAIN}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /outpost.goauthentik.io
+      backendRefs:
+        - name: ak-outpost-tvo-proxy
+          namespace: security
+          port: 9000
+# The internet-facing KOSync endpoint (bsync) is an nginx-external Ingress in
+# helmrelease.yaml, not a route here — see the comment there for why.

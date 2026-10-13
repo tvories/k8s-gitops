@@ -1,0 +1,28 @@
+---
+# Lets Gateway API resources in other namespaces point at the authentik proxy
+# outpost Service — the replacement for the per-namespace ExternalName aliases
+# the nginx forward-auth setup needed. Envoy Gateway does not route to
+# ExternalName Services, and cross-namespace backendRefs are denied unless the
+# TARGET namespace grants them, so this must live here in security.
+#
+# Two kinds are needed per app namespace:
+#   HTTPRoute      — the /outpost.goauthentik.io sign-in route on the app host
+#   SecurityPolicy — the extAuth check itself
+# Add a pair of `from` entries when another namespace adopts authentik.
+apiVersion: gateway.networking.k8s.io/v1
+kind: ReferenceGrant
+metadata:
+  name: authentik-proxy-outpost
+  namespace: security
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: media
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: media
+  to:
+    - group: ""
+      kind: Service
+      name: ak-outpost-tvo-proxy
