@@ -39,6 +39,8 @@ spec:
               repository: ghcr.io/cporcellijr/bookbridge
               tag: v7.9.0
             env:
+              HF_HOME: /data/hf_cache
+              HOME: /tmp
               TZ: "${TIMEZONE}"
               LOG_LEVEL: INFO
               # Audiobookshelf: server URL seeds first boot; the API key and library id
@@ -120,6 +122,11 @@ spec:
               - *syncHost
 
     persistence:
+      tmp:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
       data:
         enabled: true
         existingClaim: bookbridge-data
