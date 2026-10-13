@@ -126,6 +126,19 @@ spec:
         globalMounts:
           - path: /data
 
+      # Audiobook tracks BookBridge downloads from Audiobookshelf (over its API)
+      # to run alignment; it never needs the audiobook directory mounted.
+      # Overlaid on the data PVC so these full audiobook copies stay off ceph and
+      # out of the nightly VolSync backup — they already live in ABS. Lost on pod
+      # restart, which only means re-downloading in-cluster. Exceeding sizeLimit
+      # gets the pod evicted, emptying the cache, so it cannot fill the node.
+      audio-cache:
+        enabled: true
+        type: emptyDir
+        sizeLimit: 30Gi
+        globalMounts:
+          - path: /data/audio_cache
+
       # ebook text is required for audio <-> ebook alignment
       books:
         enabled: true
