@@ -8,6 +8,7 @@ resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
   - ./volsync.yaml
+  - ./prometheusrule.yaml
 configMapGenerator:
   - name: qbittorrent-coredns
     files:

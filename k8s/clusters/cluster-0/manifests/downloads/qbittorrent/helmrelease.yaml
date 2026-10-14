@@ -44,10 +44,9 @@ spec:
               VPN_TYPE: wireguard
               VPN_INTERFACE: wg0
               WIREGUARD_ENDPOINT_PORT: 51820
-              VPN_PORT_FORWARDING: on
-              VPN_PORT_FORWARDING_PROVIDER: protonvpn
+              VPN_PORT_FORWARDING: "off"
               FIREWALL_INPUT_PORTS: &port 8080
-              FIREWALL_VPN_INPUT_PORTS: &port-bt 58176
+              # FIREWALL_VPN_INPUT_PORTS comes from qbittorrent-config (envFrom).
               FIREWALL_OUTBOUND_SUBNETS: 10.96.0.0/12,10.244.0.0/16 # Allow access to k8s subnets
               TZ: "${TIMEZONE}"
               WIREGUARD_PRESHARED_KEY: ""
@@ -57,6 +56,25 @@ spec:
               - secretRef:
                   name: qbittorrent-config
             restartPolicy: Always
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -c
+                      # Block scalar: the command's `: ` and `*` would otherwise be
+                      # parsed as YAML. `$$` escapes Flux substitution.
+                      - >-
+                        wget -q -T 20 -O- "$${VPN_PORT_CHECK_URL}/$${VPN_FORWARDED_PORT}"
+                        | grep -q '"status": *"success"'
+                  # Time for the tunnel + qbittorrent to come up after a start.
+                  initialDelaySeconds: 180
+                  periodSeconds: 300
+                  timeoutSeconds: 30
+                  failureThreshold: 3
             securityContext:
               capabilities:
                 add:
@@ -74,7 +92,12 @@ spec:
               UMASK: "022"
               TZ: "${TIMEZONE}"
               QBITTORRENT__PORT: *port
-              QBITTORRENT__BT_PORT: *port-bt
+              # Listen on the Azire-forwarded port (kept out of git).
+              QBITTORRENT__BT_PORT:
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-config
+                    key: VPN_FORWARDED_PORT
             probes:
               liveness:
                 enabled: false
@@ -118,18 +141,8 @@ spec:
         ports:
           http:
             port: *port
-      bittorrent:
-        enabled: true
-        controller: *app
-        type: LoadBalancer
-        loadBalancerIP: ${LB_QBITTORRENT}
-        externalTrafficPolicy: Local
-        ports:
-          bittorrent:
-            enabled: true
-            port: *port-bt
-            protocol: TCP
-            targetPort: *port-bt
+      # No bittorrent Service: peers arrive through the VPN tunnel, and gluetun
+      # only accepts the forwarded port on the VPN interface.
 
     ingress:
       app:

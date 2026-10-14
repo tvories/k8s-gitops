@@ -1,0 +1,32 @@
+---
+# The gluetun sidecar's liveness probe asks AzireVPN whether our forwarded port
+# is reachable from the internet, and kubelet restarts gluetun after ~15 min
+# closed (helmrelease.yaml). A restart fixes a tunnel glitch; it cannot fix a
+# forward Azire has lost (their servers keep no record, so a server reboot
+# drops it). Repeated restarts are the signal that a new port is needed.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: qbittorrent
+spec:
+  groups:
+    - name: qbittorrent
+      rules:
+        - alert: QbittorrentPortForwardFailing
+          # gluetun is a sidecar (restartable initContainer), so its restarts
+          # are counted in the init-container metric. 4.5 rather than 5:
+          # increase() extrapolates and can land just under a whole number.
+          expr: >-
+            increase(kube_pod_init_container_status_restarts_total{namespace="downloads", container="gluetun"}[3h]) >= 4.5
+          labels:
+            severity: warning
+          annotations:
+            summary: qbittorrent's forwarded port has failed the external check 5 times
+            description: >-
+              gluetun in {{ $labels.pod }} has restarted {{ $value | humanize }} times in 3h
+              because AzireVPN reports the forwarded port closed, and restarting the
+              tunnel hasn't fixed it. The forward was most likely lost when Azire's
+              server rebooted: create a new port forward at
+              https://manager.azirevpn.com/wireguard, then put the new port in
+              1Password (item qbittorrent, field VPN_FORWARDED_PORT). External Secrets
+              syncs it and Reloader restarts the pod with the new port.
