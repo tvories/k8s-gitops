@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: icereed/paperless-gpt
-              tag: v0.30.0@sha256:7cb0d9ebcc9d7711a1352ddc02e7fe0a93ef216ecc48d76a5ea83743b45f6974
+              tag: v0.31.0@sha256:d668941a829552cc0eddbc7c22506b3480dfbf61bd0d6eae881ad9fcfe2de70c
             env:
               PAPERLESS_BASE_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
