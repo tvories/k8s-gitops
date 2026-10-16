@@ -39,11 +39,12 @@ spec:
       # Opt-in only: external-dns ignores every Ingress that lacks this
       # annotation, so it manages exactly the apps that ask for it.
       - --annotation-filter=external-dns/enabled=true
-      # Never delete records, even for Ingresses that disappear.
-      - --policy=upsert-only
       # Every record is a CNAME to the hostname that tracks the public IP,
       # so Ingresses don't need a per-resource target annotation.
       - --default-targets=dyn.${SECRET_DOMAIN}
+    # Never delete records, even for Ingresses that disappear. A chart value:
+    # the chart already emits --policy, so repeating it in extraArgs is fatal.
+    policy: upsert-only
     registry: txt
     txtOwnerId: cluster-0
     txtPrefix: _extdns.

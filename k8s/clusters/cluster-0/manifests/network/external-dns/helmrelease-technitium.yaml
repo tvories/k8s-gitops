@@ -50,7 +50,6 @@ spec:
       # here: the record target is the Ingress's own LB address, which is
       # exactly the internal answer we want.
       - --annotation-filter=external-dns/enabled=true
-      - --policy=upsert-only
       - --rfc2136-host=192.168.1.243
       - --rfc2136-port=53
       - --rfc2136-zone=${SECRET_DOMAIN}
@@ -58,6 +57,7 @@ spec:
       - --rfc2136-tsig-secret-alg=hmac-sha256
       # Technitium serves record lists over AXFR, which is also TSIG-gated.
       - --rfc2136-tsig-axfr
+    policy: upsert-only
     registry: txt
     txtOwnerId: cluster-0-technitium
     txtPrefix: _extdns.
