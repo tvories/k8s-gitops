@@ -5,3 +5,5 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./externalsecret-technitium.yaml
+  - ./helmrelease-technitium.yaml
