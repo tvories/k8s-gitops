@@ -42,6 +42,10 @@ spec:
       # Every record is a CNAME to the hostname that tracks the public IP,
       # so Ingresses don't need a per-resource target annotation.
       - --default-targets=dyn.${SECRET_DOMAIN}
+      # Without this, default targets only apply to resources that report no
+      # address of their own, and an Ingress always reports its LB IP -- so
+      # the private 192.168.83.x address was published to Cloudflare instead.
+      - --force-default-targets
     # Never delete records, even for Ingresses that disappear. A chart value:
     # the chart already emits --policy, so repeating it in extraArgs is fatal.
     policy: upsert-only
