@@ -46,6 +46,11 @@ spec:
       # address of their own, and an Ingress always reports its LB IP -- so
       # the private 192.168.83.x address was published to Cloudflare instead.
       - --force-default-targets
+      # Belt and braces: never publish a private address to public DNS, even
+      # if the target config above is wrong again.
+      - --exclude-target-net=10.0.0.0/8
+      - --exclude-target-net=172.16.0.0/12
+      - --exclude-target-net=192.168.0.0/16
     # Never delete records, even for Ingresses that disappear. A chart value:
     # the chart already emits --policy, so repeating it in extraArgs is fatal.
     policy: upsert-only
