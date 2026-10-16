@@ -34,6 +34,7 @@ resources:
   - influxdata-charts.yaml
   - angelnu-helm-charts.yaml
   - external-secrets.yaml
+  - ./external-dns.yaml
   - ./authentik-charts.yaml
   - ./zalando-helm-charts.yaml
   - ./postfinance.yaml
