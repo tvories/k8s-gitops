@@ -4,6 +4,6 @@
 # as part of an actual upgrade (`just talos upgrade-node` / `upgrade-k8s`).
 # Keep .mise.toml's talosctl pin in step with talos_version.
 # renovate: datasource=github-releases depName=siderolabs/talos
-talos_version: v1.14.2
+talos_version: v1.14.4
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 k8s_version: v1.37.1
