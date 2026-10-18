@@ -1,0 +1,21 @@
+---
+# Legacy name kept for clients that store the qbittorrent URL in their own DBs
+# (sonarr, radarr, chaptarr, qui). app-template dropped the "-app" suffix once
+# the bittorrent Service was removed, leaving the chart's Service as plain
+# "qbittorrent". Repoint each client to http://qbittorrent.downloads.svc.cluster.local:8080
+# and then delete this file.
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent-app
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/controller: qbittorrent
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/name: qbittorrent
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080

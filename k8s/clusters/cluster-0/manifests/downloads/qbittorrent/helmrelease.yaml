@@ -57,6 +57,19 @@ spec:
                   name: qbittorrent-config
             restartPolicy: Always
             probes:
+              # Sidecar startup probe gates the app container: without it
+              # qbittorrent binds before wg0 exists and never rebinds (0 DHT
+              # nodes, no peers, port check fails).
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /gluetun-entrypoint
+                      - healthcheck
+                  periodSeconds: 5
+                  failureThreshold: 24
               liveness:
                 enabled: true
                 custom: true

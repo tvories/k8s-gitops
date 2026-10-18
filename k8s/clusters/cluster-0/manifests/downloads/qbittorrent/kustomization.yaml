@@ -6,6 +6,7 @@ resources:
   - ocirepository.yaml
   - ./pvc.yaml
   - ./helmrelease.yaml
+  - ./service-legacy.yaml
   - ./externalsecret.yaml
   - ./volsync.yaml
   - ./prometheusrule.yaml
