@@ -37,7 +37,7 @@ spec:
           app:
             image:
               repository: ghcr.io/cporcellijr/bookbridge
-              tag: v7.9.0
+              tag: v7.10.0
             env:
               HF_HOME: /data/hf_cache
               HOME: /tmp
