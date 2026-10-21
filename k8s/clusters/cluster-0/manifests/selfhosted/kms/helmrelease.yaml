@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/11notes/kms
-              tag: 1.0.3@sha256:0eb71bab971959c8e609f280c0e7fe68968cafaab1c066274db12161ffc46674
+              tag: 1.0.3@sha256:a138e703a037c7e81e5e40bfa10fb9a9ec85ed3549e6680d0fbeafa65656fcd3
             env:
               TZ: ${TIMEZONE}
             securityContext:
