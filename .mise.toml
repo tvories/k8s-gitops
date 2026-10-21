@@ -11,6 +11,6 @@ talhelper = "latest"
 # when the client is newer than the server -- `dashboard` and `upgrade` are the
 # most skew-sensitive commands. Keep this in step with talos_version in
 # k8s/clusters/cluster-0/talos/version.yaml.
-talosctl = "1.14.2"
+talosctl = "1.14.4"
 # Renders the talos/*.yaml.j2 templates (justfiles/talos.just).
 "aqua:mitsuhiko/minijinja" = "latest"
