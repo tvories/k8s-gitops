@@ -1,7 +1,7 @@
 # restic REST server backing up to the F: drive on the Windows host.
 services:
   restserver:
-    image: restic/rest-server:0.12.1
+    image: restic/rest-server:0.14.0
     restart: always
     volumes:
       # TLS key/cert and .htpasswd; gitignored, copied from the old Ubuntu distro
