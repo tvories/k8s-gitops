@@ -39,6 +39,11 @@ spec:
       # Opt-in only: external-dns ignores every Ingress that lacks this
       # annotation, so it manages exactly the apps that ask for it.
       - --annotation-filter=external-dns/enabled=true
+      # Public DNS only for Ingresses that are actually exposed. The Technitium
+      # instance shares the annotation above, so an internal-only Ingress
+      # (e.g. nextcloud on nginx-internal) gets an internal record but must
+      # never reach Cloudflare.
+      - --ingress-class=nginx-external
       # Every record is a CNAME to the hostname that tracks the public IP,
       # so Ingresses don't need a per-resource target annotation.
       - --default-targets=dyn.${SECRET_DOMAIN}

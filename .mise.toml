@@ -1,0 +1,16 @@
+[env]
+KUBECONFIG = "{{config_root}}/k8s/clusters/cluster-0/talos/clusterconfig/kubeconfig"
+TALOSCONFIG = "{{config_root}}/k8s/clusters/cluster-0/talos/clusterconfig/talosconfig"
+
+[tools]
+python = "latest"
+# talhelper is archived; kept only until the `just talos` migration is
+# verified on every node, then remove it along with talconfig.yaml.
+talhelper = "latest"
+# Pinned to match the cluster, not "latest". talosctl warns and can misbehave
+# when the client is newer than the server -- `dashboard` and `upgrade` are the
+# most skew-sensitive commands. Keep this in step with talos_version in
+# k8s/clusters/cluster-0/talos/version.yaml.
+talosctl = "1.14.2"
+# Renders the talos/*.yaml.j2 templates (justfiles/talos.just).
+"aqua:mitsuhiko/minijinja" = "latest"

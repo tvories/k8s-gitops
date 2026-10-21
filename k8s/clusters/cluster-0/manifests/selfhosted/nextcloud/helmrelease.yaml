@@ -23,9 +23,12 @@ spec:
 
     ingress:
       enabled: true
-      className: "nginx-external"
+      className: "nginx-internal"
       annotations:
         cert-manager.io/cluster-issuer: "letsencrypt-production"
+        # Internal-only while the PHP vulnerability is unpatched: Technitium
+        # publishes nc -> nginx-internal; Cloudflare skips it (ingress-class filter).
+        external-dns/enabled: "true"
         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         nginx.ingress.kubernetes.io/proxy-body-size: "10G"
