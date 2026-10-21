@@ -5,7 +5,7 @@
 # its sign-in page is returned to the browser unchanged.
 #
 # The matching provider and application are in
-# security/authentik/config/bookbridge.tf.
+# terraform/authentik/bookbridge.tf.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:

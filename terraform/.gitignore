@@ -1,0 +1,10 @@
+# Backstop for every root: per-root .gitignore files exist but not all roots
+# had one (rustfs and vault left .env_vars unignored).
+.env_vars
+*.snap
+*credentials*.json
+.terraform/
+.check/
+*.tfstate
+*.tfstate.*
+*.tfvars

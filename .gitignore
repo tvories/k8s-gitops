@@ -32,3 +32,5 @@ compare.yaml
 *.tfstate*
 .env
 *secrets.json
+# Docker compose runtime state (keys, htpasswd)
+docker/*/data/

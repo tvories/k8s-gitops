@@ -8,6 +8,8 @@ resource "google_project_service" "apis" {
     "iam.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "identitytoolkit.googleapis.com",
+    # Home Assistant Google Calendar integration (OAuth client is console-only)
+    "calendar-json.googleapis.com",
   ])
   service            = each.key
   disable_on_destroy = false

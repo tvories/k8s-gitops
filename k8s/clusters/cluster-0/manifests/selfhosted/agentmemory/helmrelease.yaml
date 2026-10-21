@@ -147,7 +147,7 @@ spec:
                   port: http
       # Web viewer, behind authentik forward-auth. The matching provider,
       # application and outpost live in
-      # manifests/security/authentik/config/agentmemory.tf. The companion
+      # terraform/authentik/agentmemory.tf. The companion
       # /outpost.goauthentik.io route on this same host is in
       # viewer-outpost-ingress.yaml — forward_single mode requires it to be
       # served from the same origin for the sign-in redirect to complete.

@@ -1,0 +1,14 @@
+# restic REST server backing up to the F: drive on the Windows host.
+services:
+  restserver:
+    image: restic/rest-server:0.12.1
+    restart: always
+    volumes:
+      # TLS key/cert and .htpasswd; gitignored, copied from the old Ubuntu distro
+      - ./data:/data
+      - /mnt/f/restic:/backup
+    environment:
+      DISABLE_AUTHENTICATION: 1
+      OPTIONS: "--path /backup --htpasswd-file /data/.htpasswd --log /data/restic.log --listen :8000 --tls --tls-cert /data/public_key --tls-key /data/private_key"
+    ports:
+      - "8000:8000"
