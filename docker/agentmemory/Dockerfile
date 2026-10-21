@@ -5,7 +5,7 @@
 # https://github.com/rohitg00/agentmemory/tree/main/deploy
 
 # renovate: datasource=docker depName=iiidev/iii
-ARG III_VERSION=0.24.5
+ARG III_VERSION=0.24.6
 
 FROM iiidev/iii:${III_VERSION} AS iii-image
 
