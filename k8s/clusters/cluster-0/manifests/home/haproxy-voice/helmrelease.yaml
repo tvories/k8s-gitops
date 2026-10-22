@@ -40,7 +40,7 @@ spec:
               # this mirror serves a byte-identical image -- verified same
               # digest as registry-1.docker.io -- without the Hub rate limit.
               repository: mirror.gcr.io/library/haproxy
-              tag: 3.4.7-alpine@sha256:d0bec71898678c9feec850424314979452feb5e76e34537bf590ab22c50085b9
+              tag: 3.4.7-alpine@sha256:3c8c1df0ae3bea8834b3890fa6fa3b1653b4d6d9c44aecefba46428bfcfde2c0
             args:
               - -f
               - /usr/local/etc/haproxy/haproxy.cfg
