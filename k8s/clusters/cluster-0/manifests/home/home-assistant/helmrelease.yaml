@@ -91,95 +91,16 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/home-assistant/home-assistant
+              # Rootless-friendly build of the same HA release. Its entrypoint
+              # runs HA inside a venv at /config/.venv (system-site-packages,
+              # rebuilt whenever the image version changes), so custom
+              # integrations install their own requirements as uid 568. Replaces
+              # the official image + HOME=/config + hand-installed user-site
+              # packages (2026-08 to 2026-10). Sets HOME=/config itself.
+              repository: ghcr.io/home-operations/home-assistant
               tag: 2026.10.2
             env:
               TZ: "${TIMEZONE}"
-              # Makes pre-installed custom-integration dependencies importable.
-              # REQUIRED while running rootless (568). Verified 2026-08-10.
-              #
-              # Why: HA installs custom-integration requirements with
-              # `uv pip install`. It only passes `--target` when NOT in a
-              # container AND when neither UV_SYSTEM_PYTHON nor UV_PYTHON is
-              # set (homeassistant/util/package.py). This image bakes in
-              # UV_SYSTEM_PYTHON=true, so uv installs into
-              # /usr/local/lib/python3.14/site-packages -- which uid 568 cannot
-              # write. Result: "Setup failed for custom integration 'frigate':
-              # Requirements for frigate not found: ['hass-web-proxy-lib==0.0.8']".
-              #
-              # UV_SYSTEM_PYTHON cannot be unset from Kubernetes -- overriding
-              # it to "" still satisfies `var in env` -- so that lever is
-              # closed. But HA SKIPS installing any requirement it can already
-              # import, so pre-installing into a writable dir and putting it on
-              # PYTHONPATH sidesteps the install entirely.
-              #
-              # DO NOT set PYTHONPATH=/config/deps. Tried 2026-08-10; it CRASHED
-              # Home Assistant on startup:
-              #   ImportError: cannot import name 'AddressResolver' from
-              #   'zeroconf' (/config/deps/zeroconf/__init__.py)
-              #
-              # PYTHONPATH is inserted BEFORE site-packages in sys.path, and
-              # /config/deps still holds ~45 packages from when HA ran as root
-              # (zeroconf, certifi, idna, grpcio, cachetools, google, ...). Those
-              # stale copies shadowed the image's current versions. Any directory
-              # placed on PYTHONPATH must contain ONLY packages absent from the
-              # image, or it will silently downgrade core dependencies.
-              #
-              # The dependency is instead pre-installed into the user
-              # site-packages dir, which Python adds to sys.path automatically --
-              # no PYTHONPATH required.
-              #
-              # The official image sets HOME=/ , so site.getusersitepackages()
-              # resolves to /.local/... which does not exist and is not writable.
-              # Pointing HOME at the config volume moves it to
-              # /config/.local/lib/python3.14/site-packages -- writable by 568,
-              # persistent, and added to sys.path by site.py at interpreter
-              # startup once the directory exists. The upstream rootless image
-              # (ghcr.io/home-operations/home-assistant) sets HOME=/config for
-              # the same reason.
-              #
-              # This does NOT change where HA installs. UV_SYSTEM_PYTHON=true is
-              # baked into the image, which disables HA's --target fallback
-              # (homeassistant/util/package.py), and it cannot be unset from
-              # Kubernetes -- overriding it to "" still satisfies `var in env`.
-              # HA does, however, SKIP any requirement it can already import, so
-              # pre-installing is enough.
-              #
-              # PROCEDURE for a custom integration with pip requirements.
-              # Never install straight into user-site with deps: transitive deps
-              # would land there too and shadow the image. Stage first, then
-              # copy only what the image lacks.
-              #
-              #   S=/config/.stage
-              #   U=/config/.local/lib/python3.14/site-packages
-              #   I=/usr/local/lib/python3.14/site-packages
-              #   rm -rf $S && mkdir -p $S
-              #   HOME=/config python3 -m uv pip install --target $S \
-              #     --index-strategy unsafe-first-match "<pkg>==<ver>" ...
-              #   for d in $S/*; do b=$(basename $d)
-              #     [ -e "$I/$b" ] || cp -r "$d" "$U"/ ; done
-              #   rm -rf $S
-              #
-              # Then import-test, do not trust metadata alone:
-              #   python3 -c "import <module>"
-              # And audit every integration at once:
-              #   for m in /config/custom_components/*/manifest.json ...
-              #   homeassistant.util.package.is_installed(req)
-              #
-              # Drop any staged package that shadows a STDLIB module -- the
-              # `asyncio` 3.4.3 backport gets pulled in as a transitive dep and
-              # was removed by hand on 2026-08-10.
-              #
-              # Currently holds (all absent from the image, all import-verified):
-              #   aioblescan janus            -> ble_monitor
-              #   hass_web_proxy_lib          -> frigate
-              #   alexapy authcaptureproxy dictor
-              #                               -> alexa_media
-              #   glocaltokens ghome_foyer_api gpsoauth
-              #                               -> google_home
-              #   weatherbitpypi              -> weatherbit
-              #   markdown_it mdurl           -> transitive
-              HOME: "/config"
               # Postgres recorder removed on purpose: HA must not depend on
               # another service (a Postgres outage used to take HA down).
               # History stays on HA's local SQLite.
