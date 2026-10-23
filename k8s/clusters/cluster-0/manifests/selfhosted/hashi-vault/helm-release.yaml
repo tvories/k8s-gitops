@@ -21,11 +21,11 @@ spec:
     injector:
       agentImage:
         repository: "hashicorp/vault"
-        tag: "2.2.0"
+        tag: "2.2.1"
     server:
       image:
         repository: "hashicorp/vault"
-        tag: "2.2.0"
+        tag: "2.2.1"
       statefulSet:
         securityContext:
           container:
