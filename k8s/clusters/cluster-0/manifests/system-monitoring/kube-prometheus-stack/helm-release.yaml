@@ -75,7 +75,7 @@ spec:
               matchers:
                 - 'severity = "warning"'
                 - >-
-                  alertname !~ "Technitium.*|Opnsense.*|Speedtest.*|VolSync.*|Ceph.*|Qbittorrent.*|LastFailedArchiveTime|KubeJobFailed|KubePodCrashLooping|KubeNodeNotReady|KubeNodeUnreachable|KubePersistentVolumeFillingUp|NodeFilesystem.*|TargetDown"
+                  alertname !~ "Technitium.*|Opnsense.*|Speedtest.*|VolSync.*|Ceph.*|Qbittorrent.*|LastFailedArchiveTime|KubeJobFailed|KubePodCrashLooping|KubeNodeNotReady|KubeNodeUnreachable|KubePersistentVolumeFillingUp|NodeFilesystem.*|TargetDown|SystemdUnitFailed"
         inhibit_rules:
           - source_matchers: ['severity = "critical"']
             target_matchers: ['severity = "warning"']

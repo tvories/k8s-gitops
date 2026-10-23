@@ -34,3 +34,17 @@ spec:
             description: >-
               Running system is older than the current NixOS generation. Outdated:
               {{ range query (printf "node_reboot_required_component{instance='%s'} == 1" $labels.instance) }}{{ .Labels.component }} {{ end }}
+
+        # Only units listed in each host's modules.services.node-exporter.systemdUnits
+        # are exported. Oneshots (e.g. zfs-scrub) stay "failed" until their next
+        # run, so this keeps firing until fixed or `systemctl reset-failed`.
+        - alert: SystemdUnitFailed
+          expr: node_systemd_unit_state{state="failed"} == 1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.name }} failed on {{ $labels.instance }}"
+            description: >-
+              systemd unit {{ $labels.name }} is in the failed state. Check
+              `journalctl -u {{ $labels.name }}` on the host.
