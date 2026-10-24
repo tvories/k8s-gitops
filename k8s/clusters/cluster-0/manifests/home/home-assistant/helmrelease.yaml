@@ -98,7 +98,7 @@ spec:
               # the official image + HOME=/config + hand-installed user-site
               # packages (2026-08 to 2026-10). Sets HOME=/config itself.
               repository: ghcr.io/home-operations/home-assistant
-              tag: 2026.10.2
+              tag: 2026.10.4
             env:
               TZ: "${TIMEZONE}"
               # Postgres recorder removed on purpose: HA must not depend on
