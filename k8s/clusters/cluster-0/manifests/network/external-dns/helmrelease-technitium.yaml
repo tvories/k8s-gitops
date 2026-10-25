@@ -43,6 +43,10 @@ spec:
             key: tsig-secret
     sources:
       - ingress
+      # envoy-internal apps: the record target is the Gateway's own LB address
+      # (from its status). Same opt-in annotation, set on the HTTPRoute. The
+      # Cloudflare instance deliberately does not watch routes.
+      - gateway-httproute
     domainFilters:
       - "${SECRET_DOMAIN}"
     extraArgs:

@@ -4,6 +4,9 @@ kind: HTTPRoute
 metadata:
   name: shelfmark
   namespace: downloads
+  annotations:
+    # internal record via the Technitium external-dns (network/external-dns)
+    external-dns/enabled: "true"
 spec:
   parentRefs:
     - name: envoy-internal

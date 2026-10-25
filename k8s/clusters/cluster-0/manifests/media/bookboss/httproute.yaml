@@ -7,6 +7,9 @@ kind: HTTPRoute
 metadata:
   name: bookboss
   namespace: media
+  annotations:
+    # internal record via the Technitium external-dns (network/external-dns)
+    external-dns/enabled: "true"
 spec:
   parentRefs:
     - name: envoy-internal
