@@ -1,0 +1,120 @@
+---
+# One-off: give every MOBI/AZW3/AZW-only book in the calibre library an EPUB
+# format, so BookBoss (EPUB-only) can import it. NOT in kustomization.yaml:
+# apply by hand, starting with DRY_RUN=true and a small LIMIT.
+#
+# Same rules as auto-add.yaml: the library is mounted read-only, and the new
+# EPUB goes in through the content server (never touch metadata.db directly).
+# The original MOBI/AZW3 stays on the book as a second format.
+#
+# The conversion takes title/author/series/etc. from the calibre database (via
+# --read-metadata-from-opf) and calibre's cover, not whatever is embedded in the
+# source file, so metadata cleaned up in calibre carries over to the EPUB.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: calibre-convert-to-epub
+  namespace: media
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 65539
+        fsGroup: 65539
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: convert
+          image: ghcr.io/linuxserver/calibre:version-v9.17.0
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -u
+              CDB=$(command -v calibredb || ls /opt/calibre/calibredb /app/calibre/calibredb 2>/dev/null | head -n1)
+              if [ -z "$CDB" ]; then echo "calibredb not found in image" >&2; exit 1; fi
+              BIN=$(dirname "$CDB")
+              auth=(--with-library "$LIBRARY_URL" --username "$CALIBRE_USER" --password "$CALIBRE_PASS")
+              work=$(mktemp -d)
+
+              # books with no EPUB but a format that converts well; PDF/CBZ are left alone
+              "$CDB" list "${auth[@]}" --for-machine --fields formats --limit "$LIMIT" \
+                --search 'not formats:epub and (formats:azw3 or formats:mobi or formats:azw)' \
+                > "$work/books.json" || { echo "calibredb list failed" >&2; exit 1; }
+
+              # one "id<TAB>source path" line per book; prefer AZW3 (KF8) over MOBI over AZW.
+              # formats are the server's paths, which match ours: both mount /ook/Media at /media
+              "$BIN/calibre-debug" -c "
+              import json
+              for b in json.load(open('$work/books.json')):
+                  fmts = {p.rsplit('.', 1)[-1].lower(): p for p in b.get('formats') or []}
+                  src = next((fmts[e] for e in ('azw3', 'mobi', 'azw') if e in fmts), None)
+                  if src:
+                      print(f\"{b['id']}\t{src}\")
+              " > "$work/todo.tsv" || { echo "could not parse calibredb output" >&2; exit 1; }
+
+              total=$(wc -l < "$work/todo.tsv")
+              echo "$total book(s) to convert (DRY_RUN=$DRY_RUN, LIMIT=$LIMIT)"
+              ok=0; failed=0
+              # fd 3: calibredb and ebook-convert would otherwise eat the loop's stdin
+              while IFS=$'\t' read -r id src <&3; do
+                if [ ! -f "$src" ]; then
+                  echo "book $id: source not found at $src" >&2
+                  failed=$((failed + 1)); continue
+                fi
+                if [ "$DRY_RUN" = "true" ]; then
+                  echo "would convert book $id: $src"; continue
+                fi
+                rm -rf "$work/book"; mkdir "$work/book"
+                opts=()
+                if "$CDB" show_metadata "${auth[@]}" --as-opf "$id" > "$work/book/meta.opf"; then
+                  opts+=(--read-metadata-from-opf "$work/book/meta.opf")
+                else
+                  echo "book $id: could not read calibre metadata, using the file's own" >&2
+                fi
+                cover="$(dirname "$src")/cover.jpg"
+                [ -f "$cover" ] && opts+=(--cover "$cover")
+
+                if "$BIN/ebook-convert" "$src" "$work/book/book.epub" "${opts[@]}" > "$work/book/log" 2>&1 \
+                   && "$CDB" add_format "${auth[@]}" --dont-replace "$id" "$work/book/book.epub"; then
+                  echo "book $id: EPUB added"
+                  ok=$((ok + 1))
+                else
+                  # DRM-protected Kindle files end up here
+                  echo "book $id: FAILED converting $src" >&2
+                  tail -n 5 "$work/book/log" >&2
+                  failed=$((failed + 1))
+                fi
+              done 3< "$work/todo.tsv"
+              echo "done: $ok converted, $failed failed, $total total"
+          env:
+            - name: LIBRARY_URL
+              value: http://calibre-webserver.media.svc.cluster.local:8081/#Calibre_Library
+            - name: HOME
+              value: /tmp
+            # "true" lists what would be converted; set "false" to convert
+            - name: DRY_RUN
+              value: "true"
+            # books per run; raise once a small batch looks right
+            - name: LIMIT
+              value: "5"
+          envFrom:
+            - secretRef:
+                name: calibre-content-server
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 3Gi
+          volumeMounts:
+            - name: media
+              mountPath: /media
+              readOnly: true
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-nfs-media
+            readOnly: true

@@ -48,6 +48,30 @@ spec:
                     -print0 | while IFS= read -r -d '' f; do
                     echo "adding $f"
 
+                    # BookBoss is a separate library (media/bookboss): hand it its own copy of
+                    # every EPUB before calibre's dedupe below can delete the file. Its scanner
+                    # only reads top-level, lowercase *.epub files, so flatten <Author>/<Book>/;
+                    # the hash suffix keeps same-named books apart. .bookboss-sent records what
+                    # was handed over, so a file left in place by a failed add is not re-sent.
+                    case "$f" in
+                      *.[eE][pP][uU][bB])
+                        sha=$(sha256sum -- "$f" | cut -d' ' -f1)
+                        if ! grep -qx "$sha" .bookboss-sent 2>/dev/null; then
+                          name=$(basename -- "$f")
+                          dest="/bookdrop/${name%.*}-${sha:0:12}.epub"
+                          # copy under .part, then rename: BookBoss skips extensions it does not
+                          # know, so it never picks up a half-written file
+                          if cp -- "$f" "$dest.part" && mv -- "$dest.part" "$dest"; then
+                            echo "$sha" >> .bookboss-sent
+                            echo "copied to bookboss: $dest"
+                          else
+                            rm -f -- "$dest.part"
+                            echo "FAILED to copy $f to bookboss bookdrop" >&2
+                          fi
+                        fi
+                        ;;
+                    esac
+
                     # ISBN embedded in the file itself (read before the file is deleted)
                     isbn=$("$BIN/ebook-meta" "$f" 2>/dev/null \
                       | sed -n 's/^Identifiers *:.*isbn:\([0-9Xx]\{10,13\}\).*/\1/p' | head -n1)
@@ -116,8 +140,14 @@ spec:
               volumeMounts:
                 - name: uploads
                   mountPath: /uploads
+                - name: bookboss-bookdrop
+                  mountPath: /bookdrop
           volumes:
             - name: uploads
               nfs:
                 server: ${SECRET_NAS3}
                 path: /ook/Media/ebooks/uploads
+            - name: bookboss-bookdrop
+              nfs:
+                server: ${SECRET_NAS3}
+                path: /ook/Media/ebooks/bookboss/bookdrop

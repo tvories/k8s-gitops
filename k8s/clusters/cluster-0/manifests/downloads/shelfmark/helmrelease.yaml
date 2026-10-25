@@ -1,0 +1,124 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.1.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app shelfmark
+  namespace: downloads
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: shelfmark
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 65539
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65539
+        runAsNonRoot: true
+        runAsUser: 568
+
+    controllers:
+      shelfmark:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/calibrain/shelfmark
+              tag: v1.5.1@sha256:acfa46b8be80f1e2f084a7703ff027ab274397feb24006114e92c05c140b62c3
+            # Run gunicorn directly, skipping entrypoint.sh (root-startup
+            # PUID/PGID handling and log-file tee); same as bjw-s' deployment.
+            command:
+              - gunicorn
+            args:
+              - --access-logfile=-
+              - --error-logfile=-
+              - --worker-class=geventwebsocket.gunicorn.workers.GeventWebSocketWorker
+              - --workers=1
+              - -t
+              - "300"
+              - -b
+              - 0.0.0.0:8084
+              - shelfmark.main:app
+            env:
+              TZ: "${TIMEZONE}"
+              # Lands in calibre's uploads folder; the calibre-auto-add CronJob
+              # (media/calibre/auto-add.yaml) imports it into the library.
+              INGEST_DIR: /media/ebooks/uploads
+              # BookBoss only imports EPUB, so keep both libraries fed the same
+              # books. A default only: the Settings UI can override it.
+              SUPPORTED_FORMATS: epub
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &port 8084
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                # the bundled Chromium (Cloudflare bypass for Direct Download)
+                # needs ~2GB; below that every direct download fails with
+                # misleading 403 / "No download URL found" errors
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              readOnlyRootFilesystem: true
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      config:
+        existingClaim: shelfmark-config
+        globalMounts:
+          - path: /config
+      # Same claim and mount path as qbittorrent, so torrent/usenet download
+      # paths match without a Remote Path Mapping.
+      media:
+        existingClaim: downloads-nfs-media
+        globalMounts:
+          - path: /media
+      tmp:
+        type: emptyDir
+        sizeLimit: 1Gi
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+          - path: /var/log
+            subPath: var-log
