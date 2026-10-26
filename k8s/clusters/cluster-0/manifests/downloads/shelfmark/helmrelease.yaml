@@ -59,6 +59,13 @@ spec:
               # BookBoss only imports EPUB, so keep both libraries fed the same
               # books. A default only: the Settings UI can override it.
               SUPPORTED_FORMATS: epub
+              # Audiobookshelf's library (/ook/Media/books). Unset, audiobooks
+              # would land in INGEST_DIR, where calibre-auto-add ignores them.
+              DESTINATION_AUDIOBOOK: /media/books
+              # Audiobookshelf wants a folder per book; the default ("rename")
+              # leaves files loose in the library root.
+              # Default path template: {Author}/{Title}/{Title}
+              FILE_ORGANIZATION_AUDIOBOOK: organize
             probes:
               liveness:
                 enabled: true
