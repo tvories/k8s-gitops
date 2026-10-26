@@ -48,7 +48,7 @@ spec:
             - name: defrag-m720q-1
               # Keep in step with the Talos version the nodes run
               # (talos/version.yaml talos_version; v1.14.2 as of 2026-10-12).
-              image: &image ghcr.io/siderolabs/talosctl:v1.14.4@sha256:b3233234327350f20ed194f3fad83d90a64344c1940f839c7b0c0abef50c8c33
+              image: &image ghcr.io/siderolabs/talosctl:v1.14.5@sha256:0b852e35c1f513ee5eacc22183d6193486012420569fde39fcd5260c51938443
               args: ["--nodes", "192.168.80.99", "etcd", "defrag"]
               env: &env
                 - name: TALOSCONFIG
