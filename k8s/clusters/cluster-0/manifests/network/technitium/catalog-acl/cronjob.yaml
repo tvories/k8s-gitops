@@ -1,0 +1,77 @@
+# Keeps 192.168.1.0/24 in the cluster catalog zone's Zone Transfer ACL.
+#
+# Technitium rebuilds that ACL from the registered node IPs (it came back as
+# just 192.168.83.241) after homebox restarts and after Talos node upgrades,
+# but tdns2's AXFRs leave from the node's 192.168.1.x LAN address, so every
+# transfer is refused and TechnitiumZoneSerialMismatch fires 30m later. The
+# script is a no-op while the entry is present; a 20-minute schedule still
+# fixes it inside the alert's 30m `for`.
+#
+# It talks to tdns2's in-cluster Service (plain HTTP, like the exporter) and
+# the API forwards to homebox via node=tdns.cluster.t-vo.us. If tdns2 is in the
+# DANE deadlock (see technitium notes) forwarding fails, the Job fails, and
+# KubeJobFailed surfaces it, which is the right outcome since that needs hands.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: technitium-catalog-acl
+  namespace: network
+spec:
+  schedule: "*/20 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  # Kept (no ttlSecondsAfterFinished) so KubeJobFailed stays firing until looked at.
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: technitium-catalog-acl
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: fix-catalog-acl
+              # Has bash, curl and jq; same image as rook-ceph/reflector.
+              image: alpine/k8s:1.37.1
+              command: ["/bin/bash", "/app/fix-catalog-acl.sh"]
+              env:
+                - name: TECHNITIUM_URL
+                  value: http://technitium-app.network.svc.cluster.local:5380
+              envFrom:
+                - secretRef:
+                    name: technitium-catalog-acl-secret
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+                # bash here-strings can spill to a temp file.
+                - name: tmp
+                  mountPath: /tmp
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+          volumes:
+            - name: script
+              configMap:
+                name: technitium-catalog-acl
+            - name: tmp
+              emptyDir: {}

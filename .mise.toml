@@ -12,5 +12,9 @@ talhelper = "latest"
 # most skew-sensitive commands. Keep this in step with talos_version in
 # k8s/clusters/cluster-0/talos/version.yaml.
 talosctl = "1.14.5"
+# Pinned to match the controllers; keep in step with the flux2 tag in
+# k8s/global/flux/repositories/git/flux.yaml. Overrides the Nix-installed
+# flux (pkgs.unstable.fluxcd) inside this repo.
+flux2 = "2.10.0"
 # Renders the talos/*.yaml.j2 templates (justfiles/talos.just).
 "aqua:mitsuhiko/minijinja" = "latest"

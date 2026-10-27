@@ -5,3 +5,4 @@ resources:
   - ./pvc.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
+  - ./catalog-acl

@@ -119,8 +119,9 @@ spec:
               ESPHOME_PROJECT_VERSION: 2.14.0
               # Wake word (EchoMuse runs its own openWakeWord, independent of
               # the wyoming-openwakeword release used by HA satellites)
-              OWW_MODEL: hey_jarvis
-              OWW_THRESHOLD: 0.3
+              # Startup defaults only; dashboard/config-API values override them.
+              OWW_MODEL: alexa_v0.1
+              OWW_THRESHOLD: 0.725
               DB_PATH: /app/data/echomuse.db
               # strict — unknown devices wait in the pending queue for approval
               DEVICE_APPROVAL: strict
