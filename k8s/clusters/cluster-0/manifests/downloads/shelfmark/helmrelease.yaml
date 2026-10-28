@@ -56,8 +56,9 @@ spec:
               # Lands in calibre's uploads folder; the calibre-auto-add CronJob
               # (media/calibre/auto-add.yaml) imports it into the library.
               INGEST_DIR: /media/ebooks/uploads
-              # BookBoss only imports EPUB, so keep both libraries fed the same
-              # books. A default only: the Settings UI can override it.
+              # calibre-auto-add only hands EPUBs on to BookOrbit, so keep both
+              # libraries fed the same books. A default only: the Settings UI
+              # can override it.
               SUPPORTED_FORMATS: epub
               # Audiobookshelf's library (/ook/Media/books). Unset, audiobooks
               # would land in INGEST_DIR, where calibre-auto-add ignores them.

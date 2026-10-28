@@ -20,6 +20,17 @@ variable "audiobookshelf_client_secret" {
   sensitive   = true
 }
 
+variable "bookorbit_client_id" {
+  description = "The client ID for BookOrbit in Authentik."
+  type        = string
+}
+
+variable "bookorbit_client_secret" {
+  description = "The client secret for BookOrbit in Authentik."
+  type        = string
+  sensitive   = true
+}
+
 variable "grafana_client_id" {
   description = "The client ID for Grafana in Authentik."
   type        = string

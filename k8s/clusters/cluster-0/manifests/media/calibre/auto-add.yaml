@@ -48,25 +48,26 @@ spec:
                     -print0 | while IFS= read -r -d '' f; do
                     echo "adding $f"
 
-                    # BookBoss is a separate library (media/bookboss): hand it its own copy of
-                    # every EPUB before calibre's dedupe below can delete the file. Its scanner
-                    # only reads top-level, lowercase *.epub files, so flatten <Author>/<Book>/;
-                    # the hash suffix keeps same-named books apart. .bookboss-sent records what
-                    # was handed over, so a file left in place by a failed add is not re-sent.
+                    # BookOrbit is a separate library (media/bookorbit): hand it its own copy of
+                    # every EPUB before calibre's dedupe below can delete the file. It lands in
+                    # the top level of BookOrbit's library folder, picked up by that library's
+                    # scheduled scan; the hash suffix keeps same-named books apart.
+                    # .bookorbit-sent records what was handed over, so a file left in place by
+                    # a failed add is not re-sent.
                     case "$f" in
                       *.[eE][pP][uU][bB])
                         sha=$(sha256sum -- "$f" | cut -d' ' -f1)
-                        if ! grep -qx "$sha" .bookboss-sent 2>/dev/null; then
+                        if ! grep -qx "$sha" .bookorbit-sent 2>/dev/null; then
                           name=$(basename -- "$f")
-                          dest="/bookdrop/${name%.*}-${sha:0:12}.epub"
-                          # copy under .part, then rename: BookBoss skips extensions it does not
-                          # know, so it never picks up a half-written file
+                          dest="/bookorbit/${name%.*}-${sha:0:12}.epub"
+                          # copy under .part, then rename: the scanner skips extensions it does
+                          # not know, so it never picks up a half-written file
                           if cp -- "$f" "$dest.part" && mv -- "$dest.part" "$dest"; then
-                            echo "$sha" >> .bookboss-sent
-                            echo "copied to bookboss: $dest"
+                            echo "$sha" >> .bookorbit-sent
+                            echo "copied to bookorbit: $dest"
                           else
                             rm -f -- "$dest.part"
-                            echo "FAILED to copy $f to bookboss bookdrop" >&2
+                            echo "FAILED to copy $f to the bookorbit library" >&2
                           fi
                         fi
                         ;;
@@ -140,14 +141,14 @@ spec:
               volumeMounts:
                 - name: uploads
                   mountPath: /uploads
-                - name: bookboss-bookdrop
-                  mountPath: /bookdrop
+                - name: bookorbit-library
+                  mountPath: /bookorbit
           volumes:
             - name: uploads
               nfs:
                 server: ${SECRET_NAS3}
                 path: /ook/Media/ebooks/uploads
-            - name: bookboss-bookdrop
+            - name: bookorbit-library
               nfs:
                 server: ${SECRET_NAS3}
-                path: /ook/Media/ebooks/bookboss/bookdrop
+                path: /ook/Media/ebooks/bookorbit

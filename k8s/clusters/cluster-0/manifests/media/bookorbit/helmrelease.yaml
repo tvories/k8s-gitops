@@ -1,0 +1,161 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.1.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app bookorbit
+  namespace: media
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: bookorbit
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      bookorbit:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+            fsGroup: 65539
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+            seccompProfile: { type: RuntimeDefault }
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.6
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: bookorbit-secret
+          # BookOrbit's migrations run CREATE EXTENSION for uuid-ossp, pg_trgm,
+          # unaccent and vector. The first three are trusted, so the database
+          # owner can create them; pgvector is not, so create it here as the
+          # superuser and the app's IF NOT EXISTS becomes a no-op.
+          init-extensions:
+            dependsOn: init-db
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.6
+              pullPolicy: IfNotPresent
+            command:
+              - /bin/sh
+              - -c
+              - >-
+                PGPASSWORD="$INIT_POSTGRES_SUPER_PASS"
+                psql -h "$INIT_POSTGRES_HOST" -U postgres -d "$INIT_POSTGRES_DBNAME"
+                -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION IF NOT EXISTS vector'
+            envFrom: *envFrom
+        containers:
+          app:
+            image:
+              repository: ghcr.io/bookorbit/bookorbit
+              tag: 3.6.0@sha256:bbb5da52e96dbbff1dd36f55454f9845e6cde264b4b3428a3ea783124a4ca62e
+            env:
+              TZ: "${TIMEZONE}"
+              NODE_ENV: production
+              PORT: &port 3000
+              # emails, Kobo endpoints and the CORS origin
+              APP_URL: "https://bookorbit.${SECRET_DOMAIN}"
+              # top of the folder picker when creating a library
+              LIBRARY_BROWSE_ROOT: /books
+              # BOOK_DOCK_PATH is left at its default, /data/book-dock, on the
+              # ceph PVC: its watcher is inotify-only, which never sees files
+              # another NFS client writes. calibre-auto-add feeds the library
+              # folder instead (see the persistence comment below).
+              NODE_MAX_OLD_SPACE_SIZE: "1536"
+              # authentik's sso host resolves to a LAN IP in-cluster (split
+              # horizon), which BookOrbit refuses as an OIDC issuer without this
+              OIDC_ALLOW_LOCAL_ISSUERS: "true"
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/health
+                    port: *port
+                  # database migrations run before the server listens
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              readOnlyRootFilesystem: true
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      data:
+        existingClaim: bookorbit-data
+        globalMounts:
+          - path: /data
+      # BookOrbit's own library, separate from calibre's (it renames and
+      # rewrites files). Unsupported upstream: the README says not to put any
+      # writable path on NFS, at your own risk. Create the library on
+      # /books/ebooks; calibre-auto-add copies new EPUBs into its top level.
+      # The library watcher is inotify-based and misses writes from other
+      # pods, so give each library a scan schedule in the UI.
+      ebooks:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks/bookorbit
+        globalMounts:
+          - path: /books/ebooks
+      # Audiobookshelf's library, where Shelfmark and Chaptarr put audiobooks
+      # (Author/Title/ folders: use the "book per folder" library mode).
+      # Shared rather than copied, so read-only: BookOrbit only reads it, and
+      # its rename / write-metadata actions fail here instead of reshuffling
+      # files under Audiobookshelf.
+      audiobooks:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/books
+        globalMounts:
+          - path: /books/audiobooks
+            readOnly: true
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

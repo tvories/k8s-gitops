@@ -3,7 +3,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   namespace: media
-  name: bookboss
+  name: bookorbit
 spec:
   interval: 15m
   layerSelector:

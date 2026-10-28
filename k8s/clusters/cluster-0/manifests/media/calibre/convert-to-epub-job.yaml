@@ -1,6 +1,6 @@
 ---
 # One-off: give every MOBI/AZW3/AZW-only book in the calibre library an EPUB
-# format, so BookBoss (EPUB-only) can import it. NOT in kustomization.yaml:
+# format, for EPUB-only readers and the EPUB copy into BookOrbit. NOT in kustomization.yaml:
 # apply by hand, starting with DRY_RUN=true and a small LIMIT.
 #
 # Same rules as auto-add.yaml: the library is mounted read-only, and the new

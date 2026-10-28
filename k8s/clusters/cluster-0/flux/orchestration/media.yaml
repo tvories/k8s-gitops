@@ -176,15 +176,16 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: media-bookboss
+  name: media-bookorbit
   namespace: flux-system
 spec:
   dependsOn:
     - name: media-namespace
     - name: rook-ceph-cluster
     - name: network-envoy-gateway
+    - name: database-cnpg-cluster
   interval: 5m
-  path: "./k8s/clusters/cluster-0/manifests/media/bookboss"
+  path: "./k8s/clusters/cluster-0/manifests/media/bookorbit"
   prune: true
   wait: true
   sourceRef:

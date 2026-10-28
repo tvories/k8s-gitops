@@ -19,6 +19,21 @@ locals {
       ]
       launch_url = "https://ab.${var.CLUSTER_DOMAIN}"
     },
+    bookorbit = {
+      client_id     = var.bookorbit_client_id
+      client_secret = var.bookorbit_client_secret
+      group         = "media"
+      icon_url      = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/bookorbit.png"
+      # BookOrbit does the code exchange server-side, for the web UI and the
+      # native apps alike.
+      grant_types = ["authorization_code", "refresh_token"]
+      redirect_uris = [
+        "https://bookorbit.${var.CLUSTER_DOMAIN}/oauth2-callback",
+        # iOS app and the Android apps
+        "bookorbit://oauth2-callback",
+      ]
+      launch_url = "https://bookorbit.${var.CLUSTER_DOMAIN}"
+    },
     grafana = {
       client_id     = var.grafana_client_id
       client_secret = var.grafana_client_secret
