@@ -34,6 +34,20 @@ locals {
       ]
       launch_url = "https://bookorbit.${var.CLUSTER_DOMAIN}"
     },
+    grimmory = {
+      client_id     = var.grimmory_client_id
+      client_secret = var.grimmory_client_secret
+      group         = "media"
+      # Grimmory is the Booklore codebase; dashboard-icons has no grimmory.png
+      icon_url    = "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/booklore.png"
+      grant_types = ["authorization_code", "refresh_token"]
+      redirect_uris = [
+        "https://grimmory.${var.CLUSTER_DOMAIN}/oauth2-callback",
+        # the mobile apps
+        "grimmory://oauth2-callback",
+      ]
+      launch_url = "https://grimmory.${var.CLUSTER_DOMAIN}"
+    },
     grafana = {
       client_id     = var.grafana_client_id
       client_secret = var.grafana_client_secret

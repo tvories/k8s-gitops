@@ -31,6 +31,17 @@ variable "bookorbit_client_secret" {
   sensitive   = true
 }
 
+variable "grimmory_client_id" {
+  description = "The client ID for Grimmory in Authentik."
+  type        = string
+}
+
+variable "grimmory_client_secret" {
+  description = "The client secret for Grimmory in Authentik."
+  type        = string
+  sensitive   = true
+}
+
 variable "grafana_client_id" {
   description = "The client ID for Grafana in Authentik."
   type        = string

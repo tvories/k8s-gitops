@@ -1,0 +1,203 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/app-template-5.1.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app grimmory
+  namespace: media
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: grimmory
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      grimmory:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+            fsGroup: 65539
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65539 # media-rw
+            seccompProfile: { type: RuntimeDefault }
+        initContainers:
+          # Grimmory only speaks MariaDB, so it gets its own as a native
+          # sidecar on the app's PVC. The startup probe holds the app back
+          # until the real server is up: first-run setup uses a temporary
+          # server with networking off, which the TCP ping can't reach.
+          mariadb:
+            image:
+              repository: docker.io/library/mariadb
+              tag: 11.8.9-noble@sha256:c4124d1afa875e47f2892edf26b482fa54f796e2f342d3717a04ca091a22a9bd
+            args:
+              - --datadir=/data/mysql
+              # only the app, in this pod, talks to it
+              - --bind-address=127.0.0.1
+            env:
+              TZ: "${TIMEZONE}"
+              MARIADB_DATABASE: &dbName grimmory
+              MARIADB_USER: &dbUser grimmory
+            envFrom: &envFrom
+              - secretRef:
+                  name: grimmory-secret
+            restartPolicy: Always
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: &dbPing
+                      - /bin/sh
+                      - -c
+                      - mariadb-admin ping -h 127.0.0.1 -u root -p"$MARIADB_ROOT_PASSWORD"
+                  failureThreshold: 30
+                  periodSeconds: 5
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: *dbPing
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              readOnlyRootFilesystem: true
+        containers:
+          app:
+            image:
+              repository: ghcr.io/grimmory-tools/grimmory
+              tag: v3.5.0@sha256:bf6fe21c6e247597f7869664a440b5a34242e2d2940575cae39c17bfaa66dc0b
+            # The image's entrypoint creates a user and su-execs to it, which
+            # needs root; run its CMD directly as 568 instead.
+            command:
+              - java
+              - --enable-native-access=ALL-UNNAMED
+              - --enable-preview
+              - -jar
+              - /app/app.jar
+            env:
+              TZ: "${TIMEZONE}"
+              DATABASE_URL: jdbc:mariadb://127.0.0.1:3306/grimmory?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+              DATABASE_USERNAME: *dbUser
+              APP_PATH_CONFIG: /data/app
+              APP_BOOKDROP_FOLDER: /data/bookdrop
+              # Libraries are NFS, shared with bookorbit and audiobookshelf:
+              # turns off delete/move/rename from the UI
+              DISK_TYPE: NETWORK
+              # authentik.t-vo.us resolves to a LAN IP in-cluster (split
+              # horizon), which the outbound SSRF filter refuses without this.
+              # It lifts the filter for every outbound call, not only OIDC.
+              OIDC_ALLOW_UNSAFE_HOSTS: "true"
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/healthcheck
+                    port: &port 6060
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/healthcheck
+                    port: *port
+                  # Flyway migrations run before the server listens
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+            securityContext: *securityContext
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      # app/, mysql/ and bookdrop/, set by the env and args above; no subPaths
+      data:
+        existingClaim: grimmory-data
+        advancedMounts:
+          grimmory:
+            app:
+              - path: /data
+            mariadb:
+              - path: /data
+      # A trial beside bookorbit, so read-only on the same folders: the
+      # bookorbit EPUB library (fed by calibre-auto-add) and audiobookshelf's
+      # library. Grimmory keeps its metadata in MariaDB; with read-only
+      # libraries, BookDrop imports and "write metadata to file" can't land.
+      ebooks:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/ebooks/bookorbit
+        advancedMounts:
+          grimmory:
+            app:
+              - path: /books/ebooks
+                readOnly: true
+      audiobooks:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media/books
+        advancedMounts:
+          grimmory:
+            app:
+              - path: /books/audiobooks
+                readOnly: true
+      mysqld:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 1Mi
+        advancedMounts:
+          grimmory:
+            mariadb:
+              - path: /run/mysqld
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          grimmory:
+            app:
+              - path: /tmp
+                subPath: app
+            mariadb:
+              - path: /tmp
+                subPath: mariadb
