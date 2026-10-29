@@ -80,9 +80,11 @@ spec:
               # another NFS client writes. calibre-auto-add feeds the library
               # folder instead (see the persistence comment below).
               NODE_MAX_OLD_SPACE_SIZE: "1536"
-              # authentik's sso host resolves to a LAN IP in-cluster (split
+              # authentik.t-vo.us resolves to a LAN IP in-cluster (split
               # horizon), which BookOrbit refuses as an OIDC issuer without this
               OIDC_ALLOW_LOCAL_ISSUERS: "true"
+              # the sidecar below; READ_ALOUD_WORKER_TOKEN comes from the secret
+              READ_ALOUD_WORKER_URL: http://127.0.0.1:8787
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -113,11 +115,49 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
-            securityContext:
+            securityContext: &securityContext
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
               readOnlyRootFilesystem: true
+          # Builds read-along EPUBs (EPUB 3 media overlays) from a book's EPUB
+          # plus its audiobook: speech-to-text alignment, CPU only in this
+          # image. A sidecar so it shares the read-aloud volume with the app,
+          # which hands it job folders there. One job at a time; the first job
+          # per language downloads a ~190 MB model into the same volume.
+          read-aloud-worker:
+            image:
+              repository: ghcr.io/bookorbit/bookorbit-read-aloud-worker
+              tag: 3.6.0@sha256:4ca7f141f346365af8970809f7fb3947c309082c81b5b00cee0cdec5ed6c5f96
+            env:
+              TZ: "${TIMEZONE}"
+              # only the app, in this pod, talks to it
+              READ_ALOUD_WORKER_HOST: 127.0.0.1
+              READ_ALOUD_CTC_DEVICE: cpu
+              READ_ALOUD_WORKER_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: bookorbit-secret
+                    key: READ_ALOUD_WORKER_TOKEN
+            probes:
+              # /health needs the bearer token, so check the port instead
+              liveness: &workerProbes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 8787
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *workerProbes
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 4Gi
+            securityContext: *securityContext
 
     service:
       app:
@@ -129,8 +169,20 @@ spec:
     persistence:
       data:
         existingClaim: bookorbit-data
-        globalMounts:
-          - path: /data
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /data
+      # Read-aloud job folders, temp files and the speech model cache. Its own
+      # claim, not backed up: a job needs ~4x its audio in scratch space.
+      read-aloud:
+        existingClaim: bookorbit-read-aloud
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /data/read-aloud
+            read-aloud-worker:
+              - path: /data/read-aloud
       # BookOrbit's own library, separate from calibre's (it renames and
       # rewrites files). Unsupported upstream: the README says not to put any
       # writable path on NFS, at your own risk. Create the library on
@@ -141,21 +193,47 @@ spec:
         type: nfs
         server: ${SECRET_NAS3}
         path: /ook/Media/ebooks/bookorbit
-        globalMounts:
-          - path: /books/ebooks
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /books/ebooks
+            read-aloud-worker:
+              - path: /books/ebooks
+                readOnly: true
       # Audiobookshelf's library, where Shelfmark and Chaptarr put audiobooks
       # (Author/Title/ folders: use the "book per folder" library mode).
-      # Shared rather than copied, so read-only: BookOrbit only reads it, and
-      # its rename / write-metadata actions fail here instead of reshuffling
-      # files under Audiobookshelf.
+      # Shared with Audiobookshelf rather than copied. Writable because
+      # read-aloud publishes <book>.readaloud.epub into the book's folder (put
+      # the EPUB there beside the audio) and fulfilled requests land here.
+      # Don't run BookOrbit's bulk rename / write-metadata on this library:
+      # Audiobookshelf tracks these files by path.
       audiobooks:
         type: nfs
         server: ${SECRET_NAS3}
         path: /ook/Media/books
-        globalMounts:
-          - path: /books/audiobooks
-            readOnly: true
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /books/audiobooks
+            read-aloud-worker:
+              - path: /books/audiobooks
+                readOnly: true
+      # Book requests: finished downloads, at the same path qbittorrent
+      # reports them (both mount /ook/Media at /media), so no path mapping.
+      # Read-only: imports copy into the Book Dock (hardlinks can't cross
+      # into the ceph volume) and the torrent keeps seeding.
+      downloads:
+        type: nfs
+        server: ${SECRET_NAS3}
+        path: /ook/Media
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /media
+                readOnly: true
       tmp:
         type: emptyDir
-        globalMounts:
-          - path: /tmp
+        advancedMounts:
+          bookorbit:
+            app:
+              - path: /tmp

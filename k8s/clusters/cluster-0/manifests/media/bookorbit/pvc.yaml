@@ -16,3 +16,19 @@ spec:
       # the NAS and the database on postgres6
       storage: 5Gi
   storageClassName: ceph-block
+---
+# Read-aloud scratch: job folders (resumable, deleted once published) and the
+# speech model cache. Deliberately no backup labels or VolSync.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bookorbit-read-aloud
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # a run needs ~4x the audio + 7x the EPUB + 512 MB; fits ~4 GB audiobooks
+      storage: 20Gi
+  storageClassName: ceph-block
