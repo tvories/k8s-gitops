@@ -145,13 +145,21 @@ spec:
                     name: bookorbit-secret
                     key: READ_ALOUD_WORKER_TOKEN
             probes:
-              # /health needs the bearer token, so check the port instead
+              # /health needs the bearer token, so check the port instead.
+              # From inside the container: the worker listens on 127.0.0.1
+              # only, and a tcpSocket probe dials the pod IP.
               liveness: &workerProbes
                 enabled: true
                 custom: true
                 spec:
-                  tcpSocket:
-                    port: 8787
+                  exec:
+                    command:
+                      - node
+                      - -e
+                      - >-
+                        require('net').connect(8787, '127.0.0.1')
+                        .on('connect', () => process.exit(0))
+                        .on('error', () => process.exit(1))
                   periodSeconds: 30
                   timeoutSeconds: 5
                   failureThreshold: 3
