@@ -12,8 +12,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      # covers, the Book Dock (browser uploads) and app state; books live on
-      # the NAS and the database on postgres6
+      # covers, plugins and app state; books and the Book Dock live on the
+      # NAS and the database on postgres6
       storage: 5Gi
   storageClassName: ceph-block
 ---

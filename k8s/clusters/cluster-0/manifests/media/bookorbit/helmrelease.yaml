@@ -74,11 +74,14 @@ spec:
               # emails, Kobo endpoints and the CORS origin
               APP_URL: "https://bookorbit.${SECRET_DOMAIN}"
               # top of the folder picker when creating a library
-              LIBRARY_BROWSE_ROOT: /books
-              # BOOK_DOCK_PATH is left at its default, /data/book-dock, on the
-              # ceph PVC: its watcher is inotify-only, which never sees files
-              # another NFS client writes. calibre-auto-add feeds the library
-              # folder instead (see the persistence comment below).
+              LIBRARY_BROWSE_ROOT: /media
+              # Inside the same mount as qbittorrent's downloads and the
+              # library, so a request is hardlinked into the dock and renamed
+              # into the library: the torrent keeps seeding from the same
+              # bytes. Across two mounts, even of one NFS export, both fall
+              # back to a copy. Its watcher is inotify-only and misses files
+              # other NFS clients drop here, so feed libraries, not the dock.
+              BOOK_DOCK_PATH: /media/bookorbit/book-dock
               NODE_MAX_OLD_SPACE_SIZE: "1536"
               # authentik.t-vo.us resolves to a LAN IP in-cluster (split
               # horizon), which BookOrbit refuses as an OIDC issuer without this
@@ -134,6 +137,8 @@ spec:
               # only the app, in this pod, talks to it
               READ_ALOUD_WORKER_HOST: 127.0.0.1
               READ_ALOUD_CTC_DEVICE: cpu
+              # books at the same paths the app sees them
+              READ_ALOUD_LIBRARY_ROOTS: /media
               READ_ALOUD_WORKER_TOKEN:
                 valueFrom:
                   secretKeyRef:
@@ -183,52 +188,28 @@ spec:
               - path: /data/read-aloud
             read-aloud-worker:
               - path: /data/read-aloud
-      # BookOrbit's own library, separate from calibre's (it renames and
-      # rewrites files). Unsupported upstream: the README says not to put any
-      # writable path on NFS, at your own risk. Create the library on
-      # /books/ebooks; calibre-auto-add copies new EPUBs into its top level.
-      # The library watcher is inotify-based and misses writes from other
-      # pods, so give each library a scan schedule in the UI.
-      ebooks:
-        type: nfs
-        server: ${SECRET_NAS3}
-        path: /ook/Media/ebooks/bookorbit
-        advancedMounts:
-          bookorbit:
-            app:
-              - path: /books/ebooks
-            read-aloud-worker:
-              - path: /books/ebooks
-                readOnly: true
-      # Audiobookshelf's library, where Shelfmark and Chaptarr put audiobooks
-      # (Author/Title/ folders: use the "book per folder" library mode).
-      # Shared with Audiobookshelf rather than copied. Writable because
-      # read-aloud publishes <book>.readaloud.epub into the book's folder (put
-      # the EPUB there beside the audio) and fulfilled requests land here.
-      # Don't run BookOrbit's bulk rename / write-metadata on this library:
-      # Audiobookshelf tracks these files by path.
-      audiobooks:
-        type: nfs
-        server: ${SECRET_NAS3}
-        path: /ook/Media/books
-        advancedMounts:
-          bookorbit:
-            app:
-              - path: /books/audiobooks
-            read-aloud-worker:
-              - path: /books/audiobooks
-                readOnly: true
-      # Book requests: finished downloads, at the same path qbittorrent
-      # reports them (both mount /ook/Media at /media), so no path mapping.
-      # Read-only: imports copy into the Book Dock (hardlinks can't cross
-      # into the ceph volume) and the torrent keeps seeding.
-      downloads:
+      # One mount for downloads, the Book Dock and the library, at the same
+      # path qbittorrent uses (/media), so requests need no path mapping and
+      # hardlink end to end (see BOOK_DOCK_PATH). Unsupported upstream: the
+      # README says not to put any writable path on NFS, at your own risk.
+      #   /media/books               the library: Audiobookshelf's, shared
+      #                              (Author/Title/ folders, "Folder as Book")
+      #   /media/downloads/bookorbit qbittorrent's bookorbit category
+      #   /media/bookorbit/book-dock request staging
+      # Writable for read-aloud publishing, request imports and the hardlink
+      # test. Keep the library's file updates (rename / write metadata) off:
+      # Audiobookshelf tracks these files by path, and rewriting a file splits
+      # it from the torrent's seeding copy. The library watcher misses writes
+      # from other pods, so give it a scan schedule in the UI.
+      media:
         type: nfs
         server: ${SECRET_NAS3}
         path: /ook/Media
         advancedMounts:
           bookorbit:
             app:
+              - path: /media
+            read-aloud-worker:
               - path: /media
                 readOnly: true
       tmp:

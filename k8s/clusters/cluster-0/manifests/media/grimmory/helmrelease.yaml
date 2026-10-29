@@ -50,8 +50,10 @@ spec:
               - --bind-address=127.0.0.1
             env:
               TZ: "${TIMEZONE}"
-              MARIADB_DATABASE: &dbName grimmory
+              MARIADB_DATABASE: grimmory
               MARIADB_USER: &dbUser grimmory
+              # run mariadb-upgrade on its own when Renovate bumps the version
+              MARIADB_AUTO_UPGRADE: "1"
             envFrom: &envFrom
               - secretRef:
                   name: grimmory-secret
