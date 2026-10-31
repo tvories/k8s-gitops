@@ -24,7 +24,6 @@ resources:
   - grafana-charts.yaml
   # - banzaicloud-charts.yaml
   - kasten-charts.yaml
-  - fairwinds-charts.yaml
   - vector-charts.yaml
   - kubernetes-sigs-descheduler-charts.yaml
   - trilio-charts.yaml
