@@ -90,7 +90,21 @@ spec:
           type: remap
           inputs:
             - pod_logs
+          # Drop lines older than 15 minutes before they reach the sink. The
+          # first file scan runs before pod metadata has synced, so it matches
+          # nothing; the 60s rescan then finds every file as "new" and reads it
+          # from the beginning (read_from only applies at startup). That replay
+          # (~150 files, up to 10MB each) OOMKilled the pod, and Loki rejected
+          # it anyway as "too far behind". Dropped events still advance the
+          # checkpoints, so after one catch-up restarts resume normally.
+          drop_on_abort: true
           source: |-
+            ts = timestamp(.timestamp) ??
+              parse_timestamp(string(.timestamp) ?? "", format: "%+") ??
+              now()
+            if to_unix_timestamp(ts) < to_unix_timestamp(now()) - 900 {
+              abort
+            }
             app = string(.kubernetes.pod_labels."app.kubernetes.io/name") ??
               string(.kubernetes.pod_labels.app) ??
               string(.kubernetes.pod_labels."k8s-app") ??
