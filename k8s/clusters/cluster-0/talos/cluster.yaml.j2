@@ -122,6 +122,15 @@ machine:
     rules:
       - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
       - SUBSYSTEM=="apex", GROUP="44", MODE="0660"
+  # Service logs (machined, etcd, kubelet, ...) to Vector on homebox, which
+  # feeds the Loki there. Off-cluster on purpose: these are the logs you want
+  # most when the cluster itself is down. TCP so lines aren't dropped. Kernel
+  # logs go the same way via the KmsgLogConfig document at the end of this
+  # file. Receiver config lives in nix-config (hosts/homebox).
+  logging:
+    destinations:
+      - endpoint: tcp://192.168.1.43:6051/
+        format: json_lines
 cluster:
   id: op://k8s/talos/CLUSTER_ID
   secret: op://k8s/talos/CLUSTER_SECRET
@@ -149,3 +158,8 @@ cluster:
       kubernetes:
         disabled: true
       service: {}
+---
+apiVersion: v1alpha1
+kind: KmsgLogConfig
+name: homebox-kmsg
+url: tcp://192.168.1.43:6050/

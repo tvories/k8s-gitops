@@ -95,11 +95,14 @@ spec:
           remove_label_fields: true
           # `pod` stays in the JSON body (query with `| json | pod=...`);
           # as a label every pod restart would start a new stream.
+          # The chart runs customConfig through Helm's `tpl`, so Vector's
+          # {{ field }} templates are wrapped in a Go raw string to pass through
+          # literally.
           labels:
             job: kubernetes
-            namespace: "{{ namespace }}"
-            app: "{{ app }}"
-            container: "{{ container }}"
-            node: "{{ node }}"
+            namespace: "{{`{{ namespace }}`}}"
+            app: "{{`{{ app }}`}}"
+            container: "{{`{{ container }}`}}"
+            node: "{{`{{ node }}`}}"
           batch:
             max_bytes: 1048576
