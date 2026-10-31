@@ -111,3 +111,9 @@ spec:
             node: "{{`{{ node }}`}}"
           batch:
             max_bytes: 1048576
+          # Vector retries 5xx forever by default, so one batch Loki keeps
+          # rejecting (e.g. a 500 for timestamps outside its schema) blocks the
+          # pipeline and grows memory until OOMKill. Give up after ~5 minutes of
+          # backoff instead; losing a batch beats losing all logs.
+          request:
+            retry_attempts: 10
