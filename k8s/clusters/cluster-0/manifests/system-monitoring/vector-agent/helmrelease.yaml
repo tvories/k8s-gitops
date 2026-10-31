@@ -1,0 +1,105 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vector-agent
+  namespace: system-monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: vector
+      version: 0.61.0
+      sourceRef:
+        kind: HelmRepository
+        name: vector-charts
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    # DaemonSet reading /var/log/pods on each node (hostPath, runs as root;
+    # the namespace is PSA "privileged" for exactly this kind of pod).
+    role: Agent
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: vector-agent
+
+    service:
+      enabled: false
+
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+
+    # Rarely used, so kept deliberately small. Raise the limit if it OOMs
+    # during a log burst rather than dropping it.
+    resources:
+      requests:
+        cpu: 10m
+        memory: 48Mi
+      limits:
+        memory: 128Mi
+
+    customConfig:
+      data_dir: /vector-data-dir
+
+      api:
+        enabled: false
+
+      sources:
+        kubernetes_logs:
+          type: kubernetes_logs
+
+      transforms:
+        # Keep only what is useful and rebuild the event, so each line is not
+        # carrying the full pod metadata blob into Loki.
+        kubernetes_remap:
+          type: remap
+          inputs:
+            - kubernetes_logs
+          source: |-
+            app = string(.kubernetes.pod_labels."app.kubernetes.io/name") ??
+              string(.kubernetes.pod_labels.app) ??
+              string(.kubernetes.pod_labels."k8s-app") ??
+              string(.kubernetes.container_name) ??
+              "unknown"
+            . = {
+              "timestamp": .timestamp,
+              "message": .message,
+              "stream": .stream,
+              "app": app,
+              "namespace": .kubernetes.pod_namespace,
+              "container": .kubernetes.container_name,
+              "node": .kubernetes.pod_node_name,
+              "pod": .kubernetes.pod_name,
+            }
+
+      sinks:
+        # Loki runs on homebox (nix-config), off-cluster so Talos logs survive
+        # cluster outages. Pod logs go there too to keep one store.
+        loki:
+          type: loki
+          inputs:
+            - kubernetes_remap
+          endpoint: http://192.168.1.43:3100
+          encoding:
+            codec: json
+          out_of_order_action: accept
+          remove_label_fields: true
+          # `pod` stays in the JSON body (query with `| json | pod=...`);
+          # as a label every pod restart would start a new stream.
+          labels:
+            job: kubernetes
+            namespace: "{{ namespace }}"
+            app: "{{ app }}"
+            container: "{{ container }}"
+            node: "{{ node }}"
+          batch:
+            max_bytes: 1048576

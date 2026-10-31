@@ -173,10 +173,12 @@ spec:
               # 15s, so $__rate_interval can drop below two samples and rate()
               # panels show "No data" (seen on 24h ranges).
               timeInterval: 1m
+          # Loki runs on homebox (nix-config), off-cluster so Talos logs
+          # survive cluster outages.
           - name: Loki
             type: loki
             access: proxy
-            url: http://loki.system-monitoring:3100
+            url: http://192.168.1.43:3100
           # - name: influxdb
           #   type: influxdb
           #   access: proxy
