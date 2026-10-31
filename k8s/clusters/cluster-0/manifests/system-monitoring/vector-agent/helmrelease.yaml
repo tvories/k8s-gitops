@@ -55,11 +55,16 @@ spec:
         enabled: false
 
       sources:
-        kubernetes_logs:
+        # Renamed from `kubernetes_logs` (2026-10-31) to start from fresh
+        # checkpoints: the old ones were stuck replaying a backlog that OOMKilled
+        # every pod before the checkpoint could advance.
+        pod_logs:
           type: kubernetes_logs
+          # Files with no checkpoint (first start, new pods) are tailed from the
+          # end. Replaying from the beginning floods the sink, and Loki drops
+          # most of it anyway as "too far behind" once newer lines have arrived.
+          read_from: end
           # Skip log files untouched for an hour (dead pods, old rotations).
-          # Without this a fresh start replays every file on the node; Loki
-          # rejects anything older than 7 days anyway.
           ignore_older_secs: 3600
 
       transforms:
@@ -68,7 +73,7 @@ spec:
         kubernetes_remap:
           type: remap
           inputs:
-            - kubernetes_logs
+            - pod_logs
           source: |-
             app = string(.kubernetes.pod_labels."app.kubernetes.io/name") ??
               string(.kubernetes.pod_labels.app) ??
@@ -109,8 +114,11 @@ spec:
             app: "{{`{{ app }}`}}"
             container: "{{`{{ container }}`}}"
             node: "{{`{{ node }}`}}"
+          # Batches are per stream (label set), and there are ~150 streams, so
+          # the per-batch cap is multiplied by that. 1MB each blew past the
+          # memory limit during a burst.
           batch:
-            max_bytes: 1048576
+            max_bytes: 131072
           # Vector retries 5xx forever by default, so one batch Loki keeps
           # rejecting (e.g. a 500 for timestamps outside its schema) blocks the
           # pipeline and grows memory until OOMKill. Give up after ~5 minutes of
