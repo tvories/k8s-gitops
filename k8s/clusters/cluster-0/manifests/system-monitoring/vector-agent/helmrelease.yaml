@@ -66,6 +66,22 @@ spec:
           read_from: end
           # Skip log files untouched for an hour (dead pods, old rotations).
           ignore_older_secs: 3600
+          # The default (true) reads a newly found file to EOF in one go,
+          # ignoring max_read_bytes. A 10MB container log found on the 60s
+          # rescan then became a single burst that OOMKilled the pod.
+          oldest_first: false
+          use_apiserver_cache: true
+          # Don't stamp every event with the node's labels (dozens of NFD
+          # feature labels), the namespace's labels or the pod's annotations.
+          # The remap below discards them anyway, but only after they've
+          # multiplied each line's size in memory. pod_labels is kept: the
+          # remap derives `app` from it.
+          pod_annotation_fields:
+            pod_annotations: ""
+          namespace_annotation_fields:
+            namespace_labels: ""
+          node_annotation_fields:
+            node_labels: ""
 
       transforms:
         # Keep only what is useful and rebuild the event, so each line is not
