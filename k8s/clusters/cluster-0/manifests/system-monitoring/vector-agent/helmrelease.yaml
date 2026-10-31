@@ -38,14 +38,15 @@ spec:
         operator: Exists
         effect: NoSchedule
 
-    # Rarely used, so kept deliberately small. Raise the limit if it OOMs
-    # during a log burst rather than dropping it.
+    # Steady state is ~40Mi. The limit is headroom for catching up on a backlog
+    # (first start, or after Loki/homebox was unreachable): at 128Mi every pod
+    # OOMKilled on first start, before it could checkpoint, and looped.
     resources:
       requests:
         cpu: 10m
         memory: 48Mi
       limits:
-        memory: 128Mi
+        memory: 256Mi
 
     customConfig:
       data_dir: /vector-data-dir
@@ -56,6 +57,10 @@ spec:
       sources:
         kubernetes_logs:
           type: kubernetes_logs
+          # Skip log files untouched for an hour (dead pods, old rotations).
+          # Without this a fresh start replays every file on the node; Loki
+          # rejects anything older than 7 days anyway.
+          ignore_older_secs: 3600
 
       transforms:
         # Keep only what is useful and rebuild the event, so each line is not
