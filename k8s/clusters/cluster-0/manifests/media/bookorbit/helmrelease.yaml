@@ -82,7 +82,10 @@ spec:
               # back to a copy. Its watcher is inotify-only and misses files
               # other NFS clients drop here, so feed libraries, not the dock.
               BOOK_DOCK_PATH: /media/bookorbit/book-dock
-              NODE_MAX_OLD_SPACE_SIZE: "1536"
+              # Below the 4Gi limit: a scan's EPUB unzips and cover images
+              # are native memory on top of the heap (OOMKilled at 2Gi with
+              # a 1536 heap while scanning ~3,500 new books)
+              NODE_MAX_OLD_SPACE_SIZE: "2048"
               # authentik.t-vo.us resolves to a LAN IP in-cluster (split
               # horizon), which BookOrbit refuses as an OIDC issuer without this
               OIDC_ALLOW_LOCAL_ISSUERS: "true"
@@ -90,7 +93,21 @@ spec:
               READ_ALOUD_WORKER_URL: http://127.0.0.1:8787
             envFrom: *envFrom
             probes:
-              liveness: &probes
+              # A scan of a few thousand new books blocks the event loop for a
+              # minute or more at a time; at 3 x 10s the kubelet restarted it
+              # mid-scan, and the next scan blocked the same way. Restart only
+              # after ~5 minutes unanswered; readiness stays quick.
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/health
+                    port: *port
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 10
+              readiness:
                 enabled: true
                 custom: true
                 spec:
@@ -101,7 +118,6 @@ spec:
                   periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 3
-              readiness: *probes
               startup:
                 enabled: true
                 custom: true
@@ -117,7 +133,7 @@ spec:
                 cpu: 10m
                 memory: 256Mi
               limits:
-                memory: 2Gi
+                memory: 4Gi
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               capabilities:
