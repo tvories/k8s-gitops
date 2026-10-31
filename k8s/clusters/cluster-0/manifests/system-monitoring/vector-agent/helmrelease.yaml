@@ -38,9 +38,18 @@ spec:
         operator: Exists
         effect: NoSchedule
 
-    # Steady state is ~40Mi. The limit is headroom for catching up on a backlog
-    # (first start, or after Loki/homebox was unreachable): at 128Mi every pod
-    # OOMKilled on first start, before it could checkpoint, and looped.
+    # The fix for the startup OOMKill loop (vectordotdev/vector#26465): since
+    # 0.55 the first file scan drains the backlog fast enough that jemalloc's
+    # per-thread arenas balloon (one worker thread per CPU core), not a leak.
+    # Upstream's tested fix: few threads and no allocator decay delay, which
+    # took a 256Mi-limited agent from OOM to ~50Mi.
+    env:
+      - name: VECTOR_THREADS
+        value: "2"
+      - name: MALLOC_CONF
+        value: dirty_decay_ms:0,muzzy_decay_ms:0
+
+    # Steady state is ~40Mi; the limit is headroom for a catch-up burst.
     resources:
       requests:
         cpu: 10m
@@ -55,27 +64,23 @@ spec:
         enabled: false
 
       sources:
-        # Renamed from `kubernetes_logs` (2026-10-31) to start from fresh
-        # checkpoints: the old ones were stuck replaying a backlog that OOMKilled
-        # every pod before the checkpoint could advance.
+        # Renamed from `kubernetes_logs` (2026-10-31) to drop checkpoints left
+        # behind by the OOMKill loop.
         pod_logs:
           type: kubernetes_logs
-          # Files with no checkpoint (first start, new pods) are tailed from the
-          # end. Replaying from the beginning floods the sink, and Loki drops
-          # most of it anyway as "too far behind" once newer lines have arrived.
+          # Applies only to files found by the startup scan (which usually runs
+          # before pod metadata has synced, so finds little); files found later
+          # are read from the beginning. The remap's age filter covers that.
           read_from: end
           # Skip log files untouched for an hour (dead pods, old rotations).
           ignore_older_secs: 3600
-          # The default (true) reads a newly found file to EOF in one go,
-          # ignoring max_read_bytes. A 10MB container log found on the 60s
-          # rescan then became a single burst that OOMKilled the pod.
+          # Interleave reads across files rather than draining one at a time.
           oldest_first: false
           use_apiserver_cache: true
           # Don't stamp every event with the node's labels (dozens of NFD
-          # feature labels), the namespace's labels or the pod's annotations.
-          # The remap below discards them anyway, but only after they've
-          # multiplied each line's size in memory. pod_labels is kept: the
-          # remap derives `app` from it.
+          # feature labels), the namespace's labels or the pod's annotations;
+          # the remap discards them anyway. pod_labels is kept: the remap
+          # derives `app` from it.
           pod_annotation_fields:
             pod_annotations: ""
           namespace_annotation_fields:
@@ -90,13 +95,10 @@ spec:
           type: remap
           inputs:
             - pod_logs
-          # Drop lines older than 15 minutes before they reach the sink. The
-          # first file scan runs before pod metadata has synced, so it matches
-          # nothing; the 60s rescan then finds every file as "new" and reads it
-          # from the beginning (read_from only applies at startup). That replay
-          # (~150 files, up to 10MB each) OOMKilled the pod, and Loki rejected
-          # it anyway as "too far behind". Dropped events still advance the
-          # checkpoints, so after one catch-up restarts resume normally.
+          # Drop lines older than 15 minutes before they reach the sink. On a
+          # fresh start the first rescan reads every file from the beginning;
+          # Loki would reject that replay as "too far behind" anyway. Dropped
+          # events still advance the checkpoints.
           drop_on_abort: true
           source: |-
             ts = timestamp(.timestamp) ??
