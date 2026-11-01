@@ -44,7 +44,7 @@ spec:
           containers:
             - name: fix-catalog-acl
               # Has bash, curl and jq; same image as rook-ceph/reflector.
-              image: alpine/k8s:1.37.1
+              image: alpine/k8s:1.37.2
               command: ["/bin/bash", "/app/fix-catalog-acl.sh"]
               env:
                 - name: TECHNITIUM_URL
