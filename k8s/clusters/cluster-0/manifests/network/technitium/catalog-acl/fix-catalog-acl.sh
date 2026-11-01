@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Re-add the LAN to the cluster catalog zone's Zone Transfer ACL.
+# Re-add the node subnets to the cluster catalog zone's Zone Transfer ACL.
 #
 # tdns2 (k8s) pulls every catalogued zone from homebox over AXFR, and the pod's
-# masqueraded traffic leaves from its node's 192.168.1.x LAN address (the
-# on-link route beats the default). Technitium keeps dropping 192.168.1.0/24
-# from this ACL, which freezes tdns2's serials and fires
-# TechnitiumZoneSerialMismatch. Member zones inherit the catalog's ACL unless
-# "Override Zone Transfer Option" is ticked on them.
+# traffic is masqueraded to its node's address. That used to be the node's
+# 192.168.1.x LAN lease (on-link beat the default route); since the nodes lost
+# their untagged LAN address (2026-10-31) it's their 192.168.80.x VLAN80
+# address, routed through OPNsense. Technitium keeps rebuilding this ACL from
+# the registered node IPs, dropping both subnets, which freezes tdns2's serials
+# and fires TechnitiumZoneSerialMismatch. Member zones inherit the catalog's
+# ACL unless "Override Zone Transfer Option" is ticked on them.
 #
 # Runs every 20 minutes from the catalog-acl CronJob (TECHNITIUM_URL/TOKEN).
 # By hand it falls back to the terraform env:
@@ -17,7 +19,9 @@ url="${TECHNITIUM_URL:-${TF_VAR_technitium_url:?set TECHNITIUM_URL or TF_VAR_tec
 token="${TECHNITIUM_TOKEN:-${TF_VAR_technitium_token:?set TECHNITIUM_TOKEN or TF_VAR_technitium_token}}"
 catalog="cluster-catalog.cluster.t-vo.us"
 node="tdns.cluster.t-vo.us" # the primary, which serves the transfers
-lan="192.168.1.0/24"
+# VLAN80 is where transfers come from now. 192.168.1.0/24 stays until no node
+# holds a LAN lease (m720q-1 kept one longest); drop it after that.
+nets=(192.168.80.0/24 192.168.1.0/24)
 members=(cluster.t-vo.us mcbadass.local 1.168.192.in-addr.arpa 83.168.192.in-addr.arpa)
 
 api() {
@@ -42,11 +46,14 @@ opts=$(api zones/options/get "zone=${catalog}")
 echo "${catalog} before:"
 show <<<"$opts"
 
-if jq -e --arg lan "$lan" '.response.zoneTransferNetworkACL | index($lan)' <<<"$opts" >/dev/null; then
-    echo "${lan} is already in the ACL; not changing anything."
+wanted=$(printf '%s\n' "${nets[@]}" | jq -R . | jq -s .)
+missing=$(jq -c --argjson w "$wanted" '[$w[] as $n | select(.response.zoneTransferNetworkACL | index($n) | not) | $n]' <<<"$opts")
+if [[ $missing == "[]" ]]; then
+    echo "${nets[*]} already in the ACL; not changing anything."
 else
+    echo "adding missing: $(jq -r 'join(" ")' <<<"$missing")"
     # Append, don't prepend: entries match in order, so any existing "!" deny stays in force.
-    acl=$(jq -r --arg lan "$lan" '.response.zoneTransferNetworkACL + [$lan] | join(",")' <<<"$opts")
+    acl=$(jq -r --argjson m "$missing" '.response.zoneTransferNetworkACL + $m | join(",")' <<<"$opts")
     api zones/options/set "zone=${catalog}" "zoneTransferNetworkACL=${acl}" >/dev/null
     echo "${catalog} after:"
     api zones/options/get "zone=${catalog}" | show
@@ -60,9 +67,10 @@ esac
 # A member zone with its own override doesn't inherit the catalog ACL.
 for zone in "${members[@]}"; do
     api zones/options/get "zone=${zone}" |
-        jq -r --arg z "$zone" --arg lan "$lan" '.response |
-            if .overrideCatalogZoneTransfer and ((.zoneTransferNetworkACL // []) | index($lan) | not)
-            then "WARNING: \($z) overrides the catalog transfer ACL and lacks \($lan)"
+        jq -r --arg z "$zone" --argjson w "$wanted" '.response | . as $r |
+            if .overrideCatalogZoneTransfer
+            then $w[] | select(($r.zoneTransferNetworkACL // []) | index(.) | not)
+                | "WARNING: \($z) overrides the catalog transfer ACL and lacks \(.)"
             else empty end' >&2
 done
 

@@ -1,11 +1,12 @@
-# Keeps 192.168.1.0/24 in the cluster catalog zone's Zone Transfer ACL.
+# Keeps the node subnets (192.168.80.0/24, plus 192.168.1.0/24 while any node
+# still has a LAN lease) in the cluster catalog zone's Zone Transfer ACL.
 #
 # Technitium rebuilds that ACL from the registered node IPs (it came back as
 # just 192.168.83.241) after homebox restarts and after Talos node upgrades,
-# but tdns2's AXFRs leave from the node's 192.168.1.x LAN address, so every
-# transfer is refused and TechnitiumZoneSerialMismatch fires 30m later. The
-# script is a no-op while the entry is present; a 20-minute schedule still
-# fixes it inside the alert's 30m `for`.
+# but tdns2's AXFRs leave from its node's address, so every transfer is
+# refused and TechnitiumZoneSerialMismatch fires 30m later. The script is a
+# no-op while the entries are present; a 20-minute schedule still fixes it
+# inside the alert's 30m `for`.
 #
 # It talks to tdns2's in-cluster Service (plain HTTP, like the exporter) and
 # the API forwards to homebox via node=tdns.cluster.t-vo.us. If tdns2 is in the
