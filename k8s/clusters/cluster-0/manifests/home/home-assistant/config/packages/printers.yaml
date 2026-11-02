@@ -1,0 +1,155 @@
+# Printer tracking for the Printers dashboard (../dashboards/printers.yaml).
+#
+# MANAGED IN GIT: k8s-gitops/k8s/clusters/cluster-0/manifests/home/home-assistant/config/
+# Mounted read-only into /config/packages/printers.yaml from the
+# home-assistant-config ConfigMap. Edit it in the repo, not in the pod; a push
+# rolls the pod via Reloader (subPath mounts never update in place).
+#
+# Both printers come from the IPP integration (UI-configured):
+#   Canon iX6820        sensor.canon_ix6800_series, ..._{black_pgbk,black_bk,cyan,magenta,yellow}
+#   Brother MFC-9330CDW sensor.brother_mfc_9330cdw, ..._{black,cyan,magenta,yellow}_toner_cartridge
+#
+# IPP has no page counter, so everything here counts JOBS (each switch of the
+# printer status to "printing"), not pages. Printers don't track usage per
+# cartridge either; "jobs since swap" is the stand-in: a swap is detected when
+# a level jumps up, which resets that cartridge's counter and stamps the date.
+# Canon reports levels in coarse steps and stops measuring once a cartridge
+# says "low", so treat levels and swap detection as approximate.
+#
+# Layers per printer P (canon, brother) and cartridge K:
+#   sensor.<ipp source>              ipp       live level, unavailable when the printer is off
+#   sensor.P_last_K                  template  last known level (what dashboards use)
+#   counter.P_jobs_since_swap_K                jobs since that cartridge went in
+#   input_datetime.P_swapped_K                 when it went in (set by the automation)
+#   counter.P_jobs_total, sensor.P_jobs_weekly / _monthly
+# The automations derive P and K from entity ids, so new entities must keep
+# this naming.
+
+counter:
+  canon_jobs_total: &total { name: Canon jobs total, icon: mdi:printer }
+  canon_jobs_since_swap_black_pgbk: &since_swap { name: Canon jobs since PGBK swap, icon: mdi:counter }
+  canon_jobs_since_swap_black_bk: { <<: *since_swap, name: Canon jobs since BK swap }
+  canon_jobs_since_swap_cyan: { <<: *since_swap, name: Canon jobs since cyan swap }
+  canon_jobs_since_swap_magenta: { <<: *since_swap, name: Canon jobs since magenta swap }
+  canon_jobs_since_swap_yellow: { <<: *since_swap, name: Canon jobs since yellow swap }
+  brother_jobs_total: { <<: *total, name: Brother jobs total }
+  brother_jobs_since_swap_black: { <<: *since_swap, name: Brother jobs since black swap }
+  brother_jobs_since_swap_cyan: { <<: *since_swap, name: Brother jobs since cyan swap }
+  brother_jobs_since_swap_magenta: { <<: *since_swap, name: Brother jobs since magenta swap }
+  brother_jobs_since_swap_yellow: { <<: *since_swap, name: Brother jobs since yellow swap }
+
+input_datetime:
+  canon_swapped_black_pgbk: &swapped { name: Canon PGBK swapped, has_date: true, has_time: true, icon: mdi:calendar-sync }
+  canon_swapped_black_bk: { <<: *swapped, name: Canon BK swapped }
+  canon_swapped_cyan: { <<: *swapped, name: Canon cyan swapped }
+  canon_swapped_magenta: { <<: *swapped, name: Canon magenta swapped }
+  canon_swapped_yellow: { <<: *swapped, name: Canon yellow swapped }
+  brother_swapped_black: { <<: *swapped, name: Brother black swapped }
+  brother_swapped_cyan: { <<: *swapped, name: Brother cyan swapped }
+  brother_swapped_magenta: { <<: *swapped, name: Brother magenta swapped }
+  brother_swapped_yellow: { <<: *swapped, name: Brother yellow swapped }
+
+utility_meter:
+  canon_jobs_weekly: { name: Canon jobs this week, source: counter.canon_jobs_total, cycle: weekly }
+  canon_jobs_monthly: { name: Canon jobs this month, source: counter.canon_jobs_total, cycle: monthly }
+  brother_jobs_weekly: { name: Brother jobs this week, source: counter.brother_jobs_total, cycle: weekly }
+  brother_jobs_monthly: { name: Brother jobs this month, source: counter.brother_jobs_total, cycle: monthly }
+
+# Last known level per cartridge. Every trigger in a block re-renders all of
+# its sensors; each keeps its previous value while its own source is
+# unavailable, so a printer that was off during a swap still shows the jump
+# when it comes back. Unavailable only until the first real reading, so a
+# fresh install doesn't look like a jump from 0 (= a false swap).
+template:
+  - triggers:
+      - trigger: state
+        entity_id:
+          - sensor.canon_ix6800_series_black_pgbk
+          - sensor.canon_ix6800_series_black_bk
+          - sensor.canon_ix6800_series_cyan
+          - sensor.canon_ix6800_series_magenta
+          - sensor.canon_ix6800_series_yellow
+      - &start { trigger: homeassistant, event: start }
+      - &reloaded { trigger: event, event_type: event_template_reloaded }
+    sensor:
+      - <<: &last_level
+          unit_of_measurement: "%"
+          state_class: measurement
+          icon: mdi:water
+          availability: "{{ is_number(states(src)) or is_number(this.state) }}"
+          state: "{{ states(src) | int if is_number(states(src)) else this.state | int }}"
+        name: Canon last PGBK
+        variables: { src: sensor.canon_ix6800_series_black_pgbk }
+        unique_id: canon_last_black_pgbk
+        default_entity_id: sensor.canon_last_black_pgbk
+      - { <<: *last_level, name: Canon last BK, variables: { src: sensor.canon_ix6800_series_black_bk }, unique_id: canon_last_black_bk, default_entity_id: sensor.canon_last_black_bk }
+      - { <<: *last_level, name: Canon last cyan, variables: { src: sensor.canon_ix6800_series_cyan }, unique_id: canon_last_cyan, default_entity_id: sensor.canon_last_cyan }
+      - { <<: *last_level, name: Canon last magenta, variables: { src: sensor.canon_ix6800_series_magenta }, unique_id: canon_last_magenta, default_entity_id: sensor.canon_last_magenta }
+      - { <<: *last_level, name: Canon last yellow, variables: { src: sensor.canon_ix6800_series_yellow }, unique_id: canon_last_yellow, default_entity_id: sensor.canon_last_yellow }
+
+  - triggers:
+      - trigger: state
+        entity_id:
+          - sensor.brother_mfc_9330cdw_black_toner_cartridge
+          - sensor.brother_mfc_9330cdw_cyan_toner_cartridge
+          - sensor.brother_mfc_9330cdw_magenta_toner_cartridge
+          - sensor.brother_mfc_9330cdw_yellow_toner_cartridge
+      - *start
+      - *reloaded
+    sensor:
+      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last black, variables: { src: sensor.brother_mfc_9330cdw_black_toner_cartridge }, unique_id: brother_last_black, default_entity_id: sensor.brother_last_black }
+      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last cyan, variables: { src: sensor.brother_mfc_9330cdw_cyan_toner_cartridge }, unique_id: brother_last_cyan, default_entity_id: sensor.brother_last_cyan }
+      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last magenta, variables: { src: sensor.brother_mfc_9330cdw_magenta_toner_cartridge }, unique_id: brother_last_magenta, default_entity_id: sensor.brother_last_magenta }
+      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last yellow, variables: { src: sensor.brother_mfc_9330cdw_yellow_toner_cartridge }, unique_id: brother_last_yellow, default_entity_id: sensor.brother_last_yellow }
+
+automation:
+  - id: printers_count_jobs
+    alias: "Printers: count jobs"
+    description: Every switch to "printing" is one job. Managed in git, see packages/printers.yaml.
+    triggers:
+      - { trigger: state, entity_id: sensor.canon_ix6800_series, to: printing, id: canon }
+      - { trigger: state, entity_id: sensor.brother_mfc_9330cdw, to: printing, id: brother }
+    actions:
+      # counter.P_jobs_total plus every counter.P_jobs_since_swap_K
+      - action: counter.increment
+        target:
+          entity_id: >-
+            {{ states.counter | map(attribute='entity_id')
+               | select('match', 'counter\.' ~ trigger.id ~ '_jobs_') | list }}
+    mode: queued
+
+  - id: printers_detect_swap
+    alias: "Printers: detect cartridge swap"
+    description: A level jump of 15+ points is a new cartridge. Managed in git, see packages/printers.yaml.
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.canon_last_black_pgbk
+          - sensor.canon_last_black_bk
+          - sensor.canon_last_cyan
+          - sensor.canon_last_magenta
+          - sensor.canon_last_yellow
+          - sensor.brother_last_black
+          - sensor.brother_last_cyan
+          - sensor.brother_last_magenta
+          - sensor.brother_last_yellow
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ is_number(trigger.from_state.state) and is_number(trigger.to_state.state)
+             and trigger.to_state.state | int - trigger.from_state.state | int >= 15 }}
+    variables:
+      # sensor.canon_last_cyan -> p = canon, k = cyan
+      p: "{{ trigger.entity_id.split('.')[1].split('_last_')[0] }}"
+      k: "{{ trigger.entity_id.split('_last_')[1] }}"
+    actions:
+      - action: counter.reset
+        target: { entity_id: "counter.{{ p }}_jobs_since_swap_{{ k }}" }
+      - action: input_datetime.set_datetime
+        target: { entity_id: "input_datetime.{{ p }}_swapped_{{ k }}" }
+        data: { timestamp: "{{ now().timestamp() }}" }
+      - action: logbook.log
+        data:
+          name: "{{ p | capitalize }} printer"
+          message: "{{ k }} cartridge replaced ({{ trigger.from_state.state }}% → {{ trigger.to_state.state }}%)"
+    mode: queued

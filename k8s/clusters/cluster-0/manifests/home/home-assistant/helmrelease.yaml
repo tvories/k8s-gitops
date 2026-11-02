@@ -38,6 +38,9 @@ spec:
       # and voice broke, which told us nothing about which one was responsible.
     controllers:
       home-assistant:
+        annotations:
+          # subPath mounts never see ConfigMap updates; restart HA instead.
+          configmap.reloader.stakater.com/reload: home-assistant-config
         pod:
           # hostNetwork. Attaching HA to multus-iot has now broken voice assist
           # TWICE (2026-08-06 with two networks, 2026-08-09 with one), and both
@@ -307,6 +310,23 @@ spec:
         globalMounts:
           - path: /config
         # mountPath: /config
+
+      # Git-managed files layered over the /config PVC (source: ./config/,
+      # ConfigMap from kustomization.yaml). Read-only in the pod: edit them in
+      # the repo. codeserver gets them too so the editor shows the live copy.
+      config-git:
+        type: configMap
+        name: home-assistant-config
+        advancedMounts:
+          home-assistant:
+            app: &config_git_mounts
+              - path: /config/packages/printers.yaml
+                subPath: printers-package.yaml
+                readOnly: true
+              - path: /config/dashboards/printers.yaml
+                subPath: printers-dashboard.yaml
+                readOnly: true
+            codeserver: *config_git_mounts
 
       # python-matter-server keeps the CHIP/Matter fabric in /data --
       # chip_factory.ini plus the commissioning credentials that keep devices

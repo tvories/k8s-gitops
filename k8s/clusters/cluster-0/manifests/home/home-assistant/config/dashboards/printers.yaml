@@ -1,0 +1,232 @@
+# Printers dashboard (YAML mode: not editable in the UI).
+#
+# MANAGED IN GIT: k8s-gitops/k8s/clusters/cluster-0/manifests/home/home-assistant/config/
+# Mounted read-only into /config/dashboards/printers.yaml from the
+# home-assistant-config ConfigMap and registered under `lovelace: dashboards:`
+# in configuration.yaml. Entities come from ../packages/printers.yaml.
+button_card_templates:
+  cartridge:
+    show_name: true
+    show_state: false
+    show_icon: false
+    triggers_update: all
+    tap_action: { action: more-info }
+    variables:
+      color: "#888"
+      jobs: null
+      swapped: null
+    styles:
+      card:
+        - padding: 10px 4px
+      grid:
+        - grid-template-areas: '"n" "bar" "pct" "meta"'
+        - grid-template-rows: auto 1fr auto auto
+        - row-gap: 6px
+      name:
+        - font-size: 12px
+        - font-weight: 600
+      custom_fields:
+        pct:
+          - font-size: 14px
+          - font-weight: 600
+          - color: >-
+              [[[ return Number(entity?.state) <= 15 ? 'var(--error-color)' : 'var(--primary-text-color)'; ]]]
+        meta:
+          - font-size: 10px
+          - line-height: 1.3
+          - color: var(--secondary-text-color)
+    custom_fields:
+      bar: >-
+        [[[
+          const lvl = Math.max(0, Math.min(100, Number(entity?.state) || 0));
+          return `<div style="margin:0 auto;width:30px;height:96px;border-radius:6px;
+                    border:2px solid var(--divider-color);display:flex;align-items:flex-end;overflow:hidden">
+                    <div style="width:100%;height:${lvl}%;background:${variables.color}"></div></div>`;
+        ]]]
+      pct: >-
+        [[[ return isNaN(Number(entity?.state)) ? '–' : `${Number(entity.state)}%`; ]]]
+      meta: >-
+        [[[
+          if (!variables.jobs) return '';
+          const j = states[variables.jobs]?.state ?? '–';
+          const s = states[variables.swapped]?.state;
+          let ago = 'no swap seen';
+          if (s && !s.startsWith('1970') && !['unknown', 'unavailable'].includes(s)) {
+            const d = Math.floor((Date.now() - new Date(s.replace(' ', 'T'))) / 86400000);
+            ago = d === 0 ? 'swapped today' : `swapped ${d}d ago`;
+          }
+          return `${j} jobs<br>${ago}`;
+        ]]]
+
+title: Printers
+views:
+  - title: Printers
+    path: printers
+    icon: mdi:printer
+    type: sections
+    max_columns: 2
+    sections:
+      # --- Canon iX6820 ---------------------------------------------------------
+      - type: grid
+        cards:
+          - type: heading
+            heading: Canon iX6820
+            icon: mdi:printer
+          - type: custom:mushroom-template-card
+            entity: sensor.canon_ix6800_series
+            primary: "{{ states('sensor.canon_ix6800_series') | capitalize }}"
+            secondary: >-
+              {% set p = 'canon' %}
+              {% set ns = namespace(low=[]) %}
+              {% for s in states.sensor | selectattr('entity_id', 'match', 'sensor\.' ~ p ~ '_last_') %}
+                {% if is_number(s.state) and s.state | int <= 15 %}
+                  {% set ns.low = ns.low + [s.name | replace(p | capitalize ~ ' last ', '')] %}
+                {% endif %}
+              {% endfor %}
+              {% if ns.low %}Low: {{ ns.low | join(', ') }}
+              {% else %}{{ state_attr('sensor.canon_ix6800_series', 'state_message') or 'All cartridges OK' }}{% endif %}
+            icon: mdi:printer
+            icon_color: >-
+              {{ {'idle': 'green', 'printing': 'blue', 'stopped': 'red'}.get(states('sensor.canon_ix6800_series'), 'grey') }}
+            grid_options: { columns: 12 }
+          - type: grid
+            columns: 5
+            square: false
+            grid_options: { columns: 12 }
+            cards:
+              - &canon_card
+                type: custom:button-card
+                template: cartridge
+                entity: sensor.canon_last_black_pgbk
+                name: PGBK
+                variables:
+                  color: "#1a1a1a"
+                  jobs: counter.canon_jobs_since_swap_black_pgbk
+                  swapped: input_datetime.canon_swapped_black_pgbk
+              - <<: *canon_card
+                entity: sensor.canon_last_black_bk
+                name: BK
+                variables:
+                  color: "#4a4a4a"
+                  jobs: counter.canon_jobs_since_swap_black_bk
+                  swapped: input_datetime.canon_swapped_black_bk
+              - <<: *canon_card
+                entity: sensor.canon_last_cyan
+                name: C
+                variables:
+                  color: "#00aeef"
+                  jobs: counter.canon_jobs_since_swap_cyan
+                  swapped: input_datetime.canon_swapped_cyan
+              - <<: *canon_card
+                entity: sensor.canon_last_magenta
+                name: M
+                variables:
+                  color: "#ec008c"
+                  jobs: counter.canon_jobs_since_swap_magenta
+                  swapped: input_datetime.canon_swapped_magenta
+              - <<: *canon_card
+                entity: sensor.canon_last_yellow
+                name: Y
+                variables:
+                  color: "#ffd400"
+                  jobs: counter.canon_jobs_since_swap_yellow
+                  swapped: input_datetime.canon_swapped_yellow
+          - &jobs_card
+            type: custom:mushroom-entity-card
+            entity: sensor.canon_jobs_weekly
+            name: This week
+            icon: mdi:calendar-week
+            grid_options: { columns: 4 }
+          - { <<: *jobs_card, entity: sensor.canon_jobs_monthly, name: This month, icon: mdi:calendar-month }
+          - { <<: *jobs_card, entity: counter.canon_jobs_total, name: All time, icon: mdi:counter }
+
+      # --- Brother MFC-9330CDW --------------------------------------------------
+      - type: grid
+        cards:
+          - type: heading
+            heading: Brother MFC-9330CDW
+            icon: mdi:printer-outline
+          - type: custom:mushroom-template-card
+            entity: sensor.brother_mfc_9330cdw
+            primary: "{{ states('sensor.brother_mfc_9330cdw') | capitalize }}"
+            secondary: >-
+              {% set p = 'brother' %}
+              {% set ns = namespace(low=[]) %}
+              {% for s in states.sensor | selectattr('entity_id', 'match', 'sensor\.' ~ p ~ '_last_') %}
+                {% if is_number(s.state) and s.state | int <= 15 %}
+                  {% set ns.low = ns.low + [s.name | replace(p | capitalize ~ ' last ', '')] %}
+                {% endif %}
+              {% endfor %}
+              {% if ns.low %}Low: {{ ns.low | join(', ') }}
+              {% else %}{{ state_attr('sensor.brother_mfc_9330cdw', 'state_message') or 'All cartridges OK' }}{% endif %}
+            icon: mdi:printer-outline
+            icon_color: >-
+              {{ {'idle': 'green', 'printing': 'blue', 'stopped': 'red'}.get(states('sensor.brother_mfc_9330cdw'), 'grey') }}
+            grid_options: { columns: 12 }
+          - type: grid
+            columns: 4
+            square: false
+            grid_options: { columns: 12 }
+            cards:
+              - &brother_card
+                type: custom:button-card
+                template: cartridge
+                entity: sensor.brother_last_black
+                name: K
+                variables:
+                  color: "#1a1a1a"
+                  jobs: counter.brother_jobs_since_swap_black
+                  swapped: input_datetime.brother_swapped_black
+              - <<: *brother_card
+                entity: sensor.brother_last_cyan
+                name: C
+                variables:
+                  color: "#00aeef"
+                  jobs: counter.brother_jobs_since_swap_cyan
+                  swapped: input_datetime.brother_swapped_cyan
+              - <<: *brother_card
+                entity: sensor.brother_last_magenta
+                name: M
+                variables:
+                  color: "#ec008c"
+                  jobs: counter.brother_jobs_since_swap_magenta
+                  swapped: input_datetime.brother_swapped_magenta
+              - <<: *brother_card
+                entity: sensor.brother_last_yellow
+                name: Y
+                variables:
+                  color: "#ffd400"
+                  jobs: counter.brother_jobs_since_swap_yellow
+                  swapped: input_datetime.brother_swapped_yellow
+          - { <<: *jobs_card, entity: sensor.brother_jobs_weekly }
+          - { <<: *jobs_card, entity: sensor.brother_jobs_monthly, name: This month, icon: mdi:calendar-month }
+          - { <<: *jobs_card, entity: counter.brother_jobs_total, name: All time, icon: mdi:counter }
+
+      # --- History --------------------------------------------------------------
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Level history
+            icon: mdi:chart-line
+          - &history
+            type: statistics-graph
+            title: Canon
+            entities:
+              - { entity: sensor.canon_last_black_pgbk, name: PGBK }
+              - { entity: sensor.canon_last_black_bk, name: BK }
+              - { entity: sensor.canon_last_cyan, name: Cyan }
+              - { entity: sensor.canon_last_magenta, name: Magenta }
+              - { entity: sensor.canon_last_yellow, name: Yellow }
+            stat_types: [mean]
+            period: day
+            days_to_show: 90
+            chart_type: line
+            grid_options: { columns: 6 }
+          - <<: *history
+            title: Brother
+            entities:
+              - { entity: sensor.brother_last_black, name: Black }
+              - { entity: sensor.brother_last_cyan, name: Cyan }
+              - { entity: sensor.brother_last_magenta, name: Magenta }
+              - { entity: sensor.brother_last_yellow, name: Yellow }

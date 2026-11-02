@@ -8,3 +8,16 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./volsync.yaml
+# Git-managed HA config, mounted file-by-file into /config (see the
+# config-git persistence in helmrelease.yaml). Everything else in /config
+# lives on the PVC and is edited in place.
+configMapGenerator:
+  - name: home-assistant-config
+    files:
+      - printers-package.yaml=./config/packages/printers.yaml
+      - printers-dashboard.yaml=./config/dashboards/printers.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    # HA templates ({{ }}) and button-card JS (${...}) must reach the pod as-is.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
