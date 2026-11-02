@@ -133,10 +133,10 @@ views:
                   jobs: counter.canon_jobs_since_swap_yellow
                   swapped: input_datetime.canon_swapped_yellow
           - <<: &jobs_card { type: custom:mushroom-entity-card, grid_options: { columns: 4 } }
-            entity: sensor.canon_jobs_weekly
+            entity: sensor.canon_jobs_this_week
             name: This week
             icon: mdi:calendar-week
-          - { <<: *jobs_card, entity: sensor.canon_jobs_monthly, name: This month, icon: mdi:calendar-month }
+          - { <<: *jobs_card, entity: sensor.canon_jobs_this_month, name: This month, icon: mdi:calendar-month }
           - { <<: *jobs_card, entity: counter.canon_jobs_total, name: All time, icon: mdi:counter }
 
       # --- Brother MFC-9330CDW --------------------------------------------------
@@ -195,8 +195,8 @@ views:
                   color: "#ffd400"
                   jobs: counter.brother_jobs_since_swap_yellow
                   swapped: input_datetime.brother_swapped_yellow
-          - { <<: *jobs_card, entity: sensor.brother_jobs_weekly, name: This week, icon: mdi:calendar-week }
-          - { <<: *jobs_card, entity: sensor.brother_jobs_monthly, name: This month, icon: mdi:calendar-month }
+          - { <<: *jobs_card, entity: sensor.brother_jobs_this_week, name: This week, icon: mdi:calendar-week }
+          - { <<: *jobs_card, entity: sensor.brother_jobs_this_month, name: This month, icon: mdi:calendar-month }
           - { <<: *jobs_card, entity: counter.brother_jobs_total, name: All time, icon: mdi:counter }
 
       # --- History --------------------------------------------------------------

@@ -22,7 +22,8 @@
 #   sensor.P_last_K                  template  last known level (what dashboards use)
 #   counter.P_jobs_since_swap_K                jobs since that cartridge went in
 #   input_datetime.P_swapped_K                 when it went in (set by the automation)
-#   counter.P_jobs_total, sensor.P_jobs_weekly / _monthly
+#   counter.P_jobs_total, sensor.P_jobs_this_week / _this_month
+#     (utility_meter takes its entity_id from `name`, not from its key)
 # The automations derive P and K from entity ids, so new entities must keep
 # this naming.
 #
