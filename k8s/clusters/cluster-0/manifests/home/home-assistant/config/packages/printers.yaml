@@ -1,3 +1,4 @@
+---
 # Printer tracking for the Printers dashboard (../dashboards/printers.yaml).
 #
 # MANAGED IN GIT: k8s-gitops/k8s/clusters/cluster-0/manifests/home/home-assistant/config/
@@ -24,22 +25,25 @@
 #   counter.P_jobs_total, sensor.P_jobs_weekly / _monthly
 # The automations derive P and K from entity ids, so new entities must keep
 # this naming.
+#
+# Shared (&anchor) blocks never contain a key that an entry also sets: HA's
+# YAML loader logs a "duplicate key" warning for every merge-key override.
 
 counter:
-  canon_jobs_total: &total { name: Canon jobs total, icon: mdi:printer }
-  canon_jobs_since_swap_black_pgbk: &since_swap { name: Canon jobs since PGBK swap, icon: mdi:counter }
+  canon_jobs_total: { name: Canon jobs total, icon: mdi:printer }
+  canon_jobs_since_swap_black_pgbk: { <<: &since_swap { icon: mdi:counter }, name: Canon jobs since PGBK swap }
   canon_jobs_since_swap_black_bk: { <<: *since_swap, name: Canon jobs since BK swap }
   canon_jobs_since_swap_cyan: { <<: *since_swap, name: Canon jobs since cyan swap }
   canon_jobs_since_swap_magenta: { <<: *since_swap, name: Canon jobs since magenta swap }
   canon_jobs_since_swap_yellow: { <<: *since_swap, name: Canon jobs since yellow swap }
-  brother_jobs_total: { <<: *total, name: Brother jobs total }
+  brother_jobs_total: { name: Brother jobs total, icon: mdi:printer-outline }
   brother_jobs_since_swap_black: { <<: *since_swap, name: Brother jobs since black swap }
   brother_jobs_since_swap_cyan: { <<: *since_swap, name: Brother jobs since cyan swap }
   brother_jobs_since_swap_magenta: { <<: *since_swap, name: Brother jobs since magenta swap }
   brother_jobs_since_swap_yellow: { <<: *since_swap, name: Brother jobs since yellow swap }
 
 input_datetime:
-  canon_swapped_black_pgbk: &swapped { name: Canon PGBK swapped, has_date: true, has_time: true, icon: mdi:calendar-sync }
+  canon_swapped_black_pgbk: { <<: &swapped { has_date: true, has_time: true, icon: mdi:calendar-sync }, name: Canon PGBK swapped }
   canon_swapped_black_bk: { <<: *swapped, name: Canon BK swapped }
   canon_swapped_cyan: { <<: *swapped, name: Canon cyan swapped }
   canon_swapped_magenta: { <<: *swapped, name: Canon magenta swapped }
@@ -75,7 +79,7 @@ template:
       - <<: &last_level
           unit_of_measurement: "%"
           state_class: measurement
-          icon: mdi:water
+          icon: "{{ 'mdi:water' if src.startswith('sensor.canon') else 'mdi:printer-outline' }}"
           availability: "{{ is_number(states(src)) or is_number(this.state) }}"
           state: "{{ states(src) | int if is_number(states(src)) else this.state | int }}"
         name: Canon last PGBK
@@ -97,10 +101,10 @@ template:
       - *start
       - *reloaded
     sensor:
-      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last black, variables: { src: sensor.brother_mfc_9330cdw_black_toner_cartridge }, unique_id: brother_last_black, default_entity_id: sensor.brother_last_black }
-      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last cyan, variables: { src: sensor.brother_mfc_9330cdw_cyan_toner_cartridge }, unique_id: brother_last_cyan, default_entity_id: sensor.brother_last_cyan }
-      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last magenta, variables: { src: sensor.brother_mfc_9330cdw_magenta_toner_cartridge }, unique_id: brother_last_magenta, default_entity_id: sensor.brother_last_magenta }
-      - { <<: *last_level, icon: mdi:printer-outline, name: Brother last yellow, variables: { src: sensor.brother_mfc_9330cdw_yellow_toner_cartridge }, unique_id: brother_last_yellow, default_entity_id: sensor.brother_last_yellow }
+      - { <<: *last_level, name: Brother last black, variables: { src: sensor.brother_mfc_9330cdw_black_toner_cartridge }, unique_id: brother_last_black, default_entity_id: sensor.brother_last_black }
+      - { <<: *last_level, name: Brother last cyan, variables: { src: sensor.brother_mfc_9330cdw_cyan_toner_cartridge }, unique_id: brother_last_cyan, default_entity_id: sensor.brother_last_cyan }
+      - { <<: *last_level, name: Brother last magenta, variables: { src: sensor.brother_mfc_9330cdw_magenta_toner_cartridge }, unique_id: brother_last_magenta, default_entity_id: sensor.brother_last_magenta }
+      - { <<: *last_level, name: Brother last yellow, variables: { src: sensor.brother_mfc_9330cdw_yellow_toner_cartridge }, unique_id: brother_last_yellow, default_entity_id: sensor.brother_last_yellow }
 
 automation:
   - id: printers_count_jobs

@@ -1,3 +1,4 @@
+---
 # Printers dashboard (YAML mode: not editable in the UI).
 #
 # MANAGED IN GIT: k8s-gitops/k8s/clusters/cluster-0/manifests/home/home-assistant/config/
@@ -94,49 +95,47 @@ views:
             square: false
             grid_options: { columns: 12 }
             cards:
-              - &canon_card
-                type: custom:button-card
-                template: cartridge
+              # Shared (&anchor) blocks never hold a key an entry also sets:
+              # HA's YAML loader warns on every merge-key override.
+              - <<: &cartridge_card { type: custom:button-card, template: cartridge }
                 entity: sensor.canon_last_black_pgbk
                 name: PGBK
                 variables:
                   color: "#1a1a1a"
                   jobs: counter.canon_jobs_since_swap_black_pgbk
                   swapped: input_datetime.canon_swapped_black_pgbk
-              - <<: *canon_card
+              - <<: *cartridge_card
                 entity: sensor.canon_last_black_bk
                 name: BK
                 variables:
                   color: "#4a4a4a"
                   jobs: counter.canon_jobs_since_swap_black_bk
                   swapped: input_datetime.canon_swapped_black_bk
-              - <<: *canon_card
+              - <<: *cartridge_card
                 entity: sensor.canon_last_cyan
                 name: C
                 variables:
                   color: "#00aeef"
                   jobs: counter.canon_jobs_since_swap_cyan
                   swapped: input_datetime.canon_swapped_cyan
-              - <<: *canon_card
+              - <<: *cartridge_card
                 entity: sensor.canon_last_magenta
                 name: M
                 variables:
                   color: "#ec008c"
                   jobs: counter.canon_jobs_since_swap_magenta
                   swapped: input_datetime.canon_swapped_magenta
-              - <<: *canon_card
+              - <<: *cartridge_card
                 entity: sensor.canon_last_yellow
                 name: Y
                 variables:
                   color: "#ffd400"
                   jobs: counter.canon_jobs_since_swap_yellow
                   swapped: input_datetime.canon_swapped_yellow
-          - &jobs_card
-            type: custom:mushroom-entity-card
+          - <<: &jobs_card { type: custom:mushroom-entity-card, grid_options: { columns: 4 } }
             entity: sensor.canon_jobs_weekly
             name: This week
             icon: mdi:calendar-week
-            grid_options: { columns: 4 }
           - { <<: *jobs_card, entity: sensor.canon_jobs_monthly, name: This month, icon: mdi:calendar-month }
           - { <<: *jobs_card, entity: counter.canon_jobs_total, name: All time, icon: mdi:counter }
 
@@ -168,37 +167,35 @@ views:
             square: false
             grid_options: { columns: 12 }
             cards:
-              - &brother_card
-                type: custom:button-card
-                template: cartridge
+              - <<: *cartridge_card
                 entity: sensor.brother_last_black
                 name: K
                 variables:
                   color: "#1a1a1a"
                   jobs: counter.brother_jobs_since_swap_black
                   swapped: input_datetime.brother_swapped_black
-              - <<: *brother_card
+              - <<: *cartridge_card
                 entity: sensor.brother_last_cyan
                 name: C
                 variables:
                   color: "#00aeef"
                   jobs: counter.brother_jobs_since_swap_cyan
                   swapped: input_datetime.brother_swapped_cyan
-              - <<: *brother_card
+              - <<: *cartridge_card
                 entity: sensor.brother_last_magenta
                 name: M
                 variables:
                   color: "#ec008c"
                   jobs: counter.brother_jobs_since_swap_magenta
                   swapped: input_datetime.brother_swapped_magenta
-              - <<: *brother_card
+              - <<: *cartridge_card
                 entity: sensor.brother_last_yellow
                 name: Y
                 variables:
                   color: "#ffd400"
                   jobs: counter.brother_jobs_since_swap_yellow
                   swapped: input_datetime.brother_swapped_yellow
-          - { <<: *jobs_card, entity: sensor.brother_jobs_weekly }
+          - { <<: *jobs_card, entity: sensor.brother_jobs_weekly, name: This week, icon: mdi:calendar-week }
           - { <<: *jobs_card, entity: sensor.brother_jobs_monthly, name: This month, icon: mdi:calendar-month }
           - { <<: *jobs_card, entity: counter.brother_jobs_total, name: All time, icon: mdi:counter }
 
@@ -209,8 +206,13 @@ views:
           - type: heading
             heading: Level history
             icon: mdi:chart-line
-          - &history
-            type: statistics-graph
+          - <<: &history
+              type: statistics-graph
+              stat_types: [mean]
+              period: day
+              days_to_show: 90
+              chart_type: line
+              grid_options: { columns: 6 }
             title: Canon
             entities:
               - { entity: sensor.canon_last_black_pgbk, name: PGBK }
@@ -218,11 +220,6 @@ views:
               - { entity: sensor.canon_last_cyan, name: Cyan }
               - { entity: sensor.canon_last_magenta, name: Magenta }
               - { entity: sensor.canon_last_yellow, name: Yellow }
-            stat_types: [mean]
-            period: day
-            days_to_show: 90
-            chart_type: line
-            grid_options: { columns: 6 }
           - <<: *history
             title: Brother
             entities:
