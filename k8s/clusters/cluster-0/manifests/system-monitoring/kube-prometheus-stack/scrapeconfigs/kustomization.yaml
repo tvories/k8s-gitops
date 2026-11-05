@@ -7,6 +7,7 @@ resources:
   - ./nas.yaml
   - ./pi-backup.yaml
   - ./homebox.yaml
+  - ./deskmonster.yaml
   # - ./node-exporter.yaml
   # - ./pikvm.yaml
   # - ./zigbee-controller.yaml

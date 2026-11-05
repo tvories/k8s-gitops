@@ -1,0 +1,20 @@
+# deskmonster's node-exporter while it's booted into NixOS, defined in
+# tvories/nix-config hosts/deskmonster. The job name matches the other Linux
+# hosts so dashboards and alerts treat it the same way.
+#
+# It dual-boots: under Windows, windows_exporter (:9182) answers instead and
+# this target goes DOWN, and vice versa. The GPU is scraped by the
+# nvidia_gpu_exporter job in helm-release.yaml, which both OSes serve on :9835.
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: deskmonster-node-exporter
+  namespace: system-monitoring
+spec:
+  jobName: node-exporter
+  scrapeInterval: 1m
+  staticConfigs:
+    - targets: ["deskmonster.${SECRET_INTERNAL_DOMAIN}:9100"]
+  metricsPath: /metrics
