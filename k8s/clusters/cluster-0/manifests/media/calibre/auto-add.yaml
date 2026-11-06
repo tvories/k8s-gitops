@@ -26,7 +26,7 @@ spec:
             fsGroupChangePolicy: OnRootMismatch
           containers:
             - name: add
-              image: ghcr.io/linuxserver/calibre:version-v9.17.0
+              image: ghcr.io/linuxserver/calibre:version-v9.18.0
               command: ["/bin/bash", "-c"]
               args:
                 - |
