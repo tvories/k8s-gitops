@@ -204,15 +204,6 @@ spec:
           #     - target_label: __address__
           #       replacement: snmp-exporter-cisco-switch:9116 # SNMP exporter.
 
-          - job_name: "windows_exporter"
-            metrics_path: /metrics
-            scrape_interval: 1m
-            scrape_timeout: 10s
-            honor_timestamps: true
-            static_configs:
-              - targets:
-                  - "deskmonster.${SECRET_INTERNAL_DOMAIN}:9182"
-
           - job_name: "nvidia_gpu_exporter"
             metrics_path: /metrics
             scrape_interval: 30s

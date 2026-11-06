@@ -2,9 +2,10 @@
 # tvories/nix-config hosts/deskmonster. The job name matches the other Linux
 # hosts so dashboards and alerts treat it the same way.
 #
-# It dual-boots: under Windows, windows_exporter (:9182) answers instead and
-# this target goes DOWN, and vice versa. The GPU is scraped by the
-# nvidia_gpu_exporter job in helm-release.yaml, which both OSes serve on :9835.
+# NixOS is the primary OS now; the windows_exporter (:9182) job was removed
+# on 2026-11-06. It still dual-boots, so expect a TargetDown for this job
+# while it is in Windows. The GPU is scraped by the nvidia_gpu_exporter job
+# in helm-release.yaml (:9835).
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
 apiVersion: monitoring.coreos.com/v1alpha1
