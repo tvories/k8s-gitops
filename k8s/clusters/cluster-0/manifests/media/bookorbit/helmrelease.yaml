@@ -147,7 +147,7 @@ spec:
           read-aloud-worker:
             image:
               repository: ghcr.io/bookorbit/bookorbit-read-aloud-worker
-              tag: 3.6.0@sha256:4ca7f141f346365af8970809f7fb3947c309082c81b5b00cee0cdec5ed6c5f96
+              tag: 3.7.0@sha256:451dad18a5772716b3383552c40ac329836178a48058cdee6a31c3051569dc4f
             env:
               TZ: "${TIMEZONE}"
               # only the app, in this pod, talks to it
