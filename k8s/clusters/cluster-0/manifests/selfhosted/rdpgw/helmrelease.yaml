@@ -31,7 +31,7 @@ spec:
               # Upstream publishes only to Docker Hub, built from
               # dev/docker/Dockerfile in the rdpgw repo.
               repository: docker.io/bolkedebruin/rdpgw
-              tag: v2.2.0
+              tag: v3.0.0
             # Bypass the image's /run.sh entrypoint. It ships USER 0 and
             # drops privileges itself with "su rdpgw", which fails as
             # "su: must be suid to work properly" under the non-root
