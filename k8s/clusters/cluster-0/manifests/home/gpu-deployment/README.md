@@ -33,14 +33,31 @@ moment failover happens. Change one, change both.
 **Ports** — `10300` / `10200` on both sides, so HAProxy can treat desktop and
 cluster as interchangeable.
 
-`WHISPER_MODEL` deliberately does *not* match: `large-v3` on the GPU,
+`WHISPER_MODEL` deliberately does *not* match: `large-v3-turbo` on the GPU,
 `base-int8` in-cluster. Accuracy changes on failover; that's the trade.
+
+## VRAM budget
+
+The 3080 has 10 GB and is shared with the desktop. When the card runs out,
+the kernel logs `NVRM: ... Out of memory [NV_ERR_NO_MEMORY]`, and whoever
+asked for memory at that moment crashes. That has been Firefox (status 11),
+kokoro (startup failed) and whisper.cpp (segfault loop on restart).
+Full `large-v3` (~3.8 GB) + whisper.cpp (~2 GB) + kokoro (~0.9 GB) + desktop
+(~1.5 GB) used about 9.1 of the 10 GB, so the always-on set is now
+turbo + kokoro (~3 GB), and whisper.cpp only runs under
+`--profile bookbridge`.
 
 ## Setup
 
+The desktop runs NixOS (`deskmonster` in nix-config). It needs
+`hardware.nvidia-container-toolkit.enable = true` and firewall openings for
+10300/10200/8178 from the home networks. The toolkit exposes the GPU through
+CDI, so the compose file requests `nvidia.com/gpu=all` instead of the
+`nvidia` driver, and `--gpus all` doesn't work on this host.
+
 ```bash
 # 1. Confirm the toolkit sees the GPU
-docker run --rm --gpus all nvidia/cuda:12.6.0-base-ubuntu24.04 nvidia-smi
+docker run --rm --device nvidia.com/gpu=all ubuntu nvidia-smi
 
 # 2. Start
 docker compose up -d

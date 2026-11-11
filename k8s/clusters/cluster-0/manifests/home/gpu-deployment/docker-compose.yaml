@@ -1,9 +1,10 @@
-# GPU voice services for the desktop (RTX 3080).
+# GPU voice services for the desktop (deskmonster, RTX 3080, NixOS).
 #
 # These are the *primary* backends behind the HAProxy VIP on OPNsense; the
 # in-cluster CPU pods (home/whisper, home/kokoro) are the fallback. Nothing in
 # this file is applied by Flux -- it lives here so the config sits beside the
-# cluster-side manifests it mirrors. Run it on the desktop:
+# cluster-side manifests it mirrors. Run it once on the desktop; the restart
+# policy brings it back after every reboot (docker.service starts at boot):
 #
 #     docker compose up -d
 #
@@ -12,11 +13,21 @@
 #   10300  Wyoming ASR   (whisper)
 #   10200  Wyoming TTS   (kokoro via the wyoming_openai bridge)
 #
-# Not behind HAProxy (no in-cluster twin):
+# Not behind HAProxy (no in-cluster twin), and off unless started with
+# `--profile bookbridge` (see the whisper-cpp service):
 #   8178   OpenAI-compatible ASR for BookBridge (whisper.cpp server)
 #
-# Requires the NVIDIA Container Toolkit.  Verify the GPU is visible first:
-#     docker run --rm --gpus all nvidia/cuda:12.6.0-base-ubuntu24.04 nvidia-smi
+# VRAM budget (RTX 3080, 10 GB, shared with the KDE desktop, browser and
+# games): whisper turbo ~2 GB + kokoro ~1 GB always on; whisper-cpp ~2 GB
+# more when it runs. Check with `nvidia-smi` before adding anything here.
+#
+# Requires the NVIDIA Container Toolkit: `hardware.nvidia-container-toolkit
+# .enable` in nix-config (hosts/deskmonster). NixOS hands GPUs to containers
+# through CDI, not the old `nvidia` runtime, so every GPU service below asks
+# for the CDI device `nvidia.com/gpu=all` (`--gpus all` does not work here).
+# The host firewall must allow 10300/10200/8178 from the home networks.
+# Verify the GPU is visible first:
+#     docker run --rm --device nvidia.com/gpu=all ubuntu nvidia-smi
 
 services:
   # --- STT -------------------------------------------------------------------
@@ -24,10 +35,13 @@ services:
   # CUDA builds. Note the config interface differs from the in-cluster pod:
   # env vars here, command-line args there.
   #
-  # WHISPER_MODEL is large-v3 on purpose. The cluster runs base-int8 for speed
-  # on CPU; the GPU can afford a far more accurate model at similar latency.
+  # WHISPER_MODEL is large-v3-turbo. The cluster runs base-int8 for speed on
+  # CPU; the GPU can afford a far more accurate model at similar latency.
   # Transcription quality therefore *changes* on failover -- that is the
-  # intended trade, not a bug.
+  # intended trade, not a bug. Not full large-v3: that took ~3.8 GB of VRAM,
+  # and with the rest of the stack plus the desktop it filled the 10 GB card,
+  # which crashed Firefox (NV_ERR_NO_MEMORY in the kernel log). Turbo is about
+  # half that, and for short voice commands the accuracy loss is negligible.
   whisper:
     image: lscr.io/linuxserver/faster-whisper:3.8.1-gpu
     container_name: wyoming-whisper-gpu
@@ -38,7 +52,7 @@ services:
       TZ: America/Denver
       PUID: "1000"
       PGID: "1000"
-      WHISPER_MODEL: large-v3
+      WHISPER_MODEL: large-v3-turbo
       WHISPER_BEAM: "1"
       WHISPER_LANG: en
     volumes:
@@ -47,58 +61,66 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: 1
+            - driver: cdi
+              device_ids: [nvidia.com/gpu=all]
               capabilities: [gpu]
 
-  # --- Batch ASR for BookBridge ------------------------------------------------
-  # BookBridge (media/bookbridge) transcribes every new full-length audiobook
-  # with Whisper before CTC-aligning it to the ebook. In-cluster that is the
-  # `tiny` model on 4 CPUs; this offloads it to the GPU with a far better model.
-  #
-  # A separate server, not the Wyoming whisper above: BookBridge speaks the
-  # OpenAI HTTP API (POST /v1/audio/transcriptions, response_format=
-  # verbose_json), which Wyoming does not. whisper.cpp is the server BookBridge's
-  # remote provider ("whispercpp") is built around.
-  #
-  # No failover, unlike voice: if this desktop is off, BookBridge's job fails
-  # and retries every 15 minutes (up to 5 times) until it is back. Fine for
-  # background batch work; it is why this is not behind HAProxy.
-  #
-  # Pinned to the image built from the v1.9.5 release commit — whisper.cpp only
-  # publishes commit-tagged images, so the tag is the commit SHA.
-  whisper-cpp:
-    image: ghcr.io/ggml-org/whisper.cpp:main-cuda-d1be6fde11ac6e0407606b4e42fe72d34add8037
-    container_name: whisper-cpp-gpu
-    restart: unless-stopped
-    ports:
-      - "8178:8178"
-    # The image's entrypoint is `bash -c`, so this is one shell string. Fetch
-    # the model on first start (~1.6 GB, kept in the volume), then serve.
-    # large-v3-turbo: near large-v3 accuracy at several times the speed, and a
-    # small VRAM footprint beside the voice models on the 10 GB 3080.
-    # --inference-path moves the endpoint to the OpenAI path BookBridge calls;
-    # the default is /inference. No --convert: BookBridge sends WAV already.
-    command:
-      - >-
-        { [ -f /models/ggml-large-v3-turbo.bin ]
-        || ./models/download-ggml-model.sh large-v3-turbo /models; }
-        && exec whisper-server
-        --host 0.0.0.0 --port 8178
-        --model /models/ggml-large-v3-turbo.bin
-        --inference-path /v1/audio/transcriptions
-        --language en
-    environment:
-      TZ: America/Denver
-    volumes:
-      - whisper-cpp-models:/models
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+  # # --- Batch ASR for BookBridge ------------------------------------------------
+  # # BookBridge (media/bookbridge) transcribes every new full-length audiobook
+  # # with Whisper before CTC-aligning it to the ebook. In-cluster that is the
+  # # `tiny` model on 4 CPUs; this offloads it to the GPU with a far better model.
+  # #
+  # # A separate server, not the Wyoming whisper above: BookBridge speaks the
+  # # OpenAI HTTP API (POST /v1/audio/transcriptions, response_format=
+  # # verbose_json), which Wyoming does not. whisper.cpp is the server BookBridge's
+  # # remote provider ("whispercpp") is built around.
+  # #
+  # # No failover, unlike voice: if this desktop is off, BookBridge's job fails
+  # # and retries every 15 minutes (up to 5 times) until it is back. Fine for
+  # # background batch work; it is why this is not behind HAProxy.
+  # #
+  # # Pinned to the image built from the v1.9.5 release commit — whisper.cpp only
+  # # publishes commit-tagged images, so the tag is the commit SHA.
+  # #
+  # # Opt-in (profile "bookbridge"): it holds ~2 GB of VRAM permanently for
+  # # occasional batch work, and on a desktop GPU that memory competes with the
+  # # browser and games. Plain `docker compose up -d` leaves it off; start it
+  # # for a batch run and stop it after:
+  # #     docker compose --profile bookbridge up -d whisper-cpp
+  # #     docker compose --profile bookbridge stop whisper-cpp
+  # whisper-cpp:
+  #   profiles: [bookbridge]
+  #   image: ghcr.io/ggml-org/whisper.cpp:main-cuda-d1be6fde11ac6e0407606b4e42fe72d34add8037
+  #   container_name: whisper-cpp-gpu
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8178:8178"
+  #   # The image's entrypoint is `bash -c`, so this is one shell string. Fetch
+  #   # the model on first start (~1.6 GB, kept in the volume), then serve.
+  #   # large-v3-turbo: near large-v3 accuracy at several times the speed, and a
+  #   # small VRAM footprint beside the voice models on the 10 GB 3080.
+  #   # --inference-path moves the endpoint to the OpenAI path BookBridge calls;
+  #   # the default is /inference. No --convert: BookBridge sends WAV already.
+  #   command:
+  #     - >-
+  #       { [ -f /models/ggml-large-v3-turbo.bin ]
+  #       || ./models/download-ggml-model.sh large-v3-turbo /models; }
+  #       && exec whisper-server
+  #       --host 0.0.0.0 --port 8178
+  #       --model /models/ggml-large-v3-turbo.bin
+  #       --inference-path /v1/audio/transcriptions
+  #       --language en
+  #   environment:
+  #     TZ: America/Denver
+  #   volumes:
+  #     - whisper-cpp-models:/models
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: cdi
+  #             device_ids: [nvidia.com/gpu=all]
+  #             capabilities: [gpu]
 
   # --- TTS -------------------------------------------------------------------
   # Kokoro speaks an OpenAI-compatible HTTP API, not Wyoming, so it is paired
@@ -119,8 +141,8 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: 1
+            - driver: cdi
+              device_ids: [nvidia.com/gpu=all]
               capabilities: [gpu]
 
   kokoro-bridge:

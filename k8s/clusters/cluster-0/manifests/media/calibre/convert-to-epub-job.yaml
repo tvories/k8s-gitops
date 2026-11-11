@@ -24,8 +24,10 @@ spec:
       securityContext:
         runAsUser: 568
         runAsGroup: 65539
+        runAsNonRoot: true
         fsGroup: 65539
         fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
       containers:
         - name: convert
           image: ghcr.io/linuxserver/calibre:version-v9.18.0
@@ -39,21 +41,27 @@ spec:
               auth=(--with-library "$LIBRARY_URL" --username "$CALIBRE_USER" --password "$CALIBRE_PASS")
               work=$(mktemp -d)
 
-              # books with no EPUB but a format that converts well; PDF/CBZ are left alone
-              "$CDB" list "${auth[@]}" --for-machine --fields formats --limit "$LIMIT" \
-                --search 'not formats:epub and (formats:azw3 or formats:mobi or formats:azw)' \
-                > "$work/books.json" || { echo "calibredb list failed" >&2; exit 1; }
+              # The book list comes from a /tmp copy of metadata.db, opened read-only:
+              # over the content server, calibredb list returns format names, not paths.
+              cp -- "$CALIBRE_LIBRARY/metadata.db" "$work/metadata.db" \
+                || { echo "no metadata.db in $CALIBRE_LIBRARY" >&2; exit 1; }
 
-              # one "id<TAB>source path" line per book; prefer AZW3 (KF8) over MOBI over AZW.
-              # formats are the server's paths, which match ours: both mount /ook/Media at /media
+              # one "id<TAB>source path" line per book with no EPUB but a format that
+              # converts well (PDF/CBZ are left alone); prefer AZW3 (KF8) over MOBI,
+              # AZW, PRC, LIT. A file is stored as <library>/<book path>/<name>.<ext>.
               "$BIN/calibre-debug" -c "
-              import json
-              for b in json.load(open('$work/books.json')):
-                  fmts = {p.rsplit('.', 1)[-1].lower(): p for p in b.get('formats') or []}
-                  src = next((fmts[e] for e in ('azw3', 'mobi', 'azw') if e in fmts), None)
-                  if src:
-                      print(f\"{b['id']}\t{src}\")
-              " > "$work/todo.tsv" || { echo "could not parse calibredb output" >&2; exit 1; }
+              import os, sqlite3
+              pref = ('AZW3', 'MOBI', 'AZW', 'PRC', 'LIT')
+              con = sqlite3.connect('file:$work/metadata.db?mode=ro', uri=True)
+              books = {}
+              for book, path, fmt, name in con.execute(
+                      'SELECT d.book, b.path, upper(d.format), d.name FROM data d JOIN books b ON b.id = d.book ORDER BY d.book'):
+                  books.setdefault(book, {})[fmt] = os.path.join('$CALIBRE_LIBRARY', path, name + '.' + fmt.lower())
+              todo = [(b, next(f[e] for e in pref if e in f)) for b, f in books.items()
+                      if 'EPUB' not in f and any(e in f for e in pref)]
+              for b, src in todo[:$LIMIT]:
+                  print(f'{b}\t{src}')
+              " > "$work/todo.tsv" || { echo "could not read the calibre database" >&2; exit 1; }
 
               total=$(wc -l < "$work/todo.tsv")
               echo "$total book(s) to convert (DRY_RUN=$DRY_RUN, LIMIT=$LIMIT)"
@@ -94,6 +102,8 @@ spec:
               value: http://calibre-webserver.media.svc.cluster.local:8081/#Calibre_Library
             - name: HOME
               value: /tmp
+            - name: CALIBRE_LIBRARY
+              value: /media/ebooks/Calibre Library
             # "true" lists what would be converted; set "false" to convert
             - name: DRY_RUN
               value: "true"

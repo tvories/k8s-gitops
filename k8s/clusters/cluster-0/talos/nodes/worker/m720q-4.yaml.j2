@@ -5,16 +5,18 @@
 machine:
   install:
     disk: /dev/sda
+  network:
+    # No address on the untagged LAN. Omitting the DHCPv4Config is NOT enough:
+    # Talos then falls back to its platform-default DHCP at metric 1024, which
+    # beats vlan80's 2048 and sends all egress out the LAN.
+    interfaces:
+      - interface: eno1
+        dhcp: false
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: m720q-4.mcbadass.local
----
-apiVersion: v1alpha1
-kind: DHCPv4Config
-name: eno1
-routeMetric: 6144
 ---
 apiVersion: v1alpha1
 kind: LinkConfig

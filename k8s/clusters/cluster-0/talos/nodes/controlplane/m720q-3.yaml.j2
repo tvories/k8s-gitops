@@ -12,16 +12,14 @@ machine:
       - interface: eno1
         dhcp: false
         mtu: 9000
+      # No address on the untagged LAN; see m720q-1.
+      - interface: enp1s0
+        dhcp: false
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: m720q-3.mcbadass.local
----
-apiVersion: v1alpha1
-kind: DHCPv4Config
-name: enp1s0
-routeMetric: 6144
 ---
 apiVersion: v1alpha1
 kind: LinkConfig
