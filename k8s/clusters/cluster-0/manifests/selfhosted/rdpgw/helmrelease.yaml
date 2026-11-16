@@ -149,3 +149,6 @@ spec:
               - path: /etc/rdpgw/rdpgw.yaml
                 subPath: rdpgw.yaml
                 readOnly: true
+              - path: /etc/rdpgw/defaults.rdp
+                subPath: defaults.rdp
+                readOnly: true

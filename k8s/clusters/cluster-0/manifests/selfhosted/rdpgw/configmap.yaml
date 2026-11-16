@@ -71,11 +71,10 @@ data:
       EnablePort: false
       EnablePnp: false
     Client:
-      # Leaves the username out of the .rdp file so the client prompts for
-      # the desktop's own account. The authentik username is almost never
-      # the Windows account name, and a prefilled wrong one makes the
-      # client fail without explaining why. Drop this to prefill it.
-      NoUsername: true
+      Defaults: /etc/rdpgw/defaults.rdp
+      # Prefill the desktop username from Authentik now that the
+      # target is NixOS with matching account names.
+      NoUsername: false
     Security:
       # Binds the PAA token to the IP that downloaded the .rdp file. It is
       # off because nginx-external runs with externalTrafficPolicy: Cluster,
@@ -89,3 +88,12 @@ data:
       # verify (pam-jwt and friends). A Windows desktop wants a real
       # username, so leave this off.
       EnableUserToken: false
+  # Template applied to all downloaded .rdp files.
+  # KRdp on NixOS does not support Network Level Authentication (CredSSP) or
+  # gateway SSO. Disabling them here ensures clients negotiate TLS directly and
+  # prompt for the desktop's local password instead of failing after the
+  # certificate handshake.
+  defaults.rdp: |
+    promptcredentialonce:i:0
+    enablecredsspsupport:i:0
+    authentication level:i:0
