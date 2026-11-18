@@ -31,15 +31,13 @@ spec:
               # Upstream publishes only to Docker Hub, built from
               # dev/docker/Dockerfile in the rdpgw repo.
               repository: docker.io/bolkedebruin/rdpgw
-              tag: v2.2.0
-            # Bypass the image's /run.sh entrypoint. It ships USER 0 and
-            # drops privileges itself with "su rdpgw", which fails as
-            # "su: must be suid to work properly" under the non-root
-            # securityContext below. Nothing else in that script applies
-            # here: the user-creation loop needs /root/createusers.txt, and
-            # rdpgw-auth only starts for Authentication: local. Upstream
-            # rewrote the entrypoint to run as 1001 without su, but that is
-            # unreleased as of v2.2.0 — revisit on the next tag.
+              tag: v3.0.0
+            # Bypass the image's /run.sh entrypoint. Since v3.0.0 it runs as
+            # 1001 without su (v2.2.0's "su rdpgw" died under this
+            # securityContext), but it would still do nothing useful here:
+            # it mints a self-signed cert into /opt/rdpgw that Tls: disable
+            # never reads, and starts rdpgw-auth only for
+            # Authentication: local.
             command:
               - /opt/rdpgw/rdpgw
             args:
@@ -75,11 +73,10 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
-              # Left writable deliberately. rdpgw writes nothing on this
-              # configuration — Tls is disabled so no ACME cache, and the
-              # session store is cookie-based — but later releases of the
-              # image mint a self-signed cert at start, so flipping this to
-              # true would turn a version bump into a crash loop.
+              # Left writable deliberately: SessionStore: file writes session
+              # bodies to /tmp, and dropping the command override above would
+              # bring back run.sh, which writes a cert into /opt/rdpgw.
+              # Flipping this to true needs an emptyDir on /tmp at minimum.
               readOnlyRootFilesystem: false
             # rdpgw copies bytes between two sockets; the cost is the RDP
             # stream itself, not the gateway. No CPU limit so a busy session
@@ -103,10 +100,10 @@ spec:
         className: "nginx-external"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          # v2.2.0 registers no handler for "/" — the web interface is a
-          # master-only addition — so the bare hostname falls through to a
-          # 404 that this cluster's custom-http-errors renders as a 500.
-          # Send it to the endpoint that actually starts the login.
+          # Skip v3's host-picker web UI at "/": with a single entry in
+          # Server.Hosts it is an extra click, so the bare hostname goes
+          # straight to the .rdp download. Drop this annotation to get the
+          # picker back if more hosts are added.
           nginx.ingress.kubernetes.io/app-root: /connect
           # The controller intercepts 5xx cluster-wide and substitutes its own
           # page. rdpgw puts the actual fault in the response body ("Failed to
