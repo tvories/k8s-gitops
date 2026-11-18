@@ -43,7 +43,7 @@ services:
   # which crashed Firefox (NV_ERR_NO_MEMORY in the kernel log). Turbo is about
   # half that, and for short voice commands the accuracy loss is negligible.
   whisper:
-    image: lscr.io/linuxserver/faster-whisper:3.8.1-gpu
+    image: lscr.io/linuxserver/faster-whisper:3.9.0-gpu
     container_name: wyoming-whisper-gpu
     restart: unless-stopped
     ports:
