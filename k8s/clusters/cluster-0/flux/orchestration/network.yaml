@@ -5,7 +5,9 @@ metadata:
   name: network-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network"
   prune: true
   wait: true
@@ -21,7 +23,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/external-dns"
   prune: true
   wait: true
@@ -37,7 +41,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/envoy-gateway"
   prune: true
   wait: true
@@ -54,7 +60,9 @@ spec:
   dependsOn:
     - name: network-envoy-gateway
     - name: network-wildcard-certificate
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/envoy-gateway/gateway"
   prune: true
   wait: true
@@ -70,7 +78,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/ingress-nginx"
   prune: true
   wait: true
@@ -87,7 +97,9 @@ spec:
   dependsOn:
     - name: network-namespace
     - name: cert-manager-certmanager-config
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/wildcard-certificate"
   prune: true
   wait: true
@@ -105,7 +117,9 @@ spec:
     - name: network-namespace
     - name: network-ingress-nginx
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/omada-controller"
   prune: true
   wait: true
@@ -121,7 +135,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/multus"
   prune: true
   wait: true
@@ -137,7 +153,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/multus/components"
   prune: true
   wait: true
@@ -154,7 +172,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/technitium"
   prune: true
   wait: true
@@ -171,7 +191,9 @@ metadata:
 spec:
   dependsOn:
     - name: network-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/network/cloudflared"
   prune: true
   wait: true

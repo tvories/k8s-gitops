@@ -5,7 +5,9 @@ metadata:
   name: gitlab-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/gitlab"
   prune: true
   wait: true
@@ -19,7 +21,9 @@ metadata:
   name: gitlab-valkey
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/gitlab/valkey"
   prune: true
   wait: true
@@ -35,7 +39,9 @@ metadata:
 spec:
   dependsOn:
     - name: gitlab-valkey
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/gitlab/gitlab"
   prune: true
   wait: true
@@ -52,7 +58,9 @@ metadata:
 spec:
   dependsOn:
     - name: gitlab-gitlab
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/gitlab/gitlab-runner"
   prune: true
   wait: true

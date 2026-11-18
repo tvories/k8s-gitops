@@ -5,7 +5,9 @@ metadata:
   name: rook-ceph-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph"
   prune: false
   wait: true
@@ -21,7 +23,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph/operator"
   prune: false
   wait: true
@@ -42,7 +46,9 @@ spec:
   dependsOn:
     - name: rook-ceph-namespace
     - name: rook-ceph-operator
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph/csi-drivers"
   prune: false
   wait: true
@@ -60,7 +66,8 @@ spec:
     - name: rook-ceph-namespace
     - name: rook-ceph-operator
     # - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
   # The HelmRelease this waits on carries timeout: 20m, because a CephCluster
   # reconcile can run for minutes. Without a matching timeout here this
   # Kustomization inherits Flux's 5m default and reports failure while the
@@ -83,7 +90,9 @@ spec:
     - name: rook-ceph-namespace
     - name: rook-ceph-operator
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph/add-ons"
   prune: false
   wait: true
@@ -102,7 +111,9 @@ spec:
     - name: rook-ceph-namespace
     - name: rook-ceph-operator
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/rook-ceph/snapshot-controller"
   prune: false
   wait: true

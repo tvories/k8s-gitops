@@ -5,7 +5,9 @@ metadata:
   name: database-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/database"
   prune: true
   wait: true
@@ -21,7 +23,9 @@ metadata:
 spec:
   dependsOn:
     - name: database-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/database/cnpg/operator"
   prune: true
   wait: true
@@ -72,7 +76,9 @@ spec:
   dependsOn:
     - name: database-cnpg-operator
   #   - name: database-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/database/cnpg/cluster"
   prune: true
   wait: true
@@ -86,7 +92,9 @@ metadata:
   name: database-postgres-backup
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/database/postgres-backup"
   prune: true
   wait: true

@@ -16,9 +16,19 @@ spec:
         name: gitlab-charts
         namespace: flux-system
   maxHistory: 2
+  # GitLab upgrades run DB migrations and roll a dozen deployments; Flux's default
+  # 5m action timeout fails them mid-rollout. Since the 10.5.5 bump (2026-11-10)
+  # every upgrade hit that limit, the release went Failed with no upgrade
+  # remediation, and gitlab-gitlab-runner sat in a 30s dependsOn requeue loop.
+  timeout: 15m
   install:
     remediation:
       retries: 1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 2
+      strategy: rollback
   uninstall:
     keepHistory: false
   values:

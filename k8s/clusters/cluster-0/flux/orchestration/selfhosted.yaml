@@ -1,10 +1,13 @@
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: selfhosted-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted"
   prune: true
   wait: true
@@ -18,7 +21,9 @@ metadata:
   name: selfhosted-kms
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/kms"
   prune: true
   wait: true
@@ -34,7 +39,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/tandoor"
   prune: true
   wait: true
@@ -64,7 +71,9 @@ metadata:
   name: selfhosted-boobereats
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/boobereats"
   prune: true
   wait: true
@@ -92,7 +101,9 @@ metadata:
   name: selfhosted-taylorvories
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/taylorvories"
   prune: true
   wait: true
@@ -106,7 +117,9 @@ metadata:
   name: selfhosted-tmtech
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/tmtech"
   prune: true
   wait: true
@@ -150,7 +163,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/vaultwarden"
   prune: true
   wait: true
@@ -166,7 +181,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/nextcloud"
   prune: true
   wait: true
@@ -238,7 +255,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/hashi-vault"
   prune: true
   wait: true
@@ -254,7 +273,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless"
   prune: true
   wait: true
@@ -271,7 +292,9 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
     - name: selfhosted-paperless
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless-gpt"
   prune: true
   wait: true
@@ -288,7 +311,9 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
     - name: selfhosted-paperless
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/paperless-ai"
   prune: true
   wait: true
@@ -316,7 +341,9 @@ metadata:
   name: selfhosted-theme-park
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/theme-park"
   prune: true
   wait: true
@@ -360,7 +387,9 @@ metadata:
 spec:
   # dependsOn:
   # - name: database-zalando-postgres-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/immich"
   prune: true
   wait: true
@@ -390,7 +419,9 @@ metadata:
   name: selfhosted-atuin
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/atuin"
   prune: true
   wait: true
@@ -418,7 +449,9 @@ metadata:
   name: selfhosted-actual-budget
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/actual-budget"
   prune: true
   wait: true
@@ -432,7 +465,9 @@ metadata:
   name: selfhosted-lubelog
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/lubelog"
   prune: true
   wait: true
@@ -446,7 +481,9 @@ metadata:
   name: selfhosted-convertx
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/convertx"
   prune: true
   wait: true
@@ -460,7 +497,9 @@ metadata:
   name: selfhosted-searxng
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/searxng"
   prune: true
   wait: true
@@ -476,7 +515,9 @@ metadata:
 spec:
   dependsOn:
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/agentmemory"
   prune: true
   wait: true
@@ -490,7 +531,9 @@ metadata:
   name: selfhosted-rdpgw
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/rdpgw"
   prune: true
   wait: true
@@ -504,7 +547,9 @@ metadata:
   name: selfhosted-fumbles-stats
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/selfhosted/fumbles-stats"
   prune: true
   wait: true

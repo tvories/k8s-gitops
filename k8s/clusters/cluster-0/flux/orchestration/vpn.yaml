@@ -5,7 +5,9 @@ metadata:
   name: vpn-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/vpn"
   prune: true
   wait: true

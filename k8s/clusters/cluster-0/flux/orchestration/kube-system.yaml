@@ -5,7 +5,9 @@ metadata:
   name: kube-system-metrics-server
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/metrics-server"
   prune: true
   wait: true
@@ -37,7 +39,9 @@ metadata:
 spec:
   # dependsOn:
   #   - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/cilium"
   prune: false
   wait: true
@@ -81,7 +85,9 @@ metadata:
 spec:
   dependsOn:
     - name: cert-manager-certmanager
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets/app"
   prune: true
   wait: true
@@ -97,7 +103,9 @@ metadata:
 spec:
   dependsOn:
     - name: kube-system-external-secrets-app
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/external-secrets/stores"
   prune: true
   wait: true
@@ -111,7 +119,9 @@ metadata:
   name: kube-system-generic-device-plugin
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/generic-device-plugin"
   prune: true
   wait: true
@@ -125,7 +135,9 @@ metadata:
   name: system-node-feature-discovery
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/node-feature-discovery"
   prune: true
   wait: true
@@ -139,7 +151,9 @@ metadata:
   name: system-node-feature-discovery-rules
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/node-feature-discovery/rules"
   prune: true
   wait: true
@@ -153,7 +167,9 @@ metadata:
   name: kube-system-intel-device-plugin
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/intel-device-plugin"
   prune: true
   wait: true
@@ -167,7 +183,9 @@ metadata:
   name: kube-system-intel-plugin-gpu
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/kube-system/intel-device-plugin-gpu"
   prune: true
   wait: true

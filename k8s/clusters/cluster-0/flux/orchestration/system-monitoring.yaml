@@ -5,7 +5,9 @@ metadata:
   name: system-monitoring-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring"
   prune: true
   wait: true
@@ -22,7 +24,9 @@ spec:
   dependsOn:
     - name: system-monitoring-namespace
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/kube-prometheus-stack"
   prune: true
   wait: true
@@ -40,7 +44,9 @@ spec:
     - name: system-monitoring-namespace
     - name: rook-ceph-cluster
     # - name: selfhosted-minio
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/thanos"
   prune: true
   wait: true
@@ -75,7 +81,9 @@ spec:
     - name: system-monitoring-namespace
     - name: system-monitoring-kube-prom-stack
     - name: rook-ceph-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/grafana"
   prune: true
   wait: true
@@ -93,7 +101,9 @@ metadata:
 spec:
   dependsOn:
     - name: system-monitoring-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/vector-agent"
   prune: true
   wait: true
@@ -110,7 +120,9 @@ spec:
   dependsOn:
     - name: system-monitoring-namespace
     - name: system-monitoring-kube-prom-stack
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/speedtest-exporter"
   prune: true
   wait: true
@@ -127,7 +139,9 @@ spec:
   dependsOn:
     - name: system-monitoring-namespace
     - name: system-monitoring-kube-prom-stack
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/prometheus-smartctl"
   prune: true
   wait: true
@@ -159,7 +173,9 @@ metadata:
 spec:
   dependsOn:
     - name: system-monitoring-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/omada-exporter"
   prune: true
   wait: true
@@ -175,7 +191,9 @@ metadata:
 spec:
   dependsOn:
     - name: system-monitoring-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/opnsense-exporter"
   prune: true
   wait: true
@@ -191,7 +209,9 @@ metadata:
 spec:
   dependsOn:
     - name: system-monitoring-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/system-monitoring/technitium-exporter"
   prune: true
   wait: true

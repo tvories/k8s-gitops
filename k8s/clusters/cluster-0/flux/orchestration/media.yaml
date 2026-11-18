@@ -5,7 +5,9 @@ metadata:
   name: media-namespace
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media"
   prune: true
   wait: true
@@ -21,7 +23,9 @@ metadata:
 spec:
   dependsOn:
     - name: media-namespace
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/_pvc"
   prune: true
   wait: true
@@ -56,7 +60,9 @@ spec:
     - name: media-pvc
     - name: rook-ceph-cluster
     - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/plex"
   prune: true
   wait: true
@@ -95,7 +101,9 @@ spec:
     - name: media-pvc
     - name: rook-ceph-cluster
     - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/audiobookshelf"
   prune: true
   wait: true
@@ -129,7 +137,9 @@ spec:
     - name: media-namespace
     - name: rook-ceph-cluster
     - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/calibre"
   prune: true
   wait: true
@@ -147,7 +157,9 @@ spec:
     - name: media-namespace
     - name: rook-ceph-cluster
     - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/calibre-web"
   prune: true
   wait: true
@@ -165,7 +177,9 @@ spec:
     - name: media-namespace
     - name: rook-ceph-cluster
     - name: network-ingress-nginx
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/bookbridge"
   prune: true
   wait: true
@@ -184,7 +198,9 @@ spec:
     - name: rook-ceph-cluster
     - name: network-envoy-gateway
     - name: database-cnpg-cluster
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/bookorbit"
   prune: true
   wait: true
@@ -202,7 +218,9 @@ spec:
     - name: media-namespace
     - name: rook-ceph-cluster
     - name: network-envoy-gateway
-  interval: 5m
+  interval: 30m
+  retryInterval: 5m
+  timeout: 5m
   path: "./k8s/clusters/cluster-0/manifests/media/grimmory"
   prune: true
   wait: true
