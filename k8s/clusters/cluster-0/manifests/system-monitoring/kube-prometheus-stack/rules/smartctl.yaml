@@ -54,3 +54,95 @@ spec:
           annotations:
             summary: Smart NVME Wearout Indicator (instance {{ $labels.instance }})
             description: "NVMe device is wearing out (instance {{ $labels.instance }})\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # In-cluster DaemonSet (matusnovak/prometheus-smartctl) exposes smartprom_* metrics,
+    # not smartctl_device_*, so the group above never matched the Talos nodes.
+    # smartprom_<attr> = normalized value (100 = new), smartprom_<attr>_raw = raw value.
+    - name: SmartpromExporter
+      rules:
+        - alert: SmartpromSmartFailed
+          expr: "smartprom_smart_passed == 0"
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "SMART self-assessment FAILED on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} ({{ $labels.serial_number }}) reports SMART health FAILED."
+
+        - alert: SmartpromSsdLifeLow
+          # Samsung: Wear_Leveling_Count, Crucial/Micron: Percent_Lifetime_Remain (normalized = % life left)
+          expr: "(smartprom_wear_leveling_count or smartprom_percent_lifetime_remain) < 20"
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "SSD life at {{ $value }}% on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} ({{ $labels.serial_number }}) has {{ $value }}% rated endurance left. Plan a replacement."
+
+        - alert: SmartpromSsdLifeExhausted
+          expr: "(smartprom_wear_leveling_count or smartprom_percent_lifetime_remain) < 5"
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "SSD endurance exhausted on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} ({{ $labels.serial_number }}) is at {{ $value }}% rated endurance. Replace it."
+
+        - alert: SmartpromNvmeLifeLow
+          expr: "smartprom_percentage_used > 80"
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "NVMe {{ $value }}% used on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} ({{ $labels.serial_number }}) has used {{ $value }}% of rated endurance."
+
+        - alert: SmartpromMediaErrors
+          # Any reallocated/bad/uncorrectable block on a SATA SSD, or NVMe media errors.
+          # Filter each metric BEFORE `or`: `or` matches on labels (ignoring the metric
+          # name), so a zero-valued attribute would otherwise mask a non-zero one.
+          expr: >-
+            smartprom_reallocated_sector_ct_raw > 0
+            or smartprom_reallocate_nand_blk_cnt_raw > 0
+            or smartprom_runtime_bad_block_raw > 0
+            or smartprom_reported_uncorrect_raw > 0
+            or smartprom_uncorrectable_error_cnt_raw > 0
+            or smartprom_offline_uncorrectable_raw > 0
+            or smartprom_media_errors > 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Disk media errors on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} ({{ $labels.serial_number }}) reports {{ $value }} reallocated/bad/uncorrectable blocks or media errors."
+
+        - alert: SmartpromCrcErrorsIncreasing
+          # Interface CRC errors point at cable/connector/port, not the flash
+          expr: "increase(smartprom_udma_crc_error_count_raw[1h]) > 0 or increase(smartprom_crc_error_count_raw[1h]) > 0"
+          labels:
+            severity: warning
+          annotations:
+            summary: "SATA CRC errors increasing on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "Check the cable/connector for {{ $labels.model_name }} ({{ $labels.serial_number }})."
+
+        - alert: SmartpromTemperatureHigh
+          expr: "(smartprom_temperature_celsius_raw or smartprom_airflow_temperature_cel_raw or smartprom_temperature) > 65"
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Disk at {{ $value }}°C on {{ $labels.kubernetes_node }} {{ $labels.drive }}"
+            description: "{{ $labels.model_name }} has been above 65°C for 30m (most SSDs are specced to 70°C)."
+
+    - name: DiskLatency
+      rules:
+        - alert: EtcdWalFsyncSlow
+          # Healthy members here sit at 10-40ms p99; m720q-2's dying SSD hit seconds.
+          # Fires well before the stock etcdHighFsyncDurations (500ms).
+          expr: "histogram_quantile(0.99, sum by (instance, le) (rate(etcd_disk_wal_fsync_duration_seconds_bucket[5m]))) > 0.1"
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "etcd WAL fsync p99 {{ $value | humanizeDuration }} on {{ $labels.instance }}"
+            description: "Sustained slow fsync usually means the control-plane disk is degrading."
