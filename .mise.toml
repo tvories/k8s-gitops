@@ -15,6 +15,6 @@ talosctl = "1.14.6"
 # Pinned to match the controllers; keep in step with the flux2 tag in
 # k8s/global/flux/repositories/git/flux.yaml. Overrides the Nix-installed
 # flux (pkgs.unstable.fluxcd) inside this repo.
-flux2 = "2.10.0"
+flux2 = "2.10.1"
 # Renders the talos/*.yaml.j2 templates (justfiles/talos.just).
 "aqua:mitsuhiko/minijinja" = "latest"
