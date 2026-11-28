@@ -29,15 +29,42 @@ list ns name:
     kubectl -n "{{ ns }}" logs job/"list-${rsrc}-${ts}" --container list
     kubectl -n "{{ ns }}" delete job "list-${rsrc}-${ts}"
 
-[doc('Unlock a restic repository for a ReplicationSource')]
-unlock ns name:
+[doc('Remove stale restic locks for a ReplicationSource (force=true also removes live locks)')]
+unlock ns name force="false":
     #!/usr/bin/env bash
-    export rsrc="{{ name }}" namespace="{{ ns }}" ts="$(date +%H%M%S)"
-    envsubst < "{{ templates_dir }}/UnlockJob.tmpl.yaml" | kubectl apply -f -
-    bash "{{ scripts_dir }}/wait-for-k8s-job.sh" "unlock-${rsrc}-${ts}" "{{ ns }}"
-    kubectl -n "{{ ns }}" wait job/"unlock-${rsrc}-${ts}" --for condition=complete --timeout=1m
-    kubectl -n "{{ ns }}" logs job/"unlock-${rsrc}-${ts}" --container unlock
-    kubectl -n "{{ ns }}" delete job "unlock-${rsrc}-${ts}"
+    set -euo pipefail
+    secret=$(kubectl -n "{{ ns }}" get replicationsource "{{ name }}" -o jsonpath='{.spec.restic.repository}')
+    [[ -n "$secret" ]] || { echo "{{ ns }}/{{ name }}: no spec.restic.repository" >&2; exit 1; }
+    if [[ "{{ force }}" == "true" ]]; then unlock_args='["unlock","--remove-all"]'; else unlock_args='["unlock"]'; fi
+    export rsrc="{{ name }}" namespace="{{ ns }}" ts="$(date +%H%M%S)" secret unlock_args
+    job="unlock-${rsrc}-${ts}"
+    echo "==> {{ ns }}/{{ name }} (secret: ${secret})"
+    envsubst '${rsrc} ${namespace} ${ts} ${secret} ${unlock_args}' \
+        < "{{ templates_dir }}/UnlockJob.tmpl.yaml" | kubectl apply -f -
+    bash "{{ scripts_dir }}/wait-for-k8s-job.sh" "$job" "{{ ns }}"
+    rc=0
+    kubectl -n "{{ ns }}" wait job/"$job" --for condition=complete --timeout=5m || rc=$?
+    kubectl -n "{{ ns }}" logs job/"$job" --container unlock || true
+    if [[ $rc -ne 0 ]]; then
+        echo "{{ ns }}/{{ name }}: unlock did not complete; job left for inspection (ttl 1h)" >&2
+        exit $rc
+    fi
+    kubectl -n "{{ ns }}" delete job "$job"
+
+[doc('Remove stale restic locks for every restic ReplicationSource (force=true also removes live locks)')]
+unlock-all force="false":
+    #!/usr/bin/env bash
+    set -uo pipefail
+    failed=()
+    while read -r ns name; do
+        just volsync unlock "$ns" "$name" "{{ force }}" || failed+=("$ns/$name")
+    done < <(kubectl get replicationsources -A \
+        -o jsonpath='{range .items[?(@.spec.restic)]}{.metadata.namespace} {.metadata.name}{"\n"}{end}')
+    if (( ${#failed[@]} )); then
+        echo "Failed: ${failed[*]}" >&2
+        exit 1
+    fi
+    echo "All restic repositories unlocked."
 
 [doc('Restore a ReplicationSource from restic (snapshot index defaults to 1)')]
 restore ns name snapshot="1":

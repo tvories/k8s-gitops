@@ -6,14 +6,17 @@ metadata:
   namespace: "${namespace}"
 spec:
   ttlSecondsAfterFinished: 3600
+  backoffLimit: 3
   template:
     spec:
       automountServiceAccountToken: false
       restartPolicy: OnFailure
       containers:
         - name: unlock
-          image: docker.io/restic/restic:0.14.0
-          args: ["unlock", "--remove-all"]
+          image: docker.io/restic/restic:0.18.1
+          # ${unlock_args} is a JSON array: ["unlock"] removes only stale locks;
+          # ["unlock","--remove-all"] also removes locks held by running movers.
+          args: ${unlock_args}
           envFrom:
             - secretRef:
-                name: "${rsrc}-restic-secret"
+                name: "${secret}"
